@@ -502,7 +502,6 @@ function guardarYGenerarInvoice(){
   let i = 8 // es 8 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "H" + String(i) + ":N" + String(i);
-    Logger.log(filaActual)
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
     let productoFilaActual= String(rangoProductoActual.getValues());
     productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
@@ -520,23 +519,24 @@ function guardarYGenerarInvoice(){
     let Quantity = LineaFactura['cantidad'];
     let Price = LineaFactura['siniva'];
     let Amount = parseFloat(LineaFactura['importe']);//importe
-    let Iva = 1 //aqui toca calcular o traer el iva desde producto, por ahora en 1
-    let ImpoConsumo = 0// no esta ni en el original ni aca
+    let ImpoConsumo = 1// no es un parametro para empresas espanolas
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
+    let Iva = LineChargeTotal-Amount;
 
 
     //IVA
-    let ItemTaxesInformation = [];
-    let Percent = 44; //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
+    let ItemTaxesInformation = [];//taxes del producto en si
+    let percent = parseFloat(((Iva / Amount) * 100).toFixed(1)); //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
     let ivaTaxInformation = {
       Id: "01",//Id
       TaxEvidenceIndicator: false,
       TaxableAmount: Amount,
       TaxAmount: Iva,
-      Percent: Percent,
+      Percent: percent,
       BaseUnitMeasure: "",
       PerUnitAmount: ""
     };
+
     ItemTaxesInformation.push(ivaTaxInformation);
     invoiceTaxTotal.push(ivaTaxInformation);
 
@@ -549,7 +549,7 @@ function guardarYGenerarInvoice(){
       Quatity: new Number(Quantity),
       Price: new Number(Price),
       LineAllowanceTotal: 0.0,
-      LineChargeTotal: 0.0,
+      LineChargeTotal: 0.0,// que pasa aca ?
       LineTotalTaxes: LineTotalTaxes,
       LineTotal: LineChargeTotal,
       LineExtensionAmount: LineExtensionAmount,
@@ -568,10 +568,10 @@ function guardarYGenerarInvoice(){
   algo mucho */
   
 
-  let rangeFacturaTotal=prefactura_sheet.getRange(13,1,1,4);// aqui cambia con respecto al original
+  let rangeFacturaTotal=prefactura_sheet.getRange(13,1,4,4);// aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
   let facturaTotal=String(rangeFacturaTotal.getValues());
   facturaTotal=facturaTotal.split(",");
-
+  Logger.log(facturaTotal)
 
   /*Aqui cambia por completo, por ahora solo voy a dejar los parametros en numeros x 
   ,  solo coinciden el base imponible he IVA */
