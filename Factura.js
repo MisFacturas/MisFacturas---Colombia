@@ -659,7 +659,7 @@ function guardarYGenerarInvoice(){
     InvoiceAllowanceCharge: [],
     InvoiceTotal: invoice_total
   });
-
+  //merge con main
   Logger.log(invoice)
 
   
