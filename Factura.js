@@ -575,7 +575,7 @@ function guardarYGenerarInvoice(){
   /*Aqui cambia por completo, por ahora solo voy a dejar los parametros en numeros x 
   ,  solo coinciden el base imponible he IVA */
   let pfSubTotal = parseFloat(facturaTotal[0]);//base imponible
-  let pfIVA = parseFloat(array_pfTotales[2]);//IVA
+  let pfIVA = parseFloat(facturaTotal[2]);//IVA
   let pfImpoconsumo = 22;
   let pfTotal = 22;
   let pfRefuente = 0;
