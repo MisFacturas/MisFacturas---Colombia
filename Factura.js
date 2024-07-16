@@ -5,7 +5,7 @@ FILA_INICIAL_PREFACTURA = 8;
 COLUMNA_FINAL = 50;
 ADDITIONAL_ROWS = 3 + 3; //(Personalizacion)
 var spreadsheet = SpreadsheetApp.getActive();
-var prefactura_sheet = spreadsheet.getSheetByName('Factura');
+var prefactura_sheet = spreadsheet.getSheetByName('Factura2');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 
 function verificarYCopiarContacto(e) {
