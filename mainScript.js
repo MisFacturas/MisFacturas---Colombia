@@ -1,7 +1,7 @@
 var spreadsheet = SpreadsheetApp.getActive();
 var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
-var datos_sheet = spreadsheet.getSheetByName('Datos');
+var datos_sheet = spreadsheet.getSheetByName('Datos2');
 
 
 function onOpen() {
@@ -222,6 +222,7 @@ function getAdditionalDocuments() {
   }
   return AdditionalDocuments;
 }
+
 var centenas = ['', 'Ciento ', 'Doscientos ', 'Trescientos ', 'Cuatrocientos ', 'Quinientos ', 'Seiscientos ', 
 'Setecientos ', 'Ochocientos ', 'Novecientos ']
 
@@ -347,7 +348,7 @@ function getPaymentMeans(PaymentMeansTxt) {
       var PaymentMeans = 38;
     default:
       Logger.log("Error: PaymentMeans");
-      Browser.msgBox("Oops! PaymentMeans");
+      var PaymentMeans=100
   }
   return PaymentMeans;
 
@@ -451,6 +452,9 @@ function getAdditionalProperty() {
 }
 
 function getCustomerInformation(customer) {
+  /*esta funcion debe de cambiar para obtener son los datos directamente de la hoja cliente */
+
+
   var cell = datos_sheet.getRange("B50");
   //Browser.msgBox(customer);
   cell.setValue(customer);

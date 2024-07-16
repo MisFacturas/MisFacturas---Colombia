@@ -105,10 +105,10 @@ function getInvoiceGeneralInformation() {
   var range = datos_sheet.getRange("B7");
   var InvoiceAuthorizationNumber = range.getValue();
   //
-  range = prefactura_sheet.getRange("G3");
+  range = prefactura_sheet.getRange("F5");//dias de vencimiento
   var DaysOff = range.getValue();
 
-  var invoice_number = getprefacturaValue(PREFACTURA_ROW, PREFACTURA_COLUMN);
+  var invoice_number = getprefacturaValue(1, 6);//cambiamos los valores para llamar el numero de factura
   var InvoiceGeneralInformation = {
     "InvoiceAuthorizationNumber": InvoiceAuthorizationNumber,
     "PreinvoiceNumber": invoice_number,
@@ -119,7 +119,7 @@ function getInvoiceGeneralInformation() {
     "ExchangeRateDate": "",
     "SalesPerson": "",
     //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(4, 2),
+    "Note": getprefacturaValue(8, 6),//cambia los valroes parak llamar la nota de la factura 
     "ExternalGR": false
     //"AdditionalProperty": AdditionalProperty
   }
@@ -572,12 +572,98 @@ function guardarYGenerarInvoice(){
   facturaTotal=facturaTotal.split(",");
 
 
-  /*Aqui cambia por completo, por ahora solo voy a dejar los parametros viejos
-    para no enrredarme,  solo coinciden el base imponible  */
-  let BaseImponilbe = parseFloat(facturaTotal[0]);//Base imponible
-  let porcentajeIVA= facturaTotal[1];
-  let IVA =8
+  /*Aqui cambia por completo, por ahora solo voy a dejar los parametros en numeros x 
+  ,  solo coinciden el base imponible he IVA */
+  let pfSubTotal = parseFloat(facturaTotal[0]);//base imponible
+  let pfIVA = parseFloat(array_pfTotales[2]);//IVA
+  let pfImpoconsumo = 22;
+  let pfTotal = 22;
+  let pfRefuente = 0;
+  let pfReteICA = 0;
+  let pfReteIVA = 44;
+  let pfTRetenciones = 33; 
+  let pfAnticipo = 55;
+  let pfTPagar = 66;
 
+  if (pfRefuente > 0) {
+    let Percent = parseFloat((pfRefuente / pfSubTotal * 100).toFixed(2));
+    let retefuente_taxinformation = {
+      Id: "06",//Id,
+      TaxEvidenceIndicator: true,
+      TaxableAmount: pfSubTotal,
+      TaxAmount: pfRefuente,
+      Percent: Percent,
+      BaseUnitMeasure: "",
+      PerUnitAmount: ""
+    };
+    invoiceTaxTotal.push(retefuente_taxinformation);
+  };
+
+  if (pfReteICA > 0) {
+    let Factor = datos_sheet.getRange("B8").getValue();
+    let PercentReteICA = (Factor * 100).toFixed(3);
+    let invoice_ReteICA = {
+      Id: "07",//Id,
+      TaxEvidenceIndicator: true,
+      TaxableAmount: pfSubTotal,
+      TaxAmount: pfReteICA,
+      Percent: parseFloat(PercentReteICA),
+      BaseUnitMeasure: "",
+      PerUnitAmount: ""
+    };
+    invoiceTaxTotal.push(invoice_ReteICA);
+  }
+
+  if (pfReteIVA > 0) {
+    let FactorReteIva = pfReteIVA / pfSubTotal;
+    let PercentReteIVA = (FactorReteIva * 100).toFixed(2);
+    let invoice_reteIVA = {
+      Id: "05",
+      TaxEvidenceIndicator: true,
+      TaxableAmount: pfSubTotal,
+      TaxAmount: pfReteIVA,
+      Percent: parseFloat(PercentReteIVA),
+      BaseUnitMeasure: "",
+      PerUnitAmount: ""
+    };
+    invoiceTaxTotal.push(invoice_reteIVA);
+  }
+
+  //Aqui seguiria el texto, pero en el de carlos nunca lo llama 
+
+  let invoice_total = {
+    "LineExtensionAmount": pfSubTotal,
+    "TaxExclusiveAmount": pfSubTotal,
+    "TaxInclusiveAmount": pfTotal,
+    "AllowanceTotalAmount": 0,
+    "ChargeTotalAmount": 0,
+    "PrePaidAmount": pfAnticipo,
+    "PayableAmount": (pfTotal - pfAnticipo)
+  }
+
+
+  let cliente = prefactura_sheet.getRange("B1").getValue();
+  let InvoiceGeneralInformation = getInvoiceGeneralInformation();
+  let CustomerInformation = getCustomerInformation(cliente);// tal ves que por ahora no llame al cliente
+
+  let invoice = JSON.stringify({
+    CustomerInformation: CustomerInformation,
+    InvoiceGeneralInformation: InvoiceGeneralInformation,
+    Delivery: getDelivery(),
+    AdditionalDocuments: getAdditionalDocuments(),
+    AdditionalProperty: getAdditionalProperty(),
+    PaymentSummary: 44444, //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
+    ItemInformation: productoInformation,
+    //Invoice_Note: invoice_note,
+    InvoiceTaxTotal: invoiceTaxTotal,
+    InvoiceAllowanceCharge: [],
+    InvoiceTotal: invoice_total
+  });
+
+  Logger.log(invoice)
+
+  
+  
 }
 
 //--------------------------------------------------------------------------------------------//
