@@ -692,24 +692,82 @@ function obtenerDatosFactura(factura){
           var provincia = invoiceData.CustomerInformation.SubdivisionName;
           var pais = invoiceData.CustomerInformation.CountryName;
           var fechaEmision = invoiceData.Delivery.DeliveryDate;
-          //var formaPago = invoiceData.
+          var formaPago = invoiceData.PaymentSummary.PaymentMeans;
+          var listaProductos = invoiceData.ItemInformation;
+          var numeroProductos = 0;
+          var valorPagar = invoiceData.PaymentSummary.PaymentNote;
+          var notaPago = invoiceData.PaymentSummary.PaymentNote;
+          var observaciones = invoiceData.InvoiceGeneralInformation.Note;
 
-
-          
           var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla'); // Hoja donde quieres insertar el NIF
           if (!targetSheet) {
             targetSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Plantilla');
           }
           
+          for (var j = 0; j < listaProductos.length; j++) {
+            numeroProductos += 1;
+            var numeroCelda = 22 + j;
+            if (numeroProductos > 1) {
+              targetSheet.insertRowAfter(numeroCelda);
+            }
+            var celdaItem = targetSheet.getRange('C'+numeroCelda);
+            celdaItem.setBorder(true,true,true,true,null,null,null,null);
+            celdaItem.setValue(numeroProductos);
+
+            var celdaReferencia = targetSheet.getRange('D'+numeroCelda);
+            celdaReferencia.setBorder(true,true,true,true,null,null,null,null);
+            celdaReferencia.setValue(listaProductos[j].ItemReference);
+
+            var celdaDespricion = targetSheet.getRange('E'+numeroCelda);
+            celdaDespricion.setBorder(true,true,true,true,null,null,null,null);
+            celdaDespricion.setValue(listaProductos[j].Name);
+            
+            var celdaCantidad = targetSheet.getRange('F'+numeroCelda);
+            celdaCantidad.setBorder(true,true,true,true,null,null,null,null);
+            celdaCantidad.setValue(listaProductos[j].Quatity);
+            
+            var celdaPrecioUnitario = targetSheet.getRange('G'+numeroCelda);
+            celdaPrecioUnitario.setBorder(true,true,true,true,null,null,null,null);
+            celdaPrecioUnitario.setValue(listaProductos[j].Price);
+            
+            var celdaIva = targetSheet.getRange('H'+numeroCelda);
+            celdaIva.setBorder(true,true,true,true,null,null,null,null);
+            celdaIva.setValue(listaProductos[j].TaxesInformation[0].Percent);
+            
+            var celdaImporte = targetSheet.getRange('I'+numeroCelda);
+            celdaImporte.setBorder(true,true,true,true,null,null,null,null);
+
+
+          }
+
           var clienteCell = targetSheet.getRange('C12');
           var nifCell = targetSheet.getRange('C13');
           var codigoCell = targetSheet.getRange('C14');
           var direccionCell = targetSheet.getRange('C15');
+          var telefonoCell = targetSheet.getRange('C16');
+          var poblacionCell = targetSheet.getRange('C17');
+          var provinciaCell = targetSheet.getRange('C18');
+          var paisCell = targetSheet.getRange('C19');
+          var fechaEmisionCell = targetSheet.getRange('H12');
+          var formaPagoCell = targetSheet.getRange('H13');
+          var valorPagarCell = targetSheet.getRange('C38');
+          var notaPagoCell = targetSheet.getRange('B43');
+          var observacionesCell = targetSheet.getRange('B49');
+
 
           clienteCell.setValue(cliente);
           nifCell.setValue(nif);
           codigoCell.setValue(codigo);
           direccionCell.setValue(direccion);
+          telefonoCell.setValue(telefono);
+          poblacionCell.setValue(poblacion);
+          provinciaCell.setValue(provincia);
+          paisCell.setValue(pais);
+          fechaEmisionCell.setValue(fechaEmision);
+          formaPagoCell.setValue(formaPago);
+          valorPagarCell.setValue(valorPagar);
+          notaPagoCell.setValue(notaPago);
+          observacionesCell.setValue(observaciones);
           
           Logger.log(`NIF written for invoice ${factura} at row ${i + 1}`);
           return;
