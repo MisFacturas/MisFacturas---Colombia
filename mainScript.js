@@ -3,6 +3,9 @@ var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var datos_sheet = spreadsheet.getSheetByName('Datos2');
 
+// directorio alejandro C:\\Users\\catan\\OneDrive\\Documents\\Work\\Appsheets\\MisFacturasApp
+// directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp\\appsscript.json
+
 
 function onOpen() {
 

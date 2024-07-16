@@ -499,7 +499,7 @@ function guardarYGenerarInvoice(){
   let invoiceTaxTotal=[]
   var productoInformation = [];
 
-  const i = 8 // es 8 debido a que aqui empieza los productos elegidos por el cliente
+  let i = 8 // es 8 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "H" + String(i) + ":N" + String(i);
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
