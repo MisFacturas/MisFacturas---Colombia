@@ -488,6 +488,98 @@ function sendInvoice() {
 
   return;
 }
+
+function guardarYGenerarInvoice(){
+  const cantidadProductos = prefactura_sheet.getRange("I4").getValue(); // cantidad total de productos 
+  let llavesParaLinea=prefactura_sheet.getRange("H7:N7");//llamo los headers 
+  llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
+  const llavesFinales =llavesParaLinea.split(",");
+  /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
+
+  let invoiceTaxTotal=[]
+  var productoInformation = [];
+
+  const i = 8 // es 8 debido a que aqui empieza los productos elegidos por el cliente
+  do{
+    let filaActual = "H" + String(i) + ":N" + String(i);
+    let rangoProductoActual=prefactura_sheet.getRange(filaActual);
+    let productoFilaActual= String(rangoProductoActual.getValues());
+    productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
+    
+    let LineaFactura={};
+
+    for (let j=0;j<7;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo, en el nuevo son 7 tal vez 8
+      LineaFactura[llavesFinales[j]]=productoFilaActual[j]
+    }
+
+
+    let Name = LineaFactura['producto'];
+    let ItemCode = new Number(LineaFactura['referencia']);
+    let MeasureUnitCode = "Sin unidad"
+    let Quantity = LineaFactura['cantidad'];
+    let Price = LineaFactura['siniva'];
+    let Amount = parseFloat(LineaFactura['importe']);//importe
+    let Iva = 1 //aqui toca calcular o traer el iva desde producto, por ahora en 1
+    let ImpoConsumo = 0// no esta ni en el original ni aca
+    let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
+
+
+    //IVA
+    let ItemTaxesInformation = [];
+    let Percent = 44; //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
+    let ivaTaxInformation = {
+      Id: "01",//Id
+      TaxEvidenceIndicator: false,
+      TaxableAmount: Amount,
+      TaxAmount: Iva,
+      Percent: Percent,
+      BaseUnitMeasure: "",
+      PerUnitAmount: ""
+    };
+    ItemTaxesInformation.push(ivaTaxInformation);
+    invoiceTaxTotal.push(ivaTaxInformation);
+
+    let LineExtensionAmount = Amount;
+    let LineTotalTaxes = Iva + ImpoConsumo;
+
+    let productoI = {//aqui organizamos todos los parametros necesarios para 
+      ItemReference: ItemCode,
+      Name: Name,
+      Quatity: new Number(Quantity),
+      Price: new Number(Price),
+      LineAllowanceTotal: 0.0,
+      LineChargeTotal: 0.0,
+      LineTotalTaxes: LineTotalTaxes,
+      LineTotal: LineChargeTotal,
+      LineExtensionAmount: LineExtensionAmount,
+      MeasureUnitCode: MeasureUnitCode,
+      FreeOFChargeIndicator: false,
+      AdditionalReference: [],
+      AdditionalProperty: [],
+      TaxesInformation: ItemTaxesInformation,
+      AllowanceCharge: []
+    };
+    productoInformation.push(productoI);//agregamos el producto actual a la lista total 
+    i++;
+  }while(i<(8+cantidadProductos));
+
+  /* Aqui empieza el proceso de coger el precio total de la facutra OJO en nuestro caso se agrupan por % de iva, entonces cambia
+  algo mucho */
+  
+
+  let rangeFacturaTotal=prefactura_sheet.getRange(13,1,1,4);// aqui cambia con respecto al original
+  let facturaTotal=String(rangeFacturaTotal.getValues());
+  facturaTotal=facturaTotal.split(",");
+
+
+  /*Aqui cambia por completo, por ahora solo voy a dejar los parametros viejos
+    para no enrredarme,  solo coinciden el base imponible  */
+  let BaseImponilbe = parseFloat(facturaTotal[0]);//Base imponible
+  let porcentajeIVA= facturaTotal[1];
+  let IVA =8
+
+}
+
 //--------------------------------------------------------------------------------------------//
 function obtenerDatosFactura(factura){
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
