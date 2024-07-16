@@ -502,16 +502,17 @@ function guardarYGenerarInvoice(){
   let i = 8 // es 8 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "H" + String(i) + ":N" + String(i);
+    logger.log(filaActual)
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
     let productoFilaActual= String(rangoProductoActual.getValues());
     productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
-    
+    logger.log(productoFilaActual)
     let LineaFactura={};
 
     for (let j=0;j<7;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo, en el nuevo son 7 tal vez 8
       LineaFactura[llavesFinales[j]]=productoFilaActual[j]
     }
-
+    logger.log(LineaFactura)
 
     let Name = LineaFactura['producto'];
     let ItemCode = new Number(LineaFactura['referencia']);
