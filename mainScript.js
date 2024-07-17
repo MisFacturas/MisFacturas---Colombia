@@ -1,6 +1,6 @@
-var spreadsheet = SpreadsheetApp.getActive();
-var unidades_sheet = spreadsheet.getSheetByName('Unidades');
-var datos_sheet = spreadsheet.getSheetByName('Datos2');
+let spreadsheet = SpreadsheetApp.getActive();
+let unidades_sheet = spreadsheet.getSheetByName('Unidades');
+let datos_sheet = spreadsheet.getSheetByName('Datos2');
 
 // directorio alejandro C:\\Users\\catan\\OneDrive\\Documents\\Work\\Appsheets\\MisFacturasApp
 // directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp\\appsscript.json
@@ -374,172 +374,86 @@ function getPaymentType(PaymentTypeTxt) {
 }
 
 function unos(n) {
-    if (n == 0) {
-        return '';
-    }
-    else {
-        return unidades[n];
-    }
+  if (n == 0) {
+      return '';
+  }
+  else {
+      return unidades[n];
+  }
 }
 
 function dieces(n) {
-    var decena = Math.floor (n / 10);
-    var unidad = n % 10;
-    //Logger.log(`Decena: ${decena}`);
-    switch (true) {
-        case ((n % 10) == 0)://decena exacta
-            return (decenas2[n / 10])
-        case ((11 <= n) && (n <= 19))://
-            return (decenas1[(n % 10)])
-        case (Math.floor(n / 10) == 2)://22 a 29
-            return `Veinti${unos(unidad).toLowerCase()}`
-        case (0 <= n && n < 10)://unidad
-            return (unos(n % 10))
-        default://31 a 99
-            var letras = `${decenas2[decena]} y ${unos(unidad)}`;
-            return (letras)
-    }
+  var decena = Math.floor(n / 10);
+  var unidad = n % 10;
+  switch (true) {
+      case ((n % 10) == 0):
+          return (decenas2[n / 10]);
+      case ((11 <= n) && (n <= 19)):
+          return (decenas1[(n % 10)]);
+      case (Math.floor(n / 10) == 2):
+          return `Veinti${unos(unidad).toLowerCase()}`;
+      case (0 <= n && n < 10):
+          return (unos(n % 10));
+      default:
+          var letras = `${decenas2[decena]} y ${unos(unidad)}`;
+          return (letras);
+  }
 }
 
 function cienes(n) {
-    if (n == 100) {
-        return 'Cien '
-    }
-    if (!n / 100) {
-        return dieces(n)
-    }
-    else {
-        return (centenas[Math.floor(n / 100)] + dieces(n % 100))
-    }
+  if (n == 100) {
+      return 'Cien ';
+  }
+  if (n < 100) {
+      return dieces(n);
+  }
+  else {
+      return (centenas[Math.floor(n / 100)] + dieces(n % 100));
+  }
 }
 
 function int2word(n) {
-    megas = Math.floor(n / 1000 / 1000);
-    kilos = Math.floor((n - megas * 1000000) / 1000);
-    ones = n - megas * 1000000 - kilos * 1000;
+  var euros = Math.floor(n);
+  var centimos = Math.round((n - euros) * 100);
 
-    letras = ''
-    if (megas >= 1) {
-        if (megas == 1) {
-            letras = letras + 'Un Millon '
-        }
-        else {
-            letras = letras + cienes(megas) + ' Millones '
-        }
-    }
-    if (kilos >= 1) {
-        if (kilos == 1) {
-            letras = letras + 'Mil'
-        }
-        else {
-            letras = letras + cienes(kilos) + 'Mil '
-        }
-    }
+  var megas = Math.floor(euros / 1000 / 1000);
+  var kilos = Math.floor((euros - megas * 1000000) / 1000);
+  var ones = euros - megas * 1000000 - kilos * 1000;
 
-    if (ones >= 1) {
-        if (ones == 1) {
-            letras = letras + 'Un '
-        }
-        else {
-            letras = letras + cienes(ones)
-        }
-    }
+  var letras = '';
+  if (megas >= 1) {
+      if (megas == 1) {
+          letras = letras + 'Un Millón ';
+      } else {
+          letras = letras + cienes(megas) + ' Millones ';
+      }
+  }
+  if (kilos >= 1) {
+      if (kilos == 1) {
+          letras = letras + 'Mil ';
+      } else {
+          letras = letras + cienes(kilos) + 'Mil ';
+      }
+  }
 
-    return letras;
+  if (ones >= 1) {
+      if (ones == 1) {
+          letras = letras + 'Un ';
+      } else {
+          letras = letras + cienes(ones);
+      }
+  }
+
+  if (centimos > 0) {
+      letras = letras  +'Euros'+ `Con ${cienes(centimos)}Céntimos`;
+  }
+
+  return letras;
 }
+
 function getAdditionalProperty() {
-  //Browser.msgBox('getAddtionionalProperty');
   var AdditionalProperty = [];
   return AdditionalProperty;
-}
-
-function getCustomerInformation(customer) {
-  /*esta funcion debe de cambiar para obtener son los datos directamente de la hoja cliente */
-
-
-  var cell = datos_sheet.getRange("B50");
-  //Browser.msgBox(customer);
-  cell.setValue(customer);
-  //Browser.msgBox("getCustomerInformation()");
-  var range = datos_sheet.getRange("D50");
-  var Customer = range.getValue();
-
-  var range = datos_sheet.getRange("E50");
-  var CustomerCode = range.getValue();
-
-  range = datos_sheet.getRange("C51");
-  var IdentificationType = range.getValue();
-
-  range = datos_sheet.getRange("B52");
-  var Identification = range.getValue();
-
-  range = datos_sheet.getRange("B53");
-  var DV = range.getValue();
-
-  range = datos_sheet.getRange("B60");
-  var Address = range.getValue().split('|');
-  var AddressLine = Address[0];
-  var AddressPostalZone = Address[1];
-
-  range = datos_sheet.getRange("C60");
-  var CityID = range.getValue();
-
-  range = datos_sheet.getRange("B62");
-  var Telephone = range.getValue();
-
-  switch (datos_sheet.getRange("C1").getValue()) {
-    case "Pruebas":
-      var range = datos_sheet.getRange("E1");
-      break;
-    case "Produccion":
-      var range = datos_sheet.getRange("B63");
-      break;
-    default:
-      Logger.log("Oops!...Error Ambiente")
-      return;
-  }
-  var Email = range.getValue();
-  //Browser.msgBox(Email);
-
-
-  range = datos_sheet.getRange("B64");
-  var WebSiteURI = range.getValue();
-
-
-  if (IdentificationType == "#NUM!") {
-    Browser.msgBox("ERROR: Seleccione Tipo de Identificacion en Clientes")
-    return;
-  }
-
-  var CustomerInformation = {
-    "IdentificationType": IdentificationType,
-    "Identification": Identification,//.toString(),
-    "DV": DV,
-    "RegistrationName": Customer,
-    "CountryCode": "CO",
-    "CountryName": "Colombia",
-    "SubdivisionCode": datos_sheet.getRange("D60").getValue(),// 11, //Codigo de Municipio
-    "SubdivisionName": datos_sheet.getRange("G60").getValue(),//"Bogotá", //Nombre de Departamente
-    "CityCode": datos_sheet.getRange("E60").getValue(),//11001,
-    "CityName": datos_sheet.getRange("F60").getValue(),//"Bogotá, D.C.",
-    "AddressLine": String(AddressLine),
-    "PostalZone": String(AddressPostalZone),
-    "Email": Email,
-    "CustomerCode": CustomerCode,
-    "Telephone": Telephone,
-    "WebSiteURI": WebSiteURI,
-    "AdditionalAccountID": String(datos_sheet.getRange("C55").getValue()),//"1",//1, //1: Juridica, 2: Natural
-    "TaxLevelCodeListName": String(datos_sheet.getRange("C54").getValue()),//"48" Impuesto sobre las ventas IVA 49 – No responsable de impuesto sobre las ventas IVA
-    "TaxSchemeCode": String(datos_sheet.getRange("D54").getValue()),
-    "TaxSchemeName": String(datos_sheet.getRange("E54").getValue()),
-    "FiscalResponsabilities": String(datos_sheet.getRange("F54").getValue()).replace(/[|]/g, ';'),
-
-    "PartecipationPercent": 100,
-    "AdditionalCustomer": []
-
-
-  }
-  return CustomerInformation;
 }
 
 function getdatosValueA1(range) {
@@ -549,7 +463,6 @@ function getdatosValueA1(range) {
 
 function getDelivery() {
   var row = getdatosValueA1("C50");
-  //Browser.msgBox(row);
 
   var Delivery = {
     "AddressLine": "",//getdatosValueA1("B61"),

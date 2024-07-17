@@ -114,7 +114,7 @@ function getInvoiceGeneralInformation() {
     "PreinvoiceNumber": invoice_number,
     "InvoiceNumber": invoice_number,
     "DaysOff": DaysOff,
-    "Currency": "COP",
+    "Currency": "EUR",
     "ExchangeRate": "",
     "ExchangeRateDate": "",
     "SalesPerson": "",
@@ -128,8 +128,8 @@ function getInvoiceGeneralInformation() {
   return InvoiceGeneralInformation;
 }
 function getPaymentSummary(num_items, pfAnticipo) {
-  var total_factura = prefactura_sheet.getRange(FILA_INICIAL_PREFACTURA + 10 + num_items, COL_TOTALES_PREFACTURA).getValue();
-  var monto_neto = prefactura_sheet.getRange(FILA_INICIAL_PREFACTURA + 16 + num_items, COL_TOTALES_PREFACTURA).getValue();
+  var total_factura = prefactura_sheet.getRange(FILA_INICIAL_PREFACTURA + 10 + num_items, COL_TOTALES_PREFACTURA).getValue();// por ahora esto no lo utilizamos ya que no hay descuentos
+  var monto_neto = prefactura_sheet.getRange("B23").getValue();
   //var numeros = new Intl.NumberFormat('es-CO', {maximumFractionDigits:0, style: 'currency', currency: 'COP' }).format(monto);
   var numeros_total = new Intl.NumberFormat().format(total_factura);
   var numeros_neto = new Intl.NumberFormat().format(monto_neto);
@@ -140,353 +140,14 @@ function getPaymentSummary(num_items, pfAnticipo) {
     var PaymentNote = `Total Factura: $${numeros_total} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}Pesos M/L`;
   ;
 
-  var PaymentTypeTxt = prefactura_sheet.getRange("C5").getValue();
-  var PaymentMeansTxt = prefactura_sheet.getRange("B5").getValue();
+  var PaymentTypeTxt = prefactura_sheet.getRange("F4").getValue();
+  var PaymentMeansTxt = prefactura_sheet.getRange("F4").getValue();
   var PaymentSummary = {
-    "PaymentType": getPaymentType(PaymentTypeTxt),
-    "PaymentMeans": getPaymentMeans(PaymentMeansTxt),
-    "PaymentNote": `Total Factura: $${numeros_total} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}Pesos M/L`
+    "PaymentType": "getPaymentType: No hay tipo de pago",
+    "PaymentMeans": PaymentMeansTxt,//a qui habia getPaymentMeans(PaymentMeansTxt)
+    "PaymentNote": `Total Factura: $${numeros_neto} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}`
   }
   return PaymentSummary;
-}
-function sendInvoice() {
-
-
-  // 	https://misfacturas.cenet.ws/integrationAPI_2/api/InsertInvoice?SchemaID=31&IDNumber=800176901&TemplateID=73
-
-
-  var item_information = [];
-  range = prefactura_sheet.getRange("C3");
-  var num_items = range.getValue();
-
-
-  var invoice_tax_total = [];
-  //Iva Impocoinsumo InvoiceTaxTotal Retefuente ReteICA ReteIVA
-  var invoice_taxes = ['Iva', 'Impocoinsumo', 'Retefuente', 'ReteICA', 'ReteIVA'];
-
-  //Creacion de keys: arreglo para el diccionario de LineaFactura
-  var keys_range_str = "A" + String(FILA_INICIAL_PREFACTURA - 1) + ":K" + String(FILA_INICIAL_PREFACTURA - 1);
-  Logger.log(keys_range_str)
-  var range_keys = prefactura_sheet.getRange(keys_range_str);
-  var key_list = slugifyF(range_keys.getValues()).replace(/\s/g, '');
-  Logger.log(key_list);
-  var keys = key_list.split(',');
-  //Logger.log(keys);//[producto, codigoitem, unidad, cantidad, preciounitario, %descuento, subtotallinea, iva, impoconsumo, retefuente, totallinea]
-
-  //var InvoiceTaxTotal = [];  
-  function addTaxToInvoice(itt, tax) {//invoice total tax
-    Browser.msgBox(itt[0].Id);
-    var indice = itt.indexOf(t => (t.Id == tax.Id) && (t.Percent == tax.Percent));
-    Browser.msgBox(indice);
-    if (indice == -1)
-      InvoiceTaxTotal.push(tax);
-    else
-      InvoiceTaxTotal[indice].TaxableAmount += tax.TaxableAmount
-  };
-
-  var i = FILA_INICIAL_PREFACTURA;
-  do {
-    var fila = "A" + String(i) + ":K" + String(i);
-    range = prefactura_sheet.getRange(fila);
-    var list_item = String(range.getValues());
-    //Browser.msgBox(list_item);
-    // ABC Only: 
-    //Producto	Código Item	Unidad	Cantidad	SIN IVA	CON IVA	Sub Total Linea	IVA	ImpoConsumo	ReteFuente	Total Linea
-    //Producto	Código Item	Unidad	Cantidad	Precio Unitario	% Descuento	Sub Total Linea	IVA	ImpoConsumo	ReteFuente	Total Linea
-    //[Producto No 2 (Con IVA), 2, Unidad, 1, 1000, 0, 1000, 190, 0, 0, 1190]
-
-    arr = list_item.split(',');
-    var LineaFactura = {};
-    for (var j = 0; j < COL_TOTALES_PREFACTURA; j++) {
-      LineaFactura[keys[j]] = arr[j];
-    }
-
-    var Name = LineaFactura['producto'];
-    var ItemCode = new Number(LineaFactura['codigoitem']);
-    var MeasureUnitCode = getMeasureUnitCode(LineaFactura['unidad']);
-    //var FreeOFChargeIndicator = false;//True si el ítem es un regalo que no genera contraprestación y por ende no es una venta. False si no es un regalo.
-    var Quantity = LineaFactura['cantidad'];
-    var Price = LineaFactura['siniva'];
-    //var coniva = LineaFactura['coniva'];
-    var Amount = parseFloat(LineaFactura['subtotallinea']);
-    var Iva = parseFloat(LineaFactura['iva']);
-    var ImpoConsumo = parseFloat(LineaFactura['impoconsumo']);
-    //var ReteFuente = parseFloat(LineaFactura['retefuente']);
-    var LineChargeTotal = parseFloat(LineaFactura['totallinea']);
-
-
-
-
-    ItemTaxesInformation = [];
-    //IVA
-    var Percent = parseFloat(((Iva / Amount) * 100).toFixed(1));
-    //Browser.msgBox(Percent);
-    var iva_taxinformation = {
-      Id: "01",//Id,
-      TaxEvidenceIndicator: false,
-      TaxableAmount: Amount,
-      TaxAmount: Iva,
-      Percent: Percent,
-      BaseUnitMeasure: "",
-      PerUnitAmount: ""
-    };
-    ItemTaxesInformation.push(iva_taxinformation);
-    invoice_tax_total.push(iva_taxinformation);
-
-    var LineExtensionAmount = Amount;
-    var LineTotalTaxes = Iva + ImpoConsumo;//+ ReteFuente; //?ReteFuente?
-    //var LineTotal = LineChargeTotal;//new Number(Quantity * Price + LineTotalTaxes);
-
-    var item_i = {
-      ItemReference: ItemCode,
-      Name: Name,
-      Quatity: new Number(Quantity),
-      Price: new Number(Price),
-      LineAllowanceTotal: 0.0,
-      LineChargeTotal: 0.0,
-      LineTotalTaxes: LineTotalTaxes,
-      LineTotal: LineChargeTotal,
-      LineExtensionAmount: LineExtensionAmount,
-      MeasureUnitCode: MeasureUnitCode,
-      FreeOFChargeIndicator: false,
-      AdditionalReference: [],
-      AdditionalProperty: [],
-      TaxesInformation: ItemTaxesInformation,
-      AllowanceCharge: []
-    };
-    item_information.push(item_i);
-    //Browser.msgBox(JSON.stringify (item_information));
-    i++;
-  } while (i < (FILA_INICIAL_PREFACTURA + num_items));
-
-  //prefactura_sheet.getRange(FILA_INICIAL_PREFACTURA + 10 + num_items, COL_TOTALES_PREFACTURA - 1 ).getValue();
-
-  range = prefactura_sheet.getRange(FILA_INICIAL_PREFACTURA + num_items + 1 + ADDITIONAL_ROWS, COL_TOTALES_PREFACTURA, 10, 1);
-  var list_pfTotales = String(range.getValues());
-  var array_pfTotales = list_pfTotales.split(',');
-
-  var pfSubTotal = parseFloat(array_pfTotales[0]);
-  var pfIVA = parseFloat(array_pfTotales[1]);
-  var pfImpoconsumo = parseFloat(array_pfTotales[2]);
-  var pfTotal = parseFloat(array_pfTotales[3]);
-  var pfRefuente = parseFloat(array_pfTotales[4]);
-  var pfReteICA = parseFloat(array_pfTotales[5]);
-  var pfReteIVA = parseFloat(array_pfTotales[6]);
-  var pfTRetenciones = parseFloat(array_pfTotales[7]);
-  var pfAnticipo = parseFloat(array_pfTotales[8]);
-  var pfTPagar = parseFloat(array_pfTotales[9]);
-  /*
-  if (pfIVA > 0){// Improvement: IndexOf?
-    //Browser.msgBox('IVA hay')
-    //invoice_tax_total.push(invoice_iva);
-  };
-    
-  if (pfImpoconsumo > 0)
-    invoice_tax_total.push(invoice_impoconsumo);
- 
-    */
-
-  if (pfRefuente > 0) {
-    var Percent = parseFloat((pfRefuente / pfSubTotal * 100).toFixed(2));
-    //Browser.msgBox(`Hay ReteFte%: ${Percent}`);
-    var retefuente_taxinformation = {
-      Id: "06",//Id,
-      TaxEvidenceIndicator: true,
-      TaxableAmount: pfSubTotal,
-      TaxAmount: pfRefuente,
-      Percent: Percent,
-      BaseUnitMeasure: "",
-      PerUnitAmount: ""
-    };
-    invoice_tax_total.push(retefuente_taxinformation);
-  };
-
-  if (pfReteICA > 0) {
-    var Factor = datos_sheet.getRange("B8").getValue();
-    var PercentReteICA = (Factor * 100).toFixed(3);
-    //Browser.msgBox('ReteICA ' + PercentReteICA);
-    var invoice_ReteICA = {
-      Id: "07",//Id,
-      TaxEvidenceIndicator: true,
-      TaxableAmount: pfSubTotal,
-      TaxAmount: pfReteICA,
-      Percent: parseFloat(PercentReteICA),
-      BaseUnitMeasure: "",
-      PerUnitAmount: ""
-    };
-    invoice_tax_total.push(invoice_ReteICA);
-  }
-
-  if (pfReteIVA > 0) {
-    var FactorReteIva = pfReteIVA / pfSubTotal;
-    var PercentReteIVA = (FactorReteIva * 100).toFixed(2);
-    //Browser.msgBox(`Hay ReteIVA sobre ${pfSubTotal} de ${pfReteIVA} es decir ${PercentReteIVA}% `);
-    var invoice_reteIVA = {
-      Id: "05",
-      TaxEvidenceIndicator: true,
-      TaxableAmount: pfSubTotal,
-      TaxAmount: pfReteIVA,
-      Percent: parseFloat(PercentReteIVA),
-      BaseUnitMeasure: "",
-      PerUnitAmount: ""
-    };
-    invoice_tax_total.push(invoice_reteIVA);
-  }
-
-  texto = getprefacturaValue(2, 4);
-  var invoice_note = {
-    "Note": texto
-  };
-
-  var invoice_total = {
-    "LineExtensionAmount": pfSubTotal,
-    "TaxExclusiveAmount": pfSubTotal,
-    "TaxInclusiveAmount": pfTotal,
-    "AllowanceTotalAmount": 0,
-    "ChargeTotalAmount": 0,
-    "PrePaidAmount": pfAnticipo,
-    "PayableAmount": (pfTotal - pfAnticipo)
-  }
-
-  var customer = prefactura_sheet.getRange("B1").getValue();
-  var InvoiceGeneralInformation = getInvoiceGeneralInformation();
-  var CustomerInformation = getCustomerInformation(customer);
-
-  var invoice = JSON.stringify({
-    CustomerInformation: CustomerInformation,
-    InvoiceGeneralInformation: InvoiceGeneralInformation,
-    Delivery: getDelivery(),
-    AdditionalDocuments: getAdditionalDocuments(),
-    AdditionalProperty: getAdditionalProperty(),
-    PaymentSummary: getPaymentSummary(num_items),
-    ItemInformation: item_information,
-    //Invoice_Note: invoice_note,
-    InvoiceTaxTotal: invoice_tax_total,
-    InvoiceAllowanceCharge: [],
-    InvoiceTotal: invoice_total
-  });
-
-
-  range = datos_sheet.getRange("B11");
-  var token = range.getValue().slice(1, -1);
-  //Logger.log(token);
-  var authorization = 'misfacturas ' + token;
-  Logger.log(invoice);//Browser.msgBox(invoice);
-
-  var headers = {
-    'Content-Type': 'application/json',
-    //Access-Control-Allow-Origin': HOST,
-    'Authorization': authorization
-  };
-
-  var options = {
-    'muteHttpExceptions': true,//default:false
-    'method': 'post',
-    'headers': headers,
-    'payload': invoice
-  };
-  range = datos_sheet.getRange("C1");
-  var ambiente = range.getValue();
-  var numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
-  var stringToShowHeader = `Emisión Factura ${numeroFactura} en ${ambiente}`;
-  //var nameString = JSON.stringify(CustomerInformation.RegistrationName).slice(1, -1);
-  var nameString = prefactura_sheet.getRange("B1").getValue();
-  var emailString = JSON.stringify(CustomerInformation.Email).slice(1, -1);
-  var stringToShow2 = `Cliente: ${nameString}\nEmail:${emailString}`;
-  var responseDialog = Browser.msgBox(`${stringToShowHeader}`, stringToShow2, Browser.Buttons.OK_CANCEL);
-  /*
-  var ui = SpreadsheetApp.getUi(); // Same variations.
-  var result = ui.alert(
-    stringToShowHeader,
-    stringToShow2,
-    ui.ButtonSet.YES_NO);
-  if (result == ui.Button.YES) {
-    // User clicked "Yes".
-    ui.alert('Confirmation received.');
-  } else {
-    // User clicked "No" or X in the title bar.
-    ui.alert('Permission denied.');
-  };
-  */
-  if (responseDialog == "ok") {
-    Logger.log(`User clicked OK: Cliente: Invoice ${numeroFactura} to be issued`);
-  } else {
-    Logger.log('The user clicked "Cancel" or the dialog\'s close button.');
-    return;
-  }
-
-  var response = UrlFetchApp.fetch(url, options);
-  //Browser.msgBox(response.getResponseCode());
-  //Browser.msgBox(response.getContent());
-
-
-  var id_documento = response.getContentText().substring(15, 51);
-
-  if (id_documento == '')
-    if (response.getResponseCode() == 200) {
-      Browser.msgBox("Factura No Emitida: Renovar Token");
-      return;
-    }
-
-
-  switch (response.getResponseCode()) {
-    case 200:
-      Browser.msgBox("200: Documento Enviado: " + id_documento);
-      break;       
-    case 400:
-      Browser.msgBox("400: " + response.getContentText());
-      Logger.log(response.getContentText());
-      return;
-      break;
-    default:
-      Browser.msgBox("Error " + String(response.getResponseCode()));
-      return;
-      break;
-  }
-
-  //actualizacion Numero PreInvoice Invoice
-  updateprefacturaValue(PREFACTURA_ROW, PREFACTURA_COLUMN, getprefacturaValue(PREFACTURA_ROW, PREFACTURA_COLUMN) + 1);
-
-
-
-
-  //var factura = SpreadsheetApp.openById(response);
-
-  Logger.log('documento: ' + id_documento);
-  //listadoestado_sheet.appendRow([id_documento]);
-  //var factura_sheet= SpreadsheetApp.getActiveSpreadsheet().duplicateActiveSheet();
-  //factura_sheet.setName(id_documento);
-
-  // https://developers.google.com/apps-script/reference/spreadsheet/sheet#getDataRange()
-  /*var numRows = prefactura_sheet.getLastRow();
-  var numColumns = prefactura_sheet.getLastColumn();
-  Browser.msgBox(`${numRows} ${numColumns}`);*/
-
-  //Toma de valores personalizados
-  var i = 20; // Indice en la hoja de personalizacion
-  var celda_ultimo_item = FILA_INICIAL_PREFACTURA + num_items - 1;
-  var j = celda_ultimo_item + 2 + ADDITIONAL_ROWS; // Al nivel de SubTotal: Inicio Campos Personalizados
-  var lastRow_personalizacion = personalizacion_sheet.getLastRow();
-  var count_elementos_personalizacion = lastRow_personalizacion - i + 1;
-  if (count_elementos_personalizacion > 0) {
-    range = prefactura_sheet.getRange(j, 1, count_elementos_personalizacion, 2);
-    var values = range.getValues();
-    var campos_personales = "";
-    for (var row in values) {
-      for (var col in values[row]) {
-        //Browser.msgBox(values[row]);
-        campos_personales += values[row][col];
-        campos_personales += ',';
-      }
-    }
-    //Browser.msgBox(values[0]);
-
-  }
-
-  listadoestado_sheet.appendRow([id_documento, campos_personales.slice(0, -1), , , , , , , , , , datos_sheet.getRange("C1").getValue(), String(invoice)]);
-
-
-  return;
 }
 
 function guardarYGenerarInvoice(){
@@ -568,17 +229,45 @@ function guardarYGenerarInvoice(){
   algo mucho */
   
 
-  let rangeFacturaTotal=prefactura_sheet.getRange(13,1,4,4);// aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
+  //pasos para poder procesar todos los valores totales de la facutra agrupados por iva
+  // let k=13;
+  // do{
+
+  //   let rangeLineaFacturaTotal=prefactura_sheet.getRange("A"+String(k)+":D"+String(k));
+  //   let lineaFacturaTotal=String(rangeLineaFacturaTotal.getValues());
+  //   lineaFacturaTotal=lineaFacturaTotal.split(",")
+  //   //comaprador para que cuando encuentre un vacio se salga porque significa que ya acabo de leer
+  //   let baseImponible=lineaFacturaTotal[0];
+  //   let porcentajeIVA=lineaFacturaTotal[1];
+  //   let IVA=lineaFacturaTotal[2];
+  //   let total=lineaFacturaTotal[3];
+
+  //   let invoice_total_2 = {
+  //     "baseImponible": baseImponible,
+  //     "porcentajeIVA": pfSubporcentajeIVATotal,
+  //     "IVA": IVA,
+  //     "total": total,
+  //   }
+  //   Logger.log(invoice_total_2)
+
+  //   k++
+  // }while(k<20);
+
+
+
+  let rangeFacturaTotal=prefactura_sheet.getRange(20,1,1,4);// aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
   let facturaTotal=String(rangeFacturaTotal.getValues());
   facturaTotal=facturaTotal.split(",");
   Logger.log(facturaTotal)
+
+
 
   /*Aqui cambia por completo, por ahora solo voy a dejar los parametros en numeros x 
   ,  solo coinciden el base imponible he IVA */
   let pfSubTotal = parseFloat(facturaTotal[0]);//base imponible
   let pfIVA = parseFloat(facturaTotal[2]);//IVA
   let pfImpoconsumo = 22;
-  let pfTotal = 22;
+  let pfTotal = parseFloat(facturaTotal[3]);
   let pfRefuente = 0;
   let pfReteICA = 0;
   let pfReteIVA = 44;
@@ -586,49 +275,49 @@ function guardarYGenerarInvoice(){
   let pfAnticipo = 55;
   let pfTPagar = 66;
 
-  if (pfRefuente > 0) {
-    let Percent = parseFloat((pfRefuente / pfSubTotal * 100).toFixed(2));
-    let retefuente_taxinformation = {
-      Id: "06",//Id,
-      TaxEvidenceIndicator: true,
-      TaxableAmount: pfSubTotal,
-      TaxAmount: pfRefuente,
-      Percent: Percent,
-      BaseUnitMeasure: "",
-      PerUnitAmount: ""
-    };
-    invoiceTaxTotal.push(retefuente_taxinformation);
-  };
+  // if (pfRefuente > 0) {
+  //   let Percent = parseFloat((pfRefuente / pfSubTotal * 100).toFixed(2));
+  //   let retefuente_taxinformation = {
+  //     Id: "06",//Id,
+  //     TaxEvidenceIndicator: true,
+  //     TaxableAmount: pfSubTotal,
+  //     TaxAmount: pfRefuente,
+  //     Percent: Percent,
+  //     BaseUnitMeasure: "",
+  //     PerUnitAmount: ""
+  //   };
+  //   invoiceTaxTotal.push(retefuente_taxinformation);
+  // };
 
-  if (pfReteICA > 0) {
-    let Factor = datos_sheet.getRange("B8").getValue();
-    let PercentReteICA = (Factor * 100).toFixed(3);
-    let invoice_ReteICA = {
-      Id: "07",//Id,
-      TaxEvidenceIndicator: true,
-      TaxableAmount: pfSubTotal,
-      TaxAmount: pfReteICA,
-      Percent: parseFloat(PercentReteICA),
-      BaseUnitMeasure: "",
-      PerUnitAmount: ""
-    };
-    invoiceTaxTotal.push(invoice_ReteICA);
-  }
+  // if (pfReteICA > 0) {
+  //   let Factor = datos_sheet.getRange("B8").getValue();
+  //   let PercentReteICA = (Factor * 100).toFixed(3);
+  //   let invoice_ReteICA = {
+  //     Id: "07",//Id,
+  //     TaxEvidenceIndicator: true,
+  //     TaxableAmount: pfSubTotal,
+  //     TaxAmount: pfReteICA,
+  //     Percent: parseFloat(PercentReteICA),
+  //     BaseUnitMeasure: "",
+  //     PerUnitAmount: ""
+  //   };
+  //   invoiceTaxTotal.push(invoice_ReteICA);
+  // }
 
-  if (pfReteIVA > 0) {
-    let FactorReteIva = pfReteIVA / pfSubTotal;
-    let PercentReteIVA = (FactorReteIva * 100).toFixed(2);
-    let invoice_reteIVA = {
-      Id: "05",
-      TaxEvidenceIndicator: true,
-      TaxableAmount: pfSubTotal,
-      TaxAmount: pfReteIVA,
-      Percent: parseFloat(PercentReteIVA),
-      BaseUnitMeasure: "",
-      PerUnitAmount: ""
-    };
-    invoiceTaxTotal.push(invoice_reteIVA);
-  }
+  // if (pfReteIVA > 0) {
+  //   let FactorReteIva = pfReteIVA / pfSubTotal;
+  //   let PercentReteIVA = (FactorReteIva * 100).toFixed(2);
+  //   let invoice_reteIVA = {
+  //     Id: "05",
+  //     TaxEvidenceIndicator: true,
+  //     TaxableAmount: pfSubTotal,
+  //     TaxAmount: pfReteIVA,
+  //     Percent: parseFloat(PercentReteIVA),
+  //     BaseUnitMeasure: "",
+  //     PerUnitAmount: ""
+  //   };
+  //   invoiceTaxTotal.push(invoice_reteIVA);
+  // }
 
   //Aqui seguiria el texto, pero en el de carlos nunca lo llama 
 
@@ -639,7 +328,7 @@ function guardarYGenerarInvoice(){
     "AllowanceTotalAmount": 0,
     "ChargeTotalAmount": 0,
     "PrePaidAmount": pfAnticipo,
-    "PayableAmount": (pfTotal - pfAnticipo)
+    "PayableAmount": pfTotal // antes era (pfTotal - pfAnticipo) 
   }
 
 
@@ -653,14 +342,13 @@ function guardarYGenerarInvoice(){
     Delivery: getDelivery(),
     AdditionalDocuments: getAdditionalDocuments(),
     AdditionalProperty: getAdditionalProperty(),
-    PaymentSummary: 44444, //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
+    PaymentSummary: getPaymentSummary(0,0), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
     //Invoice_Note: invoice_note,
     InvoiceTaxTotal: invoiceTaxTotal,
     InvoiceAllowanceCharge: [],
     InvoiceTotal: invoice_total
   });
-  //merge con main
   Logger.log(invoice)
 
   
