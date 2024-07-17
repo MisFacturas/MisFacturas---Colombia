@@ -1,6 +1,6 @@
 var spreadsheet = SpreadsheetApp.getActive();
-let unidades_sheet = spreadsheet.getSheetByName('Unidades');
-let datos_sheet = spreadsheet.getSheetByName('Datos2');
+//let unidades_sheet = spreadsheet.getSheetByName('Unidades');
+//let datos_sheet = spreadsheet.getSheetByName('Datos2');
 
 // directorio alejandro C:\\Users\\catan\\OneDrive\\Documents\\Work\\Appsheets\\MisFacturasApp
 // directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp\\appsscript.json
