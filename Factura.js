@@ -736,6 +736,18 @@ function obtenerDatosFactura(factura){
             
             var celdaImporte = targetSheet.getRange('I'+numeroCelda);
             celdaImporte.setBorder(true,true,true,true,null,null,null,null);
+            celdaImporte.setValue(listaProductos[j].LineExtensionAmount);
+
+            var producto = listaProductos[j].Name;
+            //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
+            var grupoIva = {};
+            if (producto.percent in grupoIva) {
+              grupoIva[producto.percent] += producto.TaxableAmount;
+            } else {
+              grupoIva[producto.percent] = producto.TaxableAmount;
+            }
+
+
 
 
           }
@@ -782,5 +794,5 @@ function obtenerDatosFactura(factura){
 
 function testWriteNIFToPlantilla() {
   var invoiceNumber = 'FE946'; // Reemplaza con el número de factura deseado
-  writeNIFToPlantilla(invoiceNumber);
+  obtenerDatosFactura(invoiceNumber);
 }
