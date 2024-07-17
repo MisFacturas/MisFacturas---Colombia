@@ -1,4 +1,4 @@
-let spreadsheet = SpreadsheetApp.getActive();
+var spreadsheet = SpreadsheetApp.getActive();
 let unidades_sheet = spreadsheet.getSheetByName('Unidades');
 let datos_sheet = spreadsheet.getSheetByName('Datos2');
 
