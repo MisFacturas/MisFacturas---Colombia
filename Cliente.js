@@ -1,4 +1,4 @@
-
+var spreadsheet = SpreadsheetApp.getActive();
 let datos_sheet = spreadsheet.getSheetByName('Datos');
 let factura_sheet= spreadsheet.getSheetByName("Factura2")
 
