@@ -9,16 +9,21 @@ var prefactura_sheet = spreadsheet.getSheetByName('Factura2');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 
 function verificarYCopiarContacto(e) {
-  let hojaFacturas = e.source.getSheetByName('Factura');
+  let hojaFacturas = e.source.getSheetByName('Factura2');
   let hojaContactos = e.source.getSheetByName('Clientes');
   let celdaEditada = e.range;
 
-  // aqui se define las celdas en la hoja de facturas donde van a poner los datos ojo que importa el orden
-  let celdasDestino = ["C1", "D1","E1","B2","C2"];
+  // quitar esta parte se puede
+  let columnaContactos = 2; // Ajusta según sea necesario
+  let rowContactos= 1;
+  if (celdaEditada.getColumn() !== columnaContactos || celdaEditada.getRow() !== rowContactos) {
+    Logger.log("No se editó un contacto válido");
+    return;
+  }
 
   let nombreContacto = celdaEditada.getValue();
   let ultimaColumnaPermitida = 18; // Columna del estado en la hoja de contactos
-  let datosARetornar = ["C", "D", "O", "M", "L"]; // Columnas que quiero de la hoja de contactos
+  let datosARetornar = ["C", "D", "O","M","L"]; // Columnas que quiero de la hoja de contactos
 
   // Busca el contacto en la hoja de contactos
   let rangoContactos = hojaContactos.getRange(2, 1, hojaContactos.getLastRow() - 1, hojaContactos.getLastColumn());
@@ -29,20 +34,20 @@ function verificarYCopiarContacto(e) {
       let estadoContacto = valoresContactos[i][ultimaColumnaPermitida - 1];
       Logger.log(estadoContacto);
       if (estadoContacto === "Valido") {
-        // Copia los datos de las columnas deseadas en las celdas especificas
+        // Copia los datos de las columnas deseadas de manera vertical
         for (let j = 0; j < datosARetornar.length; j++) {
-          let columnaIndex = hojaContactos.getRange(datosARetornar[j] + (i + 2)).getColumn();
-          let valor = hojaContactos.getRange(i + 2, columnaIndex).getValue();
-          hojaFacturas.getRange(celdasDestino[j]).setValue(valor);
+          let columna = hojaContactos.getRange(datosARetornar[j] + (i + 2)).getValue();
+          Logger.log(datosARetornar[j] + (i + 2))
+          hojaFacturas.getRange("B2").offset(j, 0).setValue(columna); //  aquí se puede ajustar la celda de inicio y el desplazamiento vertical
         }
       } else {
-        // no es valido
+        // Muestra un mensaje si el contacto no es válido
         SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
       }
       return;
     }
   }
-
+  
   // Si no se encuentra el contacto
   SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no se encontró.");
 }

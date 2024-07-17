@@ -176,15 +176,13 @@ function onEdit(e){
       //celda de elegir contacto
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
-
+      obtenerFechaYHoraActual(hojaActual)
+      generarNumeroFactura(hojaActual)
     }else{
 
 
     }
-
-
-
-    verificarYCopiarContacto(e);
+    
 
   }else if(hojaActual.getName()==="Clientes"){
     verificarDatosObligatorios(e);
