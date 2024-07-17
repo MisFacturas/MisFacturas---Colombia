@@ -48,8 +48,8 @@ function getCustomerInformation(customer) {
   // var range = datos_sheet.getRange("D50");
   // var Customer = range.getValue();
 
-  var range = datos_sheet.getRange("E50");
-  var CustomerCode = range.getValue();//llamar otra vez al cliente ?
+  var range = datos_sheet.getRange("I2");
+  var CustomerCode = range.getValue();
 
   //range = datos_sheet.getRange("C51");// aqui agarra es el numero mas no el tipo en si
   //var IdentificationType = range.getValue();

@@ -507,7 +507,7 @@ function verificarTipoDeDatos(e){
     let pais = sheet.getRange("l2:l1000");
     let codigoPostal =sheet.getRange("N2:N1000");
     let telefono =sheet.getRange("O2:O1000");
-    let sitioWeb=codigoPostal =sheet.getRange("P2:P1000");
+    let sitioWeb =sheet.getRange("P2:P1000");
     let email =sheet.getRange("Q2:Q1000");
     let editedCell = e.range;
 
