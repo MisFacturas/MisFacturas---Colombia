@@ -7,6 +7,7 @@ ADDITIONAL_ROWS = 3 + 3; //(Personalizacion)
 var spreadsheet = SpreadsheetApp.getActive();
 var prefactura_sheet = spreadsheet.getSheetByName('Factura2');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
+var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 
 function verificarYCopiarContacto(e) {
   let hojaFacturas = e.source.getSheetByName('Factura2');
@@ -356,9 +357,18 @@ function guardarYGenerarInvoice(){
   });
   Logger.log(invoice)
 
+  let nameString = prefactura_sheet.getRange("B1").getValue();
+  let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
+  let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
+  listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString , "falta","vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
   
   
 }
+
+function guardarInvoice(invoice){
+
+}
+
 
 //--------------------------------------------------------------------------------------------//
 function obtenerDatosFactura(factura){
