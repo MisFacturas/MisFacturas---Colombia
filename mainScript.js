@@ -119,11 +119,15 @@ function generatePdfFromPlantilla() {
   var url = ss.getUrl().replace(/edit$/, '') + 'export?exportFormat=pdf&format=pdf' +
     '&gid=' + sheetId +
     '&size=A4' +  // Tamaño del papel
-    '&portrait=true' +  // Orientación
+    '&portrait=true' +  // Orientación vertical
     '&fitw=true' +  // Ajustar a ancho de la página
     '&sheetnames=false&printtitle=false' +  // Opciones de impresión
     '&pagenumbers=false&gridlines=false' +  // Más opciones de impresión
     '&fzr=false' +  // Aislar filas congeladas
+    '&top_margin=0.00' +  // Margen superior
+    '&bottom_margin=0.00' +  // Margen inferior
+    '&left_margin=0.00' +  // Margen izquierdo
+    '&right_margin=0.00' +  // Margen derecho
     '&horizontal_alignment=CENTER' +  // Alineación horizontal
     '&vertical_alignment=MIDDLE';  // Alineación vertical
 
@@ -138,9 +142,8 @@ function generatePdfFromPlantilla() {
   return pdfBlob;
 }
 
-
 function getPdfUrl() {
-  var pdfBlob = generatePdfFromFactura();
+  var pdfBlob = generatePdfFromPlantilla();
   var base64Data = Utilities.base64Encode(pdfBlob.getBytes());
   var contentType = pdfBlob.getContentType();
   var name = pdfBlob.getName();
