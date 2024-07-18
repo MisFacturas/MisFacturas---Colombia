@@ -109,7 +109,7 @@ function processForm(data) {
 
 function generatePdfFromFactura() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Factura');
+  var sheet = ss.getSheetByName('Plantilla');
   
   if (!sheet) {
     throw new Error('La hoja Factura no existe.');

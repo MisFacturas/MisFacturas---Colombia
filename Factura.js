@@ -439,7 +439,9 @@ function obtenerDatosFactura(factura){
             
             var celdaIva = targetSheet.getRange('H'+numeroCelda);
             celdaIva.setBorder(true,true,true,true,null,null,null,null);
-            celdaIva.setValue(listaProductos[j].TaxesInformation[0].Percent);
+            celdaIva.setValue((listaProductos[j].TaxesInformation[0].Percent)/100);
+            celdaIVA.setNumberFormat('0.0%');
+
             
             var celdaImporte = targetSheet.getRange('I'+numeroCelda);
             celdaImporte.setBorder(true,true,true,true,null,null,null,null);
