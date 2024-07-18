@@ -504,7 +504,7 @@ function obtenerDatosFactura(factura){
           descuentosCell.setValue(0);
           cargosCell.setValue(0);
           
-          Logger.log(`NIF written for invoice ${factura} at row ${i + 1}`);
+          Logger.log(grupoIva);
           return;
         } catch (e) {
           Logger.log('Error parsing JSON for row ' + (i + 1) + ': ' + e.message);
