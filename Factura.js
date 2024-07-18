@@ -437,10 +437,10 @@ function obtenerDatosFactura(factura){
             var producto = listaProductos[j]
             //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
             var grupoIva = {};
-            if (producto.percent in grupoIva) {
-              grupoIva[producto.percent] += producto.TaxableAmount;
+            if (producto.TaxesInformation[0].Percent in grupoIva) {
+              grupoIva[producto.TaxesInformation[0].Percent] += producto.TaxableAmount;
             } else {
-              grupoIva[producto.percent] = producto.TaxableAmount;
+              grupoIva[producto.TaxesInformation[0].Percent] = producto.TaxableAmount;
             }
           }
           var contador = 0;
