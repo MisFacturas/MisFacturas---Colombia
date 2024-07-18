@@ -534,3 +534,50 @@ function testWriteNIFToPlantilla() {
   var invoiceNumber = 'FE947'; // Reemplaza con el número de factura deseado
   obtenerDatosFactura(invoiceNumber);
 }
+
+function resetPlantilla() {
+  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
+  
+  // Borrar información del cliente
+  targetSheet.getRange('C12').clearContent();
+  targetSheet.getRange('C13').clearContent();
+  targetSheet.getRange('C14').clearContent();
+  targetSheet.getRange('C15').clearContent();
+  targetSheet.getRange('C16').clearContent();
+  targetSheet.getRange('C17').clearContent();
+  targetSheet.getRange('C18').clearContent();
+  targetSheet.getRange('C19').clearContent();
+  targetSheet.getRange('H12').clearContent();
+  targetSheet.getRange('H13').clearContent();
+  
+  // Borrar valor a pagar, nota de pago y observaciones
+  targetSheet.getRange('C36').clearContent();
+  targetSheet.getRange('B41').clearContent();
+  targetSheet.getRange('B47').clearContent();
+  
+  // Borrar total de items, descuentos y cargos
+  targetSheet.getRange('C24').clearContent();
+  targetSheet.getRange('C34').clearContent();
+  targetSheet.getRange('E34').clearContent();
+  
+  // Borrar productos y reestablecer filas insertadas
+  for (var i = 22; i < targetSheet.getLastRow(); i++) {
+    var rowRange = targetSheet.getRange(i, 3, 1, 7); // Columnas C a I
+    rowRange.clearContent();
+    rowRange.setBorder(false, false, false, false, null, null, null, null);
+  }
+  
+  // Borrar bases imponibles, porcentajes de IVA, IVA y totales
+  for (var j = 30; j < targetSheet.getLastRow(); j++) {
+    var ivaRowRange = targetSheet.getRange(j, 3, 1, 7); // Columnas C a I
+    ivaRowRange.clearContent();
+    ivaRowRange.setBorder(false, false, false, false, null, null, null, null);
+  }
+  
+  // Eliminar filas adicionales que se hayan insertado
+  var originalLastRow = 50; // Ajusta este valor según el número de filas original en la hoja Plantilla
+  var currentLastRow = targetSheet.getLastRow();
+  if (currentLastRow > originalLastRow) {
+    targetSheet.deleteRows(originalLastRow + 1, currentLastRow - originalLastRow);
+  }
+}
