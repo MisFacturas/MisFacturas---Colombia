@@ -393,6 +393,7 @@ function obtenerDatosFactura(factura){
           var observaciones = invoiceData.InvoiceGeneralInformation.Note;
 
           var filasInsertadas = 0;
+          var grupoIva = {};
 
           var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla'); // Hoja donde quieres insertar el NIF
           if (!targetSheet) {
@@ -436,7 +437,7 @@ function obtenerDatosFactura(factura){
 
             var producto = listaProductos[j]
             //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
-            var grupoIva = {};
+            
             if (grupoIva.hasOwnProperty(producto.TaxesInformation[0].Percent)) {
               grupoIva[producto.TaxesInformation[0].Percent] += producto.TaxesInformation[0].TaxableAmount;
             } else {
