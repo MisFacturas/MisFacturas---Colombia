@@ -403,6 +403,7 @@ function obtenerDatosFactura(factura){
           var observaciones = invoiceData.InvoiceGeneralInformation.Note;
 
           var filasInsertadas = 0;
+          var grupoIva = {};
 
           var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla'); // Hoja donde quieres insertar el NIF
           if (!targetSheet) {
@@ -446,11 +447,11 @@ function obtenerDatosFactura(factura){
 
             var producto = listaProductos[j]
             //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
-            var grupoIva = {};
-            if (producto.percent in grupoIva) {
-              grupoIva[producto.percent] += producto.TaxableAmount;
+            
+            if (grupoIva.hasOwnProperty(producto.TaxesInformation[0].Percent)) {
+              grupoIva[producto.TaxesInformation[0].Percent] += producto.TaxesInformation[0].TaxableAmount;
             } else {
-              grupoIva[producto.percent] = producto.TaxableAmount;
+              grupoIva[producto.TaxesInformation[0].Percent] = producto.TaxesInformation[0].TaxableAmount;
             }
           }
           var contador = 0;
@@ -468,14 +469,17 @@ function obtenerDatosFactura(factura){
               var celdaPorcentajeIva = targetSheet.getRange('E'+numeroCelda);
               celdaPorcentajeIva.setBorder(true,true,true,true,null,null,null,null);
               celdaPorcentajeIva.setValue(key);
+              celdaPorcentajeIva.setNumberFormat('0%');
               
               var celdaIVA = targetSheet.getRange('G'+numeroCelda);
               celdaIVA.setBorder(true,true,true,true,null,null,null,null);
               celdaIVA.setFormula('=C'+numeroCelda+'*E'+numeroCelda);
               
-              var celdaTotal = targetSheet.getRange('D'+numeroCelda);
+              var celdaTotal = targetSheet.getRange('I'+numeroCelda);
               celdaTotal.setBorder(true,true,true,true,null,null,null,null);
               celdaTotal.setFormula('=C'+numeroCelda+'+G'+numeroCelda);
+
+              contador += 1;
             }
           }
 
@@ -491,8 +495,8 @@ function obtenerDatosFactura(factura){
           var fechaEmisionCell = targetSheet.getRange('H12');
           var formaPagoCell = targetSheet.getRange('H13');
           var valorPagarCell = targetSheet.getRange('C'+(36+filasInsertadas));
-          var notaPagoCell = targetSheet.getRange('B'+(43+filasInsertadas));
-          var observacionesCell = targetSheet.getRange('B'+(49+filasInsertadas));
+          var notaPagoCell = targetSheet.getRange('B'+(41+filasInsertadas));
+          var observacionesCell = targetSheet.getRange('B'+(47+filasInsertadas));
           var totalItemsCell = targetSheet.getRange('C'+(24+filasInsertadas));
           var descuentosCell = targetSheet.getRange('C'+(34+filasInsertadas));
           var cargosCell = targetSheet.getRange('E'+(34+filasInsertadas));
@@ -515,7 +519,7 @@ function obtenerDatosFactura(factura){
           descuentosCell.setValue(0);
           cargosCell.setValue(0);
           
-          Logger.log(`NIF written for invoice ${factura} at row ${i + 1}`);
+          Logger.log(grupoIva);
           return;
         } catch (e) {
           Logger.log('Error parsing JSON for row ' + (i + 1) + ': ' + e.message);
@@ -527,6 +531,6 @@ function obtenerDatosFactura(factura){
 }
 
 function testWriteNIFToPlantilla() {
-  var invoiceNumber = 'FE946'; // Reemplaza con el número de factura deseado
+  var invoiceNumber = 'FE947'; // Reemplaza con el número de factura deseado
   obtenerDatosFactura(invoiceNumber);
 }

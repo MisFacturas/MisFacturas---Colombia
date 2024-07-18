@@ -3,7 +3,7 @@ var spreadsheet = SpreadsheetApp.getActive();
 //let datos_sheet = spreadsheet.getSheetByName('Datos2');
 
 // directorio alejandro C:\\Users\\catan\\OneDrive\\Documents\\Work\\Appsheets\\MisFacturasApp
-// directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp\\appsscript.json
+// directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp
 
 
 function onOpen() {
