@@ -437,7 +437,7 @@ function obtenerDatosFactura(factura){
             var producto = listaProductos[j]
             //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
             var grupoIva = {};
-            if (producto.TaxesInformation[0].Percent in grupoIva) {
+            if (grupoIva.hasOwnProperty(producto.TaxesInformation[0].Percent)) {
               grupoIva[producto.TaxesInformation[0].Percent] += producto.TaxesInformation[0].TaxableAmount;
             } else {
               grupoIva[producto.TaxesInformation[0].Percent] = producto.TaxesInformation[0].TaxableAmount;
@@ -466,6 +466,8 @@ function obtenerDatosFactura(factura){
               var celdaTotal = targetSheet.getRange('I'+numeroCelda);
               celdaTotal.setBorder(true,true,true,true,null,null,null,null);
               celdaTotal.setFormula('=C'+numeroCelda+'+G'+numeroCelda);
+
+              contador += 1;
             }
           }
 
