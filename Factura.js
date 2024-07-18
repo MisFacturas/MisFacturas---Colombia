@@ -458,8 +458,8 @@ function obtenerDatosFactura(factura){
               
               var celdaPorcentajeIva = targetSheet.getRange('E'+numeroCelda);
               celdaPorcentajeIva.setBorder(true,true,true,true,null,null,null,null);
-              celdaPorcentajeIva.setValue(key);
-              celdaPorcentajeIva.setNumberFormat('0%');
+              celdaPorcentajeIva.setValue(key/100);
+              celdaPorcentajeIva.setNumberFormat('0.0%');
               
               var celdaIVA = targetSheet.getRange('G'+numeroCelda);
               celdaIVA.setBorder(true,true,true,true,null,null,null,null);
