@@ -463,7 +463,7 @@ function obtenerDatosFactura(factura){
               celdaIVA.setBorder(true,true,true,true,null,null,null,null);
               celdaIVA.setFormula('=C'+numeroCelda+'*E'+numeroCelda);
               
-              var celdaTotal = targetSheet.getRange('D'+numeroCelda);
+              var celdaTotal = targetSheet.getRange('I'+numeroCelda);
               celdaTotal.setBorder(true,true,true,true,null,null,null,null);
               celdaTotal.setFormula('=C'+numeroCelda+'+G'+numeroCelda);
             }
@@ -481,8 +481,8 @@ function obtenerDatosFactura(factura){
           var fechaEmisionCell = targetSheet.getRange('H12');
           var formaPagoCell = targetSheet.getRange('H13');
           var valorPagarCell = targetSheet.getRange('C'+(36+filasInsertadas));
-          var notaPagoCell = targetSheet.getRange('B'+(43+filasInsertadas));
-          var observacionesCell = targetSheet.getRange('B'+(49+filasInsertadas));
+          var notaPagoCell = targetSheet.getRange('B'+(41+filasInsertadas));
+          var observacionesCell = targetSheet.getRange('B'+(47+filasInsertadas));
           var totalItemsCell = targetSheet.getRange('C'+(24+filasInsertadas));
           var descuentosCell = targetSheet.getRange('C'+(34+filasInsertadas));
           var cargosCell = targetSheet.getRange('E'+(34+filasInsertadas));
