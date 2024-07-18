@@ -107,32 +107,37 @@ function processForm(data) {
   }
 }
 
-function generatePdfFromFactura() {
+function generatePdfFromPlantilla() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Plantilla');
   
   if (!sheet) {
-    throw new Error('La hoja Factura no existe.');
+    throw new Error('La hoja Plantilla no existe.');
   }
-  
-  // Crear una nueva hoja de cálculo temporal
-  var tempSpreadsheet = SpreadsheetApp.create('TempSpreadsheet');
-  var tempSheet = tempSpreadsheet.getActiveSheet();
-  
-  // Copiar la hoja Factura a la hoja temporal
-  sheet.copyTo(tempSpreadsheet);
-  var newSheet = tempSpreadsheet.getSheets()[1];  // La hoja copiada es la segunda hoja
-  tempSpreadsheet.deleteSheet(tempSheet);  // Borrar la hoja inicial que se crea con el nuevo archivo
-  newSheet.setName('Factura');  // Renombrar la hoja copiada
-  
-  // Generar el PDF
-  var pdf = DriveApp.getFileById(tempSpreadsheet.getId()).getAs('application/pdf').setName('Factura.pdf');
-  
-  // Borrar la hoja de cálculo temporal
-  DriveApp.getFileById(tempSpreadsheet.getId()).setTrashed(true);
-  
-  return pdf;
+
+  var sheetId = sheet.getSheetId();
+  var url = ss.getUrl().replace(/edit$/, '') + 'export?exportFormat=pdf&format=pdf' +
+    '&gid=' + sheetId +
+    '&size=A4' +  // Tamaño del papel
+    '&portrait=true' +  // Orientación
+    '&fitw=true' +  // Ajustar a ancho de la página
+    '&sheetnames=false&printtitle=false' +  // Opciones de impresión
+    '&pagenumbers=false&gridlines=false' +  // Más opciones de impresión
+    '&fzr=false' +  // Aislar filas congeladas
+    '&horizontal_alignment=CENTER' +  // Alineación horizontal
+    '&vertical_alignment=MIDDLE';  // Alineación vertical
+
+  var token = ScriptApp.getOAuthToken();
+  var response = UrlFetchApp.fetch(url, {
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  });
+
+  var pdfBlob = response.getBlob().setName('Plantilla.pdf');
+  return pdfBlob;
 }
+
 
 function getPdfUrl() {
   var pdfBlob = generatePdfFromFactura();
