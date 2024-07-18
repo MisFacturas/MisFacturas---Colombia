@@ -107,13 +107,13 @@ function updateprefacturaValue(column, row, value) {
 
 function getInvoiceGeneralInformation() {
   //Browser.msgBox('getInvoiceGeneralInformation()');
-  var range = datos_sheet.getRange("B7");
+  var range = datos_sheet.getRange("B7");//Resolución Autorización
   var InvoiceAuthorizationNumber = range.getValue();
   //
-  range = prefactura_sheet.getRange("F5");//dias de vencimiento
+  range = prefactura_sheet.getRange("E5");//dias de vencimiento
   var DaysOff = range.getValue();
 
-  var invoice_number = getprefacturaValue(1, 6);//cambiamos los valores para llamar el numero de factura
+  var invoice_number = getprefacturaValue(1, 5);//cambiamos los valores para llamar el numero de factura
   var InvoiceGeneralInformation = {
     "InvoiceAuthorizationNumber": InvoiceAuthorizationNumber,
     "PreinvoiceNumber": invoice_number,
@@ -124,7 +124,7 @@ function getInvoiceGeneralInformation() {
     "ExchangeRateDate": "",
     "SalesPerson": "",
     //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(8, 6),//cambia los valroes parak llamar la nota de la factura 
+    "Note": getprefacturaValue(8, 5),//cambia los valroes parak llamar la nota de la factura 
     "ExternalGR": false
     //"AdditionalProperty": AdditionalProperty
   }
@@ -146,7 +146,7 @@ function getPaymentSummary(num_items, pfAnticipo) {
   ;
 
   var PaymentTypeTxt = prefactura_sheet.getRange("F4").getValue();
-  var PaymentMeansTxt = prefactura_sheet.getRange("F4").getValue();
+  var PaymentMeansTxt = prefactura_sheet.getRange("E4").getValue();
   var PaymentSummary = {
     "PaymentType": "getPaymentType: No hay tipo de pago",
     "PaymentMeans": PaymentMeansTxt,//a qui habia getPaymentMeans(PaymentMeansTxt)
