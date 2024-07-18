@@ -392,6 +392,8 @@ function obtenerDatosFactura(factura){
           var notaPago = invoiceData.PaymentSummary.PaymentNote;
           var observaciones = invoiceData.InvoiceGeneralInformation.Note;
 
+          var filasInsertadas = 0;
+
           var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla'); // Hoja donde quieres insertar el NIF
           if (!targetSheet) {
             targetSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Plantilla');
@@ -402,6 +404,7 @@ function obtenerDatosFactura(factura){
             var numeroCelda = 22 + j;
             if (numeroProductos > 1) {
               targetSheet.insertRowAfter(numeroCelda);
+              filasInsertadas += 1;
             }
             var celdaItem = targetSheet.getRange('C'+numeroCelda);
             celdaItem.setBorder(true,true,true,true,null,null,null,null);
@@ -431,7 +434,7 @@ function obtenerDatosFactura(factura){
             celdaImporte.setBorder(true,true,true,true,null,null,null,null);
             celdaImporte.setValue(listaProductos[j].LineExtensionAmount);
 
-            var producto = listaProductos[j].Name;
+            var producto = listaProductos[j]
             //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
             var grupoIva = {};
             if (producto.percent in grupoIva) {
@@ -439,11 +442,33 @@ function obtenerDatosFactura(factura){
             } else {
               grupoIva[producto.percent] = producto.TaxableAmount;
             }
-
-
-
-
           }
+          var contador = 0;
+          for (var key in grupoIva) {
+            if (grupoIva.hasOwnProperty(key)) {
+              var numeroCelda = 30 + filasInsertadas;
+              if (contador > 0) {
+                targetSheet.insertRowAfter(numeroCelda);
+                filasInsertadas += 1;
+              }
+              var celdaBaseImponible = targetSheet.getRange('C'+numeroCelda);
+              celdaBaseImponible.setBorder(true,true,true,true,null,null,null,null);
+              celdaBaseImponible.setValue(grupoIva[key]);
+              
+              var celdaPorcentajeIva = targetSheet.getRange('E'+numeroCelda);
+              celdaPorcentajeIva.setBorder(true,true,true,true,null,null,null,null);
+              celdaPorcentajeIva.setValue(key);
+              
+              var celdaIVA = targetSheet.getRange('G'+numeroCelda);
+              celdaIVA.setBorder(true,true,true,true,null,null,null,null);
+              celdaIVA.setFormula('=C'+numeroCelda+'*E'+numeroCelda);
+              
+              var celdaTotal = targetSheet.getRange('D'+numeroCelda);
+              celdaTotal.setBorder(true,true,true,true,null,null,null,null);
+              celdaTotal.setFormula('=C'+numeroCelda+'+G'+numeroCelda);
+            }
+          }
+
 
           var clienteCell = targetSheet.getRange('C12');
           var nifCell = targetSheet.getRange('C13');
@@ -455,9 +480,12 @@ function obtenerDatosFactura(factura){
           var paisCell = targetSheet.getRange('C19');
           var fechaEmisionCell = targetSheet.getRange('H12');
           var formaPagoCell = targetSheet.getRange('H13');
-          var valorPagarCell = targetSheet.getRange('C38');
-          var notaPagoCell = targetSheet.getRange('B43');
-          var observacionesCell = targetSheet.getRange('B49');
+          var valorPagarCell = targetSheet.getRange('C'+(36+filasInsertadas));
+          var notaPagoCell = targetSheet.getRange('B'+(43+filasInsertadas));
+          var observacionesCell = targetSheet.getRange('B'+(49+filasInsertadas));
+          var totalItemsCell = targetSheet.getRange('C'+(24+filasInsertadas));
+          var descuentosCell = targetSheet.getRange('C'+(34+filasInsertadas));
+          var cargosCell = targetSheet.getRange('E'+(34+filasInsertadas));
 
 
           clienteCell.setValue(cliente);
@@ -473,6 +501,9 @@ function obtenerDatosFactura(factura){
           valorPagarCell.setValue(valorPagar);
           notaPagoCell.setValue(notaPago);
           observacionesCell.setValue(observaciones);
+          totalItemsCell.setValue(numeroProductos);
+          descuentosCell.setValue(0);
+          cargosCell.setValue(0);
           
           Logger.log(`NIF written for invoice ${factura} at row ${i + 1}`);
           return;
