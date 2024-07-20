@@ -132,12 +132,15 @@ function obtenerInformacionCliente(cliente) {
   let celdaCliente = datos_sheet.getRange("H2");
   celdaCliente.setValue(cliente);
 
+
+
   let codigoContacto = datos_sheet.getRange("I2").getValue();
   let direccion = datos_sheet.getRange("T2").getValue();
   let pais = datos_sheet.getRange("S2").getValue();
   let provincia = datos_sheet.getRange("AA2").getValue();
   let poblacion = datos_sheet.getRange("Z2").getValue();
   let telefono = datos_sheet.getRange("V2").getValue();
+  let estado = datos_sheet.getRange("Y2").getValue();
 
   let ubicacion = poblacion + ", " + provincia + ", " + pais;
 
@@ -145,7 +148,8 @@ function obtenerInformacionCliente(cliente) {
     "Código cliente": codigoContacto,
     "Dirección": direccion,
     "Ubicación": ubicacion,
-    "Teléfono": telefono
+    "Teléfono": telefono,
+    "Estado": estado
   };
 
   return informacionCliente;

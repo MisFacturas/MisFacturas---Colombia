@@ -10,7 +10,7 @@ var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 
 function verificarYCopiarContacto(e) {
-  let hojaFacturas = e.source.getSheetByName('Factura2');
+  let hojaFacturas = e.source.getSheetByName('Factura');
   let hojaContactos = e.source.getSheetByName('Clientes');
   let celdaEditada = e.range;
 
@@ -27,36 +27,43 @@ function verificarYCopiarContacto(e) {
   let datosARetornar = ["B", "O","M","L","N","Q"]; // Columnas que quiero de la hoja de contactos
 
 
-
-  let listaConInformacion = obtenerInformacionCliente(nombreContacto);
-
-
-  //poner en la hoja 
-
-  
-
-  // Busca el contacto en la hoja de contactos
-  let rangoContactos = hojaContactos.getRange(2, 1, hojaContactos.getLastRow() - 1, hojaContactos.getLastColumn());
-  let valoresContactos = rangoContactos.getValues();
-
-  for (let i = 0; i < valoresContactos.length; i++) {
-    if (valoresContactos[i][0] === nombreContacto) {
-      let estadoContacto = valoresContactos[i][ultimaColumnaPermitida - 1];
-      Logger.log(estadoContacto);
-      if (estadoContacto === "Valido") {
-        // Copia los datos de las columnas deseadas de manera vertical
-        for (let j = 0; j < datosARetornar.length; j++) {
-          let columna = hojaContactos.getRange(datosARetornar[j] + (i + 2)).getValue();
-          Logger.log(datosARetornar[j] + (i + 2))
-          hojaFacturas.getRange("B2").offset(j, 0).setValue(columna); //  aquí se puede ajustar la celda de inicio y el desplazamiento vertical
-        }
-      } else {
-        // Muestra un mensaje si el contacto no es válido
-        SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
-      }
-      return;
+  if (nombreContacto==="Cliente"){
+    Logger.log("Estado default")
+  }else{
+    let listaConInformacion = obtenerInformacionCliente(nombreContacto);
+    if (listaConInformacion["Estado"]==="No Valido"){
+      SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
+    }else{
+      //asigna el valor del coldigo solamente porque ese fue lo que me pidieron no mas
+      hojaFacturas.getRange("C3").setValue(listaConInformacion["Código cliente"]);
     }
   }
+
+
+
+
+  // // Busca el contacto en la hoja de contactos
+  // let rangoContactos = hojaContactos.getRange(2, 1, hojaContactos.getLastRow() - 1, hojaContactos.getLastColumn());
+  // let valoresContactos = rangoContactos.getValues();
+
+  // for (let i = 0; i < valoresContactos.length; i++) {
+  //   if (valoresContactos[i][0] === nombreContacto) {
+  //     let estadoContacto = valoresContactos[i][ultimaColumnaPermitida - 1];
+  //     Logger.log(estadoContacto);
+  //     if (estadoContacto === "Valido") {
+  //       // Copia los datos de las columnas deseadas de manera vertical
+  //       for (let j = 0; j < datosARetornar.length; j++) {
+  //         let columna = hojaContactos.getRange(datosARetornar[j] + (i + 2)).getValue();
+  //         Logger.log(datosARetornar[j] + (i + 2))
+  //         hojaFacturas.getRange("B2").offset(j, 0).setValue(columna); //  aquí se puede ajustar la celda de inicio y el desplazamiento vertical
+  //       }
+  //     } else {
+  //       // Muestra un mensaje si el contacto no es válido
+  //       SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
+  //     }
+  //     return;
+  //   }
+  // }
   
   // Si no se encuentra el contacto
   SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no se encontró.");
@@ -67,15 +74,15 @@ function generarNumeroFactura(sheet){
   let max=1000000;
   let min=1;
   let numero= Math.floor(Math.random() * (max - min + 1)) + min;
-  sheet.getRange(1,5).setValue(numero);
+  sheet.getRange("G2").setValue(numero);
 }
 
 function obtenerFechaYHoraActual(sheet){ 
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
   let hora= Utilities.formatDate(new Date(), "GMT+1", "HH:mm:ss");
 
-  sheet.getRange(2,5).setValue(fecha)
-  sheet.getRange(3,5).setValue(hora)
+  sheet.getRange("G4").setValue(fecha)
+  sheet.getRange("G3").setValue(hora)
 }
 
 function obtenerDatosProductos(sheet,range,e){
@@ -120,10 +127,10 @@ function getInvoiceGeneralInformation() {
   var range = datos_sheet.getRange("B7");//Resolución Autorización
   var InvoiceAuthorizationNumber = range.getValue();
   //
-  range = prefactura_sheet.getRange("E5");//dias de vencimiento
+  range = prefactura_sheet.getRange("G6");//dias de vencimiento
   var DaysOff = range.getValue();
 
-  var invoice_number = getprefacturaValue(1, 5);//cambiamos los valores para llamar el numero de factura
+  var invoice_number = getprefacturaValue(2, 7);//cambiamos los valores para llamar el numero de factura
   var InvoiceGeneralInformation = {
     "InvoiceAuthorizationNumber": InvoiceAuthorizationNumber,
     "PreinvoiceNumber": invoice_number,
@@ -134,7 +141,7 @@ function getInvoiceGeneralInformation() {
     "ExchangeRateDate": "",
     "SalesPerson": "",
     //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(8, 5),//cambia los valroes parak llamar la nota de la factura 
+    "Note": getprefacturaValue(8, 3),//cambia los valroes parak llamar la nota de la factura 
     "ExternalGR": false
     //"AdditionalProperty": AdditionalProperty
   }
@@ -347,7 +354,7 @@ function guardarYGenerarInvoice(){
   }
 
 
-  let cliente = prefactura_sheet.getRange("B1").getValue();
+  let cliente = prefactura_sheet.getRange("C2").getValue();
   let InvoiceGeneralInformation = getInvoiceGeneralInformation();
   let CustomerInformation = getCustomerInformation(cliente);// tal ves que por ahora no llame al cliente
 
@@ -366,7 +373,7 @@ function guardarYGenerarInvoice(){
   });
   Logger.log(invoice)
 
-  let nameString = prefactura_sheet.getRange("B1").getValue();
+  let nameString = prefactura_sheet.getRange("C2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString , "falta","vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
