@@ -14,13 +14,7 @@ function verificarYCopiarContacto(e) {
   let hojaContactos = e.source.getSheetByName('Clientes');
   let celdaEditada = e.range;
 
-  // quitar esta parte se puede
-  let columnaContactos = 2; // Ajusta según sea necesario
-  let rowContactos= 1;
-  if (celdaEditada.getColumn() !== columnaContactos || celdaEditada.getRow() !== rowContactos) {
-    Logger.log("No se editó un contacto válido");
-    return;
-  }
+
 
   let nombreContacto = celdaEditada.getValue();
   let ultimaColumnaPermitida = 20; // Columna del estado en la hoja de contactos
