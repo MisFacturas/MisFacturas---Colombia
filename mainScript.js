@@ -174,7 +174,7 @@ function onEdit(e){
   let hojaActual = e.source.getActiveSheet();
   verificarTipoDeDatos(e);
 
-  if (hojaActual.getName()==="Factura2"){
+  if (hojaActual.getName()==="Factura"){
 
     let celdaEditada = e.range;
     let columnaContactos = 2; // Ajusta según sea necesario
