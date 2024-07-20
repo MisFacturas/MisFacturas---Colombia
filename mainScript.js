@@ -177,8 +177,8 @@ function onEdit(e){
   if (hojaActual.getName()==="Factura"){
 
     let celdaEditada = e.range;
-    let columnaContactos = 2; // Ajusta según sea necesario
-    let rowContactos= 1;
+    let columnaContactos = 3; // Ajusta según sea necesario
+    let rowContactos= 2;
 
     if (celdaEditada.getColumn() === columnaContactos || celdaEditada.getRow() === rowContactos) {
       //celda de elegir contacto
