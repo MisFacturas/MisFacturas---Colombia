@@ -23,8 +23,17 @@ function verificarYCopiarContacto(e) {
   }
 
   let nombreContacto = celdaEditada.getValue();
-  let ultimaColumnaPermitida = 18; // Columna del estado en la hoja de contactos
-  let datosARetornar = ["C", "D", "O","M","L"]; // Columnas que quiero de la hoja de contactos
+  let ultimaColumnaPermitida = 20; // Columna del estado en la hoja de contactos
+  let datosARetornar = ["B", "O","M","L","N","Q"]; // Columnas que quiero de la hoja de contactos
+
+
+
+  let listaConInformacion = obtenerInformacionCliente(nombreContacto);
+
+
+  //poner en la hoja 
+
+  
 
   // Busca el contacto en la hoja de contactos
   let rangoContactos = hojaContactos.getRange(2, 1, hojaContactos.getLastRow() - 1, hojaContactos.getLastColumn());

@@ -513,10 +513,13 @@ function verificarTipoDeDatos(e){
     let primeraApellido = sheet.getRange("J2:J1000");
     let segundoApellido = sheet.getRange("K2:K1000");
     let pais = sheet.getRange("l2:l1000");
-    let codigoPostal =sheet.getRange("N2:N1000");
-    let telefono =sheet.getRange("O2:O1000");
-    let sitioWeb =sheet.getRange("P2:P1000");
-    let email =sheet.getRange("Q2:Q1000");
+    let provincia=sheet.getRange("M2:Q1000");
+    let poblacion=sheet.getRange("N2:Q1000");
+    let direccion =sheet.getRange("O2:Q1000");
+    let codigoPostal =sheet.getRange("P2:N1000");
+    let telefono =sheet.getRange("Q2:O1000");
+    let sitioWeb =sheet.getRange("R2:P1000");
+    let email =sheet.getRange("S2:Q1000");
     let editedCell = e.range;
 
     esCeldaEnRango(numIdentificacion,editedCell,undefined,e);
@@ -527,6 +530,9 @@ function verificarTipoDeDatos(e){
     esCeldaEnRango(primeraApellido,editedCell,"string",e);
     esCeldaEnRango(segundoApellido,editedCell,"string",e);
     esCeldaEnRango(pais,editedCell,"string",e)
+    esCeldaEnRango(provincia,editedCell,"string",e)
+    esCeldaEnRango(poblacion,editedCell,"string",e)
+    esCeldaEnRango(direccion,editedCell,"string",e)
     esCeldaEnRango(codigoPostal,editedCell,undefined,e);
     esCeldaEnRango(telefono,editedCell,undefined,e);
     esCeldaEnRango(sitioWeb,editedCell,"string",e)

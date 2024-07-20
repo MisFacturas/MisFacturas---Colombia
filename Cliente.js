@@ -10,8 +10,8 @@ function verificarDatosObligatorios(e) {
   let range = e.range;
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
-  let ultimaColumnaPermitida = 18;
-  let columnasObligatorias = [1, 2, 3,4,5,6];
+  let ultimaColumnaPermitida = 20;
+  let columnasObligatorias = [1, 3,4,5,6,7,8,10,12,13,14,15,16,17,19];
   let estadosDefault = ["", "Tipo Documento","Regimen","Tipo de persona"]; // aqui otros estados predeterminados si es necesario
 
 
@@ -127,3 +127,27 @@ function getCustomerInformation(customer) {
   }
   return CustomerInformation;
 }
+
+function obtenerInformacionCliente(cliente) {
+  let celdaCliente = datos_sheet.getRange("H2");
+  celdaCliente.setValue(cliente);
+
+  let codigoContacto = datos_sheet.getRange("I2").getValue();
+  let direccion = datos_sheet.getRange("T2").getValue();
+  let pais = datos_sheet.getRange("S2").getValue();
+  let provincia = datos_sheet.getRange("AA2").getValue();
+  let poblacion = datos_sheet.getRange("Z2").getValue();
+  let telefono = datos_sheet.getRange("V2").getValue();
+
+  let ubicacion = poblacion + ", " + provincia + ", " + pais;
+
+  let informacionCliente = {
+    "Código cliente": codigoContacto,
+    "Dirección": direccion,
+    "Ubicación": ubicacion,
+    "Teléfono": telefono
+  };
+
+  return informacionCliente;
+}
+
