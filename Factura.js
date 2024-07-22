@@ -422,20 +422,20 @@ function obtenerDatosFactura(factura){
           
           for (var j = 0; j < listaProductos.length; j++) {
             numeroProductos += 1;
-            var numeroCelda = 22 + j;
+            var numeroCelda = 19 + j;
             if (numeroProductos > 1) {
               targetSheet.insertRowAfter(numeroCelda);
               filasInsertadas += 1;
             }
-            var celdaItem = targetSheet.getRange('C'+numeroCelda);
+            var celdaItem = targetSheet.getRange('A'+numeroCelda);
             celdaItem.setBorder(true,true,true,true,null,null,null,null);
             celdaItem.setValue(numeroProductos);
 
-            var celdaReferencia = targetSheet.getRange('D'+numeroCelda);
+            var celdaReferencia = targetSheet.getRange('B'+numeroCelda);
             celdaReferencia.setBorder(true,true,true,true,null,null,null,null);
             celdaReferencia.setValue(listaProductos[j].ItemReference);
 
-            var celdaDespricion = targetSheet.getRange('E'+numeroCelda);
+            var celdaDespricion = targetSheet.getRange('C'+numeroCelda);
             celdaDespricion.setBorder(true,true,true,true,null,null,null,null);
             celdaDespricion.setValue(listaProductos[j].Name);
             
@@ -469,12 +469,12 @@ function obtenerDatosFactura(factura){
           var contador = 0;
           for (var key in grupoIva) {
             if (grupoIva.hasOwnProperty(key)) {
-              var numeroCelda = 30 + filasInsertadas;
+              var numeroCelda = 27 + filasInsertadas;
               if (contador > 0) {
                 targetSheet.insertRowAfter(numeroCelda);
                 filasInsertadas += 1;
               }
-              var celdaBaseImponible = targetSheet.getRange('C'+numeroCelda);
+              var celdaBaseImponible = targetSheet.getRange('A'+numeroCelda);
               celdaBaseImponible.setBorder(true,true,true,true,null,null,null,null);
               celdaBaseImponible.setValue(grupoIva[key]);
               
@@ -483,35 +483,33 @@ function obtenerDatosFactura(factura){
               celdaPorcentajeIva.setValue(key/100);
               celdaPorcentajeIva.setNumberFormat('0.0%');
               
-              var celdaIVA = targetSheet.getRange('G'+numeroCelda);
+              var celdaIVA = targetSheet.getRange('F'+numeroCelda);
               celdaIVA.setBorder(true,true,true,true,null,null,null,null);
-              celdaIVA.setFormula('=C'+numeroCelda+'*E'+numeroCelda);
+              celdaIVA.setFormula('=A'+numeroCelda+'*E'+numeroCelda);
               
-              var celdaTotal = targetSheet.getRange('I'+numeroCelda);
+              var celdaTotal = targetSheet.getRange('H'+numeroCelda);
               celdaTotal.setBorder(true,true,true,true,null,null,null,null);
-              celdaTotal.setFormula('=C'+numeroCelda+'+G'+numeroCelda);
+              celdaTotal.setFormula('=A'+numeroCelda+'+F'+numeroCelda);
 
               contador += 1;
             }
           }
 
 
-          var clienteCell = targetSheet.getRange('C12');
-          var nifCell = targetSheet.getRange('C13');
-          var codigoCell = targetSheet.getRange('C14');
-          var direccionCell = targetSheet.getRange('C15');
-          var telefonoCell = targetSheet.getRange('C16');
-          var poblacionCell = targetSheet.getRange('C17');
-          var provinciaCell = targetSheet.getRange('C18');
-          var paisCell = targetSheet.getRange('C19');
-          var fechaEmisionCell = targetSheet.getRange('H12');
-          var formaPagoCell = targetSheet.getRange('H13');
-          var valorPagarCell = targetSheet.getRange('C'+(36+filasInsertadas));
-          var notaPagoCell = targetSheet.getRange('B'+(41+filasInsertadas));
-          var observacionesCell = targetSheet.getRange('B'+(47+filasInsertadas));
-          var totalItemsCell = targetSheet.getRange('C'+(24+filasInsertadas));
-          var descuentosCell = targetSheet.getRange('C'+(34+filasInsertadas));
-          var cargosCell = targetSheet.getRange('E'+(34+filasInsertadas));
+          var clienteCell = targetSheet.getRange('B12');
+          var nifCell = targetSheet.getRange('B13');
+          var codigoCell = targetSheet.getRange('H12');
+          var direccionCell = targetSheet.getRange('B14');
+          var telefonoCell = targetSheet.getRange('B16');
+          var poblacionCell = targetSheet.getRange('B15');
+          var fechaEmisionCell = targetSheet.getRange('H13');
+          var formaPagoCell = targetSheet.getRange('H14');
+          var valorPagarCell = targetSheet.getRange('B'+(33+filasInsertadas));
+          var notaPagoCell = targetSheet.getRange('A'+(38+filasInsertadas));
+          var observacionesCell = targetSheet.getRange('A'+(44+filasInsertadas));
+          var totalItemsCell = targetSheet.getRange('B'+(21+filasInsertadas));
+          var descuentosCell = targetSheet.getRange('A'+(31+filasInsertadas));
+          var cargosCell = targetSheet.getRange('C'+(31+filasInsertadas));
 
 
           clienteCell.setValue(cliente);
@@ -519,9 +517,7 @@ function obtenerDatosFactura(factura){
           codigoCell.setValue(codigo);
           direccionCell.setValue(direccion);
           telefonoCell.setValue(telefono);
-          poblacionCell.setValue(poblacion);
-          provinciaCell.setValue(provincia);
-          paisCell.setValue(pais);
+          poblacionCell.setValue(poblacion+', '+provincia+', '+pais);
           fechaEmisionCell.setValue(fechaEmision);
           formaPagoCell.setValue(formaPago);
           valorPagarCell.setValue(valorPagar);
@@ -551,45 +547,39 @@ function resetPlantilla() {
   var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
   
   // Borrar información del cliente
-  targetSheet.getRange('C12').clearContent();
-  targetSheet.getRange('C13').clearContent();
-  targetSheet.getRange('C14').clearContent();
-  targetSheet.getRange('C15').clearContent();
-  targetSheet.getRange('C16').clearContent();
-  targetSheet.getRange('C17').clearContent();
-  targetSheet.getRange('C18').clearContent();
-  targetSheet.getRange('C19').clearContent();
+  targetSheet.getRange('B12').clearContent();
+  targetSheet.getRange('B13').clearContent();
+  targetSheet.getRange('B14').clearContent();
+  targetSheet.getRange('B15').clearContent();
+  targetSheet.getRange('B16').clearContent();
+  targetSheet.getRange('H14').clearContent();
+  targetSheet.getRange('H15').clearContent();
   targetSheet.getRange('H12').clearContent();
   targetSheet.getRange('H13').clearContent();
   
   // Borrar valor a pagar, nota de pago y observaciones
-  targetSheet.getRange('C36').clearContent();
-  targetSheet.getRange('B41').clearContent();
-  targetSheet.getRange('B47').clearContent();
+  targetSheet.getRange('B33').clearContent();
+  targetSheet.getRange('A38').clearContent();
+  targetSheet.getRange('A44').clearContent();
   
   // Borrar total de items, descuentos y cargos
-  targetSheet.getRange('C24').clearContent();
-  targetSheet.getRange('C34').clearContent();
-  targetSheet.getRange('E34').clearContent();
+  targetSheet.getRange('B21').clearContent();
+  targetSheet.getRange('A31').clearContent();
+  targetSheet.getRange('C31').clearContent();
   
-  // Borrar productos y reestablecer filas insertadas
-  for (var i = 22; i < targetSheet.getLastRow(); i++) {
-    var rowRange = targetSheet.getRange(i, 3, 1, 7); // Columnas C a I
-    rowRange.clearContent();
-    rowRange.setBorder(false, false, false, false, null, null, null, null);
-  }
-  
-  // Borrar bases imponibles, porcentajes de IVA, IVA y totales
-  for (var j = 30; j < targetSheet.getLastRow(); j++) {
-    var ivaRowRange = targetSheet.getRange(j, 3, 1, 7); // Columnas C a I
-    ivaRowRange.clearContent();
-    ivaRowRange.setBorder(false, false, false, false, null, null, null, null);
-  }
-  
-  // Eliminar filas adicionales que se hayan insertado
-  var originalLastRow = 50; // Ajusta este valor según el número de filas original en la hoja Plantilla
-  var currentLastRow = targetSheet.getLastRow();
-  if (currentLastRow > originalLastRow) {
-    targetSheet.deleteRows(originalLastRow + 1, currentLastRow - originalLastRow);
+  // Borrar información de productos
+  var lineaProductos = 19;
+  limpiarTablas(lineaProductos);
+
+  var lineaBases = 27;
+  limpiarTablas(lineaBases);
+}
+
+function limpiarTablas(linea){
+  var primeraFila = targetSheet.getRange(linea+":"+linea);
+  primeraFila.clearContent();
+  linea++;
+  while (!targetSheet.getRange('A'+linea).isBlank()) {
+    targetSheet.deleteRow(linea);
   }
 }
