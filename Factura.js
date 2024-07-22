@@ -576,6 +576,7 @@ function resetPlantilla() {
 }
 
 function limpiarTablas(linea){
+  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
   var primeraFila = targetSheet.getRange(linea+":"+linea);
   primeraFila.clearContent();
   linea++;
