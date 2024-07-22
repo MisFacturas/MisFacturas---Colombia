@@ -60,7 +60,7 @@ function verificarYCopiarContacto(e) {
   // }
   
   // Si no se encuentra el contacto
-  SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no se encontró.");
+  //SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no se encontró.");
 }
 
 
