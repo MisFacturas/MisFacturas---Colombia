@@ -198,7 +198,8 @@ function onEdit(e){
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
       const nextRow = lastProductRow + 1;
       Logger.log("entra al primer else if")
-  
+      Logger.log("next row"+nextRow)
+      Logger.log("taxSectionStartRow"+taxSectionStartRow) 
       // Insert a new row below the last product row if it's not already in the tax section
       if (nextRow < taxSectionStartRow) {
         hojaActual.insertRowAfter(lastProductRow);
