@@ -193,13 +193,13 @@ function onEdit(e){
       generarNumeroFactura(hojaActual)
 
     }else if (celdaEditada.getRow() >= productStartRow && celdaEditada.getRow() < productEndRow && celdaEditada.getColumn() <= productEndColumn){
-      const lastProductRow = getLastProductRow(sheet, productStartRow, productEndRow);
+      const lastProductRow = getLastProductRow(hojaActual, productStartRow, productEndRow);
     
       // If the edit is on the last product row, insert a new row below it
       if (range.getRow() === lastProductRow) {
-        sheet.insertRowAfter(lastProductRow);
+        hojaActual.insertRowAfter(lastProductRow);
         // Ensure the tax section is pushed down by inserting another row above it
-        sheet.insertRowBefore(productEndRow);
+        hojaActual.insertRowBefore(productEndRow);
       }
       
 
