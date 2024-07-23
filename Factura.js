@@ -545,6 +545,13 @@ function testWriteNIFToPlantilla() {
 
 function resetPlantilla() {
   var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
+
+  // Borrar información de productos
+  var lineaProductos = 19;
+  limpiarTablas(lineaProductos);
+
+  var lineaBases = 27;
+  limpiarTablas(lineaBases);
   
   // Borrar información del cliente
   targetSheet.getRange('B12').clearContent();
@@ -567,12 +574,7 @@ function resetPlantilla() {
   targetSheet.getRange('A31').clearContent();
   targetSheet.getRange('C31').clearContent();
   
-  // Borrar información de productos
-  var lineaProductos = 19;
-  limpiarTablas(lineaProductos);
-
-  var lineaBases = 27;
-  limpiarTablas(lineaBases);
+  
 }
 
 function limpiarTablas(linea){
