@@ -233,7 +233,7 @@ function getTaxSectionStartRow(sheet) {
   Logger.log(maxRows)
 
   // Find the first empty row after the products, which will be the start of the tax section
-  for (let row = 21; row <= maxRows; row++) { // Start checking from row 22
+  for (let row = 20; row <= maxRows; row++) { // Start checking from row 22
     if (sheet.getRange(row, 2).getValue() === '' &&
         sheet.getRange(row, 3).getValue() === '' &&
         sheet.getRange(row, 4).getValue() === '' &&
