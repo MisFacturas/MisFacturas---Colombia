@@ -197,7 +197,7 @@ function onEdit(e){
       generarNumeroFactura(hojaActual)
 
     }
-    else if (rowEditada >= productStartRow && colEditada <= 2 && rowEditada>taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
+    else if (rowEditada >= productStartRow && colEditada <= 2 && rowEditada<taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
       Logger.log("lastProductRow "+lastProductRow)
       const nextRow = lastProductRow + 1;
