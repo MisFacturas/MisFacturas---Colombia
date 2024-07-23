@@ -177,16 +177,19 @@ function onEdit(e){
   if (hojaActual.getName()==="Factura"){
 
     let celdaEditada = e.range;
+    let rowEditada=celdaEditada.getRow();
+    let colEditada=celdaEditada.getColumn();
+
     let columnaContactos = 3; // Ajusta según sea necesario
     let rowContactos= 2;
+    
 
-
-    const productStartRow = 15; // Starting row for products
-    const productEndColumn = 8; // Assuming products end at column H
+    const productStartRow = 15; // prodcutos empeiza aca
+    const productEndColumn = 8; //   procutos terminan en column H
     const taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
     Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
-    if (celdaEditada.getColumn() === columnaContactos || celdaEditada.getRow() === rowContactos) {
+    if (colEditada === columnaContactos && rowEditada === rowContactos) {
       //celda de elegir contacto
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
@@ -194,15 +197,28 @@ function onEdit(e){
       generarNumeroFactura(hojaActual)
 
     }
-    else if (celdaEditada.getRow() >= productStartRow && celdaEditada.getColumn() <= productEndColumn) {
+    else if (rowEditada >= productStartRow && colEditada <= 2 && rowEditada>taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
       Logger.log("lastProductRow "+lastProductRow)
       const nextRow = lastProductRow + 1;
       Logger.log("entra al primer else if")
       Logger.log("next row "+nextRow)
       Logger.log("taxSectionStartRow "+taxSectionStartRow) 
-      // Insert a new row below the last product row if it's not already in the tax section
+
+      //PRoceso para ingresar la info del producto
+      let valorCelda=celdaEditada.getValue();
+      let dictInformacionProducto= obtenerInformacionProducto(valorCelda);
+      
+
+      // Insertar una nueva row 
       if (lastProductRow < taxSectionStartRow) {
+        // insertar cosas del producto en la hoja
+        hojaActual.getRange("C"+String(lastProductRow)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        // hojaActual.getRange("E"+String(lastProductRow)).setValue(dictInformacionProducto);//sin iva
+        // hojaActual.getRange("F"+String(lastProductRow)).setValue(dictInformacionProducto);//con iva
+        // hojaActual.getRange("G"+String(lastProductRow)).setValue(dictInformacionProducto);//importe
+        // hojaActual.getRange("H"+String(lastProductRow)).setValue(dictInformacionProducto);//total de linea
+
         hojaActual.insertRowAfter(lastProductRow);
         Logger.log("Entra al segundo if dnetro del else if ")
         Logger.log("")
@@ -222,21 +238,22 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   let lastProductRow = productStartRow;
 
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
-    if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
+    if (sheet.getRange(row, 2).getValue() !== '') { 
       lastProductRow = row;
     }
   }
-
+  //aqui arrelgar error que se agrega una nueva linea cuando hay espacio arriba
   return lastProductRow;
 }
 
 function getTaxSectionStartRow(sheet) {
+  //obtiene la row donde esta la seccion de taxinformation
   const maxRows = sheet.getMaxRows();
   Logger.log("get tac section star row")
   Logger.log(maxRows)
 
-  // Find the first empty row after the products, which will be the start of the tax section
-  for (let row = 22; row <= maxRows; row++) { // Start checking from row 22
+  // obtenemos la row donde esta la "base imponible, llegando asi al principio "
+  for (let row = 22; row <= maxRows; row++) { // 22 porque su row predetermmiado es ese
     if (sheet.getRange(row, 2).getValue() === 'Base imponible') {
 
       Logger.log("dentro de getTax row "+row)
@@ -244,7 +261,7 @@ function getTaxSectionStartRow(sheet) {
     }
   }
 
-  // If no empty row is found, assume the tax section starts after the last row
+  // esto puede causar errores
   return maxRows + 1;
 }
 
