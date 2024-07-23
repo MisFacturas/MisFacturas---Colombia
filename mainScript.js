@@ -184,7 +184,7 @@ function onEdit(e){
     const productStartRow = 15; // Starting row for products
     const productEndColumn = 8; // Assuming products end at column H
     const taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
-    Logger.log(taxSectionStartRow)
+    Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
     if (celdaEditada.getColumn() === columnaContactos || celdaEditada.getRow() === rowContactos) {
       //celda de elegir contacto
@@ -196,14 +196,16 @@ function onEdit(e){
     }
     else if (celdaEditada.getRow() >= productStartRow && celdaEditada.getColumn() <= productEndColumn) {
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
+      Logger.log("lastProductRow "+lastProductRow)
       const nextRow = lastProductRow + 1;
       Logger.log("entra al primer else if")
-      Logger.log("next row"+nextRow)
-      Logger.log("taxSectionStartRow"+taxSectionStartRow) 
+      Logger.log("next row "+nextRow)
+      Logger.log("taxSectionStartRow "+taxSectionStartRow) 
       // Insert a new row below the last product row if it's not already in the tax section
       if (nextRow < taxSectionStartRow) {
         hojaActual.insertRowAfter(lastProductRow);
         Logger.log("Entra al segundo if dnetro del else if ")
+        Logger.log("")
       }
     }
 
@@ -241,6 +243,8 @@ function getTaxSectionStartRow(sheet) {
         sheet.getRange(row, 6).getValue() === '' &&
         sheet.getRange(row, 7).getValue() === '' &&
         sheet.getRange(row, 8).getValue() === '') {
+
+      Logger.log("dentro de getTax row "+row)
       return row;
     }
   }
