@@ -167,8 +167,8 @@ function getPaymentSummary(num_items, pfAnticipo) {
 }
 
 function guardarYGenerarInvoice(){
-  const cantidadProductos = prefactura_sheet.getRange("I4").getValue(); // cantidad total de productos 
-  let llavesParaLinea=prefactura_sheet.getRange("H7:N7");//llamo los headers 
+  const cantidadProductos = prefactura_sheet.getRange("H37").getValue(); // cantidad total de productos 
+  let llavesParaLinea=prefactura_sheet.getRange("B14:H14");//llamo los headers 
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
@@ -176,7 +176,7 @@ function guardarYGenerarInvoice(){
   let invoiceTaxTotal=[]
   var productoInformation = [];
 
-  let i = 8 // es 8 debido a que aqui empieza los productos elegidos por el cliente
+  let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "H" + String(i) + ":N" + String(i);
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
@@ -270,7 +270,7 @@ function guardarYGenerarInvoice(){
   // }while(k<20);
 
 
-
+  //estos es dinamico
   let rangeFacturaTotal=prefactura_sheet.getRange(20,1,1,4);// aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
   let facturaTotal=String(rangeFacturaTotal.getValues());
   facturaTotal=facturaTotal.split(",");
