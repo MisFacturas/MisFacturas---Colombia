@@ -184,6 +184,7 @@ function onEdit(e){
     const productStartRow = 15; // Starting row for products
     const productEndColumn = 8; // Assuming products end at column H
     const taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
+    Logger.log(taxSectionStartRow)
 
     if (celdaEditada.getColumn() === columnaContactos || celdaEditada.getRow() === rowContactos) {
       //celda de elegir contacto
