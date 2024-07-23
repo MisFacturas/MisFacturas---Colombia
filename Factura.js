@@ -479,9 +479,10 @@ function obtenerDatosFactura(factura){
             }
           }
           var contador = 0;
+          var auxiliarFilasInsertadas = filasInsertadas;
           for (var key in grupoIva) {
             if (grupoIva.hasOwnProperty(key)) {
-              var numeroCelda = 27 + filasInsertadas;
+              var numeroCelda = 27 + auxiliarFilasInsertadas;
               if (contador > 0) {
                 targetSheet.insertRowAfter(numeroCelda);
                 targetSheet.getRange('A'+(numeroCelda+1)+':D'+(numeroCelda+1)).merge();
@@ -514,6 +515,7 @@ function obtenerDatosFactura(factura){
               celdaTotal.setHorizontalAlignment('center');
 
               contador += 1;
+              auxiliarFilasInsertadas += 1;
               Logger.log('IVA: ' + key + '%');
             }
           }
