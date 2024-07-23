@@ -202,7 +202,7 @@ function onEdit(e){
       Logger.log("next row "+nextRow)
       Logger.log("taxSectionStartRow "+taxSectionStartRow) 
       // Insert a new row below the last product row if it's not already in the tax section
-      if (nextRow < taxSectionStartRow) {
+      if (lastProductRow < taxSectionStartRow) {
         hojaActual.insertRowAfter(lastProductRow);
         Logger.log("Entra al segundo if dnetro del else if ")
         Logger.log("")
