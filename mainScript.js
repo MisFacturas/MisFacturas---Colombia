@@ -196,7 +196,7 @@ function onEdit(e){
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, productEndRow);
     
       // If the edit is on the last product row, insert a new row below it
-      if (range.getRow() === lastProductRow) {
+      if (celdaEditada.getRow() === lastProductRow) {
         hojaActual.insertRowAfter(lastProductRow);
         // Ensure the tax section is pushed down by inserting another row above it
         hojaActual.insertRowBefore(productEndRow);
