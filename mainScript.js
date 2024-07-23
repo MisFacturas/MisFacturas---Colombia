@@ -180,22 +180,62 @@ function onEdit(e){
     let columnaContactos = 3; // Ajusta según sea necesario
     let rowContactos= 2;
 
+
+    const productStartRow = 15;
+    const productEndRow = 21; // One row before the tax calculation section
+    const productEndColumn = 8; // Assuming products end at column H
+
     if (celdaEditada.getColumn() === columnaContactos || celdaEditada.getRow() === rowContactos) {
       //celda de elegir contacto
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
       obtenerFechaYHoraActual(hojaActual)
       generarNumeroFactura(hojaActual)
-    }else{
 
+    }else if (celdaEditada.getRow() >= productStartRow && celdaEditada.getRow() < productEndRow && celdaEditada.getColumn() <= productEndColumn){
+      const lastProductRow = getLastProductRow(sheet, productStartRow, productEndRow);
+    
+      // If the edit is on the last product row, insert a new row below it
+      if (range.getRow() === lastProductRow) {
+        sheet.insertRowAfter(lastProductRow);
+        // Ensure the tax section is pushed down by inserting another row above it
+        sheet.insertRowBefore(productEndRow);
+      }
+      
 
     }
-    
+
+    updateTotalProductCounter(sheet, productStartRow, productEndRow);
 
   }else if(hojaActual.getName()==="Clientes"){
     verificarDatosObligatorios(e);
 
   }
+}
+
+function getLastProductRow(sheet, productStartRow, productEndRow) {
+  let lastProductRow = productStartRow;
+  
+  for (let row = productStartRow; row < productEndRow; row++) {
+    if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
+      lastProductRow = row;
+    }
+  }
+  
+  return lastProductRow;
+}
+
+function updateTotalProductCounter(sheet, productStartRow, productEndRow) {
+  let totalProducts = 0;
+  
+  for (let row = productStartRow; row < productEndRow; row++) {
+    if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
+      totalProducts++;
+    }
+  }
+  
+  // Set the total products count in cell B27
+  sheet.getRange('B27').setValue(totalProducts);
 }
 
 function slugifyF (str) {
