@@ -575,11 +575,13 @@ function resetPlantilla() {
   var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
 
   // Borrar información de productos
+  var colProductos = "A";
   var lineaProductos = 19;
-  limpiarTablas(lineaProductos);
+  limpiarTablas(colProductos, lineaProductos);
 
+  var colBases = "E";
   var lineaBases = 27;
-  limpiarTablas(lineaBases);
+  limpiarTablas(colBases, lineaBases);
   
   // Borrar información del cliente
   targetSheet.getRange('B12').clearContent();
@@ -605,12 +607,12 @@ function resetPlantilla() {
   
 }
 
-function limpiarTablas(linea){
+function limpiarTablas(columna, linea){
   var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
   var primeraFila = targetSheet.getRange(linea+":"+linea);
   primeraFila.clearContent();
   linea++;
-  while (!targetSheet.getRange('A'+linea).isBlank()) {
+  while (!targetSheet.getRange(columna+linea).isBlank()) {
     targetSheet.deleteRow(linea);
   }
 }
