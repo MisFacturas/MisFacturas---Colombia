@@ -203,7 +203,7 @@ function onEdit(e){
       }
     }
 
-    updateTotalProductCounter(hojaActual, productStartRow, productEndRow);
+    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow);
 
   }else if(hojaActual.getName()==="Clientes"){
     verificarDatosObligatorios(e);
