@@ -181,9 +181,9 @@ function onEdit(e){
     let rowContactos= 2;
 
 
-    const productStartRow = 15;
-    const productEndRow = 21; // One row before the tax calculation section
+    const productStartRow = 15; // Starting row for products
     const productEndColumn = 8; // Assuming products end at column H
+    const taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
 
     if (celdaEditada.getColumn() === columnaContactos || celdaEditada.getRow() === rowContactos) {
       //celda de elegir contacto
@@ -192,20 +192,18 @@ function onEdit(e){
       obtenerFechaYHoraActual(hojaActual)
       generarNumeroFactura(hojaActual)
 
-    }else if (celdaEditada.getRow() >= productStartRow && celdaEditada.getRow() < productEndRow && celdaEditada.getColumn() <= productEndColumn){
-      const lastProductRow = getLastProductRow(hojaActual, productStartRow, productEndRow);
-    
-      // If the edit is on the last product row, insert a new row below it
-      if (celdaEditada.getRow() === lastProductRow) {
+    }
+    else if (celdaEditada.getRow() >= productStartRow && celdaEditada.getColumn() <= productEndColumn) {
+      const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
+      const nextRow = lastProductRow + 1;
+  
+      // Insert a new row below the last product row if it's not already in the tax section
+      if (nextRow < taxSectionStartRow) {
         hojaActual.insertRowAfter(lastProductRow);
-        // Ensure the tax section is pushed down by inserting another row above it
-        hojaActual.insertRowBefore(productEndRow);
       }
-      
-
     }
 
-    updateTotalProductCounter(sheet, productStartRow, productEndRow);
+    updateTotalProductCounter(hojaActual, productStartRow, productEndRow);
 
   }else if(hojaActual.getName()==="Clientes"){
     verificarDatosObligatorios(e);
@@ -213,27 +211,48 @@ function onEdit(e){
   }
 }
 
-function getLastProductRow(sheet, productStartRow, productEndRow) {
+function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   let lastProductRow = productStartRow;
-  
-  for (let row = productStartRow; row < productEndRow; row++) {
+
+  for (let row = productStartRow; row < taxSectionStartRow; row++) {
     if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
       lastProductRow = row;
     }
   }
-  
+
   return lastProductRow;
 }
 
-function updateTotalProductCounter(sheet, productStartRow, productEndRow) {
+function getTaxSectionStartRow(sheet) {
+  const maxRows = sheet.getMaxRows();
+
+  // Find the first empty row after the products, which will be the start of the tax section
+  for (let row = 22; row <= maxRows; row++) { // Start checking from row 22
+    if (sheet.getRange(row, 2).getValue() === '' &&
+        sheet.getRange(row, 3).getValue() === '' &&
+        sheet.getRange(row, 4).getValue() === '' &&
+        sheet.getRange(row, 5).getValue() === '' &&
+        sheet.getRange(row, 6).getValue() === '' &&
+        sheet.getRange(row, 7).getValue() === '' &&
+        sheet.getRange(row, 8).getValue() === '') {
+      return row;
+    }
+  }
+
+  // If no empty row is found, assume the tax section starts after the last row
+  return maxRows + 1;
+}
+
+function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow) {
   let totalProducts = 0;
-  
-  for (let row = productStartRow; row < productEndRow; row++) {
+
+  // Iterate through the product rows to count the non-empty ones
+  for (let row = productStartRow; row < taxSectionStartRow; row++) {
     if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
       totalProducts++;
     }
   }
-  
+
   // Set the total products count in cell B27
   sheet.getRange('B27').setValue(totalProducts);
 }
