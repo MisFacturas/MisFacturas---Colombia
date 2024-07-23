@@ -514,7 +514,6 @@ function obtenerDatosFactura(factura){
               celdaTotal.setHorizontalAlignment('center');
 
               contador += 1;
-              filasInsertadas += 1;
             }
           }
 
