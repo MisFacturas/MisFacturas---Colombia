@@ -18,16 +18,16 @@ function verificarYCopiarContacto(e) {
 
   let nombreContacto = celdaEditada.getValue();
   let ultimaColumnaPermitida = 20; // Columna del estado en la hoja de contactos
-  let datosARetornar = ["B", "O","M","L","N","Q"]; // Columnas que quiero de la hoja de contactos
+  let datosARetornar = ["B", "O", "M", "L", "N", "Q"]; // Columnas que quiero de la hoja de contactos
 
 
-  if (nombreContacto==="Cliente"){
+  if (nombreContacto === "Cliente") {
     Logger.log("Estado default")
-  }else{
+  } else {
     let listaConInformacion = obtenerInformacionCliente(nombreContacto);
-    if (listaConInformacion["Estado"]==="No Valido"){
+    if (listaConInformacion["Estado"] === "No Valido") {
       SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
-    }else{
+    } else {
       //asigna el valor del coldigo solamente porque ese fue lo que me pidieron no mas
       hojaFacturas.getRange("C3").setValue(listaConInformacion["Código cliente"]);
     }
@@ -58,41 +58,41 @@ function verificarYCopiarContacto(e) {
   //     return;
   //   }
   // }
-  
+
   // Si no se encuentra el contacto
   //SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no se encontró.");
 }
 
 
-function generarNumeroFactura(sheet){
-  let max=1000000;
-  let min=1;
-  let numero= Math.floor(Math.random() * (max - min + 1)) + min;
+function generarNumeroFactura(sheet) {
+  let max = 1000000;
+  let min = 1;
+  let numero = Math.floor(Math.random() * (max - min + 1)) + min;
   sheet.getRange("G2").setValue(numero);
 }
 
-function obtenerFechaYHoraActual(sheet){ 
+function obtenerFechaYHoraActual(sheet) {
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
-  let hora= Utilities.formatDate(new Date(), "GMT+1", "HH:mm:ss");
+  let hora = Utilities.formatDate(new Date(), "GMT+1", "HH:mm:ss");
 
   sheet.getRange("G4").setValue(fecha)
   sheet.getRange("G3").setValue(hora)
 }
 
-function obtenerDatosProductos(sheet,range,e){
-    if ( range.getA1Notation() === "A14" || range.getA1Notation()=== "A15" || range.getA1Notation() === "A16" || range.getA1Notation()=== "A17" || range.getA1Notation()=== "A18") {
+function obtenerDatosProductos(sheet, range, e) {
+  if (range.getA1Notation() === "A14" || range.getA1Notation() === "A15" || range.getA1Notation() === "A16" || range.getA1Notation() === "A17" || range.getA1Notation() === "A18") {
     Logger.log("entro a obtenerdatos")
     var selectedProduct = range.getValue();
-    
+
     // Referencia a la hoja de productos
     var productSheet = e.source.getSheetByName("Productos");
     var data = productSheet.getDataRange().getValues();
-    
+
     // Encuentra el producto en la hoja de productos
     for (var i = 1; i < data.length; i++) {
       Logger.log(data[i][1])
       Logger.log(selectedProduct)
-      if (data[i][1] == selectedProduct) {  
+      if (data[i][1] == selectedProduct) {
         sheet.getRange("B14").setValue(data[i][0]);  // Código de referencia
         sheet.getRange("D14").setValue(data[i][2]);  // Valor unitario
         sheet.getRange("E14").setValue(data[i][4]);  // Otros datos,  segun sea necesario
@@ -166,27 +166,27 @@ function getPaymentSummary(num_items, pfAnticipo) {
   return PaymentSummary;
 }
 
-function guardarYGenerarInvoice(){
+function guardarYGenerarInvoice() {
   const cantidadProductos = prefactura_sheet.getRange("H37").getValue(); // cantidad total de productos 
-  let llavesParaLinea=prefactura_sheet.getRange("B14:H14");//llamo los headers 
+  let llavesParaLinea = prefactura_sheet.getRange("B14:H14");//llamo los headers 
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
-  const llavesFinales =llavesParaLinea.split(",");
+  const llavesFinales = llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
 
-  let invoiceTaxTotal=[]
+  let invoiceTaxTotal = []
   var productoInformation = [];
 
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
-  do{
+  do {
     let filaActual = "H" + String(i) + ":N" + String(i);
-    let rangoProductoActual=prefactura_sheet.getRange(filaActual);
-    let productoFilaActual= String(rangoProductoActual.getValues());
-    productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
+    let rangoProductoActual = prefactura_sheet.getRange(filaActual);
+    let productoFilaActual = String(rangoProductoActual.getValues());
+    productoFilaActual = productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
     Logger.log(productoFilaActual)
-    let LineaFactura={};
+    let LineaFactura = {};
 
-    for (let j=0;j<7;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo, en el nuevo son 7 tal vez 8
-      LineaFactura[llavesFinales[j]]=productoFilaActual[j]
+    for (let j = 0; j < 7; j++) {// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo, en el nuevo son 7 tal vez 8
+      LineaFactura[llavesFinales[j]] = productoFilaActual[j]
     }
     Logger.log(LineaFactura)
 
@@ -198,7 +198,7 @@ function guardarYGenerarInvoice(){
     let Amount = parseFloat(LineaFactura['importe']);//importe
     let ImpoConsumo = 1// no es un parametro para empresas espanolas
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
-    let Iva = LineChargeTotal-Amount;
+    let Iva = LineChargeTotal - Amount;
 
 
     //IVA
@@ -239,11 +239,11 @@ function guardarYGenerarInvoice(){
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
-  }while(i<(8+cantidadProductos));
+  } while (i < (8 + cantidadProductos));
 
   /* Aqui empieza el proceso de coger el precio total de la facutra OJO en nuestro caso se agrupan por % de iva, entonces cambia
   algo mucho */
-  
+
 
   //pasos para poder procesar todos los valores totales de la facutra agrupados por iva
   // let k=13;
@@ -271,9 +271,9 @@ function guardarYGenerarInvoice(){
 
 
   //estos es dinamico
-  let rangeFacturaTotal=prefactura_sheet.getRange(20,1,1,4);// aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
-  let facturaTotal=String(rangeFacturaTotal.getValues());
-  facturaTotal=facturaTotal.split(",");
+  let rangeFacturaTotal = prefactura_sheet.getRange(20, 1, 1, 4);// aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
+  let facturaTotal = String(rangeFacturaTotal.getValues());
+  facturaTotal = facturaTotal.split(",");
   Logger.log(facturaTotal)
 
 
@@ -287,7 +287,7 @@ function guardarYGenerarInvoice(){
   let pfRefuente = 0;
   let pfReteICA = 0;
   let pfReteIVA = 44;
-  let pfTRetenciones = 33; 
+  let pfTRetenciones = 33;
   let pfAnticipo = 55;
   let pfTPagar = 66;
 
@@ -358,7 +358,7 @@ function guardarYGenerarInvoice(){
     Delivery: getDelivery(),
     AdditionalDocuments: getAdditionalDocuments(),
     AdditionalProperty: getAdditionalProperty(),
-    PaymentSummary: getPaymentSummary(0,0), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
+    PaymentSummary: getPaymentSummary(0, 0), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
     //Invoice_Note: invoice_note,
     InvoiceTaxTotal: invoiceTaxTotal,
@@ -370,32 +370,32 @@ function guardarYGenerarInvoice(){
   let nameString = prefactura_sheet.getRange("C2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
-  listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString , "falta","vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
-  
-  
+  listadoestado_sheet.appendRow(["vacio", "vacio", "vacio", fecha, "vacio", numeroFactura, nameString, "falta", "vacio", "vacio", "representacion", "Vacio", String(invoice)]);
+
+
 }
 
-function guardarInvoice(invoice){
+function guardarInvoice(invoice) {
 
 }
 
 
 //--------------------------------------------------------------------------------------------//
-function obtenerDatosFactura(factura){
+function obtenerDatosFactura(factura) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
   var dataRange = sheet.getDataRange();
   var data = dataRange.getValues();
-  
+
   var invoiceColIndex = 5; // Columna F (indexada desde 0)
   var jsonColIndex = 12; // Columna M (indexada desde 0)
-  
+
   for (var i = 1; i < data.length; i++) { // Comienza en 1 para saltar la fila de encabezado
     if (data[i][invoiceColIndex] == factura) {
       var jsonData = data[i][jsonColIndex];
       if (jsonData) {
         try {
           var invoiceData = JSON.parse(jsonData);
-          
+
           var cliente = invoiceData.CustomerInformation.RegistrationName;
           var nif = invoiceData.CustomerInformation.Identification;
           var codigo = invoiceData.CustomerInformation.AdditionalAccountID;
@@ -420,58 +420,58 @@ function obtenerDatosFactura(factura){
           if (!targetSheet) {
             targetSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Plantilla');
           }
-          
+
           for (var j = 0; j < listaProductos.length; j++) {
             numeroProductos += 1;
             var numeroCelda = 19 + j;
             if (numeroProductos > 1) {
               targetSheet.insertRowAfter(numeroCelda);
-              targetSheet.getRange('C'+(numeroCelda+1)+':E'+(numeroCelda+1)).merge();
+              targetSheet.getRange('C' + (numeroCelda + 1) + ':E' + (numeroCelda + 1)).merge();
               filasInsertadas += 1;
               filasInsertadasPorProductos += 1;
             }
-            var celdaItem = targetSheet.getRange('A'+numeroCelda);
-            celdaItem.setBorder(true,true,true,true,null,null,null,null);
+            var celdaItem = targetSheet.getRange('A' + numeroCelda);
+            celdaItem.setBorder(true, true, true, true, null, null, null, null);
             celdaItem.setValue(numeroProductos);
             celdaItem.setHorizontalAlignment('center');
 
-            var celdaReferencia = targetSheet.getRange('B'+numeroCelda);
-            celdaReferencia.setBorder(true,true,true,true,null,null,null,null);
+            var celdaReferencia = targetSheet.getRange('B' + numeroCelda);
+            celdaReferencia.setBorder(true, true, true, true, null, null, null, null);
             celdaReferencia.setValue(listaProductos[j].ItemReference);
             celdaReferencia.setHorizontalAlignment('center');
 
-            var celdaDespricion = targetSheet.getRange('C'+numeroCelda);
-            celdaDespricion.setBorder(true,true,true,true,null,null,null,null);
+            var celdaDespricion = targetSheet.getRange('C' + numeroCelda);
+            celdaDespricion.setBorder(true, true, true, true, null, null, null, null);
             celdaDespricion.setValue(listaProductos[j].Name);
             celdaDespricion.setHorizontalAlignment('center');
-            
-            var celdaCantidad = targetSheet.getRange('F'+numeroCelda);
-            celdaCantidad.setBorder(true,true,true,true,null,null,null,null);
+
+            var celdaCantidad = targetSheet.getRange('F' + numeroCelda);
+            celdaCantidad.setBorder(true, true, true, true, null, null, null, null);
             celdaCantidad.setValue(listaProductos[j].Quatity);
             celdaCantidad.setHorizontalAlignment('center');
-            
-            var celdaPrecioUnitario = targetSheet.getRange('G'+numeroCelda);
-            celdaPrecioUnitario.setBorder(true,true,true,true,null,null,null,null);
+
+            var celdaPrecioUnitario = targetSheet.getRange('G' + numeroCelda);
+            celdaPrecioUnitario.setBorder(true, true, true, true, null, null, null, null);
             celdaPrecioUnitario.setValue(listaProductos[j].Price);
             celdaPrecioUnitario.setHorizontalAlignment('center');
             celdaPrecioUnitario.setNumberFormat('€#,##0.00')
-            
-            var celdaIva = targetSheet.getRange('H'+numeroCelda);
-            celdaIva.setBorder(true,true,true,true,null,null,null,null);
-            celdaIva.setValue((listaProductos[j].TaxesInformation[0].Percent)/100);
+
+            var celdaIva = targetSheet.getRange('H' + numeroCelda);
+            celdaIva.setBorder(true, true, true, true, null, null, null, null);
+            celdaIva.setValue((listaProductos[j].TaxesInformation[0].Percent) / 100);
             celdaIva.setNumberFormat('0.0%');
             celdaIva.setHorizontalAlignment('center');
 
-            
-            var celdaImporte = targetSheet.getRange('I'+numeroCelda);
-            celdaImporte.setBorder(true,true,true,true,null,null,null,null);
+
+            var celdaImporte = targetSheet.getRange('I' + numeroCelda);
+            celdaImporte.setBorder(true, true, true, true, null, null, null, null);
             celdaImporte.setValue(listaProductos[j].LineExtensionAmount);
             celdaImporte.setHorizontalAlignment('center');
             celdaImporte.setNumberFormat('€#,##0.00')
 
             var producto = listaProductos[j]
             //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
-            
+
             if (grupoIva.hasOwnProperty(producto.TaxesInformation[0].Percent)) {
               grupoIva[producto.TaxesInformation[0].Percent] += producto.TaxesInformation[0].TaxableAmount;
             } else {
@@ -479,43 +479,50 @@ function obtenerDatosFactura(factura){
             }
           }
           var contador = 0;
+          var numeroCeldaBase = 27; // Define la celda base inicial
+
           for (var key in grupoIva) {
             if (grupoIva.hasOwnProperty(key)) {
-              var numeroCelda = 27 + filasInsertadas;
+              var numeroCelda = numeroCeldaBase + filasInsertadas; // Calcula la celda actual
+
               if (contador > 0) {
                 targetSheet.insertRowAfter(numeroCelda);
-                targetSheet.getRange('A'+(numeroCelda+1)+':D'+(numeroCelda+1)).merge();
-                targetSheet.getRange('F'+(numeroCelda+1)+':G'+(numeroCelda+1)).merge();
-                targetSheet.getRange('H'+(numeroCelda+1)+':I'+(numeroCelda+1)).merge();
+                targetSheet.getRange('A' + (numeroCelda + 1) + ':D' + (numeroCelda + 1)).merge();
+                targetSheet.getRange('F' + (numeroCelda + 1) + ':G' + (numeroCelda + 1)).merge();
+                targetSheet.getRange('H' + (numeroCelda + 1) + ':I' + (numeroCelda + 1)).merge();
                 filasInsertadas += 1;
+                numeroCelda += 1; // Incrementa para la nueva fila insertada
               }
-              var celdaBaseImponible = targetSheet.getRange('A'+numeroCelda);
-              celdaBaseImponible.setBorder(true,true,true,true,null,null,null,null);
+
+              var celdaBaseImponible = targetSheet.getRange('A' + numeroCelda);
+              celdaBaseImponible.setBorder(true, true, true, true, null, null, null, null);
               celdaBaseImponible.setValue(grupoIva[key]);
               celdaBaseImponible.setNumberFormat('€#,##0.00');
               celdaBaseImponible.setHorizontalAlignment('center');
-              
-              var celdaPorcentajeIva = targetSheet.getRange('E'+numeroCelda);
-              celdaPorcentajeIva.setBorder(true,true,true,true,null,null,null,null);
-              celdaPorcentajeIva.setValue(key/100);
+
+              var celdaPorcentajeIva = targetSheet.getRange('E' + numeroCelda);
+              celdaPorcentajeIva.setBorder(true, true, true, true, null, null, null, null);
+              celdaPorcentajeIva.setValue(key / 100);
               celdaPorcentajeIva.setNumberFormat('0.0%');
               celdaPorcentajeIva.setHorizontalAlignment('center');
-              
-              var celdaIVA = targetSheet.getRange('F'+numeroCelda);
-              celdaIVA.setBorder(true,true,true,true,null,null,null,null);
-              celdaIVA.setFormula('=A'+numeroCelda+'*E'+numeroCelda);
+
+              var celdaIVA = targetSheet.getRange('F' + numeroCelda);
+              celdaIVA.setBorder(true, true, true, true, null, null, null, null);
+              celdaIVA.setFormula('=A' + numeroCelda + '*E' + numeroCelda);
               celdaIVA.setNumberFormat('€#,##0.00');
               celdaIVA.setHorizontalAlignment('center');
-              
-              var celdaTotal = targetSheet.getRange('H'+numeroCelda);
-              celdaTotal.setBorder(true,true,true,true,null,null,null,null);
-              celdaTotal.setFormula('=A'+numeroCelda+'+F'+numeroCelda);
+
+              var celdaTotal = targetSheet.getRange('H' + numeroCelda);
+              celdaTotal.setBorder(true, true, true, true, null, null, null, null);
+              celdaTotal.setFormula('=A' + numeroCelda + '+F' + numeroCelda);
               celdaTotal.setNumberFormat('€#,##0.00');
               celdaTotal.setHorizontalAlignment('center');
 
               contador += 1;
+              filasInsertadas += 1; // Asegúrate de incrementar filasInsertadas en cada iteración
             }
           }
+
 
 
           var clienteCell = targetSheet.getRange('B12');
@@ -526,15 +533,15 @@ function obtenerDatosFactura(factura){
           var poblacionCell = targetSheet.getRange('B15');
           var fechaEmisionCell = targetSheet.getRange('H13');
           var formaPagoCell = targetSheet.getRange('H14');
-          var valorPagarCell = targetSheet.getRange('B'+(33+filasInsertadas));
-          var notaPagoCell = targetSheet.getRange('A'+(38+filasInsertadas));
-          var observacionesCell = targetSheet.getRange('A'+(44+filasInsertadas));
-          var totalItemsCell = targetSheet.getRange('B'+(21+filasInsertadasPorProductos));
-          var descuentosCell = targetSheet.getRange('A'+(31+filasInsertadas));
-          var cargosCell = targetSheet.getRange('C'+(31+filasInsertadas));
-          var sumaBaseImponible = targetSheet.getRange('A'+(28+filasInsertadas));
-          var sumaImpIva = targetSheet.getRange('F'+(28+filasInsertadas));
-          var sumaTotal = targetSheet.getRange('H'+(28+filasInsertadas));
+          var valorPagarCell = targetSheet.getRange('B' + (33 + filasInsertadas));
+          var notaPagoCell = targetSheet.getRange('A' + (38 + filasInsertadas));
+          var observacionesCell = targetSheet.getRange('A' + (44 + filasInsertadas));
+          var totalItemsCell = targetSheet.getRange('B' + (21 + filasInsertadasPorProductos));
+          var descuentosCell = targetSheet.getRange('A' + (31 + filasInsertadas));
+          var cargosCell = targetSheet.getRange('C' + (31 + filasInsertadas));
+          var sumaBaseImponible = targetSheet.getRange('A' + (28 + filasInsertadas));
+          var sumaImpIva = targetSheet.getRange('F' + (28 + filasInsertadas));
+          var sumaTotal = targetSheet.getRange('H' + (28 + filasInsertadas));
 
 
           clienteCell.setValue(cliente);
@@ -542,7 +549,7 @@ function obtenerDatosFactura(factura){
           codigoCell.setValue(codigo);
           direccionCell.setValue(direccion);
           telefonoCell.setValue(telefono);
-          poblacionCell.setValue(poblacion+', '+provincia+', '+pais);
+          poblacionCell.setValue(poblacion + ', ' + provincia + ', ' + pais);
           fechaEmisionCell.setValue(fechaEmision);
           formaPagoCell.setValue(formaPago);
           valorPagarCell.setValue(valorPagar);
@@ -551,11 +558,11 @@ function obtenerDatosFactura(factura){
           totalItemsCell.setValue(numeroProductos);
           descuentosCell.setValue(0);
           cargosCell.setValue(0);
-          sumaBaseImponible.setFormula('=SUM(A'+(27+numeroProductos-1)+':A'+(28+filasInsertadas-1)+')');
-          sumaImpIva.setFormula('=SUM(F'+(27+numeroProductos-1)+':F'+(28+filasInsertadas-1)+')');
-          sumaTotal.setFormula('=SUM(H'+(27+numeroProductos-1)+':H'+(28+filasInsertadas-1)+')');
-          
-          
+          sumaBaseImponible.setFormula('=SUM(A' + (27 + numeroProductos - 1) + ':A' + (28 + filasInsertadas - 1) + ')');
+          sumaImpIva.setFormula('=SUM(F' + (27 + numeroProductos - 1) + ':F' + (28 + filasInsertadas - 1) + ')');
+          sumaTotal.setFormula('=SUM(H' + (27 + numeroProductos - 1) + ':H' + (28 + filasInsertadas - 1) + ')');
+
+
           Logger.log(grupoIva);
           return;
         } catch (e) {
@@ -583,7 +590,7 @@ function resetPlantilla() {
   var colBases = "E";
   var lineaBases = 27;
   limpiarTablas(colBases, lineaBases);
-  
+
   // Borrar información del cliente
   targetSheet.getRange('B12').clearContent();
   targetSheet.getRange('B13').clearContent();
@@ -594,26 +601,26 @@ function resetPlantilla() {
   targetSheet.getRange('H15').clearContent();
   targetSheet.getRange('H12').clearContent();
   targetSheet.getRange('H13').clearContent();
-  
+
   // Borrar valor a pagar, nota de pago y observaciones
   targetSheet.getRange('B33').clearContent();
   targetSheet.getRange('A38').clearContent();
   targetSheet.getRange('A44').clearContent();
-  
+
   // Borrar total de items, descuentos y cargos
   targetSheet.getRange('B21').clearContent();
   targetSheet.getRange('A31').clearContent();
   targetSheet.getRange('C31').clearContent();
-  
-  
+
+
 }
 
-function limpiarTablas(columna, linea){
+function limpiarTablas(columna, linea) {
   var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
-  var primeraFila = targetSheet.getRange(linea+":"+linea);
+  var primeraFila = targetSheet.getRange(linea + ":" + linea);
   primeraFila.clearContent();
   linea++;
-  while (!targetSheet.getRange(columna+linea).isBlank()) {
+  while (!targetSheet.getRange(columna + linea).isBlank()) {
     targetSheet.deleteRow(linea);
   }
 }
