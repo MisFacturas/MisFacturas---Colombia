@@ -443,6 +443,7 @@ function obtenerDatosFactura(factura){
             var celdaDespricion = targetSheet.getRange('C'+numeroCelda);
             celdaDespricion.setBorder(true,true,true,true,null,null,null,null);
             celdaDespricion.setValue(listaProductos[j].Name);
+            celdaDespricion.setHorizontalAlignment('center');
             
             var celdaCantidad = targetSheet.getRange('F'+numeroCelda);
             celdaCantidad.setBorder(true,true,true,true,null,null,null,null);
@@ -513,6 +514,7 @@ function obtenerDatosFactura(factura){
               celdaTotal.setHorizontalAlignment('center');
 
               contador += 1;
+              filasInsertadas += 1;
             }
           }
 
@@ -550,9 +552,9 @@ function obtenerDatosFactura(factura){
           totalItemsCell.setValue(numeroProductos);
           descuentosCell.setValue(0);
           cargosCell.setValue(0);
-          sumaBaseImponible.setFormula('=SUM(A'+27+filasInsertadas+':A'+(28+filasInsertadas-1)+')');
-          sumaImpIva.setFormula('=SUM(F'+27+filasInsertadas+':F'+(28+filasInsertadas-1)+')');
-          sumaTotal.setFormula('=SUM(H'+27+filasInsertadas+':H'+(28+filasInsertadas-1)+')');
+          sumaBaseImponible.setFormula('=SUM(A'+(27+numeroProductos-1)+':A'+(28+filasInsertadas-1)+')');
+          sumaImpIva.setFormula('=SUM(F'+(27+numeroProductos-1)+':F'+(28+filasInsertadas-1)+')');
+          sumaTotal.setFormula('=SUM(H'+(27+numeroProductos-1)+':H'+(28+filasInsertadas-1)+')');
           
           
           Logger.log(grupoIva);
