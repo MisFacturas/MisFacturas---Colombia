@@ -196,10 +196,12 @@ function onEdit(e){
     else if (celdaEditada.getRow() >= productStartRow && celdaEditada.getColumn() <= productEndColumn) {
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
       const nextRow = lastProductRow + 1;
+      Logger.log("entra al primer else if")
   
       // Insert a new row below the last product row if it's not already in the tax section
       if (nextRow < taxSectionStartRow) {
         hojaActual.insertRowAfter(lastProductRow);
+        Logger.log("Entra al segundo if dnetro del else if ")
       }
     }
 
@@ -225,6 +227,8 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
 
 function getTaxSectionStartRow(sheet) {
   const maxRows = sheet.getMaxRows();
+  Logger.log("get tac section star row")
+  Logger.log(maxRows)
 
   // Find the first empty row after the products, which will be the start of the tax section
   for (let row = 22; row <= maxRows; row++) { // Start checking from row 22
