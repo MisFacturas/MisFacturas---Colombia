@@ -11,11 +11,11 @@ var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 
 var diccionarioCaluclarIva={
-  "21%": 0,
-  "10%": 0,
-  "5%": 0,
-  "4%": 0,
-  "0%": 0
+  "0.21": 0,
+  "0.1": 0,
+  "0.05": 0,
+  "0.04": 0,
+  "0": 0
 }
 
 function verificarYCopiarContacto(e) {
