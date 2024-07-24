@@ -300,7 +300,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     }else{
       totalProducts++;
       let dictInformacionProducto= obtenerInformacionProducto(prodcutoActual);
-      Logger.log("dictInformacionProducto"+dictInformacionProducto)
+      //Logger.log("dictInformacionProducto"+dictInformacionProducto)
       let porcientoIVA=dictInformacionProducto["porciento Iva"];
 
       Logger.log("porcientoIVA "+porcientoIVA)
