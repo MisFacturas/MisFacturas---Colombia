@@ -297,7 +297,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
   let rowEdited= celdaEditada.getRow();
   
   //toca revisar creo que cuando hay un producto con un espacio en el medio no teien encuenta y se sale 
-
+  limpiarDict();
   // calcualr cuando no hay cantidad
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
     let prodcutoActual=sheet.getRange(row, 2).getValue()
