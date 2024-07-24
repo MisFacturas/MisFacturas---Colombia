@@ -245,7 +245,7 @@ function onEdit(e){
       hojaActual.getRange("H"+String(rowEditada)).setValue(totalDeLinea);
 
     }
-    calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
+    //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
     updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow,celdaEditada);//tengo que revisar esto 
 
   }else if(hojaActual.getName()==="Clientes"){
