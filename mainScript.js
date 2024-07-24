@@ -212,7 +212,7 @@ function onEdit(e){
 
       // Insertar una nueva row 
       let diferencia =Math.abs(taxSectionStartRow-lastProductRow)
-      if(diferencia<=2){
+      if(diferencia<2){
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
         hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio con IVA"]);//precio con IVA
