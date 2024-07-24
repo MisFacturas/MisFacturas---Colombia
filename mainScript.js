@@ -218,7 +218,7 @@ function onEdit(e){
         hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
         Logger.log("Differencia"+diferencia)
-        hojaActual.insertRowAfter(lastProductRow);
+        hojaActual.insertRowAfter(lastProductRow);//tal vez aca aumntar el tax csoso para el bug
 
       }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
@@ -309,7 +309,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
         let importeActual=sheet.getRange("G"+String(row)).getValue();
         Logger.log("importeActual "+importeActual)
         Logger.log("Row"+ row)
-        diccionarioCaluclarIva["porcientoIVA"]+=importeActual;
+        diccionarioCaluclarIva[porcientoIVA]+=importeActual;
       }
     }
 
