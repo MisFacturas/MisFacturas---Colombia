@@ -255,8 +255,8 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
 function getTaxSectionStartRow(sheet) {
   //obtiene la row donde esta la seccion de taxinformation
   const maxRows = sheet.getMaxRows();
-  Logger.log("get tac section star row")
-  Logger.log(maxRows)
+  //Logger.log("get tac section star row")
+  //Logger.log(maxRows)
 
   // obtenemos la row donde esta la "base imponible, llegando asi al principio "
   for (let row = 22; row <= maxRows; row++) { // 22 porque su row predetermmiado es ese
