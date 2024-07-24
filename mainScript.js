@@ -329,8 +329,8 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     if(valorllave===0){
       continue
     }else{
-      hojaActual.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
-      hojaActual.getRange("C"+String(posicionTaxInfo)).setValue(llaveActual);
+      sheet.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
+      sheet.getRange("C"+String(posicionTaxInfo)).setValue(llaveActual);
       posicionTaxInfo++;
     }
   }
@@ -339,6 +339,16 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
   // Set the total products count in cell B27
   sheet.getRange('I11').setValue(totalProducts);
+}
+
+function limpiarDict(){
+  diccionarioCaluclarIva={
+    "0.21": 0,
+    "0.1": 0,
+    "0.05": 0,
+    "0.04": 0,
+    "0": 0
+  }
 }
 
 function slugifyF (str) {
