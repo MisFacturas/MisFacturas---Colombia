@@ -245,8 +245,8 @@ function onEdit(e){
       hojaActual.getRange("H"+String(rowEditada)).setValue(totalDeLinea);
 
     }
-
-    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow);//tengo que revisar esto 
+    calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
+    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow,celdaEditada);//tengo que revisar esto 
 
   }else if(hojaActual.getName()==="Clientes"){
     verificarDatosObligatorios(e);
@@ -286,15 +286,52 @@ function getTaxSectionStartRow(sheet) {
   return maxRows + 1;
 }
 
-function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow) {
+function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,celdaEditada) {
   let totalProducts = 0;
+  let rowEdited= celdaEditada.getRow();
+  
+  //toca revisar creo que cuando hay un producto con un espacio en el medio no teien encuenta y se sale 
 
-  // Iterate through the product rows to count the non-empty ones
+  // calcualr cuando no hay cantidad
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
-    if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
+    let prodcutoActual=sheet.getRange(row, 2).getValue()
+    if(prodcutoActual===""){
+        Logger.log("PRODUCTO VACIO")
+    }else{
       totalProducts++;
+      let dictInformacionProducto= obtenerInformacionProducto(prodcutoActual);
+      let porcientoIVA=dictInformacionProducto["porciento Iva"];
+
+      Logger.log("porcientoIVA "+porcientoIVA)
+      if (porcientoIVA in diccionarioCaluclarIva){
+        Logger.log("entra a coger el importe")
+        let importeActual=sheet.getRange("G"+String(row)).getValue();
+        diccionarioCaluclarIva["porcientoIVA"]+=importeActual;
+      }
+    }
+
+    // if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
+    //   totalProducts++;
+    // }
+  }
+
+  Logger.log("Obtener llaves del dict")
+  let llavesDiccionarioProducto=Object.keys(diccionarioCaluclarIva);
+  let posicionTaxInfo=taxSectionStartRow+1;//tal vez +1 >?
+  for(let k=0;k<llavesDiccionarioProducto.length;k++){
+    let llaveActual =llavesDiccionarioProducto[k];
+    let valorllave=diccionarioCaluclarIva[llaveActual];
+
+    if(valorllave===0){
+      continue
+    }else{
+      hojaActual.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
+      hojaActual.getRange("C"+String(posicionTaxInfo)).setValue(llaveActual);
+      posicionTaxInfo++;
     }
   }
+
+
 
   // Set the total products count in cell B27
   sheet.getRange('I11').setValue(totalProducts);

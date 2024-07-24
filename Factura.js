@@ -4,10 +4,19 @@ COL_TOTALES_PREFACTURA = 11;// K
 FILA_INICIAL_PREFACTURA = 8;
 COLUMNA_FINAL = 50;
 ADDITIONAL_ROWS = 3 + 3; //(Personalizacion)
+
 var spreadsheet = SpreadsheetApp.getActive();
 var prefactura_sheet = spreadsheet.getSheetByName('Factura2');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
+
+var diccionarioCaluclarIva={
+  "21%": 0,
+  "10%": 0,
+  "5%": 0,
+  "4%": 0,
+  "0%": 0
+}
 
 function verificarYCopiarContacto(e) {
   let hojaFacturas = e.source.getSheetByName('Factura');
@@ -34,33 +43,6 @@ function verificarYCopiarContacto(e) {
   }
 
 
-
-
-  // // Busca el contacto en la hoja de contactos
-  // let rangoContactos = hojaContactos.getRange(2, 1, hojaContactos.getLastRow() - 1, hojaContactos.getLastColumn());
-  // let valoresContactos = rangoContactos.getValues();
-
-  // for (let i = 0; i < valoresContactos.length; i++) {
-  //   if (valoresContactos[i][0] === nombreContacto) {
-  //     let estadoContacto = valoresContactos[i][ultimaColumnaPermitida - 1];
-  //     Logger.log(estadoContacto);
-  //     if (estadoContacto === "Valido") {
-  //       // Copia los datos de las columnas deseadas de manera vertical
-  //       for (let j = 0; j < datosARetornar.length; j++) {
-  //         let columna = hojaContactos.getRange(datosARetornar[j] + (i + 2)).getValue();
-  //         Logger.log(datosARetornar[j] + (i + 2))
-  //         hojaFacturas.getRange("B2").offset(j, 0).setValue(columna); //  aquí se puede ajustar la celda de inicio y el desplazamiento vertical
-  //       }
-  //     } else {
-  //       // Muestra un mensaje si el contacto no es válido
-  //       SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
-  //     }
-  //     return;
-  //   }
-  // }
-  
-  // Si no se encuentra el contacto
-  //SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no se encontró.");
 }
 
 
