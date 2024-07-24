@@ -211,16 +211,18 @@ function onEdit(e){
       
 
       // Insertar una nueva row 
-      if(taxSectionStartRow-lastProductRow>=2){
+      if(Math.abs(taxSectionStartRow-lastProductRow)<=2){
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto);
-      }else if (lastProductRow < taxSectionStartRow) {//erores ?
+        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio con IVA"]);//precio con IVA
+
+      }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
+        
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto);//valor unitario sin iva
-        // hojaActual.getRange("F"+String(lastProductRow)).setValue(dictInformacionProducto);//con iva
-        // hojaActual.getRange("G"+String(lastProductRow)).setValue(dictInformacionProducto);//importe
-        // hojaActual.getRange("H"+String(lastProductRow)).setValue(dictInformacionProducto);//total de linea
+        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio con IVA"]);//precio con IVA
+        //calcular importe y total de linea apenas se ingrese el valor de cantidad
 
         hojaActual.insertRowAfter(lastProductRow);
         Logger.log("Entra al segundo if dnetro del else if ")

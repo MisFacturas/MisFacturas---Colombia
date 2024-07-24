@@ -11,12 +11,16 @@ function obtenerInformacionProducto(producto) {
     let impuestos = datos_sheet.getRange("M11").getValue();
 
   
+    let porcentajeNumerico = parseFloat(porcientoIva.replace('%', ''));
+    let valorConIva = (valorProducto * porcentajeNumerico) / 100;
+
     let informacionProducto = {
       "codigo Producto": codigoProducto,
       "valor Unitario": valorUnitario,
       "porciento Iva": porcientoIva,
       "precio Con Iva": precioConIva,
-      "impuestos": impuestos
+      "impuestos": impuestos,
+      "precio con IVA":valorConIva
     };
   
     return informacionProducto;
