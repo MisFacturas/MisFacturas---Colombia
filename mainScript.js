@@ -339,8 +339,9 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     }else{
       sheet.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
       let valorEnPorcentaje=(llaveActual * 100) + '%';
-      sheet.getRange("C"+String(posicionTaxInfo)).setValue(llaveActual);
+      sheet.getRange("C"+String(posicionTaxInfo)).setValue(valorEnPorcentaje);
       sheet.getRange("C"+String(posicionTaxInfo)).setNumberFormat("0.00%");
+      Logger.log("SetnumberFormat?")
       posicionTaxInfo++;
     }
   }
