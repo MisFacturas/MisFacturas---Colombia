@@ -192,7 +192,7 @@ function onEdit(e){
 
     const productStartRow = 15; // prodcutos empeiza aca
     const productEndColumn = 8; //   procutos terminan en column H
-    const taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
+    let taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
     //Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
     if (colEditada === columnaContactos && rowEditada === rowContactos) {
@@ -225,7 +225,7 @@ function onEdit(e){
         Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
         Logger.log("Differencia"+diferencia)
         hojaActual.insertRowAfter(lastProductRow);//tal vez aca aumntar el tax csoso para el bug
-
+        taxSectionStartRow+=1
       }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
         
@@ -338,7 +338,9 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
       continue
     }else{
       sheet.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
+      let valorEnPorcentaje=(llaveActual * 100) + '%';
       sheet.getRange("C"+String(posicionTaxInfo)).setValue(llaveActual);
+      sheet.getRange("C"+String(posicionTaxInfo)).setNumberFormat("0.00%");
       posicionTaxInfo++;
     }
   }
