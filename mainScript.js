@@ -49,6 +49,12 @@ function openFacturaSheet() {
   SpreadsheetApp.setActiveSheet(sheet);
 }
 
+function openHistorialSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Historial Facturas");
+  SpreadsheetApp.setActiveSheet(sheet);
+}
+
 function showMenuFactura() {
   var html = HtmlService.createHtmlOutputFromFile('menuFactura')
     .setTitle('Menú Factura');
