@@ -187,7 +187,7 @@ function onEdit(e){
     const productStartRow = 15; // prodcutos empeiza aca
     const productEndColumn = 8; //   procutos terminan en column H
     const taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
-    Logger.log("taxSectionStartRow "+taxSectionStartRow)
+    //Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
     if (colEditada === columnaContactos && rowEditada === rowContactos) {
       //celda de elegir contacto
@@ -201,8 +201,8 @@ function onEdit(e){
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
       Logger.log("lastProductRow "+lastProductRow)
       const nextRow = lastProductRow + 1;
-      Logger.log("entra al primer else if")
-      Logger.log("next row "+nextRow)
+      //Logger.log("entra al primer else if")
+      //Logger.log("next row "+nextRow)
       Logger.log("taxSectionStartRow "+taxSectionStartRow) 
 
       //PRoceso para ingresar la info del producto
