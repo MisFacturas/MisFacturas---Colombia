@@ -212,12 +212,13 @@ function onEdit(e){
 
       // Insertar una nueva row 
       let diferencia =Math.abs(taxSectionStartRow-lastProductRow)
-      if(diferencia<2 && rowEditada ===lastProductRow){
+      if(diferencia<=2 && rowEditada ===lastProductRow){
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
         hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
         Logger.log("Differencia"+diferencia)
+        hojaActual.insertRowAfter(lastProductRow);
 
       }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
@@ -227,7 +228,7 @@ function onEdit(e){
         hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         //calcular importe y total de linea apenas se ingrese el valor de cantidad
 
-        hojaActual.insertRowAfter(lastProductRow);
+        
         Logger.log("Entra al segundo if dnetro del else if ")
         Logger.log("")
       }
