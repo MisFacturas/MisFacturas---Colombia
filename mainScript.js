@@ -197,7 +197,7 @@ function onEdit(e){
       generarNumeroFactura(hojaActual)
 
     }
-    else if (rowEditada >= productStartRow && colEditada <= 2 && rowEditada<taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
+    else if (rowEditada >= productStartRow && colEditada == 2 && rowEditada<taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
       Logger.log("lastProductRow "+lastProductRow)
       const nextRow = lastProductRow + 1;
@@ -211,10 +211,13 @@ function onEdit(e){
       
 
       // Insertar una nueva row 
-      if (lastProductRow < taxSectionStartRow) {
+      if(taxSectionStartRow-lastProductRow>=2){
+        hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto);
+      }else if (lastProductRow < taxSectionStartRow) {//erores ?
         // insertar cosas del producto en la hoja
-        hojaActual.getRange("C"+String(lastProductRow)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        // hojaActual.getRange("E"+String(lastProductRow)).setValue(dictInformacionProducto);//sin iva
+        hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto);//valor unitario sin iva
         // hojaActual.getRange("F"+String(lastProductRow)).setValue(dictInformacionProducto);//con iva
         // hojaActual.getRange("G"+String(lastProductRow)).setValue(dictInformacionProducto);//importe
         // hojaActual.getRange("H"+String(lastProductRow)).setValue(dictInformacionProducto);//total de linea
