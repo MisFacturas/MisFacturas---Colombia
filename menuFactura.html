@@ -121,6 +121,10 @@
           google.script.run.showEnviarEmail();
         }
 
+        function openHistorial() {
+          google.script.run.openHistorialSheet();
+        }
+
       </script>
     <title>Menú factura</title>
 </head>
@@ -132,7 +136,7 @@
       <div class="container">
         <h1>Facturas</h1>
         <div class="btn-group">
-            <button onclick="">Ver facturas</button>
+            <button onclick="openHistorial()">Historial facturas</button>
             <button onclick="downloadPdf()">Generar PDF</button>
             <button onclick="showEnviarEmail()">Enviar factura por correo</button>
             <input class="exit" type="button" value="Volver al menú principal" onclick="showMenuPrincipal()" style="margin-top: 20px;"/>
