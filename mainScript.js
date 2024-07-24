@@ -211,12 +211,13 @@ function onEdit(e){
       
 
       // Insertar una nueva row 
-      if(Math.abs(taxSectionStartRow-lastProductRow)<=2){
+      let diferencia =Math.abs(taxSectionStartRow-lastProductRow)
+      if(diferencia<=2){
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
         hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio con IVA"]);//precio con IVA
         Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
-        Logger.log("Differencia"+taxSectionStartRow-lastProductRow)
+        Logger.log("Differencia"+diferencia)
       }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
         
