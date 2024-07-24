@@ -1,5 +1,6 @@
 function obtenerInformacionProducto(producto) {
     let celdaProducto = datos_sheet.getRange("I11");
+    Logger.log("producto dentro de obtener "+producto)
     celdaProducto.setValue(producto);
   
   
