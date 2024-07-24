@@ -318,10 +318,13 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
   Logger.log("Obtener llaves del dict")
   let llavesDiccionarioProducto=Object.keys(diccionarioCaluclarIva);
   let posicionTaxInfo=taxSectionStartRow+1;//tal vez +1 >?
+  Logger.log("posicionTaxInfo "+posicionTaxInfo)
+  Logger.log("llavesDiccionarioProducto"+llavesDiccionarioProducto)
   for(let k=0;k<llavesDiccionarioProducto.length;k++){
     let llaveActual =llavesDiccionarioProducto[k];
     let valorllave=diccionarioCaluclarIva[llaveActual];
-
+    Logger.log("llaveActual "+llaveActual)
+    Logger.log("valorllave"+ valorllave)
     if(valorllave===0){
       continue
     }else{
