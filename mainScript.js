@@ -215,7 +215,8 @@ function onEdit(e){
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
         hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio con IVA"]);//precio con IVA
-
+        Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
+        Logger.log("Differencia"+taxSectionStartRow-lastProductRow)
       }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
         

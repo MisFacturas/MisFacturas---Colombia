@@ -12,6 +12,7 @@ function obtenerInformacionProducto(producto) {
 
     
     let porcentajeNumerico = parseFloat(porcientoIva.replace('%', ''));
+    Logger.log("porcentajeNumerico"+porcentajeNumerico)
     let valorConIva = (valorUnitario * porcentajeNumerico) / 100;
 
     let informacionProducto = {
