@@ -307,6 +307,8 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
       if (porcientoIVA in diccionarioCaluclarIva){
         Logger.log("entra a coger el importe")
         let importeActual=sheet.getRange("G"+String(row)).getValue();
+        Logger.log("importeActual "+importeActual)
+        Logger.log("Row"+ row)
         diccionarioCaluclarIva["porcientoIVA"]+=importeActual;
       }
     }
