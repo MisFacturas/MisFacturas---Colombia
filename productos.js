@@ -12,7 +12,7 @@ function obtenerInformacionProducto(producto) {
 
   
     let porcentajeNumerico = parseFloat(porcientoIva.replace('%', ''));
-    let valorConIva = (valorProducto * porcentajeNumerico) / 100;
+    let valorConIva = (valorUnitario * porcentajeNumerico) / 100;
 
     let informacionProducto = {
       "codigo Producto": codigoProducto,
