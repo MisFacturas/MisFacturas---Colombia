@@ -513,15 +513,15 @@ function obtenerDatosFactura(factura){
           var poblacionCell = targetSheet.getRange('B15');
           var fechaEmisionCell = targetSheet.getRange('H13');
           var formaPagoCell = targetSheet.getRange('H14');
-          var valorPagarCell = targetSheet.getRange('B'+(33+filasInsertadas));
+          var valorPagarCell = targetSheet.getRange('B'+(34+filasInsertadas));
           var notaPagoCell = targetSheet.getRange('A'+(38+filasInsertadas));
-          var observacionesCell = targetSheet.getRange('A'+(44+filasInsertadas));
+          var observacionesCell = targetSheet.getRange('A'+(43+filasInsertadas));
           var totalItemsCell = targetSheet.getRange('B'+(21+filasInsertadasPorProductos));
-          var descuentosCell = targetSheet.getRange('A'+(31+filasInsertadas));
-          var cargosCell = targetSheet.getRange('C'+(31+filasInsertadas));
-          var sumaBaseImponible = targetSheet.getRange('A'+(28+filasInsertadas));
-          var sumaImpIva = targetSheet.getRange('F'+(28+filasInsertadas));
-          var sumaTotal = targetSheet.getRange('H'+(28+filasInsertadas));
+          var descuentosCell = targetSheet.getRange('A'+(32+filasInsertadas));
+          var cargosCell = targetSheet.getRange('C'+(32+filasInsertadas));
+          var sumaBaseImponible = targetSheet.getRange('B'+(29+filasInsertadas));
+          var sumaImpIva = targetSheet.getRange('F'+(29+filasInsertadas));
+          var sumaTotal = targetSheet.getRange('H'+(29+filasInsertadas));
 
 
           clienteCell.setValue(cliente);
