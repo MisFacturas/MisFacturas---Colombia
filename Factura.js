@@ -583,14 +583,14 @@ function resetPlantilla() {
   targetSheet.getRange('H13').clearContent();
   
   // Borrar valor a pagar, nota de pago y observaciones
-  targetSheet.getRange('B33').clearContent();
+  targetSheet.getRange('B34').clearContent();
   targetSheet.getRange('A38').clearContent();
-  targetSheet.getRange('A44').clearContent();
+  targetSheet.getRange('A43').clearContent();
   
   // Borrar total de items, descuentos y cargos
   targetSheet.getRange('B21').clearContent();
-  targetSheet.getRange('A31').clearContent();
-  targetSheet.getRange('C31').clearContent();
+  targetSheet.getRange('A32').clearContent();
+  targetSheet.getRange('C32').clearContent();
   
   
 }
