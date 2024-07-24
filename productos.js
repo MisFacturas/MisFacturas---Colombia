@@ -21,7 +21,7 @@ function obtenerInformacionProducto(producto) {
       "porciento Iva": porcientoIva,
       "precio Con Iva": precioConIva,
       "impuestos": impuestos,
-      "precio con IVA":valorConIva
+      "precio con IVA2":valorConIva
     };
   
     return informacionProducto;

@@ -212,27 +212,40 @@ function onEdit(e){
 
       // Insertar una nueva row 
       let diferencia =Math.abs(taxSectionStartRow-lastProductRow)
-      if(diferencia<2){
+      if(diferencia<2 && rowEditada ===lastProductRow){
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio con IVA"]);//precio con IVA
+        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
         Logger.log("Differencia"+diferencia)
+
       }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
         
         hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio con IVA"]);//precio con IVA
+        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         //calcular importe y total de linea apenas se ingrese el valor de cantidad
 
         hojaActual.insertRowAfter(lastProductRow);
         Logger.log("Entra al segundo if dnetro del else if ")
         Logger.log("")
       }
+    }else if (rowEditada >= productStartRow && colEditada == 4 && rowEditada<taxSectionStartRow){// edita celda cantidad
+      //calcular Importe y Total de linea
+      let producto = hojaActual.getRange("B"+String(rowEditada)).getValue();//obtiene en prodcuto en la linea seleccionada
+      let dictInformacionProducto= obtenerInformacionProducto(producto);
+      let cantidadProducto = celdaEditada.getValue()
+
+      let importe= cantidadProducto*dictInformacionProducto["valor Unitario"];
+      let totalDeLinea = cantidadProducto*dictInformacionProducto["precio Con Iva"];
+
+      hojaActual.getRange("G"+String(rowEditada)).setValue(importe);
+      hojaActual.getRange("H"+String(rowEditada)).setValue(totalDeLinea);
+
     }
 
-    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow);
+    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow);//tengo que revisar esto 
 
   }else if(hojaActual.getName()==="Clientes"){
     verificarDatosObligatorios(e);
