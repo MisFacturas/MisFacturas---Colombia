@@ -350,6 +350,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     Logger.log("llaveActual "+llaveActual)
     Logger.log("valorllave"+ valorllave)
     if(valorllave===0){
+      Logger.log("posicionTaxInfo dentro del espacio vacio"+posicionTaxInfo)
       //revisar que ya se halla borrado de la lista de total taxes, ya que esto implica que no hay ningun prodcuto con este %de IVA
       let RangeIVAActivos=sheet.getRange(posicionTaxInfo,3,6)// 3 porque es donde esta el IVA
       let IVAsActivos=RangeIVAActivos.getValues();
