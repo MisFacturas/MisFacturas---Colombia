@@ -385,7 +385,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
   }
 
-  let rangeImporteTotal=sheet.getRange(productStartRow,7,taxSectionStartRow-2-productStartRow)
+  let rangeImporteTotal=sheet.getRange(productStartRow,7,taxSectionStartRow-productStartRow-1)
   let valores = rangeImporteTotal.getValues();
 
   let suma = 0;
@@ -398,6 +398,22 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
   Logger.log("Suma total de valores en el rango: " + suma);
 
+  let rangeBaseImponible=sheet.getRange(taxSectionStartRow+1,2,5)
+  let valores2 = rangeBaseImponible.getValues();
+
+  let suma2 = 0;
+  let limite=true
+  
+  for (let i = 0; i < valores2.length; i++) {
+    if (!isNaN(valores2[i][0]) && valores2[i][0] !== '' && limite) { // Asegurarse de que el valor sea un número y no esté vacío
+      suma2 += parseFloat(valores2[i][0]);
+      if(suma===suma2){
+        limite=false
+      }
+    }
+    //ya no es igual implica que lo de aqui en adelante se borra
+    Logger.log("verificar la columna B"+taxSectionStartRow+1+i)
+  }
 
 
   // Set the total products count in cell B27
