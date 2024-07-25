@@ -62,6 +62,12 @@ function showMenuFactura() {
     .showSidebar(html);
 }
 
+function showNuevaFactura(){
+  var html = HtmlService.createHtmlOutputFromFile('nuevaFactura').setTitle("Nueva factura")
+  SpreadsheetApp.getUi()
+  .showSidebar(html);
+}
+
 function openClientesSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Clientes");
