@@ -408,11 +408,15 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     if (!isNaN(valores2[i][0]) && valores2[i][0] !== '' && limite) { // Asegurarse de que el valor sea un número y no esté vacío
       suma2 += parseFloat(valores2[i][0]);
       if(suma===suma2){
+        Logger.log("eNTRA A LA SUMA ES IGUAL")
         limite=false
       }
+    }else{    //ya no es igual implica que lo de aqui en adelante se borra
+    let taxSectionStartRow2=Number(taxSectionStartRow)
+    let filaABorrar=taxSectionStartRow2+1+i;
+    sheet.getRange("B"+String(filaABorrar)).setValue("");
+    sheet.getRange("C"+String(filaABorrar)).setValue("");
     }
-    //ya no es igual implica que lo de aqui en adelante se borra
-    Logger.log("verificar la columna B"+taxSectionStartRow+1+i)
   }
 
 
