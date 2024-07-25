@@ -262,10 +262,12 @@ function onEdit(e){
 }
 
 function calcularImporteYTotal(hojaActual, rowEditada) {
+  Logger.log("rowEditada"+rowEditada)
   let producto = hojaActual.getRange("B" + String(rowEditada)).getValue(); // Obtiene el producto en la línea seleccionada
   let dictInformacionProducto = obtenerInformacionProducto(producto);
   let cantidadProducto = hojaActual.getRange("D" + String(rowEditada)).getValue(); // Asume que la cantidad está en la columna D
-
+  Logger.log("producto"+producto)
+  Logger.log("cantidadProducto"+cantidadProducto)
   let importe = cantidadProducto * dictInformacionProducto["valor Unitario"];
   let totalDeLinea = cantidadProducto * dictInformacionProducto["precio Con Iva"];
 
