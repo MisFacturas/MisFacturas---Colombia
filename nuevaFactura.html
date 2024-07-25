@@ -64,6 +64,7 @@
 
     function addNewProduct() {
       // Función para agregar nuevo producto
+      google.script.run.withSuccessHandler(writeDocument).showAgregarProdcuto();
     }
 
     function saveInvoice() {

@@ -68,6 +68,12 @@ function showNuevaFactura(){
   .showSidebar(html);
 }
 
+function showAgregarProdcuto(){
+  var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Agregar Producto")
+  SpreadsheetApp.getUi()
+  .showSidebar(html);
+}
+
 function openClientesSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Clientes2");

@@ -7,18 +7,26 @@
     .narrow {
       margin-bottom: 0.5rem;
     }
-    .bottom-right {
+    .top-right {
       position: fixed;
-      bottom: 10px;
+      top: 10px;
       right: 10px;
+      z-index: 1000;
+    }
+    .center-text {
+      text-align: center;
     }
   </style>
 </head>
 <body>
+  <div class="top-right">
+    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
+  </div>
   <h3>Clientes</h3>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
   
   <form id="clientForm">
+    <!-- Form content -->
     <div class="form-group">
       <label for="contacto">Contacto</label>
       <input type="text" class="form-control" id="contacto" placeholder="Contacto">
@@ -85,6 +93,7 @@
     <div class="form-group">
       <label for="regimen">Regimen</label>
       <select class="form-control" id="regimen">
+        <!-- options -->
         <option value="Operación de régimen general">Operación de régimen general</option>
         <option value="Exportación">Exportación</option>
         <option value="Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección">Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección</option>
@@ -115,7 +124,6 @@
       </select>
     </div>
     <button type="button" class="btn btn-primary" onclick="saveData()">Guardar</button>
-    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
   </form>
   
   <script>
@@ -126,33 +134,10 @@
     }
 
     function Back() {
-      google.script.run
-        .withSuccessHandler(writeDocument)
-        .loadIndex();
+      google.script.run.showSidebar();
     }
-
     function saveData() {
-      var clientData = {
-        contacto: document.getElementById('contacto').value,
-        codigoContacto: document.getElementById('codigoContacto').value,
-        tipoDocumento: document.getElementById('tipoDocumento').value,
-        numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
-        tipoPersona: document.getElementById('tipoPersona').value,
-        regimen: document.getElementById('regimen').value,
-        nombreComercial: document.getElementById('nombreComercial').value,
-        primerNombre: document.getElementById('primerNombre').value,
-        segundoNombre: document.getElementById('segundoNombre').value,
-        primerApellido: document.getElementById('primerApellido').value,
-        segundoApellido: document.getElementById('segundoApellido').value,
-        pais: document.getElementById('pais').value,
-        direccion: document.getElementById('direccion').value,
-        codigoPostal: document.getElementById('codigoPostal').value,
-        telefono: document.getElementById('telefono').value,
-        sitioWeb: document.getElementById('sitioWeb').value,
-        email: document.getElementById('email').value
-      };
 
-      google.script.run.saveClientData(clientData);
     }
   </script>
 </body>
