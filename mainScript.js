@@ -382,20 +382,21 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     // let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
     // let IVAsActivos=RangeIVAActivos.getValues().flat();;
 
-    let rangeImporteTotal=sheet.getRange(productStartRow,6,taxSectionStartRow-2)
-    let valores = rangeImporteTotal.getValues();
-
-    let suma = 0;
-  
-    for (let i = 0; i < valores.length; i++) {
-      if (!isNaN(valores[i][0]) && valores[i][0] !== '') { // Asegurarse de que el valor sea un número y no esté vacío
-        suma += parseFloat(valores[i][0]);
-      }
-    }
-  
-    Logger.log("Suma total de valores en el rango: " + suma);
 
   }
+
+  let rangeImporteTotal=sheet.getRange(productStartRow,6,taxSectionStartRow-2)
+  let valores = rangeImporteTotal.getValues();
+
+  let suma = 0;
+  Logger.log("valores de rango supuestament" +valores)
+  for (let i = 0; i < valores.length; i++) {
+    if (!isNaN(valores[i][0]) && valores[i][0] !== '') { // Asegurarse de que el valor sea un número y no esté vacío
+      suma += parseFloat(valores[i][0]);
+    }
+  }
+
+  Logger.log("Suma total de valores en el rango: " + suma);
 
 
 
