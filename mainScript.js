@@ -385,7 +385,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
   }
 
-  let rangeImporteTotal=sheet.getRange(productStartRow,6,taxSectionStartRow-2)
+  let rangeImporteTotal=sheet.getRange(productStartRow,7,taxSectionStartRow-2-productStartRow)
   let valores = rangeImporteTotal.getValues();
 
   let suma = 0;
