@@ -247,15 +247,7 @@ function onEdit(e){
       }
     }else if (rowEditada >= productStartRow && colEditada == 4 && rowEditada<taxSectionStartRow){// edita celda cantidad
       //calcular Importe y Total de linea
-      let producto = hojaActual.getRange("B"+String(rowEditada)).getValue();//obtiene en prodcuto en la linea seleccionada
-      let dictInformacionProducto= obtenerInformacionProducto(producto);
-      let cantidadProducto = celdaEditada.getValue()
-
-      let importe= cantidadProducto*dictInformacionProducto["valor Unitario"];
-      let totalDeLinea = cantidadProducto*dictInformacionProducto["precio Con Iva"];
-
-      hojaActual.getRange("G"+String(rowEditada)).setValue(importe);
-      hojaActual.getRange("H"+String(rowEditada)).setValue(totalDeLinea);
+      calcularImporteYTotal(hojaActual, rowEditada);
 
     }
     //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
@@ -265,6 +257,18 @@ function onEdit(e){
     verificarDatosObligatorios(e);
 
   }
+}
+
+function calcularImporteYTotal(hojaActual, rowEditada) {
+  let producto = hojaActual.getRange("B" + String(rowEditada)).getValue(); // Obtiene el producto en la línea seleccionada
+  let dictInformacionProducto = obtenerInformacionProducto(producto);
+  let cantidadProducto = hojaActual.getRange("D" + String(rowEditada)).getValue(); // Asume que la cantidad está en la columna D
+
+  let importe = cantidadProducto * dictInformacionProducto["valor Unitario"];
+  let totalDeLinea = cantidadProducto * dictInformacionProducto["precio Con Iva"];
+
+  hojaActual.getRange("G" + String(rowEditada)).setValue(importe);
+  hojaActual.getRange("H" + String(rowEditada)).setValue(totalDeLinea);
 }
 
 function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
