@@ -341,7 +341,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
   Logger.log("Obtener llaves del dict")
   let llavesDiccionarioProducto=Object.keys(diccionarioCaluclarIva);
-  let posicionTaxInfo=taxSectionStartRow+1;//tal vez +1 >?
+  let posicionTaxInfo=taxSectionStartRow+1;//tal vez +1 > row?
   Logger.log("posicionTaxInfo "+posicionTaxInfo)
   Logger.log("llavesDiccionarioProducto"+llavesDiccionarioProducto)
   for(let k=0;k<llavesDiccionarioProducto.length;k++){
@@ -351,6 +351,13 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     Logger.log("valorllave"+ valorllave)
     if(valorllave===0){
       //revisar que ya se halla borrado de la lista de total taxes, ya que esto implica que no hay ningun prodcuto con este %de IVA
+      let RangeIVAActivos=sheet.getRange(posicionTaxInfo,3,6)// 3 porque es donde esta el IVA
+      let IVAsActivos=RangeIVAActivos.getValues();
+      Logger.log("IVAsActivos sin String " +IVAsActivos)
+      let IVAsActivos2=String(RangeIVAActivos.getValues());
+      Logger.log("IVAsActivos CON String " +IVAsActivos2)
+
+
       continue
     }else{
       sheet.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
