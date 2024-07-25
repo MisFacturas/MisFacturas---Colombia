@@ -24,10 +24,10 @@ function onOpen() {
 
 function showSidebar() {
   var html = HtmlService.createHtmlOutputFromFile('main')
-      .setTitle('Menú prueba');
-      SpreadsheetApp.getUi()
-      .showSidebar(html);
-    }
+    .setTitle('Menú prueba');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
 function showPreProductos() {
   console.log("Attempting to show Productos");
   var html = HtmlService.createHtmlOutputFromFile('preProductos')
@@ -42,7 +42,7 @@ function showAggProductos() {
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
-    
+
 function openFacturaSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Factura");
@@ -62,16 +62,16 @@ function showMenuFactura() {
     .showSidebar(html);
 }
 
-function showNuevaFactura(){
+function showNuevaFactura() {
   var html = HtmlService.createHtmlOutputFromFile('nuevaFactura').setTitle("Nueva factura")
   SpreadsheetApp.getUi()
-  .showSidebar(html);
+    .showSidebar(html);
 }
 
-function showAgregarProdcuto(){
+function showAgregarProdcuto() {
   var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Agregar Producto")
   SpreadsheetApp.getUi()
-  .showSidebar(html);
+    .showSidebar(html);
 }
 
 function openClientesSheet() {
@@ -100,7 +100,7 @@ function showEnviarEmail() {
     .showSidebar(html);
 }
 
-function inicarFacturaNuevaMain(){
+function inicarFacturaNuevaMain() {
   inicarFacturaNueva();
 }
 
@@ -110,14 +110,14 @@ function processForm(data) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Productos");
     const lastRow = sheet.getLastRow();
     const newRow = lastRow + 1;
-    
+
     const codigoReferencia = data.codigoReferencia;
     const nombre = data.nombre;
     const valorUnitario = parseFloat(data.valorUnitario);
     const iva = parseFloat(data.iva) / 100;
     const precioConIva = valorUnitario * (1 + iva);
     const impuestos = valorUnitario * iva;
-    
+
     sheet.getRange(newRow, 1).setValue(codigoReferencia);
     sheet.getRange(newRow, 2).setValue(nombre);
     sheet.getRange(newRow, 3).setValue(valorUnitario);
@@ -127,8 +127,8 @@ function processForm(data) {
     ivaCell.setNumberFormat('0.00%'); // Formatea la celda como porcentaje con dos decimales
     sheet.getRange(newRow, 5).setValue(precioConIva); // Guarda el precio con IVA
     sheet.getRange(newRow, 6).setValue(impuestos); // Guarda el valor de los impuestos
-    
-    
+
+
 
     return "Datos guardados correctamente";
   } catch (error) {
@@ -139,7 +139,7 @@ function processForm(data) {
 function generatePdfFromPlantilla() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Plantilla');
-  
+
   if (!sheet) {
     throw new Error('La hoja Plantilla no existe.');
   }
@@ -153,22 +153,34 @@ function generatePdfFromPlantilla() {
     '&sheetnames=false&printtitle=false' +  // Opciones de impresión
     '&pagenumbers=false&gridlines=false' +  // Más opciones de impresión
     '&fzr=false' +  // Aislar filas congeladas
-    //'&top_margin=0.00' +  // Margen superior
+    '&top_margin=0.8' +  // Margen superior
     '&bottom_margin=0.00' +  // Margen inferior
-    '&left_margin=0.5' +  // Margen izquierdo
-    '&right_margin=0.5' +  // Margen derecho
+    '&left_margin=0.50' +  // Margen izquierdo
+    '&right_margin=0.50' +  // Margen derecho
     '&horizontal_alignment=CENTER' +  // Alineación horizontal
     '&vertical_alignment=TOP';  // Alineación vertical
 
   var token = ScriptApp.getOAuthToken();
-  var response = UrlFetchApp.fetch(url, {
-    headers: {
-      'Authorization': 'Bearer ' + token
-    }
-  });
 
-  var pdfBlob = response.getBlob().setName('Plantilla.pdf');
-  return pdfBlob;
+  try {
+    var response = UrlFetchApp.fetch(url, {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      muteHttpExceptions: true
+    });
+
+    if (response.getResponseCode() === 200) {
+      var pdfBlob = response.getBlob().setName('Plantilla.pdf');
+      return pdfBlob;
+    } else {
+      Logger.log('Error ' + response.getResponseCode() + ': ' + response.getContentText());
+      throw new Error('Error ' + response.getResponseCode() + ': ' + response.getContentText());
+    }
+  } catch (e) {
+    Logger.log('Exception: ' + e.message);
+    throw new Error('Exception: ' + e.message);
+  }
 }
 
 function getPdfUrl() {
@@ -183,7 +195,7 @@ function sendPdfByEmail(email) {
   var pdfFile = generatePdfFromFactura();
   var subject = 'Factura';
   var body = 'Adjunto encontrará la factura en formato PDF.';
-  
+
   if (!email) {
     return "Por favor ingrese una dirección de correo válida.";
   }
@@ -194,24 +206,24 @@ function sendPdfByEmail(email) {
     body: body,
     attachments: [pdfFile.getAs(MimeType.PDF)]
   });
-  
+
   return "PDF generado y enviado por correo electrónico a " + email;
 }
 
 
-function onEdit(e){
+function onEdit(e) {
   let hojaActual = e.source.getActiveSheet();
   verificarTipoDeDatos(e);
 
-  if (hojaActual.getName()==="Factura"){
+  if (hojaActual.getName() === "Factura") {
 
     let celdaEditada = e.range;
-    let rowEditada=celdaEditada.getRow();
-    let colEditada=celdaEditada.getColumn();
+    let rowEditada = celdaEditada.getRow();
+    let colEditada = celdaEditada.getColumn();
 
     let columnaContactos = 3; // Ajusta según sea necesario
-    let rowContactos= 2;
-    
+    let rowContactos = 2;
+
 
     const productStartRow = 15; // prodcutos empeiza aca
     const productEndColumn = 8; //   procutos terminan en column H
@@ -226,64 +238,64 @@ function onEdit(e){
       //generarNumeroFactura(hojaActual)
 
     }
-    else if (rowEditada >= productStartRow && colEditada == 2 && rowEditada<taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
+    else if (rowEditada >= productStartRow && colEditada == 2 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
-      Logger.log("lastProductRow "+lastProductRow)
+      Logger.log("lastProductRow " + lastProductRow)
       const nextRow = lastProductRow + 1;
       //Logger.log("entra al primer else if")
       //Logger.log("next row "+nextRow)
-      Logger.log("taxSectionStartRow "+taxSectionStartRow) 
+      Logger.log("taxSectionStartRow " + taxSectionStartRow)
 
       //PRoceso para ingresar la info del producto
-      let valorCelda=celdaEditada.getValue();
-      let dictInformacionProducto= obtenerInformacionProducto(valorCelda);
-      
+      let valorCelda = celdaEditada.getValue();
+      let dictInformacionProducto = obtenerInformacionProducto(valorCelda);
+
 
       // Insertar una nueva row 
-      let diferencia =Math.abs(taxSectionStartRow-lastProductRow)
-      if(diferencia<=2 && rowEditada ===lastProductRow){
-        hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+      let diferencia = Math.abs(taxSectionStartRow - lastProductRow)
+      if (diferencia <= 2 && rowEditada === lastProductRow) {
+        hojaActual.getRange("C" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaActual.getRange("F" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
-        Logger.log("Differencia"+diferencia)
+        Logger.log("Differencia" + diferencia)
         hojaActual.insertRowAfter(lastProductRow);//tal vez aca aumntar el tax csoso para el bug
-        taxSectionStartRow+=1
+        taxSectionStartRow += 1
         calcularImporteYTotal(hojaActual, rowEditada);
-      }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
+      } else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
-        
-        hojaActual.getRange("C"+String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("E"+String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("F"+String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+
+        hojaActual.getRange("C" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaActual.getRange("F" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         //calcular importe y total de linea apenas se ingrese el valor de cantidad
 
-        
+
         Logger.log("Entra al segundo if dnetro del else if ")
         Logger.log("")
         calcularImporteYTotal(hojaActual, rowEditada);
       }
-    }else if (rowEditada >= productStartRow && colEditada == 4 && rowEditada<taxSectionStartRow){// edita celda cantidad
+    } else if (rowEditada >= productStartRow && colEditada == 4 && rowEditada < taxSectionStartRow) {// edita celda cantidad
       //calcular Importe y Total de linea
       calcularImporteYTotal(hojaActual, rowEditada);
 
     }
     //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
-    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow,celdaEditada);//tengo que revisar esto 
+    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow, celdaEditada);//tengo que revisar esto 
 
-  }else if(hojaActual.getName()==="Clientes"){
+  } else if (hojaActual.getName() === "Clientes") {
     verificarDatosObligatorios(e);
 
   }
 }
 
 function calcularImporteYTotal(hojaActual, rowEditada) {
-  Logger.log("rowEditada"+rowEditada)
+  Logger.log("rowEditada" + rowEditada)
   let producto = hojaActual.getRange("B" + String(rowEditada)).getValue(); // Obtiene el producto en la línea seleccionada
   let dictInformacionProducto = obtenerInformacionProducto(producto);
   let cantidadProducto = hojaActual.getRange("D" + String(rowEditada)).getValue(); // Asume que la cantidad está en la columna D
-  Logger.log("producto"+producto)
-  Logger.log("cantidadProducto"+cantidadProducto)
+  Logger.log("producto" + producto)
+  Logger.log("cantidadProducto" + cantidadProducto)
   let importe = cantidadProducto * dictInformacionProducto["valor Unitario"];
   let totalDeLinea = cantidadProducto * dictInformacionProducto["precio Con Iva"];
 
@@ -296,7 +308,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   let lastProductRow = productStartRow;
 
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
-    if (sheet.getRange(row, 2).getValue() !== '') { 
+    if (sheet.getRange(row, 2).getValue() !== '') {
       lastProductRow = row;
     }
   }
@@ -314,7 +326,7 @@ function getTaxSectionStartRow(sheet) {
   for (let row = 22; row <= maxRows; row++) { // 22 porque su row predetermmiado es ese
     if (sheet.getRange(row, 2).getValue() === 'Base imponible') {
 
-      Logger.log("dentro de getTax row "+row)
+      Logger.log("dentro de getTax row " + row)
       return row;
     }
   }
@@ -323,30 +335,30 @@ function getTaxSectionStartRow(sheet) {
   return maxRows + 1;
 }
 
-function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,celdaEditada) {
+function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, celdaEditada) {
   let totalProducts = 0;
-  let rowEdited= celdaEditada.getRow();
-  
+  let rowEdited = celdaEditada.getRow();
+
   //toca revisar creo que cuando hay un producto con un espacio en el medio no teien encuenta y se sale 
   limpiarDict();
   // calcualr cuando no hay cantidad
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
-    let prodcutoActual=sheet.getRange(row, 2).getValue()
-    if(prodcutoActual===""){
-        Logger.log("PRODUCTO VACIO")
-    }else{
+    let prodcutoActual = sheet.getRange(row, 2).getValue()
+    if (prodcutoActual === "") {
+      Logger.log("PRODUCTO VACIO")
+    } else {
       totalProducts++;
-      let dictInformacionProducto= obtenerInformacionProducto(prodcutoActual);
+      let dictInformacionProducto = obtenerInformacionProducto(prodcutoActual);
       //Logger.log("dictInformacionProducto"+dictInformacionProducto)
-      let porcientoIVA=dictInformacionProducto["porciento Iva"];
+      let porcientoIVA = dictInformacionProducto["porciento Iva"];
 
-      Logger.log("porcientoIVA "+porcientoIVA)
-      if (porcientoIVA in diccionarioCaluclarIva){
+      Logger.log("porcientoIVA " + porcientoIVA)
+      if (porcientoIVA in diccionarioCaluclarIva) {
         Logger.log("entra a coger el importe")
-        let importeActual=sheet.getRange("G"+String(row)).getValue();
-        Logger.log("importeActual "+importeActual)
-        Logger.log("Row"+ row)
-        diccionarioCaluclarIva[porcientoIVA]+=importeActual;
+        let importeActual = sheet.getRange("G" + String(row)).getValue();
+        Logger.log("importeActual " + importeActual)
+        Logger.log("Row" + row)
+        diccionarioCaluclarIva[porcientoIVA] += importeActual;
       }
     }
 
@@ -356,17 +368,17 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
   }
 
   Logger.log("Obtener llaves del dict")
-  let llavesDiccionarioProducto=Object.keys(diccionarioCaluclarIva);
-  let posicionTaxInfo=taxSectionStartRow+1;//tal vez +1 > row?
-  Logger.log("posicionTaxInfo "+posicionTaxInfo)
-  Logger.log("llavesDiccionarioProducto"+llavesDiccionarioProducto)
-  let poscionTaxParaIvaNoPresente=posicionTaxInfo
-  for(let k=0;k<llavesDiccionarioProducto.length;k++){
-    let llaveActual =llavesDiccionarioProducto[k];
-    let valorllave=diccionarioCaluclarIva[llaveActual];
-    Logger.log("llaveActual tipo "+typeof(llaveActual))
-    Logger.log("valorllave tipo "+ typeof(valorllave))
-    if(valorllave===0){
+  let llavesDiccionarioProducto = Object.keys(diccionarioCaluclarIva);
+  let posicionTaxInfo = taxSectionStartRow + 1;//tal vez +1 > row?
+  Logger.log("posicionTaxInfo " + posicionTaxInfo)
+  Logger.log("llavesDiccionarioProducto" + llavesDiccionarioProducto)
+  let poscionTaxParaIvaNoPresente = posicionTaxInfo
+  for (let k = 0; k < llavesDiccionarioProducto.length; k++) {
+    let llaveActual = llavesDiccionarioProducto[k];
+    let valorllave = diccionarioCaluclarIva[llaveActual];
+    Logger.log("llaveActual tipo " + typeof (llaveActual))
+    Logger.log("valorllave tipo " + typeof (valorllave))
+    if (valorllave === 0) {
       // Logger.log("posicionTaxInfo dentro del espacio vacio"+posicionTaxInfo)
       // //revisar que ya se halla borrado de la lista de total taxes, ya que esto implica que no hay ningun prodcuto con este %de IVA
       // let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
@@ -386,11 +398,11 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
 
       continue
-    }else{
-      sheet.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
-      let valorEnPorcentaje=(llaveActual * 100) + '%';
-      sheet.getRange("C"+String(posicionTaxInfo)).setValue(valorEnPorcentaje);
-      sheet.getRange("C"+String(posicionTaxInfo)).setNumberFormat("0.00%");
+    } else {
+      sheet.getRange("B" + String(posicionTaxInfo)).setValue(valorllave);
+      let valorEnPorcentaje = (llaveActual * 100) + '%';
+      sheet.getRange("C" + String(posicionTaxInfo)).setValue(valorEnPorcentaje);
+      sheet.getRange("C" + String(posicionTaxInfo)).setNumberFormat("0.00%");
       Logger.log("SetnumberFormat?")
       posicionTaxInfo++;
     }
@@ -401,11 +413,11 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
   }
 
-  let rangeImporteTotal=sheet.getRange(productStartRow,7,taxSectionStartRow-productStartRow-1)
+  let rangeImporteTotal = sheet.getRange(productStartRow, 7, taxSectionStartRow - productStartRow - 1)
   let valores = rangeImporteTotal.getValues();
 
   let suma = 0;
-  Logger.log("valores de rango supuestament" +valores)
+  Logger.log("valores de rango supuestament" + valores)
   for (let i = 0; i < valores.length; i++) {
     if (!isNaN(valores[i][0]) && valores[i][0] !== '') { // Asegurarse de que el valor sea un número y no esté vacío
       suma += parseFloat(valores[i][0]);
@@ -414,25 +426,25 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
   Logger.log("Suma total de valores en el rango: " + suma);
 
-  let rangeBaseImponible=sheet.getRange(taxSectionStartRow+1,2,5)
+  let rangeBaseImponible = sheet.getRange(taxSectionStartRow + 1, 2, 5)
   let valores2 = rangeBaseImponible.getValues();
 
   let suma2 = 0;
-  let limite=true
-  
+  let limite = true
+
   for (let i = 0; i < valores2.length; i++) {
     if (!isNaN(valores2[i][0]) && valores2[i][0] !== '' && limite) { // Asegurarse de que el valor sea un número y no esté vacío
       suma2 += parseFloat(valores2[i][0]);
-      if(suma===suma2){
+      if (suma === suma2) {
         Logger.log("eNTRA A LA SUMA ES IGUAL")
-        limite=false
+        limite = false
       }
-    }else{    //ya no es igual implica que lo de aqui en adelante se borra
-    let taxSectionStartRow2=Number(taxSectionStartRow)
-    let filaABorrar=taxSectionStartRow2+1+i;
-    Logger.log("filaABorrar")
-    sheet.getRange("B"+String(filaABorrar)).setValue("");
-    sheet.getRange("C"+String(filaABorrar)).setValue("");
+    } else {    //ya no es igual implica que lo de aqui en adelante se borra
+      let taxSectionStartRow2 = Number(taxSectionStartRow)
+      let filaABorrar = taxSectionStartRow2 + 1 + i;
+      Logger.log("filaABorrar")
+      sheet.getRange("B" + String(filaABorrar)).setValue("");
+      sheet.getRange("C" + String(filaABorrar)).setValue("");
     }
   }
 
@@ -441,9 +453,9 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
   sheet.getRange('H13').setValue(totalProducts);
 }
 
-function limpiarDict(){
+function limpiarDict() {
   Logger.log("Limpiar el dict")
-  diccionarioCaluclarIva={
+  diccionarioCaluclarIva = {
     "0.21": 0,
     "0.1": 0,
     "0.05": 0,
@@ -452,24 +464,24 @@ function limpiarDict(){
   }
 }
 
-function slugifyF (str) {
+function slugifyF(str) {
   var map = {
-      '-' : ' ',
-      '-' : '_',
-      'a' : 'á|à|ã|â|À|Á|Ã|Â',
-      'e' : 'é|è|ê|É|È|Ê',
-      'i' : 'í|ì|î|Í|Ì|Î',
-      'o' : 'ó|ò|ô|õ|Ó|Ò|Ô|Õ',
-      'u' : 'ú|ù|û|ü|Ú|Ù|Û|Ü',
-      'c' : 'ç|Ç',
-      'n' : 'ñ|Ñ'
+    '-': ' ',
+    '-': '_',
+    'a': 'á|à|ã|â|À|Á|Ã|Â',
+    'e': 'é|è|ê|É|È|Ê',
+    'i': 'í|ì|î|Í|Ì|Î',
+    'o': 'ó|ò|ô|õ|Ó|Ò|Ô|Õ',
+    'u': 'ú|ù|û|ü|Ú|Ù|Û|Ü',
+    'c': 'ç|Ç',
+    'n': 'ñ|Ñ'
   };
-  
+
   str = String(str)
   str = str.toLowerCase();
-  
+
   for (var pattern in map) {
-      str = str.replace(new RegExp(map[pattern], 'g'), pattern);
+    str = str.replace(new RegExp(map[pattern], 'g'), pattern);
   };
 
   return str;
@@ -485,11 +497,11 @@ function getAdditionalDocuments() {
   return AdditionalDocuments;
 }
 
-var centenas = ['', 'Ciento ', 'Doscientos ', 'Trescientos ', 'Cuatrocientos ', 'Quinientos ', 'Seiscientos ', 
-'Setecientos ', 'Ochocientos ', 'Novecientos ']
+var centenas = ['', 'Ciento ', 'Doscientos ', 'Trescientos ', 'Cuatrocientos ', 'Quinientos ', 'Seiscientos ',
+  'Setecientos ', 'Ochocientos ', 'Novecientos ']
 
-var decenas1 = ['Diez ', 'Once ', 'Doce ', 'Trece ', 'Catorce ', 'Quince ', 'Dieciseis ', 'Diecisiete ', 
-'Dieciocho ', 'Diecinueve ']
+var decenas1 = ['Diez ', 'Once ', 'Doce ', 'Trece ', 'Catorce ', 'Quince ', 'Dieciseis ', 'Diecisiete ',
+  'Dieciocho ', 'Diecinueve ']
 
 var decenas2 = ['', 'Diez', 'Veinte ', 'Treinta ', 'Cuarenta ', 'Cincuenta ', 'Sesenta ', 'Setenta', 'Ochenta ', 'Noventa ']
 var unidades = ['', 'Un ', 'Dos ', 'Tres ', 'Cuatro ', 'Cinco ', 'Seis ', 'Siete ', 'Ocho ', 'Nueve ']
@@ -610,7 +622,7 @@ function getPaymentMeans(PaymentMeansTxt) {
       var PaymentMeans = 38;
     default:
       Logger.log("Error: PaymentMeans");
-      var PaymentMeans=100
+      var PaymentMeans = 100
   }
   return PaymentMeans;
 
@@ -618,7 +630,7 @@ function getPaymentMeans(PaymentMeansTxt) {
 
 
 
-function getPaymentType(PaymentTypeTxt) { 
+function getPaymentType(PaymentTypeTxt) {
   switch (PaymentTypeTxt) {
     case 'Contado':
       var PaymentType = 1;
@@ -635,10 +647,10 @@ function getPaymentType(PaymentTypeTxt) {
 
 function unos(n) {
   if (n == 0) {
-      return '';
+    return '';
   }
   else {
-      return unidades[n];
+    return unidades[n];
   }
 }
 
@@ -646,29 +658,29 @@ function dieces(n) {
   var decena = Math.floor(n / 10);
   var unidad = n % 10;
   switch (true) {
-      case ((n % 10) == 0):
-          return (decenas2[n / 10]);
-      case ((11 <= n) && (n <= 19)):
-          return (decenas1[(n % 10)]);
-      case (Math.floor(n / 10) == 2):
-          return `Veinti${unos(unidad).toLowerCase()}`;
-      case (0 <= n && n < 10):
-          return (unos(n % 10));
-      default:
-          var letras = `${decenas2[decena]} y ${unos(unidad)}`;
-          return (letras);
+    case ((n % 10) == 0):
+      return (decenas2[n / 10]);
+    case ((11 <= n) && (n <= 19)):
+      return (decenas1[(n % 10)]);
+    case (Math.floor(n / 10) == 2):
+      return `Veinti${unos(unidad).toLowerCase()}`;
+    case (0 <= n && n < 10):
+      return (unos(n % 10));
+    default:
+      var letras = `${decenas2[decena]} y ${unos(unidad)}`;
+      return (letras);
   }
 }
 
 function cienes(n) {
   if (n == 100) {
-      return 'Cien ';
+    return 'Cien ';
   }
   if (n < 100) {
-      return dieces(n);
+    return dieces(n);
   }
   else {
-      return (centenas[Math.floor(n / 100)] + dieces(n % 100));
+    return (centenas[Math.floor(n / 100)] + dieces(n % 100));
   }
 }
 
@@ -682,30 +694,30 @@ function int2word(n) {
 
   var letras = '';
   if (megas >= 1) {
-      if (megas == 1) {
-          letras = letras + 'Un Millón ';
-      } else {
-          letras = letras + cienes(megas) + ' Millones ';
-      }
+    if (megas == 1) {
+      letras = letras + 'Un Millón ';
+    } else {
+      letras = letras + cienes(megas) + ' Millones ';
+    }
   }
   if (kilos >= 1) {
-      if (kilos == 1) {
-          letras = letras + 'Mil ';
-      } else {
-          letras = letras + cienes(kilos) + 'Mil ';
-      }
+    if (kilos == 1) {
+      letras = letras + 'Mil ';
+    } else {
+      letras = letras + cienes(kilos) + 'Mil ';
+    }
   }
 
   if (ones >= 1) {
-      if (ones == 1) {
-          letras = letras + 'Un ';
-      } else {
-          letras = letras + cienes(ones);
-      }
+    if (ones == 1) {
+      letras = letras + 'Un ';
+    } else {
+      letras = letras + cienes(ones);
+    }
   }
 
   if (centimos > 0) {
-      letras = letras  +'Euros'+ `Con ${cienes(centimos)}Céntimos`;
+    letras = letras + 'Euros' + `Con ${cienes(centimos)}Céntimos`;
   }
 
   return letras;
@@ -740,9 +752,9 @@ function getDelivery() {
 
 }
 
-function getMeasureUnitCode(measureName){
+function getMeasureUnitCode(measureName) {
   var range = unidades_sheet.getRange("E1");
-  
+
   var formula = `=DGET($A$1:$B$1104,A$1,{"Descripcion";"=${measureName}"})`;
   range.setValue(formula);
 
@@ -750,15 +762,15 @@ function getMeasureUnitCode(measureName){
 }
 
 
-function verificarTipoDeDatos(e){
-    /*Funcion que verificar que celda o grupo de celdas editada
-  y verifica su valor para saber si es valido 
-  Input: e objeto que actua como una instancia del sheet editado 
-  Output: no tiene output pero regresa un mensaje en caso de que sea erroneo el tipo de dato*/
+function verificarTipoDeDatos(e) {
+  /*Funcion que verificar que celda o grupo de celdas editada
+y verifica su valor para saber si es valido 
+Input: e objeto que actua como una instancia del sheet editado 
+Output: no tiene output pero regresa un mensaje en caso de que sea erroneo el tipo de dato*/
 
   let sheet = e.range.getSheet();
 
-  if(sheet.getName()==="Clientes"){//aca filtro de hoja, por cada hoja verifica cosas distintas
+  if (sheet.getName() === "Clientes") {//aca filtro de hoja, por cada hoja verifica cosas distintas
     let numIdentificacion = sheet.getRange("D2:D1000");
     let contacto = sheet.getRange("A2:A1000");
     let codigoContacto = sheet.getRange("B2:B1000");
@@ -767,59 +779,59 @@ function verificarTipoDeDatos(e){
     let primeraApellido = sheet.getRange("J2:J1000");
     let segundoApellido = sheet.getRange("K2:K1000");
     let pais = sheet.getRange("l2:l1000");
-    let provincia=sheet.getRange("M2:M1000");
-    let poblacion=sheet.getRange("N2:N1000");
-    let direccion =sheet.getRange("O2:O1000");
-    let codigoPostal =sheet.getRange("P2:P1000");
-    let telefono =sheet.getRange("Q2:Q1000");
-    let sitioWeb =sheet.getRange("R2:R1000");
-    let email =sheet.getRange("S2:S1000");
+    let provincia = sheet.getRange("M2:M1000");
+    let poblacion = sheet.getRange("N2:N1000");
+    let direccion = sheet.getRange("O2:O1000");
+    let codigoPostal = sheet.getRange("P2:P1000");
+    let telefono = sheet.getRange("Q2:Q1000");
+    let sitioWeb = sheet.getRange("R2:R1000");
+    let email = sheet.getRange("S2:S1000");
     let editedCell = e.range;
 
-    esCeldaEnRango(numIdentificacion,editedCell,undefined,e);
-    esCeldaEnRango(contacto,editedCell,"string",e);
-    esCeldaEnRango(codigoContacto,editedCell,undefined,e);
-    esCeldaEnRango(primerNombre,editedCell,"string",e);
-    esCeldaEnRango(segundoNombre,editedCell,"string",e);
-    esCeldaEnRango(primeraApellido,editedCell,"string",e);
-    esCeldaEnRango(segundoApellido,editedCell,"string",e);
-    esCeldaEnRango(pais,editedCell,"string",e)
-    esCeldaEnRango(provincia,editedCell,"string",e)
-    esCeldaEnRango(poblacion,editedCell,"string",e)
-    esCeldaEnRango(direccion,editedCell,"string",e)
-    esCeldaEnRango(codigoPostal,editedCell,undefined,e);
-    esCeldaEnRango(telefono,editedCell,undefined,e);
-    esCeldaEnRango(sitioWeb,editedCell,"string",e)
-    esCeldaEnRango(email,editedCell,"string",e)
+    esCeldaEnRango(numIdentificacion, editedCell, undefined, e);
+    esCeldaEnRango(contacto, editedCell, "string", e);
+    esCeldaEnRango(codigoContacto, editedCell, undefined, e);
+    esCeldaEnRango(primerNombre, editedCell, "string", e);
+    esCeldaEnRango(segundoNombre, editedCell, "string", e);
+    esCeldaEnRango(primeraApellido, editedCell, "string", e);
+    esCeldaEnRango(segundoApellido, editedCell, "string", e);
+    esCeldaEnRango(pais, editedCell, "string", e)
+    esCeldaEnRango(provincia, editedCell, "string", e)
+    esCeldaEnRango(poblacion, editedCell, "string", e)
+    esCeldaEnRango(direccion, editedCell, "string", e)
+    esCeldaEnRango(codigoPostal, editedCell, undefined, e);
+    esCeldaEnRango(telefono, editedCell, undefined, e);
+    esCeldaEnRango(sitioWeb, editedCell, "string", e)
+    esCeldaEnRango(email, editedCell, "string", e)
   }
 }
 
-function esCeldaEnRango(range,editedCell,tipoDato='number',e){
-      if (editedCell.getRow() >= range.getRow() && 
-        editedCell.getRow() <= range.getLastRow() &&
-        editedCell.getColumn() >= range.getColumn() &&
-        editedCell.getColumn() <= range.getLastColumn()){
-          let value = e.value;
-          if(typeof value ==="undefined"){// no funciona value===null || value ==="null" || value ===''
-            Logger.log("Ingreso algo vacio")
-          }else{
-            let newValue = convertirANumero(value);
-            if (typeof newValue!==tipoDato){
-              SpreadsheetApp.getUi().alert("Error: Solo se permite "+tipoDato+" en este rango");
-              e.range.setValue("");
-            }else{
-              Logger.log("Ingreso el tipo de valor correcto")
-            }
-          }
-        }
+function esCeldaEnRango(range, editedCell, tipoDato = 'number', e) {
+  if (editedCell.getRow() >= range.getRow() &&
+    editedCell.getRow() <= range.getLastRow() &&
+    editedCell.getColumn() >= range.getColumn() &&
+    editedCell.getColumn() <= range.getLastColumn()) {
+    let value = e.value;
+    if (typeof value === "undefined") {// no funciona value===null || value ==="null" || value ===''
+      Logger.log("Ingreso algo vacio")
+    } else {
+      let newValue = convertirANumero(value);
+      if (typeof newValue !== tipoDato) {
+        SpreadsheetApp.getUi().alert("Error: Solo se permite " + tipoDato + " en este rango");
+        e.range.setValue("");
+      } else {
+        Logger.log("Ingreso el tipo de valor correcto")
+      }
+    }
+  }
 }
 
-function convertirANumero(value){
+function convertirANumero(value) {
 
-  let number=Number(value);
-  if(!isNaN(number)){
+  let number = Number(value);
+  if (!isNaN(number)) {
     return number;
-  }else{
+  } else {
     return value;
   }
 
