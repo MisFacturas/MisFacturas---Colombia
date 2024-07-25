@@ -379,20 +379,21 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
       posicionTaxInfo++;
     }
 
-    let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
-    let IVAsActivos=RangeIVAActivos.getValues().flat();;
+    // let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
+    // let IVAsActivos=RangeIVAActivos.getValues().flat();;
 
-    let elementosUnicos = new Set();
+    let rangeImporteTotal=sheet.getRange(productStartRow,6,taxSectionStartRow-2)
+    let valores = rangeImporteTotal.getValues();
 
-    // Recorrer la lista de atrás hacia adelante y eliminar repetidos
-    for (let i = IVAsActivos.length - 1; i >= 0; i--) {
-      let valor = IVAsActivos[i];
-      if (elementosUnicos.has(valor)) {
-        Logger.log("B"+String(poscionTaxParaIvaNoPresente+i))
-      } else {
-        elementosUnicos.add(valor); // Agregar el elemento al Set si es único
+    let suma = 0;
+  
+    for (let i = 0; i < valores.length; i++) {
+      if (!isNaN(valores[i][0]) && valores[i][0] !== '') { // Asegurarse de que el valor sea un número y no esté vacío
+        suma += parseFloat(valores[i][0]);
       }
     }
+  
+    Logger.log("Suma total de valores en el rango: " + suma);
 
   }
 
