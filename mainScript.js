@@ -68,6 +68,13 @@ function openClientesSheet() {
   SpreadsheetApp.setActiveSheet(sheet);
 }
 
+function showClientes() {
+  var html = HtmlService.createHtmlOutputFromFile('menuCliente')
+    .setTitle('Menu cliente');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
 function openProductosSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Productos");

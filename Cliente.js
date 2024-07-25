@@ -39,6 +39,8 @@ function verificarDatosObligatorios(e) {
 
 function crearContacto(){
   Logger.log("imprima algo")
+  showClientes()
+
 }
 
 function getCustomerInformation(customer) {
