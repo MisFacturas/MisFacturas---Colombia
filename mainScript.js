@@ -414,6 +414,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     }else{    //ya no es igual implica que lo de aqui en adelante se borra
     let taxSectionStartRow2=Number(taxSectionStartRow)
     let filaABorrar=taxSectionStartRow2+1+i;
+    Logger.log("filaABorrar")
     sheet.getRange("B"+String(filaABorrar)).setValue("");
     sheet.getRange("C"+String(filaABorrar)).setValue("");
     }
