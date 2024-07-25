@@ -233,6 +233,7 @@ function onEdit(e){
         Logger.log("Differencia"+diferencia)
         hojaActual.insertRowAfter(lastProductRow);//tal vez aca aumntar el tax csoso para el bug
         taxSectionStartRow+=1
+        calcularImporteYTotal(hojaActual, rowEditada);
       }else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
         
@@ -244,6 +245,7 @@ function onEdit(e){
         
         Logger.log("Entra al segundo if dnetro del else if ")
         Logger.log("")
+        calcularImporteYTotal(hojaActual, rowEditada);
       }
     }else if (rowEditada >= productStartRow && colEditada == 4 && rowEditada<taxSectionStartRow){// edita celda cantidad
       //calcular Importe y Total de linea
