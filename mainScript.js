@@ -388,7 +388,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     for (let i = IVAsActivos.length - 1; i >= 0; i--) {
       let valor = IVAsActivos[i];
       if (elementosUnicos.has(valor)) {
-        Logger.log("B"+String(poscionTaxParaIvaNoPresente+1))
+        Logger.log("B"+String(poscionTaxParaIvaNoPresente+i))
       } else {
         elementosUnicos.add(valor); // Agregar el elemento al Set si es único
       }
