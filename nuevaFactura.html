@@ -12,6 +12,14 @@
       top: 10px;
       right: 10px;
     }
+    .centered {
+      text-align: center;
+    }
+    .button-center {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
     .bottom-right {
       position: fixed;
       bottom: 10px;
@@ -20,11 +28,15 @@
   </style>
 </head>
 <body>
-  <h3>Nueva Factura</h3>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-  <button type="button" class="btn btn-success" onclick="addNewProduct()">Agregar Nuevo Producto</button>
-
-  <button type="button" class="btn btn-secondary top-right" onclick="Back()">Back</button>
+  <div class="d-flex justify-content-between align-items-center">
+    <h3 class="m-0">Nueva Factura</h3>
+    <button type="button" class="btn btn-secondary top-right" onclick="Back()">Back</button>
+  </div>
+  <p class="centered">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  
+  <div class="button-center">
+    <button type="button" class="btn btn-success" onclick="addNewProduct()">Agregar Nuevo Producto</button>
+  </div>
 
   <div class="bottom-right">
     <button type="button" class="btn btn-primary" onclick="saveInvoice()">Guardar Factura</button>
@@ -41,7 +53,7 @@
     function Back() {
       google.script.run
         .withSuccessHandler(writeDocument)
-        .loadIndex();
+        .showMenuFactura();
     }
 
     function addNewProduct() {
