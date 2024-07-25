@@ -533,10 +533,10 @@ function obtenerDatosFactura(factura){
           //Extaccion celdas de datos cliente
           var clienteCeldaHoja = hojaCeldas.getRange('E3').getValue();
           var nifCeldaHoja = hojaCeldas.getRange('E4').getValue();
-          var codigoCeldaHoja = hojaCeldas.getRange('E5').getValue();
-          var direccionCeldaHoja = hojaCeldas.getRange('E6').getValue();
+          var codigoCeldaHoja = hojaCeldas.getRange('E8').getValue();
+          var direccionCeldaHoja = hojaCeldas.getRange('E5').getValue();
           var telefonoCeldaHoja = hojaCeldas.getRange('E7').getValue();
-          var poblacionCeldaHoja = hojaCeldas.getRange('E8').getValue();
+          var poblacionCeldaHoja = hojaCeldas.getRange('E6').getValue();
           var fechaEmisionCeldaHoja = hojaCeldas.getRange('E9').getValue();
           var formaPagoCeldaHoja = hojaCeldas.getRange('E10').getValue();
 
