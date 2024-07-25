@@ -20,6 +20,10 @@ var diccionarioCaluclarIva={
 
 function inicarFacturaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
+  let hojaInfoUsuario= spreadsheet.getSheetByName('Info Usuario');
+  let IABN=hojaInfoUsuario.getRange("B7").getValue()
+
+  hojaFactura.getRange("C10").setValue(IABN)
   generarNumeroFactura(hojaFactura);
   obtenerFechaYHoraActual(hojaFactura);
 }
