@@ -348,22 +348,25 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
   for(let k=0;k<llavesDiccionarioProducto.length;k++){
     let llaveActual =llavesDiccionarioProducto[k];
     let valorllave=diccionarioCaluclarIva[llaveActual];
-    Logger.log("llaveActual "+llaveActual)
-    Logger.log("valorllave"+ valorllave)
+    Logger.log("llaveActual tipo "+typeof(llaveActual))
+    Logger.log("valorllave tipo "+ typeof(valorllave))
     if(valorllave===0){
-      Logger.log("posicionTaxInfo dentro del espacio vacio"+posicionTaxInfo)
-      //revisar que ya se halla borrado de la lista de total taxes, ya que esto implica que no hay ningun prodcuto con este %de IVA
-      let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
-      let IVAsActivos=RangeIVAActivos.getValues();
-      // no importa, implica que simplemnte no esta entoces borrar el primero que encuentre de abajo para arriba
-      Logger.log("IVAsActivos sin String " +IVAsActivos)
-      let IVAsActivos2=String(RangeIVAActivos.getValues());
-      Logger.log("IVAsActivos CON String " +IVAsActivos2)
-      for (let i = IVAsActivos.length - 1; i >= 0; i--) {
-        if(IVAsActivos[i]===llaveActual){
-          let base=hojaActual.getRange("B"+String(poscionTaxParaIvaNoPresente+i)).getValue()
-        }
-      }
+      // Logger.log("posicionTaxInfo dentro del espacio vacio"+posicionTaxInfo)
+      // //revisar que ya se halla borrado de la lista de total taxes, ya que esto implica que no hay ningun prodcuto con este %de IVA
+      // let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
+      // let IVAsActivos=RangeIVAActivos.getValues();
+      // // no importa, implica que simplemnte no esta entoces borrar el primero que encuentre de abajo para arriba
+      // Logger.log("IVAsActivos sin String " +IVAsActivos)
+      // let IVAsActivos2=String(RangeIVAActivos.getValues());
+      // Logger.log("IVAsActivos CON String " +IVAsActivos2)
+      // for (let i = IVAsActivos.length - 1; i >= 0; i--) {
+      //   Logger.log("IVAsActivos[i]" +IVAsActivos[i])
+      //   Logger.log("llaveActual" +llaveActual)
+      //   if(IVAsActivos[i]==llaveActual){
+      //     let base=sheet.getRange("B"+String(poscionTaxParaIvaNoPresente+i)).getValue()
+      //     Logger.log("celda B algo"+base)
+      //   }
+      // }
 
 
       continue
@@ -375,6 +378,22 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
       Logger.log("SetnumberFormat?")
       posicionTaxInfo++;
     }
+
+    let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
+    let IVAsActivos=RangeIVAActivos.getValues().flat();;
+
+    let elementosUnicos = new Set();
+
+    // Recorrer la lista de atrás hacia adelante y eliminar repetidos
+    for (let i = IVAsActivos.length - 1; i >= 0; i--) {
+      let valor = IVAsActivos[i];
+      if (elementosUnicos.has(valor)) {
+        Logger.log("B"+String(poscionTaxParaIvaNoPresente+1))
+      } else {
+        elementosUnicos.add(valor); // Agregar el elemento al Set si es único
+      }
+    }
+
   }
 
 
