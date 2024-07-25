@@ -357,7 +357,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 
 
   // Set the total products count in cell B27
-  sheet.getRange('I11').setValue(totalProducts);
+  sheet.getRange('H13').setValue(totalProducts);
 }
 
 function limpiarDict(){

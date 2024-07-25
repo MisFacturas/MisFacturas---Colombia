@@ -17,7 +17,20 @@ var diccionarioCaluclarIva={
   "0.04": 0,
   "0": 0
 }
-
+function limpiarYEliminarFila(numeroFila,hoja,celda,hojaTax){
+  if (numeroFila>20 && numeroFila<hojaTax){
+    hoja.deleteRow(numeroFila)
+  }else{
+    hoja.getRange("B"+String(numeroFila)).setValue("");
+    hoja.getRange("C"+String(numeroFila)).setValue("");
+    hoja.getRange("D"+String(numeroFila)).setValue("");
+    hoja.getRange("E"+String(numeroFila)).setValue(0);
+    hoja.getRange("F"+String(numeroFila)).setValue(0);
+    hoja.getRange("G"+String(numeroFila)).setValue(0);
+    hoja.getRange("H"+String(numeroFila)).setValue(0);
+    //sheet.getRange("C"+String(posicionTaxInfo)).setValue(valorEnPorcentaje);
+  }
+}
 function verificarYCopiarContacto(e) {
   let hojaFacturas = e.source.getSheetByName('Factura');
   let hojaContactos = e.source.getSheetByName('Clientes');
