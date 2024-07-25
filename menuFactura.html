@@ -125,6 +125,11 @@
           google.script.run.openHistorialSheet();
         }
 
+        function openNuevaFactura(){
+            google.script.run.openFacturaSheet();
+
+        }
+
       </script>
     <title>Menú factura</title>
 </head>
@@ -139,8 +144,10 @@
             <button onclick="openHistorial()">Historial facturas</button>
             <button onclick="downloadPdf()">Generar PDF</button>
             <button onclick="showEnviarEmail()">Enviar factura por correo</button>
+            <button onclick="openNuevaFactura()">Nueva factura</button>
             <input class="exit" type="button" value="Volver al menú principal" onclick="showMenuPrincipal()" style="margin-top: 20px;"/>
             <input class="exit" type="button" value="Cerrar todo" onclick="google.script.host.close()"/>
+
         </div>
       </div>
 </body>

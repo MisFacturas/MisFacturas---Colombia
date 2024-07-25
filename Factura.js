@@ -17,7 +17,7 @@ var diccionarioCaluclarIva={
   "0.04": 0,
   "0": 0
 }
-function limpiarYEliminarFila(numeroFila,hoja,celda,hojaTax){
+function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
   if (numeroFila>20 && numeroFila<hojaTax){
     hoja.deleteRow(numeroFila)
   }else{
