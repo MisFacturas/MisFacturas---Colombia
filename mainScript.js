@@ -335,6 +335,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
     Logger.log("llaveActual "+llaveActual)
     Logger.log("valorllave"+ valorllave)
     if(valorllave===0){
+      //revisar que ya se halla borrado de la lista de total taxes, ya que esto implica que no hay ningun prodcuto con este %de IVA
       continue
     }else{
       sheet.getRange("B"+String(posicionTaxInfo)).setValue(valorllave);
@@ -353,6 +354,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow,ce
 }
 
 function limpiarDict(){
+  Logger.log("Limpiar el dict")
   diccionarioCaluclarIva={
     "0.21": 0,
     "0.1": 0,

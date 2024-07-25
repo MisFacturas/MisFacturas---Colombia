@@ -37,6 +37,10 @@ function verificarDatosObligatorios(e) {
   }
 }
 
+function crearContacto(){
+  Logger.log("imprima algo")
+}
+
 function getCustomerInformation(customer) {
   /*esta funcion debe de cambiar para obtener son los datos directamente de la hoja cliente */
   // ojo de donde esta cogiendo el datosheet ?
