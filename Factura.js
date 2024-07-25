@@ -415,6 +415,8 @@ function obtenerDatosFactura(factura){
           if (!targetSheet) {
             targetSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Plantilla');
           }
+
+          var hojaCeldas = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Celdas Plantilla');
           
           for (var j = 0; j < listaProductos.length; j++) {
             numeroProductos += 1;
@@ -517,15 +519,25 @@ function obtenerDatosFactura(factura){
             }
           }
 
+          //Extaccion celdas de datos cliente
+          var clienteCeldaHoja = hojaCeldas.getRange('E3').getValue();
+          var nifCeldaHoja = hojaCeldas.getRange('E4').getValue();
+          var codigoCeldaHoja = hojaCeldas.getRange('E5').getValue();
+          var direccionCeldaHoja = hojaCeldas.getRange('E6').getValue();
+          var telefonoCeldaHoja = hojaCeldas.getRange('E7').getValue();
+          var poblacionCeldaHoja = hojaCeldas.getRange('E8').getValue();
+          var fechaEmisionCeldaHoja = hojaCeldas.getRange('E9').getValue();
+          var formaPagoCeldaHoja = hojaCeldas.getRange('E10').getValue();
 
-          var clienteCell = targetSheet.getRange('B12');
-          var nifCell = targetSheet.getRange('B13');
-          var codigoCell = targetSheet.getRange('H12');
-          var direccionCell = targetSheet.getRange('B14');
-          var telefonoCell = targetSheet.getRange('B16');
-          var poblacionCell = targetSheet.getRange('B15');
-          var fechaEmisionCell = targetSheet.getRange('H13');
-          var formaPagoCell = targetSheet.getRange('H14');
+          //Datos Cliente
+          var clienteCell = targetSheet.getRange(clienteCeldaHoja);
+          var nifCell = targetSheet.getRange(nifCeldaHoja);
+          var codigoCell = targetSheet.getRange(codigoCeldaHoja);
+          var direccionCell = targetSheet.getRange(direccionCeldaHoja);
+          var telefonoCell = targetSheet.getRange(telefonoCeldaHoja);
+          var poblacionCell = targetSheet.getRange(poblacionCeldaHoja);
+          var fechaEmisionCell = targetSheet.getRange(fechaEmisionCeldaHoja);
+          var formaPagoCell = targetSheet.getRange(formaPagoCeldaHoja);
           var valorPagarCell = targetSheet.getRange('B'+(34+filasInsertadas));
           var notaPagoCell = targetSheet.getRange('A'+(38+filasInsertadas));
           var observacionesCell = targetSheet.getRange('A'+(43+filasInsertadas));

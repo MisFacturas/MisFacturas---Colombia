@@ -143,12 +143,12 @@ function generatePdfFromPlantilla() {
     '&sheetnames=false&printtitle=false' +  // Opciones de impresión
     '&pagenumbers=false&gridlines=false' +  // Más opciones de impresión
     '&fzr=false' +  // Aislar filas congeladas
-    '&top_margin=0.00' +  // Margen superior
+    //'&top_margin=0.00' +  // Margen superior
     '&bottom_margin=0.00' +  // Margen inferior
-    '&left_margin=0.00' +  // Margen izquierdo
-    '&right_margin=0.00' +  // Margen derecho
+    '&left_margin=0.5' +  // Margen izquierdo
+    '&right_margin=0.5' +  // Margen derecho
     '&horizontal_alignment=CENTER' +  // Alineación horizontal
-    '&vertical_alignment=MIDDLE';  // Alineación vertical
+    '&vertical_alignment=TOP';  // Alineación vertical
 
   var token = ScriptApp.getOAuthToken();
   var response = UrlFetchApp.fetch(url, {
