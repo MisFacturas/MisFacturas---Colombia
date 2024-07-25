@@ -70,7 +70,7 @@ function showNuevaFactura(){
 
 function openClientesSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Clientes");
+  var sheet = ss.getSheetByName("Clientes2");
   SpreadsheetApp.setActiveSheet(sheet);
 }
 
@@ -92,6 +92,10 @@ function showEnviarEmail() {
     .setTitle('Enviar Email');
   SpreadsheetApp.getUi()
     .showSidebar(html);
+}
+
+function inicarFacturaNuevaMain(){
+  inicarFacturaNueva();
 }
 
 
@@ -212,8 +216,8 @@ function onEdit(e){
       //celda de elegir contacto
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
-      obtenerFechaYHoraActual(hojaActual)
-      generarNumeroFactura(hojaActual)
+      //obtenerFechaYHoraActual(hojaActual)
+      //generarNumeroFactura(hojaActual)
 
     }
     else if (rowEditada >= productStartRow && colEditada == 2 && rowEditada<taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)

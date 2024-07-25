@@ -17,6 +17,13 @@ var diccionarioCaluclarIva={
   "0.04": 0,
   "0": 0
 }
+
+function inicarFacturaNueva(){
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+  generarNumeroFactura(hojaFactura);
+  obtenerFechaYHoraActual(hojaFactura);
+}
+
 function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
   if (numeroFila>20 && numeroFila<hojaTax){
     hoja.deleteRow(numeroFila)
@@ -60,10 +67,10 @@ function verificarYCopiarContacto(e) {
 
 
 function generarNumeroFactura(sheet){
-  let max=1000000;
-  let min=1;
-  let numero= Math.floor(Math.random() * (max - min + 1)) + min;
-  sheet.getRange("G2").setValue(numero);
+  let numeroActual= sheet.getRange("G2").getValue();
+  numeroActual=Number(numeroActual);
+  numeroActual++
+  sheet.getRange("G2").setValue(numeroActual);
 }
 
 function obtenerFechaYHoraActual(sheet){ 
