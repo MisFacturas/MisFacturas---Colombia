@@ -318,7 +318,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
     }
   }
   //aqui arrelgar error que se agrega una nueva linea cuando hay espacio arriba
-  return lastProductRow;
+  return lastProductRow-1;
 }
 
 function getTaxSectionStartRow(sheet) {
