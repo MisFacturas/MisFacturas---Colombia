@@ -343,6 +343,7 @@ function getTaxSectionStartRow(sheet) {
 function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, celdaEditada) {
   let totalProducts = 0;
   let rowEdited = celdaEditada.getRow();
+  Logger.log("taxSectionStartRow"+taxSectionStartRow)
 
   //toca revisar creo que cuando hay un producto con un espacio en el medio no teien encuenta y se sale 
   limpiarDict();
