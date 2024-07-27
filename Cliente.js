@@ -7,7 +7,7 @@ function obtenerTipoDePersona(e){
   let sheet = e.source.getActiveSheet();
   let range = e.range;
   let rowEditada = range.getRow();
-  let colEditada = range.getColumn();
+  let colEditada = 2;
 
   let tipoPersona =sheet.getRange(rowEditada,colEditada).getValue()
   return tipoPersona
@@ -23,6 +23,11 @@ function verificarDatosObligatorios(e,tipoPersona) {
   let colEditada = range.getColumn();
   let ultimaColumnaPermitida = 20;
   let columnasObligatorias=[];
+  if(tipoPersona===""){
+    Logger.log("vacio hizo edicion no en tipopersoan, cogemos el viejo")
+    tipoPersona=sheet.getRange("B"+String(rowEditada)).getValue();
+  }
+
   if(tipoPersona==="Autonomo"){
     columnasObligatorias = [1,2,3,4,6,8,10,12,15,16,17,19];
   }else if(tipoPersona==="Empresa"){
