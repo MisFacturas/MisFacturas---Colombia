@@ -9,7 +9,7 @@ function obtenerTipoDePersona(e){
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
 
-  let tipoPersona =sheet.getRange(rowEditada,colEditada)
+  let tipoPersona =sheet.getRange(rowEditada,colEditada).getValue()
   return tipoPersona
 }
 
@@ -36,11 +36,13 @@ function verificarDatosObligatorios(e,tipoPersona) {
   if (rowEditada > 1 && colEditada <= ultimaColumnaPermitida) {
     let estaCompleto = true;
     let estaVacioOPredeterminado = true;
+    let rangoParaResaltar = [];
 
     for (let i = 0; i < columnasObligatorias.length; i++) {
       let valorDeCelda = sheet.getRange(rowEditada, columnasObligatorias[i]).getValue();
       if (estadosDefault.includes(valorDeCelda)) {
         estaCompleto = false;
+        rangoParaResaltar.push(columnasObligatorias[i]);
       } else {
         estaVacioOPredeterminado = false;
       }
