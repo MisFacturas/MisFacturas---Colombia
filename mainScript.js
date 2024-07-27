@@ -220,7 +220,6 @@ function onEdit(e) {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
-
     let columnaContactos = 3; // Ajusta según sea necesario
     let rowContactos = 2;
 
@@ -284,7 +283,15 @@ function onEdit(e) {
     updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow, celdaEditada);//tengo que revisar esto 
 
   } else if (hojaActual.getName() === "Clientes") {
-    verificarDatosObligatorios(e);
+    let celdaEditada = e.range;
+    let rowEditada = celdaEditada.getRow();
+    let colEditada = celdaEditada.getColumn();
+    let colTipoDePersona=2
+    if(colEditada===colTipoDePersona){
+      let tipoPersona= obtenerTipoDePersona(e);
+      verificarDatosObligatorios(e,tipoPersona)
+    }
+  
 
   }
 }
@@ -452,6 +459,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
   // Set the total products count in cell B27
   sheet.getRange('H13').setValue(totalProducts);
 }
+
 
 function limpiarDict() {
   Logger.log("Limpiar el dict")
@@ -772,8 +780,8 @@ Output: no tiene output pero regresa un mensaje en caso de que sea erroneo el ti
 
   if (sheet.getName() === "Clientes") {//aca filtro de hoja, por cada hoja verifica cosas distintas
     let numIdentificacion = sheet.getRange("D2:D1000");
-    let contacto = sheet.getRange("A2:A1000");
-    let codigoContacto = sheet.getRange("B2:B1000");
+    let codigoContacto = sheet.getRange("E2:E1000");
+    let nomberComercial=sheet.getRange("G2:G1000");
     let primerNombre = sheet.getRange("H2:H1000");
     let segundoNombre = sheet.getRange("I2:I1000");
     let primeraApellido = sheet.getRange("J2:J1000");
@@ -789,7 +797,7 @@ Output: no tiene output pero regresa un mensaje en caso de que sea erroneo el ti
     let editedCell = e.range;
 
     esCeldaEnRango(numIdentificacion, editedCell, undefined, e);
-    esCeldaEnRango(contacto, editedCell, "string", e);
+    esCeldaEnRango(nomberComercial,editedCell,"String",e)
     esCeldaEnRango(codigoContacto, editedCell, undefined, e);
     esCeldaEnRango(primerNombre, editedCell, "string", e);
     esCeldaEnRango(segundoNombre, editedCell, "string", e);
