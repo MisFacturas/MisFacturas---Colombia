@@ -254,7 +254,7 @@ function onEdit(e) {
       Logger.log("Differencia" + diferencia)
       Logger.log("rowEditada" + rowEditada)
       Logger.log("lastProductRow" + lastProductRow)
-      if (diferencia <= 2 && rowEditada === lastProductRow) {
+      if (diferencia <= 2 && rowEditada === Number(lastProductRow-2)) {
         hojaActual.getRange("B" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("D" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
         hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
