@@ -456,7 +456,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
 
 
   // Set the total products count in cell B27
-  sheet.getRange('B'+String(taxSectionStartRow)).setValue(totalProducts);
+  sheet.getRange('B'+String(Number(taxSectionStartRow-1))).setValue(totalProducts);
 }
 
 
