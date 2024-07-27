@@ -251,12 +251,15 @@ function onEdit(e) {
 
       // Insertar una nueva row 
       let diferencia = Math.abs(taxSectionStartRow - lastProductRow)
+      Logger.log("Differencia" + diferencia)
+      Logger.log("rowEditada" + rowEditada)
+      Logger.log("lastProductRow" + lastProductRow)
       if (diferencia <= 2 && rowEditada === lastProductRow) {
         hojaActual.getRange("B" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
         hojaActual.getRange("D" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
         hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         //Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
-        Logger.log("Differencia" + diferencia)
+        Logger.log("dentro de Differencia" + diferencia)
         hojaActual.insertRowAfter(lastProductRow);//tal vez aca aumntar el tax csoso para el bug
         taxSectionStartRow += 1
         calcularImporteYTotal(hojaActual, rowEditada);
