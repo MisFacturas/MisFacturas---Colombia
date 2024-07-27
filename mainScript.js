@@ -795,7 +795,7 @@ Output: no tiene output pero regresa un mensaje en caso de que sea erroneo el ti
     let editedCell = e.range;
 
     esCeldaEnRango(numIdentificacion, editedCell, undefined, e);
-    esCeldaEnRango(nomberComercial,editedCell,"String",e)
+    esCeldaEnRango(nomberComercial,editedCell,"string",e)
     esCeldaEnRango(codigoContacto, editedCell, undefined, e);
     esCeldaEnRango(primerNombre, editedCell, "string", e);
     esCeldaEnRango(segundoNombre, editedCell, "string", e);

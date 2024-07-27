@@ -14,57 +14,50 @@ function obtenerTipoDePersona(e){
 }
 
 
-function verificarDatosObligatorios(e,tipoPersona) {
-
-  //falta verificar datos en facturas cuando genero factura
+function verificarDatosObligatorios(e, tipoPersona) {
   let sheet = e.source.getActiveSheet();
   let range = e.range;
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
   let ultimaColumnaPermitida = 20;
-  let columnasObligatorias=[];
-  if(tipoPersona===""){
-    Logger.log("vacio hizo edicion no en tipopersoan, cogemos el viejo")
-    tipoPersona=sheet.getRange("B"+String(rowEditada)).getValue();
+  let columnasObligatorias = [];
+  
+  if (tipoPersona === "") {
+    Logger.log("Vacio hizo edicion no en tipoPersona, cogemos el viejo");
+    tipoPersona = sheet.getRange("B" + String(rowEditada)).getValue();
   }
 
-  if(tipoPersona==="Autonomo"){
-    columnasObligatorias = [1,2,3,4,6,8,10,12,15,16,17,19];
-  }else if(tipoPersona==="Empresa"){
-    columnasObligatorias = [1,2,3,4,6,7,12,15,16,17,19];
-  }else{
-    Logger.log("Vacio tipo de persona")
+  if (tipoPersona === "Autonomo") {
+    columnasObligatorias = [1, 2, 3, 4, 6, 8, 10, 12, 15, 16, 17, 19];
+  } else if (tipoPersona === "Empresa") {
+    columnasObligatorias = [1, 2, 3, 4, 6, 7, 12, 15, 16, 17, 19];
+  } else {
+    Logger.log("Vacio tipo de persona");
   }
-  let estadosDefault = ["", "Tipo Documento","Regimen","Tipo de persona"]; // aqui otros estados predeterminados si es necesario
-
+  
+  let estadosDefault = ["", "Tipo Documento", "Regimen", "Tipo de persona"]; // aquí otros estados predeterminados si es necesario
 
   if (rowEditada > 1 && colEditada <= ultimaColumnaPermitida) {
     let estaCompleto = true;
     let estaVacioOPredeterminado = true;
-    let rangoParaResaltar = [];
 
+    // Borrar el color de fondo de todas las celdas obligatorias antes de la verificación
+    for (let i = 0; i < columnasObligatorias.length; i++) {
+      sheet.getRange(rowEditada, columnasObligatorias[i]).setBackground(null);
+    }
+
+    // Verificar celdas obligatorias
     for (let i = 0; i < columnasObligatorias.length; i++) {
       let valorDeCelda = sheet.getRange(rowEditada, columnasObligatorias[i]).getValue();
       if (estadosDefault.includes(valorDeCelda)) {
         estaCompleto = false;
-        rangoParaResaltar.push(columnasObligatorias[i]);
+        sheet.getRange(rowEditada, columnasObligatorias[i]).setBackground('#FFC7C7'); // Resaltar en rojo claro
       } else {
         estaVacioOPredeterminado = false;
       }
     }
 
-    //borrar color celdas
-    for (let i = 0; i < columnasObligatorias.length; i++) {
-      sheet.getRange(rowEditada, columnasObligatorias[i]).setBackground(null);
-    }
-
-    // Resaltar en rojo claro las celdas obligatorias que no están completas
-    if (!estaCompleto) {
-      for (let i = 0; i < rangoParaResaltar.length; i++) {
-        sheet.getRange(rowEditada, rangoParaResaltar[i]).setBackground('#FFC7C7');
-      }
-    }
-
+    // Actualizar el estado en la última columna permitida
     if (estaVacioOPredeterminado) {
       sheet.getRange(rowEditada, ultimaColumnaPermitida).clearContent();
     } else {
@@ -73,6 +66,7 @@ function verificarDatosObligatorios(e,tipoPersona) {
     }
   }
 }
+
 
 function crearContacto(){
   Logger.log("imprima algo")
