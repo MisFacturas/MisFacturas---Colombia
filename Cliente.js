@@ -13,8 +13,57 @@ function obtenerTipoDePersona(e){
   return tipoPersona
 }
 
+function saveClientData(formData) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Clientes');
+  if (!sheet) {
+    throw new Error('La hoja "Clientes" no existe.');
+  }
+
+  const lastRow = sheet.getLastRow();
+  const dataRange = sheet.getRange(2, 1, lastRow, 1).getValues(); // Obtener la columna A desde la fila 2 hasta la última
+
+  let emptyRow = 0;
+  for (let i = 0; i < dataRange.length; i++) {
+    if (dataRange[i][0] === '') { // Si la celda está vacía, esta es la fila vacía
+      emptyRow = i + 2; // i + 2 porque dataRange empieza en la fila 2
+      break;
+    }
+  }
+
+  if (emptyRow === 0) {
+    emptyRow = lastRow + 1; // Si no se encontró ninguna fila vacía, usar la siguiente fila después de la última
+  }
+
+  const values = [
+    formData.tipoContacto,
+    formData.tipoPersona,
+    formData.tipoDocumento,
+    formData.numeroIdentificacion,
+    formData.codigoContacto,
+    formData.regimen,
+    formData.nombreComercial,
+    formData.primerNombre,
+    formData.segundoNombre,
+    formData.primerApellido,
+    formData.segundoApellido,
+    formData.pais,
+    formData.provincia,
+    formData.poblacion,
+    formData.direccion,
+    formData.codigoPostal,
+    formData.telefono,
+    formData.sitioWeb,
+    formData.email
+  ];
+
+  sheet.getRange(emptyRow, 1, 1, values.length).setValues([values]);
+}
+
 
 function verificarDatosObligatorios(e, tipoPersona) {
+
+  // va generar error a la hora de que se borre la info del cliente creo 
+
   let sheet = e.source.getActiveSheet();
   let range = e.range;
   let rowEditada = range.getRow();

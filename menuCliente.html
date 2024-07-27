@@ -343,14 +343,14 @@
     function Back() {
       google.script.run.showSidebar();
     }
-    
+
     function verificarDatosObligatorios() {
       const form = document.getElementById('clienteForm');
       const tipoPersona = document.getElementById('tipoPersona').value;
       const columnasObligatorias = tipoPersona === 'Autonomo' ? 
-        ['tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto', 'regimen', 'nombreComercial', 'primerNombre', 'primerApellido', 'pais', 'provincia', 'poblacion', 'direccion', 'codigoPostal'] :
+        ['tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'regimen',  'primerNombre', 'primerApellido', 'pais',  'direccion', 'codigoPostal','telefono',  'email'] :
         tipoPersona === 'Empresa' ? 
-        ['tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto', 'regimen', 'nombreComercial', 'primerNombre', 'primerApellido', 'pais', 'provincia', 'poblacion', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email'] : 
+        ['tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion',  'regimen',  'nombreComercial', 'pais',  'direccion', 'codigoPostal', 'telefono',  'email'] : 
         [];
 
       let isValid = true;
