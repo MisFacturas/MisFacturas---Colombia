@@ -260,7 +260,7 @@ function onEdit(e) {
         hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         //Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
         Logger.log("dentro de Differencia" + diferencia)
-        hojaActual.insertRowAfter(lastProductRow);//tal vez aca aumntar el tax csoso para el bug
+        hojaActual.insertRowAfter(Number(lastProductRow-2));//tal vez aca aumntar el tax csoso para el bug
         taxSectionStartRow += 1
         calcularImporteYTotal(hojaActual, rowEditada);
 
