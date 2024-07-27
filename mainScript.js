@@ -220,7 +220,7 @@ function onEdit(e) {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
-    let columnaContactos = 3; // Ajusta según sea necesario
+    let columnaContactos = 2; // Ajusta según sea necesario
     let rowContactos = 2;
 
 
@@ -237,10 +237,9 @@ function onEdit(e) {
       //generarNumeroFactura(hojaActual)
 
     }
-    else if (rowEditada >= productStartRow && colEditada == 2 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
+    else if (rowEditada >= productStartRow && colEditada == 1 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
       Logger.log("lastProductRow " + lastProductRow)
-      const nextRow = lastProductRow + 1;
       //Logger.log("entra al primer else if")
       //Logger.log("next row "+nextRow)
       Logger.log("taxSectionStartRow " + taxSectionStartRow)
@@ -253,20 +252,21 @@ function onEdit(e) {
       // Insertar una nueva row 
       let diferencia = Math.abs(taxSectionStartRow - lastProductRow)
       if (diferencia <= 2 && rowEditada === lastProductRow) {
-        hojaActual.getRange("C" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("F" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
-        Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
+        hojaActual.getRange("B" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaActual.getRange("D" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+        //Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
         Logger.log("Differencia" + diferencia)
         hojaActual.insertRowAfter(lastProductRow);//tal vez aca aumntar el tax csoso para el bug
         taxSectionStartRow += 1
         calcularImporteYTotal(hojaActual, rowEditada);
+
       } else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
 
-        hojaActual.getRange("C" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("F" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+        hojaActual.getRange("B" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaActual.getRange("D" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
         //calcular importe y total de linea apenas se ingrese el valor de cantidad
 
 
@@ -274,7 +274,7 @@ function onEdit(e) {
         Logger.log("")
         calcularImporteYTotal(hojaActual, rowEditada);
       }
-    } else if (rowEditada >= productStartRow && colEditada == 4 && rowEditada < taxSectionStartRow) {// edita celda cantidad
+    } else if (rowEditada >= productStartRow && colEditada == 3 && rowEditada < taxSectionStartRow) {// edita celda cantidad
       //calcular Importe y Total de linea
       calcularImporteYTotal(hojaActual, rowEditada);
 
@@ -296,16 +296,16 @@ function onEdit(e) {
 
 function calcularImporteYTotal(hojaActual, rowEditada) {
   Logger.log("rowEditada" + rowEditada)
-  let producto = hojaActual.getRange("B" + String(rowEditada)).getValue(); // Obtiene el producto en la línea seleccionada
+  let producto = hojaActual.getRange("A" + String(rowEditada)).getValue(); // Obtiene el producto en la línea seleccionada
   let dictInformacionProducto = obtenerInformacionProducto(producto);
-  let cantidadProducto = hojaActual.getRange("D" + String(rowEditada)).getValue(); // Asume que la cantidad está en la columna D
+  let cantidadProducto = hojaActual.getRange("C" + String(rowEditada)).getValue(); // Asume que la cantidad está en la columna D
   Logger.log("producto" + producto)
   Logger.log("cantidadProducto" + cantidadProducto)
   let importe = cantidadProducto * dictInformacionProducto["valor Unitario"];
   let totalDeLinea = cantidadProducto * dictInformacionProducto["precio Con Iva"];
 
-  hojaActual.getRange("G" + String(rowEditada)).setValue(importe);
-  hojaActual.getRange("H" + String(rowEditada)).setValue(totalDeLinea);
+  hojaActual.getRange("F" + String(rowEditada)).setValue(importe);
+  hojaActual.getRange("G" + String(rowEditada)).setValue(totalDeLinea);
 }
 
 function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
@@ -313,7 +313,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   let lastProductRow = productStartRow;
 
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
-    if (sheet.getRange(row, 2).getValue() !== '') {
+    if (sheet.getRange(row, 1).getValue() !== '') {
       lastProductRow = row;
     }
   }
@@ -329,10 +329,10 @@ function getTaxSectionStartRow(sheet) {
 
   // obtenemos la row donde esta la "base imponible, llegando asi al principio "
   for (let row = 22; row <= maxRows; row++) { // 22 porque su row predetermmiado es ese
-    if (sheet.getRange(row, 2).getValue() === 'Base imponible') {
+    if (sheet.getRange(row, 1).getValue() === 'TOTAL PRODUCTOS') {
 
       Logger.log("dentro de getTax row " + row)
-      return row;
+      return row+1;// tal vez solo dejarlo en Base imponible
     }
   }
 
@@ -348,7 +348,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
   limpiarDict();
   // calcualr cuando no hay cantidad
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
-    let prodcutoActual = sheet.getRange(row, 2).getValue()
+    let prodcutoActual = sheet.getRange(row, 1).getValue()
     if (prodcutoActual === "") {
       Logger.log("PRODUCTO VACIO")
     } else {
@@ -360,7 +360,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
       Logger.log("porcientoIVA " + porcientoIVA)
       if (porcientoIVA in diccionarioCaluclarIva) {
         Logger.log("entra a coger el importe")
-        let importeActual = sheet.getRange("G" + String(row)).getValue();
+        let importeActual = sheet.getRange("F" + String(row)).getValue();
         Logger.log("importeActual " + importeActual)
         Logger.log("Row" + row)
         diccionarioCaluclarIva[porcientoIVA] += importeActual;
@@ -404,11 +404,11 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
 
       continue
     } else {
-      sheet.getRange("B" + String(posicionTaxInfo)).setValue(valorllave);
+      sheet.getRange("A" + String(posicionTaxInfo)).setValue(valorllave);
       let valorEnPorcentaje = (llaveActual * 100) + '%';
-      sheet.getRange("C" + String(posicionTaxInfo)).setValue(valorEnPorcentaje);
-      sheet.getRange("C" + String(posicionTaxInfo)).setNumberFormat("0.00%");
-      Logger.log("SetnumberFormat?")
+      sheet.getRange("B" + String(posicionTaxInfo)).setValue(valorEnPorcentaje);
+      sheet.getRange("B" + String(posicionTaxInfo)).setNumberFormat("0.00%");
+      //Logger.log("SetnumberFormat?")
       posicionTaxInfo++;
     }
 
@@ -418,7 +418,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
 
   }
 
-  let rangeImporteTotal = sheet.getRange(productStartRow, 7, taxSectionStartRow - productStartRow - 1)
+  let rangeImporteTotal = sheet.getRange(productStartRow, 6, taxSectionStartRow - productStartRow - 1)
   let valores = rangeImporteTotal.getValues();
 
   let suma = 0;
@@ -431,7 +431,7 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
 
   Logger.log("Suma total de valores en el rango: " + suma);
 
-  let rangeBaseImponible = sheet.getRange(taxSectionStartRow + 1, 2, 5)
+  let rangeBaseImponible = sheet.getRange(taxSectionStartRow + 1, 1, 5)
   let valores2 = rangeBaseImponible.getValues();
 
   let suma2 = 0;
@@ -448,14 +448,14 @@ function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, c
       let taxSectionStartRow2 = Number(taxSectionStartRow)
       let filaABorrar = taxSectionStartRow2 + 1 + i;
       Logger.log("filaABorrar")
+      sheet.getRange("A" + String(filaABorrar)).setValue("");
       sheet.getRange("B" + String(filaABorrar)).setValue("");
-      sheet.getRange("C" + String(filaABorrar)).setValue("");
     }
   }
 
 
   // Set the total products count in cell B27
-  sheet.getRange('H13').setValue(totalProducts);
+  sheet.getRange('B'+String(taxSectionStartRow)).setValue(totalProducts);
 }
 
 
