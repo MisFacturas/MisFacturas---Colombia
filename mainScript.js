@@ -287,11 +287,8 @@ function onEdit(e) {
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
     let colTipoDePersona=2
-    if(colEditada===colTipoDePersona){
-      Logger.log("entrra")
-      let tipoPersona= obtenerTipoDePersona(e);
-      verificarDatosObligatorios(e,tipoPersona)
-    }
+    let tipoPersona= obtenerTipoDePersona(e);
+    verificarDatosObligatorios(e,tipoPersona)
   
 
   }
