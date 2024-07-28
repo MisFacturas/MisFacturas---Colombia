@@ -26,7 +26,8 @@ function obtenerInformacionProducto(producto) {
   }
   
   function buscarProductos(query) {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('productos');
+    Logger.log("Entra a BuscarProducto")
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Productos');
     const data = sheet.getDataRange().getValues();
     const headers = data.shift();
     const nombreIndex = headers.indexOf('Nombre');
