@@ -71,7 +71,7 @@ function guardarFacturaProceso(){
 
 function limpiarHojaFactura(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  //elimiar filas no predeterminadas de productos
+
   //total productos
   hojaFactura.getRange("B2").setValue("")//Cliente
   hojaFactura.getRange("B3").setValue("")//Codigo
@@ -123,7 +123,6 @@ function limpiarHojaFactura(){
           Logger.log("J" + j);
         }
 
-        // no borra la otra porque empieza de menor a mayor, deberia ser mayor a menor, calcule mijo
       }else if(informacionCelda==="Base imponible"){
         Logger.log("Entra en Base imponible")
         break
@@ -150,10 +149,11 @@ function inicarFacturaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaInfoUsuario= spreadsheet.getSheetByName('Info Usuario');
   let IABN=hojaInfoUsuario.getRange("B7").getValue()
+  limpiarHojaFactura();
 
   hojaFactura.getRange("B11").setValue(IABN)
-  generarNumeroFactura(hojaFactura); //que haga esto cuando eliga cliente tambien
-  obtenerFechaYHoraActual(hojaFactura);
+  generarNumeroFactura(); //que haga esto cuando eliga cliente tambien
+  obtenerFechaYHoraActual();
 }
 
 function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
@@ -200,14 +200,18 @@ function verificarYCopiarContacto(e) {
 }
 
 
-function generarNumeroFactura(sheet){
+function generarNumeroFactura(){
+  let sheet = spreadsheet.getSheetByName('Factura');
+
   let numeroActual= sheet.getRange("G2").getValue();
   numeroActual=Number(numeroActual);
   numeroActual++
   sheet.getRange("G2").setValue(numeroActual);
 }
 
-function obtenerFechaYHoraActual(sheet){ 
+function obtenerFechaYHoraActual(){ 
+  let sheet = spreadsheet.getSheetByName('Factura');
+
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
   let hora= Utilities.formatDate(new Date(), "GMT+1", "HH:mm:ss");
 
