@@ -67,10 +67,12 @@ function limpiarHojaFactura(){
       Logger.log("informacionCelda"+informacionCelda)
       if(informacionCelda==="TOTAL PRODUCTOS"){
         //eliminar celdas
-        for(let j=21;j<(i-2);j++){//j=21 porque no puede borrar la 20 y (i-2) porque se quiere dejar los dos espacios de amortiguacion
+        for (let j = i - 3; j >= 21; j--) {
           hojaFactura.deleteRow(j);
-          Logger.log("J"+j)
+          Logger.log("J" + j);
         }
+        
+        // no borra la otra porque empieza de menor a mayor, deberia ser mayor a menor, calcule mijo
       }else if(informacionCelda==="Base imponible"){
         Logger.log("Entra en Base imponible")
         break
