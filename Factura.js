@@ -36,6 +36,7 @@ function verificarEstadoValidoFactura() {
 
   // Recorrer 
   for (let i = 0; i < listaCombinada.length; i++) {
+    Logger.log(listaCombinada[i])
     if(listaCombinada[i]===""){
       estaValido=false
     }
@@ -56,7 +57,7 @@ function verificarEstadoValidoFactura() {
   return estaValido;  
 }
 
-function guardarFacturaProceso(){
+function guardarFactura(){
   let estadoFactura=verificarEstadoValidoFactura();
   if(estadoFactura){
     //factura valida
@@ -161,13 +162,11 @@ function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
   if (numeroFila>20 && numeroFila<hojaTax){
     hoja.deleteRow(numeroFila)
   }else{
-    hoja.getRange("B"+String(numeroFila)).setValue("");
-    hoja.getRange("C"+String(numeroFila)).setValue("");
-    hoja.getRange("D"+String(numeroFila)).setValue("");
-    hoja.getRange("E"+String(numeroFila)).setValue(0);
-    hoja.getRange("F"+String(numeroFila)).setValue(0);
-    hoja.getRange("G"+String(numeroFila)).setValue(0);
-    hoja.getRange("H"+String(numeroFila)).setValue(0);
+    hoja.getRange("A"+String(numeroFila)).setValue("");//producto
+    hoja.getRange("B"+String(numeroFila)).setValue("");//ref
+    hoja.getRange("C"+String(numeroFila)).setValue("");//cantidad
+    hoja.getRange("D"+String(numeroFila)).setValue(0);//CON IVa
+    hoja.getRange("E"+String(numeroFila)).setValue(0);//sin iva
     //sheet.getRange("C"+String(posicionTaxInfo)).setValue(valorEnPorcentaje);
   }
 }
