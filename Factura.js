@@ -36,11 +36,11 @@ function limpiarHojaFactura(){
 
   //productos predeterminados 
   for(let i=15;i<21;i++){
-    hojaFactura.getRange("A").setValue("")//Producto
-    hojaFactura.getRange("B").setValue("")//referencia
-    hojaFactura.getRange("C").setValue("")//cantidad
-    hojaFactura.getRange("D").setValue(0)//sin iva
-    hojaFactura.getRange("E").setValue(0)//con iva
+    hojaFactura.getRange("A"+String(i)).setValue("")//Producto
+    hojaFactura.getRange("B"+String(i)).setValue("")//referencia
+    hojaFactura.getRange("C"+String(i)).setValue("")//cantidad
+    hojaFactura.getRange("D"+String(i)).setValue(0)//sin iva
+    hojaFactura.getRange("E"+String(i)).setValue(0)//con iva
   }
 
   //productos no predetrminados
