@@ -41,6 +41,7 @@
     }
 
     function buscarProducto() {
+      Logger.log("buscarProducto")
       const query = document.getElementById('buscarProducto').value;
       google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(query);
     }
