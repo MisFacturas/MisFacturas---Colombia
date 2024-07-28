@@ -46,6 +46,7 @@ function limpiarHojaFactura(){
   //productos no predetrminados
   let totalProductos=hojaFactura.getRange("A23")
   if(totalProductos==="TOTAL PRODUCTOS"){
+    Logger.log("entra en prodcutos no predeterminados priemr if")
     //implica que no se agrego mas productos que los predeterminados, se borra todo en su estado normal
     hojaFactura.getRange("B23").setValue(0)//totalproductos
     hojaFactura.getRange("G24").setValue("")//Cargos
@@ -58,6 +59,7 @@ function limpiarHojaFactura(){
 
   }else{
     // no esta en su estado predetrminado, toca saber hasta donde van
+    Logger.log("entra en prodcutos no predeterminados segundo if")
     const maxRows = hojaFactura.getLastRow();
     for(let i = 24;i<maxRows;i++){// 23 porque es el estado en donde deberia de estar el total prodcutos 
       let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
