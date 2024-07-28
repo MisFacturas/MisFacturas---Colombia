@@ -63,13 +63,19 @@ function limpiarHojaFactura(){
     const maxRows = hojaFactura.getLastRow();
     for(let i = 24;i<maxRows;i++){// 23 porque es el estado en donde deberia de estar el total prodcutos 
       let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
+      Logger.log("i"+i)
       if(informacionCelda==="TOTAL PRODUCTOS"){
         //eliminar celdas
         for(let j=21;j<(i-2);j++){//j=21 porque no puede borrar la 20 y (i-2) porque se quiere dejar los dos espacios de amortiguacion
           hojaFactura.deleteRow(j);
+          Logger.log("J"+j)
         }
+      }else if(informacionCelda==="Base imponible"){
+        Logger.log("Entra en Base imponible")
+        break
       }
     }
+
     hojaFactura.getRange("B23").setValue(0)//totalproductos
     hojaFactura.getRange("G24").setValue("")//Cargos
     hojaFactura.getRange("G25").setValue("")//descuentos
