@@ -18,6 +18,57 @@ var diccionarioCaluclarIva={
   "0": 0
 }
 
+function verificarEstadoValidoFactura() {
+  // en esta funcion se debe de verificar si el numero de factura ya fue utiliazado en alguna otra factura
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+  
+  // función que verifica si una factura cumple con los requisitos mínimos para guardar
+  let estaValido = true;
+
+  let clienteActual = hojaFactura.getRange("B2").getValue();
+  let informacionFactura = hojaFactura.getRange(2, 7, 5, 1).getValues();
+
+  // Crear una lista combinada
+  let listaCombinada = [clienteActual];  // Añadir clienteActual al array
+  for (let i = 0; i < informacionFactura.length; i++) {
+    listaCombinada.push(informacionFactura[i][0]);  // Añadir cada valor de informacionFactura
+  }
+
+  // Recorrer 
+  for (let i = 0; i < listaCombinada.length; i++) {
+    if(listaCombinada[i]===""){
+      estaValido=false
+    }
+  }
+
+  let totalProductos=hojaFactura.getRange("A23").getValue();
+
+  if (totalProductos==="TOTAL PRODUCTOS"){
+    // no hay necesidad de encontrar TOTAL PRODUCTOS si no esta, porque eso implica que si anadio asi sea 1 prodcuto
+    let valorTotalProductos=hojaFactura.getRange("B23").getValue();
+    if(valorTotalProductos===0){
+      // no agrego producto
+      estaValido=false
+    }
+  }
+
+
+  return estaValido;  
+}
+
+function guardarFacturaProceso(){
+  let estadoFactura=verificarEstadoValidoFactura();
+  if(estadoFactura){
+    //factura valida
+    // generar json
+    guardarFacturaHistorial()
+  }else{
+    Logger.log("Factrua no valida")
+  }
+  
+
+}
+
 function limpiarHojaFactura(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   //elimiar filas no predeterminadas de productos
@@ -71,7 +122,7 @@ function limpiarHojaFactura(){
           hojaFactura.deleteRow(j);
           Logger.log("J" + j);
         }
-        
+
         // no borra la otra porque empieza de menor a mayor, deberia ser mayor a menor, calcule mijo
       }else if(informacionCelda==="Base imponible"){
         Logger.log("Entra en Base imponible")

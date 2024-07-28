@@ -29,8 +29,7 @@
     </div>
     <div class="form-group">
       <label for="buscarProducto">Buscar producto</label>
-      <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar producto" onkeypress="buscarProducto()">
-      <div id="resultadosBusqueda" class="list-group mt-2"></div>
+      <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar producto">
     </div>
     <button type="button" class="btn btn-primary" onclick="agregarProducto()">Agregar producto</button>
   </form>
@@ -39,31 +38,6 @@
     function Back() {
       google.script.run.showNuevaFactura();
     }
-
-    function buscarProducto() {
-      Logger.log("buscarProducto")
-      const query = document.getElementById('buscarProducto').value;
-      google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(query);
-    }
-
-    function mostrarResultados(resultados) {
-      const resultadosDiv = document.getElementById('resultadosBusqueda');
-      resultadosDiv.innerHTML = '';
-      resultados.forEach(producto => {
-        const item = document.createElement('a');
-        item.href = '#';
-        item.className = 'list-group-item list-group-item-action';
-        item.innerText = `${producto.nombre} (Código: ${producto.codigo})`;
-        item.onclick = () => seleccionarProducto(producto);
-        resultadosDiv.appendChild(item);
-      });
-    }
-
-    function seleccionarProducto(producto) {
-      // Aquí puedes definir cómo quieres manejar la selección del producto
-      console.log('Producto seleccionado:', producto);
-    }
-
     function agregarProducto() {
       // Funcionalidad futura para agregar productos
     }
