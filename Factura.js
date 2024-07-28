@@ -18,13 +18,30 @@ var diccionarioCaluclarIva={
   "0": 0
 }
 
+function limpiarHojaFactura(){
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+
+  hojaFactura.getRange("B2").setValue("")//Cliente
+  hojaFactura.getRange("B3").setValue("")//Codigo
+
+  hojaFactura.getRange("G3").setValue("")//hora
+  hojaFactura.getRange("G4").setValue("")//fecha
+  hojaFactura.getRange("G5").setValue("")//forma pago
+  hojaFactura.getRange("G6").setValue("")//dias vencimiento
+
+  hojaFactura.getRange("B10").setValue("")//Osbervaciones
+  hojaFactura.getRange("B11").setValue("")//IBAN
+  hojaFactura.getRange("D11").setValue("")//Nota de pago 
+}
+
+
 function inicarFacturaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaInfoUsuario= spreadsheet.getSheetByName('Info Usuario');
   let IABN=hojaInfoUsuario.getRange("B7").getValue()
 
-  hojaFactura.getRange("C10").setValue(IABN)
-  generarNumeroFactura(hojaFactura);
+  hojaFactura.getRange("B11").setValue(IABN)
+  generarNumeroFactura(hojaFactura); //que haga esto cuando eliga cliente tambien
   obtenerFechaYHoraActual(hojaFactura);
 }
 
@@ -384,6 +401,7 @@ function guardarYGenerarInvoice(){
 function guardarInvoice(invoice){
 
 }
+
 
 
 //--------------------------------------------------------------------------------------------//
