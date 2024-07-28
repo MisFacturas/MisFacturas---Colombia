@@ -20,7 +20,8 @@ var diccionarioCaluclarIva={
 
 function limpiarHojaFactura(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-
+  //elimiar filas no predeterminadas de productos
+  //total productos
   hojaFactura.getRange("B2").setValue("")//Cliente
   hojaFactura.getRange("B3").setValue("")//Codigo
 
@@ -32,6 +33,20 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//IBAN
   hojaFactura.getRange("D11").setValue("")//Nota de pago 
+
+  //productos predeterminados 
+  for(let i=15;i<21;i++){
+    hojaFactura.getRange("A").setValue("")//Producto
+    hojaFactura.getRange("B").setValue("")//referencia
+    hojaFactura.getRange("C").setValue("")//cantidad
+    hojaFactura.getRange("D").setValue(0)//sin iva
+    hojaFactura.getRange("E").setValue(0)//con iva
+  }
+
+  //productos no predetrminados
+  let totalProductos=hojaFactura.getRange("A23")
+
+  hojaFactura.getRange("").setValue("")//
 }
 
 
