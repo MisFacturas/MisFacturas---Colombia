@@ -64,6 +64,7 @@ function limpiarHojaFactura(){
     for(let i = 24;i<maxRows;i++){// 23 porque es el estado en donde deberia de estar el total prodcutos 
       let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)
+      Logger.log("informacionCelda"+informacionCelda)
       if(informacionCelda==="TOTAL PRODUCTOS"){
         //eliminar celdas
         for(let j=21;j<(i-2);j++){//j=21 porque no puede borrar la 20 y (i-2) porque se quiere dejar los dos espacios de amortiguacion
