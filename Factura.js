@@ -45,8 +45,42 @@ function limpiarHojaFactura(){
 
   //productos no predetrminados
   let totalProductos=hojaFactura.getRange("A23")
+  if(totalProductos==="TOTAL PRODUCTOS"){
+    //implica que no se agrego mas productos que los predeterminados, se borra todo en su estado normal
+    hojaFactura.getRange("B23").setValue(0)//totalproductos
+    hojaFactura.getRange("G24").setValue("")//Cargos
+    hojaFactura.getRange("G25").setValue("")//descuentos
 
-  hojaFactura.getRange("").setValue("")//
+    for(let i=25;i<30;i++){
+      hojaFactura.getRange("A"+String(i)).setValue("")//base imponible
+      hojaFactura.getRange("B"+String(i)).setValue("")//iva
+    }
+
+  }else{
+    // no esta en su estado predetrminado, toca saber hasta donde van
+    const maxRows = hojaFactura.getLastRow();
+    for(let i = 24;i<maxRows;i++){// 23 porque es el estado en donde deberia de estar el total prodcutos 
+      let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
+      if(informacionCelda==="TOTAL PRODUCTOS"){
+        //eliminar celdas
+        for(let j=21;j<(i-2);j++){//j=21 porque no puede borrar la 20 y (i-2) porque se quiere dejar los dos espacios de amortiguacion
+          hojaFactura.deleteRow(j);
+        }
+      }
+    }
+    hojaFactura.getRange("B23").setValue(0)//totalproductos
+    hojaFactura.getRange("G24").setValue("")//Cargos
+    hojaFactura.getRange("G25").setValue("")//descuentos
+
+    for(let i=25;i<30;i++){
+      hojaFactura.getRange("A"+String(i)).setValue("")//base imponible
+      hojaFactura.getRange("B"+String(i)).setValue("")//iva
+    }
+
+
+  }
+
+  // hojaFactura.getRange("").setValue("")//
 }
 
 
@@ -61,6 +95,7 @@ function inicarFacturaNueva(){
 }
 
 function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
+  //funcion para el boton que se va a agregar al final del producto
   if (numeroFila>20 && numeroFila<hojaTax){
     hoja.deleteRow(numeroFila)
   }else{
@@ -74,6 +109,7 @@ function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
     //sheet.getRange("C"+String(posicionTaxInfo)).setValue(valorEnPorcentaje);
   }
 }
+
 function verificarYCopiarContacto(e) {
   let hojaFacturas = e.source.getSheetByName('Factura');
   let hojaContactos = e.source.getSheetByName('Clientes');
