@@ -25,3 +25,21 @@ function obtenerInformacionProducto(producto) {
     return informacionProducto;
   }
   
+  function buscarProductos(query) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('productos');
+    const data = sheet.getDataRange().getValues();
+    const headers = data.shift();
+    const nombreIndex = headers.indexOf('Nombre');
+  
+    const resultados = data.filter(row => row[nombreIndex].toLowerCase().includes(query.toLowerCase()));
+    
+    return resultados.map(row => ({
+      codigo: row[headers.indexOf('Código de referencia')],
+      nombre: row[nombreIndex],
+      valorUnitario: row[headers.indexOf('Valor unitario')],
+      iva: row[headers.indexOf('IVA %')],
+      precioConIva: row[headers.indexOf('Precio con iva')],
+      impuestos: row[headers.indexOf('Impuestos')]
+    }));
+  }
+  
