@@ -257,7 +257,7 @@ function updateprefacturaValue(column, row, value) {
 
 function getInvoiceGeneralInformation() {
   //Browser.msgBox('getInvoiceGeneralInformation()');
-  var range = datos_sheet.getRange("");//Resolución Autorización
+  var range = datos_sheet.getRange("nulo");//Resolución Autorización
   var InvoiceAuthorizationNumber = range.getValue();
   //
   range = prefactura_sheet.getRange("G6");//dias de vencimiento
@@ -542,7 +542,8 @@ function guardarYGenerarInvoice(){
   let nameString = prefactura_sheet.getRange("B2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
-  listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString , "falta","vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
+  let codigoCliente=prefactura_sheet.getRange("B3").getValue();
+  listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
   
   
 }
