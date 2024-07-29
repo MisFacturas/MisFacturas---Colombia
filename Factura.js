@@ -118,11 +118,9 @@ function insertarImagen(fila) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
   var cell = sheet.getRange('F'+fila);
-  var image = SpreadsheetApp.newCellImage().setSourceUrl(imageUrl).build();
-  cell.setValue(image);
-  images = sheet.getImages();
   var numFactura = "FE947"
-  images[images.length - 1].assignScript('generarPDFfactura(' + numFactura +')');
+  var image = SpreadsheetApp.newCellImage().setSourceUrl(imageUrl).assignScript('generarPDFfactura(' + numFactura +')').build();
+  cell.setValue(image);
   //generarPDFfactura
   //var image = sheet.insertImage(imageUrl, cell.getColumn(), cell.getRow(), 1, 1);
 }
