@@ -335,7 +335,7 @@ function verificarYCopiarContacto(e) {
       SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
     }else{
       //asigna el valor del coldigo solamente porque ese fue lo que me pidieron no mas
-      hojaFacturas.getRange("C3").setValue(listaConInformacion["Código cliente"]);
+      hojaFacturas.getRange("B3").setValue(listaConInformacion["Código cliente"]);
     }
   }
 
