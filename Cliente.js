@@ -61,31 +61,28 @@ function saveClientData(formData) {
 
 
 function verificarDatosObligatorios(e, tipoPersona) {
-
-  // va generar error a la hora de que se borre la info del cliente creo 
-
   let sheet = e.source.getActiveSheet();
   let range = e.range;
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
-  let ultimaColumnaPermitida = 20;
+  let ultimaColumnaPermitida = 21; // Actualizado para reflejar el número de columnas
   let columnasObligatorias = [];
-  let todasLasColumnas=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
-  
+  let todasLasColumnas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
   if (tipoPersona === "") {
     Logger.log("Vacio hizo edicion no en tipoPersona, cogemos el viejo");
-    tipoPersona = sheet.getRange("B" + String(rowEditada)).getValue();
+    tipoPersona = sheet.getRange("D" + String(rowEditada)).getValue(); // Columna 4 para Tipo Persona
   }
 
   if (tipoPersona === "Autonomo") {
-    columnasObligatorias = [1, 2, 3, 4, 6, 8, 10, 12, 15, 16, 17, 19];
+    columnasObligatorias = [2, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20]; // Incluyendo "Nombre cliente" (columna 2)
   } else if (tipoPersona === "Empresa") {
-    columnasObligatorias = [1, 2, 3, 4, 6, 7, 12, 15, 16, 17, 19];
+    columnasObligatorias = [2, 4, 5, 6, 7, 8, 12, 15, 16, 18, 20]; // Incluyendo "Nombre cliente" (columna 2)
   } else {
     Logger.log("Vacio tipo de persona");
   }
   
-  let estadosDefault = ["", "Tipo Documento", "Regimen", "Tipo de persona"]; // aquí otros estados predeterminados si es necesario
+  let estadosDefault = ["", "Tipo Documento", "Regimen", "Tipo de persona"]; // Aquí otros estados predeterminados si es necesario
 
   if (rowEditada > 1 && colEditada <= ultimaColumnaPermitida) {
     let estaCompleto = true;
@@ -107,12 +104,12 @@ function verificarDatosObligatorios(e, tipoPersona) {
       }
     }
 
-    // Actualizar el estado en la última columna permitida
+    // Actualizar el estado en la primera columna
     if (estaVacioOPredeterminado) {
-      sheet.getRange(rowEditada, ultimaColumnaPermitida).clearContent();
+      sheet.getRange(rowEditada, 1).clearContent(); // Limpiar contenido de "Estado"
     } else {
       let status = estaCompleto ? "Valido" : "No Valido";
-      sheet.getRange(rowEditada, ultimaColumnaPermitida).setValue(status);
+      sheet.getRange(rowEditada, 1).setValue(status); // Establecer valor en "Estado"
     }
   }
 }

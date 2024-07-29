@@ -6,7 +6,7 @@ COLUMNA_FINAL = 50;
 ADDITIONAL_ROWS = 3 + 3; //(Personalizacion)
 
 var spreadsheet = SpreadsheetApp.getActive();
-var prefactura_sheet = spreadsheet.getSheetByName('Factura2');
+var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 
