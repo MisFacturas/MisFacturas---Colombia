@@ -71,8 +71,8 @@ function guardarFactura(){
 }
 
 function guardarFacturaHistorial(){
-  var hojaFactura = spreadsheet.getActiveSpreadsheet().getSheetByName('Factura');
-  var hojaListado = spreadsheet.getActiveSpreadsheet().getSheetByName('ListadoEstado');
+  var hojaFactura = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Factura');
+  var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var numeroFactura = hojaFactura.getRange("G2").getValue();
   var cliente = hojaFactura.getRange("B2").getValue();
   var fechaEmision = hojaFactura.getRange("G3").getValue();
