@@ -30,22 +30,40 @@
     <div class="search-box">
       <label for="buscarProducto">Buscar producto</label>
       <div class="row">
-        <input type="text" id="buscarProducto" placeholder="Buscar producto" autocomplete="off">
+        <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto" autocomplete="off" onkeyup="buscarProductos()">
       </div>
-      <div class ="result-box">
-
+      <div class="result-box">
+        <!-- Los resultados se mostrarán aquí -->
       </div>
     </div>
     <button type="button" class="btn btn-primary" onclick="agregarProducto()">Agregar producto</button>
   </form>
   
-  <script>
+<script>
     function Back() {
       google.script.run.showNuevaFactura();
     }
+
     function agregarProducto() {
       // Funcionalidad futura para agregar productos
+      console.log("este si")
     }
-  </script>
+
+    function buscarProductos() {
+      console.log("busacr producto")
+      var input = document.getElementById('buscarProducto').value;
+      google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
+    }
+
+    function mostrarResultados(productos) {
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = '';
+      productos.forEach(function(producto) {
+        var div = document.createElement('div');
+        div.textContent = producto;
+        resultBox.appendChild(div);
+      });
+    }
+</script>
 </body>
 </html>
