@@ -35,6 +35,7 @@ function saveClientData(formData) {
   }
 
   const values = [
+    formData.nombreCliente,
     formData.tipoContacto,
     formData.tipoPersona,
     formData.tipoDocumento,

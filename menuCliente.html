@@ -28,6 +28,10 @@
   <form id="clientForm">
     <!-- Form content -->
     <div class="form-group">
+      <label for="nombreCliente">Nombre cliente</label>
+      <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre Cliente">
+    </div>
+    <div class="form-group">
       <label for="tipoContacto">Tipo de contacto</label>
       <select class="form-control" id="tipoContacto">
         <option value="Proveedor">Proveedor</option>
@@ -348,9 +352,9 @@
       const form = document.getElementById('clienteForm');
       const tipoPersona = document.getElementById('tipoPersona').value;
       const columnasObligatorias = tipoPersona === 'Autonomo' ? 
-        ['tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'regimen',  'primerNombre', 'primerApellido', 'pais',  'direccion', 'codigoPostal','telefono',  'email'] :
+        ['nombreCliente','tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'regimen',  'primerNombre', 'primerApellido', 'pais',  'direccion', 'codigoPostal','telefono',  'email'] :
         tipoPersona === 'Empresa' ? 
-        ['tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion',  'regimen',  'nombreComercial', 'pais',  'direccion', 'codigoPostal', 'telefono',  'email'] : 
+        ['nombreCliente','tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion',  'regimen',  'nombreComercial', 'pais',  'direccion', 'codigoPostal', 'telefono',  'email'] : 
         [];
 
       let isValid = true;
@@ -371,6 +375,7 @@
     function saveData() {
       if (verificarDatosObligatorios()) {
         const formData = {
+          nombreCliente: document.getElementById('nombreCliente').value,
           tipoContacto: document.getElementById('tipoContacto').value,
           tipoPersona: document.getElementById('tipoPersona').value,
           tipoDocumento: document.getElementById('tipoDocumento').value,
