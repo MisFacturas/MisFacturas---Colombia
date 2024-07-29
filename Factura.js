@@ -113,7 +113,7 @@ function limpiarHojaFactura(){
     // no esta en su estado predetrminado, toca saber hasta donde van
     Logger.log("entra en prodcutos no predeterminados segundo if")
     const maxRows = hojaFactura.getLastRow();
-    for(let i = 24;i<maxRows;i++){// 23 porque es el estado en donde deberia de estar el total prodcutos 
+    for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
       let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)
       Logger.log("informacionCelda"+informacionCelda)
@@ -153,7 +153,7 @@ function inicarFacturaNueva(){
   limpiarHojaFactura();
 
   hojaFactura.getRange("B11").setValue(IABN)
-  generarNumeroFactura(); //que haga esto cuando eliga cliente tambien
+  generarNumeroFactura(); 
   obtenerFechaYHoraActual();
 }
 
@@ -257,7 +257,7 @@ function updateprefacturaValue(column, row, value) {
 
 function getInvoiceGeneralInformation() {
   //Browser.msgBox('getInvoiceGeneralInformation()');
-  var range = datos_sheet.getRange("B7");//Resolución Autorización
+  var range = datos_sheet.getRange("");//Resolución Autorización
   var InvoiceAuthorizationNumber = range.getValue();
   //
   range = prefactura_sheet.getRange("G6");//dias de vencimiento
@@ -274,7 +274,7 @@ function getInvoiceGeneralInformation() {
     "ExchangeRateDate": "",
     "SalesPerson": "",
     //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(8, 3),//cambia los valroes parak llamar la nota de la factura 
+    "Note": getprefacturaValue(11, 4),//cambia los valroes parak llamar la nota de la factura 
     "ExternalGR": false
     //"AdditionalProperty": AdditionalProperty
   }
@@ -306,8 +306,26 @@ function getPaymentSummary(num_items, pfAnticipo) {
 }
 
 function guardarYGenerarInvoice(){
-  const cantidadProductos = prefactura_sheet.getRange("H37").getValue(); // cantidad total de productos 
-  let llavesParaLinea=prefactura_sheet.getRange("B14:H14");//llamo los headers 
+
+  //obtener el total de prodcutos
+  const posicionTotalProductos = prefactura_sheet.getRange("A23").getValue(); // para verificar donde esta el TOTAL
+  if (posicionTotalProductos==="TOTAL PRODUCTOS"){
+    const cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
+  }else{
+    const maxRows = hojaFactura.getLastRow();
+    for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
+      let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
+      Logger.log("i"+i)
+      Logger.log("informacionCelda"+informacionCelda)
+      if(informacionCelda==="TOTAL PRODUCTOS"){
+        const cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
+        
+      }
+    }
+
+  }
+
+  let llavesParaLinea=prefactura_sheet.getRange("A14:G14");//llamo los headers 
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
@@ -317,7 +335,7 @@ function guardarYGenerarInvoice(){
 
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
-    let filaActual = "H" + String(i) + ":N" + String(i);
+    let filaActual = "A" + String(i) + ":G" + String(i);
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
     let productoFilaActual= String(rangoProductoActual.getValues());
     productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
@@ -378,7 +396,7 @@ function guardarYGenerarInvoice(){
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
-  }while(i<(8+cantidadProductos));
+  }while(i<(15+cantidadProductos));
 
   /* Aqui empieza el proceso de coger el precio total de la facutra OJO en nuestro caso se agrupan por % de iva, entonces cambia
   algo mucho */
@@ -409,8 +427,24 @@ function guardarYGenerarInvoice(){
   // }while(k<20);
 
 
-  //estos es dinamico
-  let rangeFacturaTotal=prefactura_sheet.getRange(20,1,1,4);// aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
+  //estos es dinamico, verificar donde va el total cargo y descuento
+  const posicionTotalFactura = prefactura_sheet.getRange("A32").getValue(); // para verificar donde esta el TOTAL
+  let rangeFacturaTotal=""
+  let cargo=0
+  let descuento=0
+  if (posicionTotalFactura==="Total factura"){
+    rangeFacturaTotal=prefactura_sheet.getRange(31,1,1,4);
+    cargo = prefactura_sheet.getRange("G24").getValue();
+    descuento=prefactura_sheet.getRange("G25").getValue();
+  }else{
+    const maxRows = hojaFactura.getLastRow();//creo que maxrow siempre va a hacer la maxima, por ende es donde esta el total
+    rangeFacturaTotal=prefactura_sheet.getRange((maxRows-1),1,1,4);//(maxRows-1) porque no necesito el total
+    cargo = prefactura_sheet.getRange("G"+String(maxRows-8)).getValue();//(maxRows-8)  y -7 porque es donde deberia estar descuento y cargos
+    descuento=prefactura_sheet.getRange("G"+String(maxRows-7)).getValue();
+  }
+
+
+  // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
   let facturaTotal=String(rangeFacturaTotal.getValues());
   facturaTotal=facturaTotal.split(",");
   Logger.log(facturaTotal)
@@ -425,10 +459,10 @@ function guardarYGenerarInvoice(){
   let pfTotal = parseFloat(facturaTotal[3]);
   let pfRefuente = 0;
   let pfReteICA = 0;
-  let pfReteIVA = 44;
-  let pfTRetenciones = 33; 
-  let pfAnticipo = 55;
-  let pfTPagar = 66;
+  let pfReteIVA = 0;
+  let pfTRetenciones = 0; 
+  let pfAnticipo = descuento;
+  let pfTPagar = 0;
 
   // if (pfRefuente > 0) {
   //   let Percent = parseFloat((pfRefuente / pfSubTotal * 100).toFixed(2));
@@ -483,11 +517,11 @@ function guardarYGenerarInvoice(){
     "AllowanceTotalAmount": 0,
     "ChargeTotalAmount": 0,
     "PrePaidAmount": pfAnticipo,
-    "PayableAmount": pfTotal // antes era (pfTotal - pfAnticipo) 
+    "PayableAmount": (pfTotal-pfAnticipo) // antes era (pfTotal - pfAnticipo) 
   }
 
 
-  let cliente = prefactura_sheet.getRange("C2").getValue();
+  let cliente = prefactura_sheet.getRange("B2").getValue();
   let InvoiceGeneralInformation = getInvoiceGeneralInformation();
   let CustomerInformation = getCustomerInformation(cliente);// tal ves que por ahora no llame al cliente
 
@@ -506,7 +540,7 @@ function guardarYGenerarInvoice(){
   });
   Logger.log(invoice)
 
-  let nameString = prefactura_sheet.getRange("C2").getValue();
+  let nameString = prefactura_sheet.getRange("B2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString , "falta","vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);

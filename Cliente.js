@@ -70,6 +70,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
   let colEditada = range.getColumn();
   let ultimaColumnaPermitida = 20;
   let columnasObligatorias = [];
+  let todasLasColumnas=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
   
   if (tipoPersona === "") {
     Logger.log("Vacio hizo edicion no en tipoPersona, cogemos el viejo");
@@ -91,8 +92,8 @@ function verificarDatosObligatorios(e, tipoPersona) {
     let estaVacioOPredeterminado = true;
 
     // Borrar el color de fondo de todas las celdas obligatorias antes de la verificación
-    for (let i = 0; i < columnasObligatorias.length; i++) {
-      sheet.getRange(rowEditada, columnasObligatorias[i]).setBackground(null);
+    for (let i = 0; i < todasLasColumnas.length; i++) {
+      sheet.getRange(rowEditada, todasLasColumnas[i]).setBackground(null);
     }
 
     // Verificar celdas obligatorias
@@ -190,10 +191,10 @@ function getCustomerInformation(customer) {
     "RegistrationName": customer,
     "CountryCode": "ES",
     "CountryName": "España",
-    "SubdivisionCode": "En España no existen municipios",// 11, //Codigo de Municipio
-    "SubdivisionName": datos_sheet.getRange("B7").getValue(),//"Bogotá", //Nombre de Departamente //solo aparece en la facutra privincia
+    "SubdivisionCode": "En España no se como funcionan codigo  de provinica",// 11, //Codigo de Municipio
+    "SubdivisionName": datos_sheet.getRange("AA2").getValue(),// provicnica
     "CityCode": "Hay dos codigos postales, este solo existe para colombia",
-    "CityName": factura_sheet.getRange("B8").getValue(),//"Bogotá, D.C.",
+    "CityName": factura_sheet.getRange("Z2").getValue(),//polbacion
     "AddressLine": String(Address),
     "PostalZone": datos_sheet.getRange("U2").getValue(),//Confundido con el codigo postal hay 2, de recepcion y de 
     "Email": Email,
