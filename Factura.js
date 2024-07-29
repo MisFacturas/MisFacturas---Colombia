@@ -282,25 +282,22 @@ function getInvoiceGeneralInformation() {
 
   return InvoiceGeneralInformation;
 }
-function getPaymentSummary(num_items, pfAnticipo) {
-  var total_factura = prefactura_sheet.getRange(FILA_INICIAL_PREFACTURA + 10 + num_items, COL_TOTALES_PREFACTURA).getValue();// por ahora esto no lo utilizamos ya que no hay descuentos
-  var monto_neto = prefactura_sheet.getRange("B23").getValue();
+function getPaymentSummary(posicionTotalFactura) {
+  var total_factura = prefactura_sheet.getRange("A"+String(posicionTotalFactura)).getValue();// por ahora esto no lo utilizamos ya que no hay descuentos
+  var monto_neto = prefactura_sheet.getRange("B"+String(posicionTotalFactura+1)).getValue();
   //var numeros = new Intl.NumberFormat('es-CO', {maximumFractionDigits:0, style: 'currency', currency: 'COP' }).format(monto);
   var numeros_total = new Intl.NumberFormat().format(total_factura);
   var numeros_neto = new Intl.NumberFormat().format(monto_neto);
   //Browser.msgBox(`${numeros_total}  ${numeros_neto}`);
-  if (pfAnticipo > 0)
-    var PaymentNote = `Total Factura: $${numeros_total} \rSaldo Factura  $${numeros_neto}: ${int2word(monto_neto)}Pesos M/L`;
-  else
-    var PaymentNote = `Total Factura: $${numeros_total} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}Pesos M/L`;
-  ;
 
-  var PaymentTypeTxt = prefactura_sheet.getRange("F4").getValue();
+  Logger.log("total_factura"+total_factura)
+  Logger.log("monto_neto"+monto_neto)
+  var PaymentTypeTxt = prefactura_sheet.getRange("G5").getValue();
   var PaymentMeansTxt = prefactura_sheet.getRange("E4").getValue();
   var PaymentSummary = {
-    "PaymentType": "getPaymentType: No hay tipo de pago",
-    "PaymentMeans": PaymentMeansTxt,//a qui habia getPaymentMeans(PaymentMeansTxt)
-    "PaymentNote": `Total Factura: $${numeros_neto} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}`
+    "PaymentType": PaymentTypeTxt,
+    "PaymentMeans": "PaymentMeansTxt: No hay medio de pago",//a qui habia getPaymentMeans(PaymentMeansTxt)
+    "PaymentNote": `Total Factura: $${numeros_total} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}`
   }
   return PaymentSummary;
 }
@@ -428,11 +425,12 @@ function guardarYGenerarInvoice(){
 
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionTotalFactura = prefactura_sheet.getRange("A32").getValue(); // para verificar donde esta el TOTAL
+  const posicionOriginalTotalFactura = prefactura_sheet.getRange("A32").getValue(); // para verificar donde esta el TOTAL
   let rangeFacturaTotal=""
   let cargo=0
   let descuento=0
-  if (posicionTotalFactura==="Total factura"){
+  let posicionTotalFactura=31
+  if (posicionOriginalTotalFactura==="Total factura"){
     rangeFacturaTotal=prefactura_sheet.getRange(31,1,1,4);
     cargo = prefactura_sheet.getRange("G24").getValue();
     descuento=prefactura_sheet.getRange("G25").getValue();
@@ -441,6 +439,7 @@ function guardarYGenerarInvoice(){
     rangeFacturaTotal=prefactura_sheet.getRange((maxRows-1),1,1,4);//(maxRows-1) porque no necesito el total
     cargo = prefactura_sheet.getRange("G"+String(maxRows-8)).getValue();//(maxRows-8)  y -7 porque es donde deberia estar descuento y cargos
     descuento=prefactura_sheet.getRange("G"+String(maxRows-7)).getValue();
+    posicionTotalFactura=maxRows-1
   }
 
 
@@ -455,7 +454,7 @@ function guardarYGenerarInvoice(){
   ,  solo coinciden el base imponible he IVA */
   let pfSubTotal = parseFloat(facturaTotal[0]);//base imponible
   let pfIVA = parseFloat(facturaTotal[2]);//IVA
-  let pfImpoconsumo = 22;
+  let pfImpoconsumo = 0;
   let pfTotal = parseFloat(facturaTotal[3]);
   let pfRefuente = 0;
   let pfReteICA = 0;
@@ -515,9 +514,9 @@ function guardarYGenerarInvoice(){
     "TaxExclusiveAmount": pfSubTotal,
     "TaxInclusiveAmount": pfTotal,
     "AllowanceTotalAmount": 0,
-    "ChargeTotalAmount": 0,
+    "ChargeTotalAmount": cargo,
     "PrePaidAmount": pfAnticipo,
-    "PayableAmount": (pfTotal-pfAnticipo) // antes era (pfTotal - pfAnticipo) 
+    "PayableAmount": (pfTotal-pfAnticipo+cargo) // antes era (pfTotal - pfAnticipo) 
   }
 
 
@@ -531,7 +530,7 @@ function guardarYGenerarInvoice(){
     Delivery: getDelivery(),
     AdditionalDocuments: getAdditionalDocuments(),
     AdditionalProperty: getAdditionalProperty(),
-    PaymentSummary: getPaymentSummary(0,0), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
+    PaymentSummary: getPaymentSummary(posicionTotalFactura), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
     //Invoice_Note: invoice_note,
     InvoiceTaxTotal: invoiceTaxTotal,

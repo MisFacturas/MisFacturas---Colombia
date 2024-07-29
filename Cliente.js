@@ -194,7 +194,7 @@ function getCustomerInformation(customer) {
     "SubdivisionCode": "En España no se como funcionan codigo  de provinica",// 11, //Codigo de Municipio
     "SubdivisionName": datos_sheet.getRange("AA2").getValue(),// provicnica
     "CityCode": "Hay dos codigos postales, este solo existe para colombia",
-    "CityName": factura_sheet.getRange("Z2").getValue(),//polbacion
+    "CityName": datos_sheet.getRange("Z2").getValue(),//polbacion
     "AddressLine": String(Address),
     "PostalZone": datos_sheet.getRange("U2").getValue(),//Confundido con el codigo postal hay 2, de recepcion y de 
     "Email": Email,
