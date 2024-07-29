@@ -70,6 +70,145 @@ function guardarFactura(){
 
 }
 
+function guardarFacturaHistorial(){
+  var hojaFactura = spreadsheet.getActiveSpreadsheet().getSheetByName('Factura');
+  var hojaListado = spreadsheet.getActiveSpreadsheet().getSheetByName('ListadoEstado');
+  var numeroFactura = hojaFactura.getRange("G2").getValue();
+  var cliente = hojaFactura.getRange("B2").getValue();
+  var fechaEmision = hojaFactura.getRange("G3").getValue();
+  var estado = "Creada";
+  var informacionCliente = getCustomerInformation(cliente);
+  var nif = informacionCliente.Identification;
+
+  var lastRow = hojaListado.getLastRow();
+  var newRow = lastRow + 1;
+  var celdaNumFactura = hojaListado.getRange("A"+newRow);
+  celdaNumFactura.setValue(numeroFactura);
+  celdaNumFactura.setHorizontalAlignment('center');
+  celdaNumFactura.setBorder(true,true,true,true,null,null,null,null);
+
+  var celdaCliente = hojaListado.getRange("B"+newRow);
+  celdaCliente.setValue(cliente);
+  celdaCliente.setHorizontalAlignment('center');
+  celdaCliente.setBorder(true,true,true,true,null,null,null,null);
+
+  var celdaNIF = hojaListado.getRange("C"+newRow);
+  celdaNIF.setValue(nif);
+  celdaNIF.setHorizontalAlignment('center');
+  celdaNIF.setBorder(true,true,true,true,null,null,null,null);
+
+  var celdaFecha = hojaListado.getRange("D"+newRow);
+  celdaFecha.setValue(fechaEmision);
+  celdaFecha.setHorizontalAlignment('center');
+  celdaFecha.setBorder(true,true,true,true,null,null,null,null);
+
+  var celdaEstado = hojaListado.getRange("E"+newRow);
+  celdaEstado.setValue(estado);
+  celdaEstado.setHorizontalAlignment('center');
+  celdaEstado.setBorder(true,true,true,true,null,null,null,null);
+
+}
+
+function insertarImagen(fila) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
+  var cell = sheet.getRange('F'+fila);
+  
+  var image = sheet.insertImage(imageUrl, cell.getColumn(), cell.getRow(), 1, 1);
+}
+
+function onEdit(e, fila) {
+  var range = e.range;
+  var sheet = range.getSheet();
+  
+  // Suponiendo que la imagen está en A1
+  if (range.getA1Notation() == 'F'+fila) {
+    var cell = sheet.getRange('F'+fila);
+    var image = sheet.getImages(cell.getRow(), cell.getColumn(), 1, 1);
+    
+    if (image.length > 0) {
+      var img = image[0];
+      if (range.getRow() == img.getRow() && range.getColumn() == img.getColumn()) {
+        var numeroFactura = sheet.getRange('A'+fila).getValue();
+        generarPDFfactura(numeroFactura);
+      }
+    }
+  }
+}
+
+function generarPDFfactura(numeroFactura) {
+  obtenerDatosFactura(numeroFactura);
+  Utilities.sleep(6000);
+  var pdfBlob = generarPDF();
+  var url = generarPdfUrl(pdfBlob);
+
+  // Crear un archivo temporal en el Drive para proporcionar un enlace de descarga
+  var tempFile = DriveApp.createFile(pdfBlob);
+  var tempFileUrl = tempFile.getDownloadUrl();
+
+  // Enviar un enlace de descarga al usuario
+  var html = '<html><body><a href="' + tempFileUrl + '">Descargar PDF de la Factura ' + numeroFactura + '</a></body></html>';
+  var ui = HtmlService.createHtmlOutput(html)
+    .setWidth(300)
+    .setHeight(100);
+  SpreadsheetApp.getUi().showModalDialog(ui, 'Descargar PDF');
+}
+
+function generarPDF() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Plantilla');
+
+  if (!sheet) {
+    throw new Error('La hoja Plantilla no existe.');
+  }
+
+  var sheetId = sheet.getSheetId();
+  var url = ss.getUrl().replace(/edit$/, '') + 'export?exportFormat=pdf&format=pdf' +
+    '&gid=' + sheetId +
+    '&size=A4' +  // Tamaño del papel
+    '&portrait=true' +  // Orientación vertical
+    '&fitw=true' +  // Ajustar a ancho de la página
+    '&sheetnames=false&printtitle=false' +  // Opciones de impresión
+    '&pagenumbers=false&gridlines=false' +  // Más opciones de impresión
+    '&fzr=false' +  // Aislar filas congeladas
+    '&top_margin=0.8' +  // Margen superior
+    '&bottom_margin=0.00' +  // Margen inferior
+    '&left_margin=0.50' +  // Margen izquierdo
+    '&right_margin=0.50' +  // Margen derecho
+    '&horizontal_alignment=CENTER' +  // Alineación horizontal
+    '&vertical_alignment=TOP';  // Alineación vertical
+
+  var token = ScriptApp.getOAuthToken();
+
+  try {
+    var response = UrlFetchApp.fetch(url, {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      muteHttpExceptions: true
+    });
+
+    if (response.getResponseCode() === 200) {
+      var pdfBlob = response.getBlob().setName('Plantilla.pdf');
+      return pdfBlob;
+    } else {
+      Logger.log('Error ' + response.getResponseCode() + ': ' + response.getContentText());
+      throw new Error('Error ' + response.getResponseCode() + ': ' + response.getContentText());
+    }
+  } catch (e) {
+    Logger.log('Exception: ' + e.message);
+    throw new Error('Exception: ' + e.message);
+  }
+}
+
+function generarPdfUrl(pdfBlob) {
+  var base64Data = Utilities.base64Encode(pdfBlob.getBytes());
+  var contentType = pdfBlob.getContentType();
+  var name = pdfBlob.getName();
+  return `data:${contentType};base64,${base64Data}`;
+}
+
+
 function limpiarHojaFactura(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
 
@@ -807,4 +946,23 @@ function limpiarTablas(columna, linea){
   while (!targetSheet.getRange(columna+linea).isBlank()) {
     targetSheet.deleteRow(linea);
   }
+}
+
+function sacarColumnaFila(celda){
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Celdas Plantilla');
+  var celdaDestino = hoja.getRange(celda).getValue();
+  var match = celdaDestino.match(/([A-Z]+)(\d+)/);
+  if (match) {
+    var columna = match[1];  // 'B'
+    var fila = parseInt(match[2], 10);  // 21
+    
+    return [columna, fila];
+  } else {
+    Logger.log('No se pudo dividir la referencia de celda.');
+  }
+}
+
+function pruebaSacar(){
+  var lista = sacarColumnaFila("E18")
+  Logger.log(lista)
 }
