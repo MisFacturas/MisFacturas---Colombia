@@ -107,6 +107,11 @@ function guardarFacturaHistorial(){
   celdaEstado.setHorizontalAlignment('center');
   celdaEstado.setBorder(true,true,true,true,null,null,null,null);
 
+  var celdaImagen = hojaListado.getRange("F"+newRow);
+  insertarImagen(newRow);
+  celdaImagen-setHorizontalAlignment('center');
+  celdaImagen.setBorder(true,true,true,true,null,null,null,null);
+
 }
 
 function insertarImagen(fila) {
