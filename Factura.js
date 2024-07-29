@@ -120,26 +120,11 @@ function insertarImagen(fila) {
   var cell = sheet.getRange('F'+fila);
   var image = SpreadsheetApp.newCellImage().setSourceUrl(imageUrl).build();
   cell.setValue(image);
+  images = sheet.getImages();
+  var numFactura = "FE947"
+  images[images.length - 1].assignScript('generarPDFfactura(' + numFactura +')');
+  //generarPDFfactura
   //var image = sheet.insertImage(imageUrl, cell.getColumn(), cell.getRow(), 1, 1);
-}
-
-function onEdit(e, fila) {
-  var range = e.range;
-  var sheet = range.getSheet();
-  
-  // Suponiendo que la imagen está en A1
-  if (range.getA1Notation() == 'F'+fila) {
-    var cell = sheet.getRange('F'+fila);
-    var image = sheet.getImages(cell.getRow(), cell.getColumn(), 1, 1);
-    
-    if (image.length > 0) {
-      var img = image[0];
-      if (range.getRow() == img.getRow() && range.getColumn() == img.getColumn()) {
-        var numeroFactura = sheet.getRange('A'+fila).getValue();
-        generarPDFfactura(numeroFactura);
-      }
-    }
-  }
 }
 
 function generarPDFfactura(numeroFactura) {
