@@ -1,3 +1,4 @@
+var spreadsheet = SpreadsheetApp.getActive();
 function obtenerInformacionProducto(producto) {
     let celdaProducto = datos_sheet.getRange("I11");
     Logger.log("producto dentro de obtener "+producto)
@@ -24,6 +25,30 @@ function obtenerInformacionProducto(producto) {
   
     return informacionProducto;
   }
+
+function buscarProductos(){
+  var spreadsheet = SpreadsheetApp.getActive();
+  var hojaProductos = spreadsheet.getSheetByName('Productos');
+  let ultimaRowActiva=hojaProductos.getMaxRows();
+  let valorListaProductos=hojaProductos.getRange(2,2,ultimaRowActiva,1).getValues()
+  var listaProductos = valores.map(function(row) {
+    return row[0];
+  }).join(',');
+
+  const resultBox= document.querySelector(".result-box");
+  const inputBox=document.getElementById("search-box");
+
+  inputBox.onkeyup = function(){
+    let result=[];
+    let input=inputBox.value;
+    if(input.length){
+      result = listaProductos.filter((keyword)=>{
+        
+      });
+    }
+  }
+
+}
   
 
   

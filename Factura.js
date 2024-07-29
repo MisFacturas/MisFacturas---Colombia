@@ -6,7 +6,7 @@ COLUMNA_FINAL = 50;
 ADDITIONAL_ROWS = 3 + 3; //(Personalizacion)
 
 var spreadsheet = SpreadsheetApp.getActive();
-var prefactura_sheet = spreadsheet.getSheetByName('Factura2');
+var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 
@@ -335,7 +335,7 @@ function verificarYCopiarContacto(e) {
       SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
     }else{
       //asigna el valor del coldigo solamente porque ese fue lo que me pidieron no mas
-      hojaFacturas.getRange("C3").setValue(listaConInformacion["Código cliente"]);
+      hojaFacturas.getRange("B3").setValue(listaConInformacion["Código cliente"]);
     }
   }
 

@@ -213,7 +213,7 @@ function sendPdfByEmail(email) {
 
 function onEdit(e) {
   let hojaActual = e.source.getActiveSheet();
-  verificarTipoDeDatos(e);
+  //verificarTipoDeDatos(e);
 
   if (hojaActual.getName() === "Factura") {
 
@@ -285,7 +285,7 @@ function onEdit(e) {
     //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
     updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow, celdaEditada);//tengo que revisar esto 
 
-  } else if (hojaActual.getName() === "Clientes") {
+  } else if (hojaActual.getName() === "Clientes2") {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
