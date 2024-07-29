@@ -75,7 +75,7 @@ function guardarFacturaHistorial(){
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var numeroFactura = hojaFactura.getRange("G2").getValue();
   var cliente = hojaFactura.getRange("B2").getValue();
-  var fechaEmision = hojaFactura.getRange("G3").getValue();
+  var fechaEmision = hojaFactura.getRange("G4").getValue();
   var estado = "Creada";
   var informacionCliente = getCustomerInformation(cliente);
   var nif = informacionCliente.Identification;
@@ -115,7 +115,7 @@ function guardarFacturaHistorial(){
 }
 
 function insertarImagen(fila) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
   var cell = sheet.getRange('F'+fila);
   
