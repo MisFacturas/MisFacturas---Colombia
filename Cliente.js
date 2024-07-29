@@ -1,6 +1,6 @@
 var spreadsheet = SpreadsheetApp.getActive();
 var datos_sheet = spreadsheet.getSheetByName('Datos');
-var factura_sheet= spreadsheet.getSheetByName("Factura2")
+var factura_sheet= spreadsheet.getSheetByName("Factura")
 
 
 function obtenerTipoDePersona(e){
@@ -20,7 +20,7 @@ function saveClientData(formData) {
   }
 
   const lastRow = sheet.getLastRow();
-  const dataRange = sheet.getRange(2, 1, lastRow, 1).getValues(); // Obtener la columna A desde la fila 2 hasta la última
+  const dataRange = sheet.getRange(2, 2, lastRow, 1).getValues(); // Obtener la columna A desde la fila 2 hasta la última
 
   let emptyRow = 0;
   for (let i = 0; i < dataRange.length; i++) {
@@ -57,7 +57,7 @@ function saveClientData(formData) {
     formData.email
   ];
 
-  sheet.getRange(emptyRow, 1, 1, values.length).setValues([values]);
+  sheet.getRange(emptyRow, 2, 1, values.length).setValues([values]);
 }
 
 
