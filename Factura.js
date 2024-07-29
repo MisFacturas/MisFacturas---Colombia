@@ -118,9 +118,7 @@ function insertarImagen(fila) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
   var cell = sheet.getRange('F'+fila);
-  var numFactura = "FE947"
   var image = SpreadsheetApp.newCellImage().setSourceUrl(imageUrl).build();
-  image.assignScript('generarPDFfactura(' + numFactura +')')
   cell.setValue(image);
   //generarPDFfactura
   //var image = sheet.insertImage(imageUrl, cell.getColumn(), cell.getRow(), 1, 1);
