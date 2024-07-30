@@ -180,7 +180,6 @@ function insertarImagen(fila) {
   var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
   var numFactura = sheet.getRange('A'+fila).getValue();
   image.assignScript("generarPDFfactura");
-  image.setAnchorCell(cell);
   image.setHeight(20);
   image.setWidth(20);
   image.setAnchorCellXOffset(40);
@@ -191,7 +190,7 @@ function generarPDFfactura() {
   var fila = hoja.getLastRow();
   var numeroFactura = hoja.getRange('A'+fila).getValue();
   obtenerDatosFactura(numeroFactura);
-  Utilities.sleep(6000);
+  Utilities.sleep(8000);
   var pdfBlob = generarPDF();
   var url = generarPdfUrl(pdfBlob);
 
@@ -242,7 +241,7 @@ function generarPDF() {
     });
 
     if (response.getResponseCode() === 200) {
-      var pdfBlob = response.getBlob().setName('Plantilla.pdf');
+      var pdfBlob = response.getBlob().setName('Factura.pdf');
       return pdfBlob;
     } else {
       Logger.log('Error ' + response.getResponseCode() + ': ' + response.getContentText());
@@ -821,7 +820,7 @@ function obtenerDatosFactura(factura){
             var celdaPrecioUnitario = targetSheet.getRange('G'+numeroCelda);
             celdaPrecioUnitario.setBorder(true,true,true,true,null,null,null,null);
             celdaPrecioUnitario.setValue(listaProductos[j].Price);
-            celdaPrecioUnitario.setHorizontalAlignment('center');
+            celdaPrecioUnitario.setHorizontalAlignment('normal');
             celdaPrecioUnitario.setNumberFormat('€#,##0.00')
             
             var celdaIva = targetSheet.getRange('H'+numeroCelda);
@@ -834,7 +833,7 @@ function obtenerDatosFactura(factura){
             var celdaImporte = targetSheet.getRange('I'+numeroCelda);
             celdaImporte.setBorder(true,true,true,true,null,null,null,null);
             celdaImporte.setValue(listaProductos[j].LineExtensionAmount);
-            celdaImporte.setHorizontalAlignment('center');
+            celdaImporte.setHorizontalAlignment('normal');
             celdaImporte.setNumberFormat('€#,##0.00')
 
             var producto = listaProductos[j]
@@ -865,7 +864,7 @@ function obtenerDatosFactura(factura){
               celdaBaseImponible.setBorder(true,true,true,true,null,null,null,null);
               celdaBaseImponible.setValue(grupoIva[key]);
               celdaBaseImponible.setNumberFormat('€#,##0.00');
-              celdaBaseImponible.setHorizontalAlignment('center');
+              celdaBaseImponible.setHorizontalAlignment('normal');
               
               var celdaPorcentajeIva = targetSheet.getRange('E'+numeroCelda);
               celdaPorcentajeIva.setBorder(true,true,true,true,null,null,null,null);
@@ -877,13 +876,13 @@ function obtenerDatosFactura(factura){
               celdaIVA.setBorder(true,true,true,true,null,null,null,null);
               celdaIVA.setFormula('=A'+numeroCelda+'*E'+numeroCelda);
               celdaIVA.setNumberFormat('€#,##0.00');
-              celdaIVA.setHorizontalAlignment('center');
+              celdaIVA.setHorizontalAlignment('normal');
               
               var celdaTotal = targetSheet.getRange('H'+numeroCelda);
               celdaTotal.setBorder(true,true,true,true,null,null,null,null);
               celdaTotal.setFormula('=A'+numeroCelda+'+F'+numeroCelda);
               celdaTotal.setNumberFormat('€#,##0.00');
-              celdaTotal.setHorizontalAlignment('center');
+              celdaTotal.setHorizontalAlignment('normal');
 
               contador += 1;
               Logger.log('IVA: ' + key + '%');
