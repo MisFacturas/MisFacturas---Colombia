@@ -120,6 +120,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     //tal vez aca aumntar el tax csoso para el bug
     hojaFactura.insertRowAfter(rowParaAgregar);
     hojaFactura.getRange("F"+String(rowParaAgregar)).setValue("=C"+String(rowParaAgregar)+"*D"+String(rowParaAgregar))
+    hojaFactura.getRange("G"+String(rowParaAgregar)).setValue("=C"+String(rowParaAgregar)+"*E"+String(rowParaAgregar))
     taxSectionStartRow += 1
   }
 
@@ -491,7 +492,7 @@ function guardarYGenerarInvoice(){
   if (posicionTotalProductos==="TOTAL PRODUCTOS"){
     const cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
   }else{
-    const maxRows = hojaFactura.getLastRow();
+    const maxRows = prefactura_sheet.getLastRow();
     for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
       let informacionCelda=prefactura_sheet.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)

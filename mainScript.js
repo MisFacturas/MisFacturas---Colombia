@@ -263,6 +263,8 @@ function onEdit(e) {
         hojaActual.insertRowAfter(Number(lastProductRow-2));//tal vez aca aumntar el tax csoso para el bug
         taxSectionStartRow += 1
         //calcularImporteYTotal(hojaActual, rowEditada);
+        hojaActual.getRange("F"+String(rowEditada)).setValue("=C"+String(rowEditada)+"*D"+String(rowEditada))
+        hojaActual.getRange("G"+String(rowEditada)).setValue("=C"+String(rowEditada)+"*E"+String(rowEditada))
 
       } else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
