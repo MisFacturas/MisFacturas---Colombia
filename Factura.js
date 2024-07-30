@@ -175,10 +175,13 @@ function insertarImagen(fila) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
   var cell = sheet.getRange('F'+fila);
+  cell.setHorizontalAlignment('center');
   var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
   var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
   image.assignScript("resetPlantilla");
   image.setAnchorCell(cell);
+  image.setHeight(20);
+  image.setWidth(20);
 }
 
 function generarPDFfactura(numeroFactura) {
