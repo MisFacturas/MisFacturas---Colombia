@@ -76,7 +76,7 @@ function showAgregarProdcuto() {
 
 function openClientesSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Clientes2");
+  var sheet = ss.getSheetByName("Clientes");
   SpreadsheetApp.setActiveSheet(sheet);
 }
 
@@ -287,7 +287,7 @@ function onEdit(e) {
     //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
     updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow, celdaEditada);//tengo que revisar esto 
 
-  } else if (hojaActual.getName() === "Clientes2") {
+  } else if (hojaActual.getName() === "Clientes") {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
