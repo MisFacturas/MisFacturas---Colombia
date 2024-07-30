@@ -178,7 +178,8 @@ function insertarImagen(fila) {
   cell.setHorizontalAlignment('center');
   var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
   var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
-  image.assignScript("resetPlantilla");
+  var numFactura = sheet.getRange('A'+fila).getValue();
+  image.assignScript("generarPDFfactura("+numFactura+")");
   image.setAnchorCell(cell);
   image.setHeight(20);
   image.setWidth(20);
