@@ -119,7 +119,7 @@ function insertarImagen(fila) {
   var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
   var cell = sheet.getRange('F'+fila);
   var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
-  var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
+  var image = sheet.insertCellImage(imageBlob, cell.getColumn(), cell.getRow());
   image.assignScript("resetPlantilla");
 }
 
