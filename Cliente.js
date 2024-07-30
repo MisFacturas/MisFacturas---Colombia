@@ -20,11 +20,14 @@ function saveClientData(formData) {
   }
 
   const lastRow = sheet.getLastRow();
-  const dataRange = sheet.getRange(2, 2, lastRow, 1).getValues(); // Obtener la columna A desde la fila 2 hasta la última
+  const dataRange = sheet.getRange(2, 2, lastRow, 19).getValues(); // Obtener desde la columna B hasta la S (19 columnas)
 
   let emptyRow = 0;
   for (let i = 0; i < dataRange.length; i++) {
-    if (dataRange[i][0] === '') { // Si la celda está vacía, esta es la fila vacía
+    const row = dataRange[i];
+    const isEmpty = row.every(cell => cell === ''); // Verificar si todas las celdas de la fila están vacías
+
+    if (isEmpty) {
       emptyRow = i + 2; // i + 2 porque dataRange empieza en la fila 2
       break;
     }
@@ -58,7 +61,10 @@ function saveClientData(formData) {
   ];
 
   sheet.getRange(emptyRow, 2, 1, values.length).setValues([values]);
+
+  sheet.getRange(emptyRow, 1,).setValue("Valido");
 }
+
 
 
 function verificarDatosObligatorios(e, tipoPersona) {

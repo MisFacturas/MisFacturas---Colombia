@@ -62,12 +62,69 @@ function guardarFactura(){
   if(estadoFactura){
     //factura valida
     // generar json
+    guardarYGenerarInvoice()
     guardarFacturaHistorial()
   }else{
     Logger.log("Factrua no valida")
   }
   
 
+}
+
+function agregarProductoDesdeFactura(cantidad,producto){
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
+  const productStartRow = 15;
+  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+
+  let dictInformacionProducto ={}
+  if(producto==="" || cantidad==="" || cantidad===0){
+    throw new Error('Porfavor elige un producto y un cantidad adecuado');
+  }else{
+    Logger.log("entra a dictInformacionProducto")
+    dictInformacionProducto = obtenerInformacionProducto(producto);
+  }
+
+  Logger.log("Pasa verificacion de producto")
+  Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
+
+  if(Number(taxSectionStartRow)===24){
+    let totalProductos=hojaFactura.getRange("B23").getValue();
+    if(totalProductos===5){
+      hojaFactura.insertRowAfter(20)
+      taxSectionStartRow += 1
+    }
+    Logger.log("lastProductRow dentro de coso ===24" +lastProductRow)
+    for(let i =productStartRow;i<21;i++){
+      let valorProducto= hojaFactura.getRange("A"+String(i)).getValue();
+      if(valorProducto===""){
+        //em estado deafult, sea agrega dentro de las primeras 6 lienas
+        hojaFactura.getRange("A"+String(i)).setValue(producto);//producto
+        hojaFactura.getRange("B" + String(i)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaFactura.getRange("D" + String(i)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaFactura.getRange("E" + String(i)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+        hojaFactura.getRange("C"+String(i)).setValue(cantidad);//cantidad
+        break
+      }
+    }
+  }else{
+    Logger.log("lastProductRow dentro de coso neuvo" +lastProductRow)
+    let rowParaAgregar=Number(lastProductRow-2)
+    Logger.log("rowParaAgregar"+rowParaAgregar)
+    hojaFactura.getRange("A"+String(rowParaAgregar)).setValue(producto);//producto
+    hojaFactura.getRange("B" + String(rowParaAgregar)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+    hojaFactura.getRange("D" + String(rowParaAgregar)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+    hojaFactura.getRange("E" + String(rowParaAgregar)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+    hojaFactura.getRange("C"+String(rowParaAgregar)).setValue(cantidad);//cantidad
+    //agg fila
+    //tal vez aca aumntar el tax csoso para el bug
+    hojaFactura.insertRowAfter(rowParaAgregar);
+    hojaFactura.getRange("F"+String(rowParaAgregar)).setValue("=C"+String(rowParaAgregar)+"*D"+String(rowParaAgregar))
+    hojaFactura.getRange("G"+String(rowParaAgregar)).setValue("=C"+String(rowParaAgregar)+"*E"+String(rowParaAgregar))
+    taxSectionStartRow += 1
+  }
+
+  updateTotalProductCounter(hojaFactura, productStartRow, taxSectionStartRow);
 }
 
 function guardarFacturaHistorial(){
@@ -206,7 +263,7 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("G3").setValue("")//hora
   hojaFactura.getRange("G4").setValue("")//fecha
   hojaFactura.getRange("G5").setValue("")//forma pago
-  hojaFactura.getRange("G6").setValue("")//dias vencimiento
+  hojaFactura.getRange("G6").setValue(0)//dias vencimiento
 
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//IBAN
@@ -383,8 +440,8 @@ function updateprefacturaValue(column, row, value) {
 
 function getInvoiceGeneralInformation() {
   //Browser.msgBox('getInvoiceGeneralInformation()');
-  var range = datos_sheet.getRange("nulo");//Resolución Autorización
-  var InvoiceAuthorizationNumber = range.getValue();
+
+  var InvoiceAuthorizationNumber = "nulo"//Resolución Autorización
   //
   range = prefactura_sheet.getRange("G6");//dias de vencimiento
   var DaysOff = range.getValue();
@@ -435,13 +492,13 @@ function guardarYGenerarInvoice(){
   if (posicionTotalProductos==="TOTAL PRODUCTOS"){
     const cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
   }else{
-    const maxRows = hojaFactura.getLastRow();
+    const maxRows = prefactura_sheet.getLastRow();
     for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
-      let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
+      let informacionCelda=prefactura_sheet.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)
       Logger.log("informacionCelda"+informacionCelda)
       if(informacionCelda==="TOTAL PRODUCTOS"){
-        const cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
+        var cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
         
       }
     }
@@ -561,7 +618,7 @@ function guardarYGenerarInvoice(){
     cargo = prefactura_sheet.getRange("G24").getValue();
     descuento=prefactura_sheet.getRange("G25").getValue();
   }else{
-    const maxRows = hojaFactura.getLastRow();//creo que maxrow siempre va a hacer la maxima, por ende es donde esta el total
+    const maxRows = prefactura_sheet.getLastRow();//creo que maxrow siempre va a hacer la maxima, por ende es donde esta el total
     rangeFacturaTotal=prefactura_sheet.getRange((maxRows-1),1,1,4);//(maxRows-1) porque no necesito el total
     cargo = prefactura_sheet.getRange("G"+String(maxRows-8)).getValue();//(maxRows-8)  y -7 porque es donde deberia estar descuento y cargos
     descuento=prefactura_sheet.getRange("G"+String(maxRows-7)).getValue();

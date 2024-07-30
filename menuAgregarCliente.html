@@ -13,6 +13,16 @@
     .center-text {
       text-align: center;
     }
+    .result-box {
+      max-height: 200px; /* Limitar la altura máxima del cuadro de resultados */
+      overflow-y: auto;  /* Habilitar desplazamiento si el contenido excede la altura máxima */
+      border: 1px solid #ccc; /* Añadir un borde para separar visualmente los resultados */
+      margin-top: 10px; /* Espaciado superior */
+    }
+    .result-box div:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -27,7 +37,7 @@
       <label for="cantidad">Cantidad</label>
       <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
     </div>
-    <div class="search-box">
+    <div class="form-group">
       <label for="buscarProducto">Buscar producto</label>
       <div class="row">
         <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto" autocomplete="off" onkeyup="buscarProductos()">
@@ -45,12 +55,21 @@
     }
 
     function agregarProducto() {
-      // Funcionalidad futura para agregar productos
-      console.log("este si")
+      var cantidad = document.getElementById('cantidad').value;
+      var producto = document.getElementById('buscarProducto').value;
+
+      // Guardar los valores en variables
+      var cantidadSeleccionada = cantidad;
+      var productoSeleccionado = producto;
+
+      
+      console.log("Producto:", productoSeleccionado, "Cantidad:", cantidadSeleccionada);
+      google.script.run.agregarProductoDesdeFactura(cantidad,producto)
+
+
     }
 
     function buscarProductos() {
-      console.log("busacr producto")
       var input = document.getElementById('buscarProducto').value;
       google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
     }
@@ -61,8 +80,17 @@
       productos.forEach(function(producto) {
         var div = document.createElement('div');
         div.textContent = producto;
+        div.onclick = function() {
+          seleccionarProducto(producto);
+        };
         resultBox.appendChild(div);
       });
+    }
+
+    function seleccionarProducto(producto) {
+      document.getElementById('buscarProducto').value = producto;
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = ''; // Limpiar los resultados
     }
 </script>
 </body>

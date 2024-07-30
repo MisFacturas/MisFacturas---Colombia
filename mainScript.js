@@ -76,7 +76,7 @@ function showAgregarProdcuto() {
 
 function openClientesSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Clientes2");
+  var sheet = ss.getSheetByName("Clientes");
   SpreadsheetApp.setActiveSheet(sheet);
 }
 
@@ -254,7 +254,7 @@ function onEdit(e) {
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
       obtenerFechaYHoraActual()
-      generarNumeroFactura()
+      //generarNumeroFactura()
 
     }
     else if (rowEditada >= productStartRow && colEditada == 1 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
@@ -283,6 +283,8 @@ function onEdit(e) {
         hojaActual.insertRowAfter(Number(lastProductRow-2));//tal vez aca aumntar el tax csoso para el bug
         taxSectionStartRow += 1
         //calcularImporteYTotal(hojaActual, rowEditada);
+        hojaActual.getRange("F"+String(rowEditada)).setValue("=C"+String(rowEditada)+"*D"+String(rowEditada))
+        hojaActual.getRange("G"+String(rowEditada)).setValue("=C"+String(rowEditada)+"*E"+String(rowEditada))
 
       } else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
         // insertar cosas del producto en la hoja
@@ -305,7 +307,7 @@ function onEdit(e) {
     //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
     updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow, celdaEditada);//tengo que revisar esto 
 
-  } else if (hojaActual.getName() === "Clientes2") {
+  } else if (hojaActual.getName() === "Clientes") {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
@@ -355,7 +357,7 @@ function getTaxSectionStartRow(sheet) {
     if (sheet.getRange(row, 1).getValue() === 'TOTAL PRODUCTOS') {
 
       Logger.log("dentro de getTax row " + row)
-      return row+1;// tal vez solo dejarlo en Base imponible
+      return row+1;// tal vez solo dejarlo en Base imponible,se agrega 1 osea 1 mas que base imposnible
     }
   }
 
@@ -363,9 +365,9 @@ function getTaxSectionStartRow(sheet) {
   return maxRows + 1;
 }
 
-function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow, celdaEditada) {
+function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow) {
   let totalProducts = 0;
-  let rowEdited = celdaEditada.getRow();
+  
   Logger.log("taxSectionStartRow"+taxSectionStartRow)
 
   //toca revisar creo que cuando hay un producto con un espacio en el medio no teien encuenta y se sale 
