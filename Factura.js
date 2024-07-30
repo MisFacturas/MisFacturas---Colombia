@@ -76,11 +76,12 @@ function agregarProductoDesdeFactura(cantidad,producto){
   const productStartRow = 15;
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
 
+  let dictInformacionProducto ={}
   if(producto==="" || cantidad==="" || cantidad===0){
     throw new Error('Porfavor elige un producto y un cantidad adecuado');
   }else{
     Logger.log("entra a dictInformacionProducto")
-    let dictInformacionProducto = obtenerInformacionProducto(producto);
+    dictInformacionProducto = obtenerInformacionProducto(producto);
   }
 
   Logger.log("Pasa verificacion de producto")
