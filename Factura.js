@@ -110,7 +110,6 @@ function agregarProductoDesdeFactura(cantidad,producto){
   }else{
     Logger.log("lastProductRow dentro de coso neuvo" +lastProductRow)
     let rowParaAgregar=Number(lastProductRow-2)
-    hojaFactura.insertRowAfter(rowParaAgregar);
     Logger.log("rowParaAgregar"+rowParaAgregar)
     hojaFactura.getRange("A"+String(rowParaAgregar)).setValue(producto);//producto
     hojaFactura.getRange("B" + String(rowParaAgregar)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
@@ -119,6 +118,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     hojaFactura.getRange("C"+String(rowParaAgregar)).setValue(cantidad);//cantidad
     //agg fila
     //tal vez aca aumntar el tax csoso para el bug
+    hojaFactura.insertRowAfter(rowParaAgregar);
     taxSectionStartRow += 1
   }
 
