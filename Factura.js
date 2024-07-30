@@ -263,7 +263,7 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("G3").setValue("")//hora
   hojaFactura.getRange("G4").setValue("")//fecha
   hojaFactura.getRange("G5").setValue("")//forma pago
-  hojaFactura.getRange("G6").setValue("")//dias vencimiento
+  hojaFactura.getRange("G6").setValue(0)//dias vencimiento
 
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//IBAN
@@ -618,7 +618,7 @@ function guardarYGenerarInvoice(){
     cargo = prefactura_sheet.getRange("G24").getValue();
     descuento=prefactura_sheet.getRange("G25").getValue();
   }else{
-    const maxRows = hojaFactura.getLastRow();//creo que maxrow siempre va a hacer la maxima, por ende es donde esta el total
+    const maxRows = prefactura_sheet.getLastRow();//creo que maxrow siempre va a hacer la maxima, por ende es donde esta el total
     rangeFacturaTotal=prefactura_sheet.getRange((maxRows-1),1,1,4);//(maxRows-1) porque no necesito el total
     cargo = prefactura_sheet.getRange("G"+String(maxRows-8)).getValue();//(maxRows-8)  y -7 porque es donde deberia estar descuento y cargos
     descuento=prefactura_sheet.getRange("G"+String(maxRows-7)).getValue();
