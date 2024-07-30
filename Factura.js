@@ -498,7 +498,7 @@ function guardarYGenerarInvoice(){
       Logger.log("i"+i)
       Logger.log("informacionCelda"+informacionCelda)
       if(informacionCelda==="TOTAL PRODUCTOS"){
-        const cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
+        var cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
         
       }
     }
