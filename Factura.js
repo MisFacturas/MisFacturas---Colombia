@@ -91,6 +91,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     let totalProductos=hojaFactura.getRange("B23").getValue();
     if(totalProductos===5){
       hojaFactura.insertRowAfter(20)
+      taxSectionStartRow += 1
     }
     Logger.log("lastProductRow dentro de coso ===24" +lastProductRow)
     for(let i =productStartRow;i<21;i++){
