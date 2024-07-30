@@ -13,6 +13,10 @@
     .center-text {
       text-align: center;
     }
+    .result-box div:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -27,7 +31,7 @@
       <label for="cantidad">Cantidad</label>
       <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
     </div>
-    <div class="search-box">
+    <div class="form-group">
       <label for="buscarProducto">Buscar producto</label>
       <div class="row">
         <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto" autocomplete="off" onkeyup="buscarProductos()">
@@ -50,7 +54,7 @@
     }
 
     function buscarProductos() {
-      console.log("busacr producto")
+      console.log("buscar producto");
       var input = document.getElementById('buscarProducto').value;
       google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
     }
@@ -61,8 +65,17 @@
       productos.forEach(function(producto) {
         var div = document.createElement('div');
         div.textContent = producto;
+        div.onclick = function() {
+          seleccionarProducto(producto);
+        };
         resultBox.appendChild(div);
       });
+    }
+
+    function seleccionarProducto(producto) {
+      document.getElementById('buscarProducto').value = producto;
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = ''; // Limpiar los resultados
     }
 </script>
 </body>
