@@ -440,8 +440,8 @@ function updateprefacturaValue(column, row, value) {
 
 function getInvoiceGeneralInformation() {
   //Browser.msgBox('getInvoiceGeneralInformation()');
-  var range = datos_sheet.getRange("nulo");//Resolución Autorización
-  var InvoiceAuthorizationNumber = range.getValue();
+
+  var InvoiceAuthorizationNumber = "nulo"//Resolución Autorización
   //
   range = prefactura_sheet.getRange("G6");//dias de vencimiento
   var DaysOff = range.getValue();
