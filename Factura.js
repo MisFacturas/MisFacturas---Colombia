@@ -62,6 +62,7 @@ function guardarFactura(){
   if(estadoFactura){
     //factura valida
     // generar json
+    guardarYGenerarInvoice()
     guardarFacturaHistorial()
   }else{
     Logger.log("Factrua no valida")
@@ -107,9 +108,9 @@ function agregarProductoDesdeFactura(cantidad,producto){
       }
     }
   }else{
-    hojaFactura.insertRowAfter(Number(lastProductRow-1));
     Logger.log("lastProductRow dentro de coso neuvo" +lastProductRow)
     let rowParaAgregar=Number(lastProductRow-2)
+    hojaFactura.insertRowAfter(rowParaAgregar);
     Logger.log("rowParaAgregar"+rowParaAgregar)
     hojaFactura.getRange("A"+String(rowParaAgregar)).setValue(producto);//producto
     hojaFactura.getRange("B" + String(rowParaAgregar)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
