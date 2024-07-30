@@ -88,6 +88,10 @@ function agregarProductoDesdeFactura(cantidad,producto){
   Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
 
   if(Number(taxSectionStartRow)===24){
+    let totalProductos=hojaFactura.getRange("B23").getValue();
+    if(totalProductos===5){
+      hojaFactura.insertRowAfter(20)
+    }
     Logger.log("lastProductRow dentro de coso ===24" +lastProductRow)
     for(let i =productStartRow;i<21;i++){
       let valorProducto= hojaFactura.getRange("A"+String(i)).getValue();
@@ -104,6 +108,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
   }else{
     Logger.log("lastProductRow dentro de coso neuvo" +lastProductRow)
     let rowParaAgregar=Number(lastProductRow-1)
+    Logger.log("rowParaAgregar"+rowParaAgregar)
     hojaFactura.getRange("A"+String(rowParaAgregar)).setValue(producto);//producto
     hojaFactura.getRange("B" + String(rowParaAgregar)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
     hojaFactura.getRange("D" + String(rowParaAgregar)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
