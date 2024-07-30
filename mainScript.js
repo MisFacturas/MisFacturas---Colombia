@@ -335,7 +335,7 @@ function getTaxSectionStartRow(sheet) {
     if (sheet.getRange(row, 1).getValue() === 'TOTAL PRODUCTOS') {
 
       Logger.log("dentro de getTax row " + row)
-      return row+1;// tal vez solo dejarlo en Base imponible
+      return row+1;// tal vez solo dejarlo en Base imponible,se agrega 1 osea 1 mas que base imposnible
     }
   }
 

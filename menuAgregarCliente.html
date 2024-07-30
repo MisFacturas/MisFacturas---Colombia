@@ -62,10 +62,11 @@
       var cantidadSeleccionada = cantidad;
       var productoSeleccionado = producto;
 
-      // Implementar la lógica adicional aquí con cantidadSeleccionada y productoSeleccionado
+      
       console.log("Producto:", productoSeleccionado, "Cantidad:", cantidadSeleccionada);
+      google.script.run.agregarProductoDesdeFactura(cantidad,producto)
 
-      // Aquí podrías enviar los datos a Google Sheets, otra función, o cualquier otra acción que necesites realizar
+
     }
 
     function buscarProductos() {

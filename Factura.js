@@ -70,6 +70,40 @@ function guardarFactura(){
 
 }
 
+function agregarProductoDesdeFactura(cantidad,producto){
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian de emepzar a ir los ivas y eso, toca restar -1
+  const productStartRow = 15;
+  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+
+  if(producto==="" || cantidad==="" || cantidad===0){
+    throw new Error('Porfavor elige un producto y un cantidad adecuado');
+  }else{
+    Logger.log("entra a dictInformacionProducto")
+    let dictInformacionProducto = obtenerInformacionProducto(producto);
+  }
+
+  Logger.log("Pasa verificacion de producto")
+  Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
+
+  if(Number(taxSectionStartRow-1)===24){
+    for(let i =productStartRow;i<21;i++){
+      let valorProducto= hojaFactura.getRange("A"+String(i)).getValue();
+      if(valorProducto===""){
+        //em estado deafult, sea agrega dentro de las primeras 6 lienas
+        hojaFactura.getRange("A"+String(i)).setValue(producto);//producto
+        hojaFactura.getRange("B" + String(i)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+        hojaFactura.getRange("D" + String(i)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+        hojaFactura.getRange("E" + String(i)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+        hojaFactura.getRange("C"+String(i)).setValue(cantidad);//cantidad
+        break
+      }
+    }
+  }else{
+    Logger.log("lastProductRow dentro de coso neuvo" +lastProductRow)
+  }
+}
+
 function guardarFacturaHistorial(){
   var hojaFactura = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Factura');
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
