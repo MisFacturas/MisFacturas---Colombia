@@ -13,6 +13,12 @@
     .center-text {
       text-align: center;
     }
+    .result-box {
+      max-height: 200px; /* Limitar la altura máxima del cuadro de resultados */
+      overflow-y: auto;  /* Habilitar desplazamiento si el contenido excede la altura máxima */
+      border: 1px solid #ccc; /* Añadir un borde para separar visualmente los resultados */
+      margin-top: 10px; /* Espaciado superior */
+    }
     .result-box div:hover {
       background-color: #f0f0f0;
       cursor: pointer;
@@ -49,12 +55,20 @@
     }
 
     function agregarProducto() {
-      // Funcionalidad futura para agregar productos
-      console.log("este si")
+      var cantidad = document.getElementById('cantidad').value;
+      var producto = document.getElementById('buscarProducto').value;
+
+      // Guardar los valores en variables
+      var cantidadSeleccionada = cantidad;
+      var productoSeleccionado = producto;
+
+      // Implementar la lógica adicional aquí con cantidadSeleccionada y productoSeleccionado
+      console.log("Producto:", productoSeleccionado, "Cantidad:", cantidadSeleccionada);
+
+      // Aquí podrías enviar los datos a Google Sheets, otra función, o cualquier otra acción que necesites realizar
     }
 
     function buscarProductos() {
-      console.log("buscar producto");
       var input = document.getElementById('buscarProducto').value;
       google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
     }
