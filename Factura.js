@@ -182,6 +182,7 @@ function insertarImagen(fila) {
   image.setAnchorCell(cell);
   image.setHeight(20);
   image.setWidth(20);
+  image.setAnchorCellXOffset(40);
 }
 
 function generarPDFfactura(numeroFactura) {
