@@ -234,7 +234,7 @@ function onEdit(e) {
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
       obtenerFechaYHoraActual()
-      generarNumeroFactura()
+      //generarNumeroFactura()
 
     }
     else if (rowEditada >= productStartRow && colEditada == 1 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
