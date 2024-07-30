@@ -179,14 +179,17 @@ function insertarImagen(fila) {
   var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
   var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
   var numFactura = sheet.getRange('A'+fila).getValue();
-  image.assignScript("generarPDFfactura("+numFactura+")");
+  image.assignScript("generarPDFfactura");
   image.setAnchorCell(cell);
   image.setHeight(20);
   image.setWidth(20);
   image.setAnchorCellXOffset(40);
 }
 
-function generarPDFfactura(numeroFactura) {
+function generarPDFfactura() {
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
+  var fila = hoja.getLastRow();
+  var numeroFactura = hoja.getRange('A'+fila).getValue();
   obtenerDatosFactura(numeroFactura);
   Utilities.sleep(6000);
   var pdfBlob = generarPDF();
