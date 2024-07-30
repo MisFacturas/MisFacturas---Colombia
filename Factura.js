@@ -88,6 +88,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
   Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
 
   if(Number(taxSectionStartRow)===24){
+    Logger.log("lastProductRow dentro de coso ===24" +lastProductRow)
     for(let i =productStartRow;i<21;i++){
       let valorProducto= hojaFactura.getRange("A"+String(i)).getValue();
       if(valorProducto===""){
@@ -102,7 +103,18 @@ function agregarProductoDesdeFactura(cantidad,producto){
     }
   }else{
     Logger.log("lastProductRow dentro de coso neuvo" +lastProductRow)
+    let rowParaAgregar=Number(lastProductRow-1)
+    hojaFactura.getRange("A"+String(rowParaAgregar)).setValue(producto);//producto
+    hojaFactura.getRange("B" + String(rowParaAgregar)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
+    hojaFactura.getRange("D" + String(rowParaAgregar)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
+    hojaFactura.getRange("E" + String(rowParaAgregar)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
+    hojaFactura.getRange("C"+String(rowParaAgregar)).setValue(cantidad);//cantidad
+    //agg fila
+    //hojaFactura.insertRowAfter(Number(lastProductRow-2));//tal vez aca aumntar el tax csoso para el bug
+    taxSectionStartRow += 1
   }
+
+  updateTotalProductCounter(hojaFactura, productStartRow, taxSectionStartRow);
 }
 
 function guardarFacturaHistorial(){
