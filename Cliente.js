@@ -191,9 +191,9 @@ function getCustomerInformation(customer) {
   var CustomerInformation = {
     "IdentificationType": IdentificationType,
     "Identification": Identification,//.toString(),
-    "DV": DV,
+    "DV": prefactura_sheet.getRange("G4").getValue(),
     "RegistrationName": customer,
-    "CountryCode": "ES",
+    "CountryCode": "ES",//cambia dependiendo del pais
     "CountryName": "España",
     "SubdivisionCode": "En España no se como funcionan codigo  de provinica",// 11, //Codigo de Municipio
     "SubdivisionName": datos_sheet.getRange("AA2").getValue(),// provicnica

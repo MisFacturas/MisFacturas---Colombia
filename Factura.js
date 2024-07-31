@@ -498,6 +498,7 @@ function guardarYGenerarInvoice(){
   //obtener el total de prodcutos
   const posicionTotalProductos = prefactura_sheet.getRange("A23").getValue(); // para verificar donde esta el TOTAL
   if (posicionTotalProductos==="TOTAL PRODUCTOS"){
+    Logger.log("entra al primer if de json")
     var cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
   }else{
     const maxRows = prefactura_sheet.getLastRow();
@@ -520,7 +521,7 @@ function guardarYGenerarInvoice(){
 
   let invoiceTaxTotal=[];
   var productoInformation = [];
-  Logger.log(cantidadProductos)
+  Logger.log("cantidadProductos"+cantidadProductos)
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "A" + String(i) + ":G" + String(i);
