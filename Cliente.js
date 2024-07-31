@@ -191,7 +191,7 @@ function getCustomerInformation(customer) {
   var CustomerInformation = {
     "IdentificationType": IdentificationType,
     "Identification": Identification,//.toString(),
-    "DV": prefactura_sheet.getRange("G4").getValue(),
+    "DV": Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy"),
     "RegistrationName": customer,
     "CountryCode": "ES",//cambia dependiendo del pais
     "CountryName": "España",

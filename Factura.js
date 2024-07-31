@@ -404,10 +404,10 @@ function obtenerFechaYHoraActual(){
 
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
   let hora= Utilities.formatDate(new Date(), "GMT+1", "HH:mm:ss");
-  Logger.log(fecha)
+
   sheet.getRange("G4").setValue(fecha)
   sheet.getRange("G3").setValue(hora)
-  Logger.log(sheet.getRange("G4").getValue())
+
 }
 
 function obtenerDatosProductos(sheet,range,e){
