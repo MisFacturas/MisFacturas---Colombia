@@ -340,7 +340,7 @@ function limpiarHojaFactura(){
 function inicarFacturaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
-  let IABN=hojaInfoUsuario.getRange("B7").getValue()
+  let IABN=hojaInfoUsuario.getRange("B9").getValue()
   limpiarHojaFactura();
 
   hojaFactura.getRange("B11").setValue(IABN)
@@ -524,9 +524,11 @@ function guardarYGenerarInvoice(){
   var productoInformation = [];
   Logger.log("cantidadProductos"+cantidadProductos)
   let saltarEspaciosEnBlanco=false
+  let buffer=0
   if (cantidadProductos<5){
     Logger.log("entra a saltarEspaciosEnBlanco")
     saltarEspaciosEnBlanco=true
+    buffer=5
   }
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
@@ -599,7 +601,7 @@ function guardarYGenerarInvoice(){
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
-  }while(i<(15+cantidadProductos+5));//esos 5 son de buffer por si hay espacio entre los prodcutos
+  }while(i<(15+cantidadProductos+buffer));//esos 5 son de buffer por si hay espacio entre los prodcutos
 
   /* Aqui empieza el proceso de coger el precio total de la facutra OJO en nuestro caso se agrupan por % de iva, entonces cambia
   algo mucho */

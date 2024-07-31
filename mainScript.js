@@ -250,11 +250,14 @@ function onEdit(e) {
     //Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
     if (colEditada === columnaContactos && rowEditada === rowContactos) {
-      //celda de elegir contacto
+      //celda de elegir contacto en hoja factura
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
       obtenerFechaYHoraActual()
       //generarNumeroFactura()
+      let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
+      let  = hojaInfoUsuario.getRange("B9").getValue();
+      factura_sheet.getRange("B11").setValue(iban)
 
     }
     else if (rowEditada >= productStartRow && colEditada == 1 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
