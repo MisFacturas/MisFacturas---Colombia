@@ -404,7 +404,7 @@ function obtenerFechaYHoraActual(){
 
   let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
   let hora= Utilities.formatDate(new Date(), "GMT+1", "HH:mm:ss");
-
+  Logger.log(fecha)
   sheet.getRange("G4").setValue(fecha)
   sheet.getRange("G3").setValue(hora)
 }
@@ -522,6 +522,9 @@ function guardarYGenerarInvoice(){
   let invoiceTaxTotal=[];
   var productoInformation = [];
   Logger.log("cantidadProductos"+cantidadProductos)
+  if (cantidadProductos<5){
+    let saltarEspaciosEnBlanco=true
+  }
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "A" + String(i) + ":G" + String(i);
