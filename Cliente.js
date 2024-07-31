@@ -203,7 +203,7 @@ function agregarPaises(){
   ];
   let Paragg=0
   for(let i=25;i<paises.length;i++){
-    datos_sheet.getRange("A"+String(i)).setValue(lista[Paragg])
+    datos_sheet.getRange("A"+String(i)).setValue(paises[Paragg])
     Paragg++
   }
  }
