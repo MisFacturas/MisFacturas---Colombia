@@ -556,6 +556,7 @@ function guardarYGenerarInvoice(){
     Logger.log(i)
     if(Name==="" && saltarEspaciosEnBlanco){
       Logger.log("entra dentro del continue")
+      i++
       continue
 
     }
