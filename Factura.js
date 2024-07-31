@@ -523,8 +523,9 @@ function guardarYGenerarInvoice(){
   let invoiceTaxTotal=[];
   var productoInformation = [];
   Logger.log("cantidadProductos"+cantidadProductos)
+  let saltarEspaciosEnBlanco=false
   if (cantidadProductos<5){
-    let saltarEspaciosEnBlanco=true
+    saltarEspaciosEnBlanco=true
   }
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
@@ -550,6 +551,11 @@ function guardarYGenerarInvoice(){
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
     let Iva = LineChargeTotal-Amount;
 
+    if(Name==="" && saltarEspaciosEnBlanco){
+      Logger.log("entra dentro del continue")
+      continue
+
+    }
 
     //IVA
     let ItemTaxesInformation = [];//taxes del producto en si
@@ -589,7 +595,7 @@ function guardarYGenerarInvoice(){
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
-  }while(i<(15+cantidadProductos));
+  }while(i<(15+cantidadProductos+5));//esos 5 son de buffer por si hay espacio entre los prodcutos
 
   /* Aqui empieza el proceso de coger el precio total de la facutra OJO en nuestro caso se agrupan por % de iva, entonces cambia
   algo mucho */
