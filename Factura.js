@@ -525,6 +525,7 @@ function guardarYGenerarInvoice(){
   Logger.log("cantidadProductos"+cantidadProductos)
   let saltarEspaciosEnBlanco=false
   if (cantidadProductos<5){
+    Logger.log("entra a saltarEspaciosEnBlanco")
     saltarEspaciosEnBlanco=true
   }
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
@@ -550,7 +551,9 @@ function guardarYGenerarInvoice(){
     let ImpoConsumo = 1// no es un parametro para empresas espanolas
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
     let Iva = LineChargeTotal-Amount;
-
+    Logger.log("Name +")
+    Logger.log("saltarEspaciosEnBlanco" +saltarEspaciosEnBlanco)
+    Logger.log(i)
     if(Name==="" && saltarEspaciosEnBlanco){
       Logger.log("entra dentro del continue")
       continue
