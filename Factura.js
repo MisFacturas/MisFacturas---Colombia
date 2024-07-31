@@ -339,7 +339,7 @@ function limpiarHojaFactura(){
 
 function inicarFacturaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let hojaInfoUsuario= spreadsheet.getSheetByName('Info Usuario');
+  let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
   let IABN=hojaInfoUsuario.getRange("B7").getValue()
   limpiarHojaFactura();
 
@@ -498,7 +498,7 @@ function guardarYGenerarInvoice(){
   //obtener el total de prodcutos
   const posicionTotalProductos = prefactura_sheet.getRange("A23").getValue(); // para verificar donde esta el TOTAL
   if (posicionTotalProductos==="TOTAL PRODUCTOS"){
-    const cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
+    var cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
   }else{
     const maxRows = prefactura_sheet.getLastRow();
     for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
@@ -518,9 +518,9 @@ function guardarYGenerarInvoice(){
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
 
-  let invoiceTaxTotal=[]
+  let invoiceTaxTotal=[];
   var productoInformation = [];
-
+  Logger.log(cantidadProductos)
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "A" + String(i) + ":G" + String(i);
