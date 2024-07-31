@@ -69,7 +69,7 @@ function showNuevaFactura() {
 }
 
 function showAgregarProdcuto() {
-  var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Agregar Producto")
+  var html = HtmlService.createHtmlOutputFromFile('menuAgregarProducto').setTitle("Agregar Producto")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }

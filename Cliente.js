@@ -2,6 +2,23 @@ var spreadsheet = SpreadsheetApp.getActive();
 var datos_sheet = spreadsheet.getSheetByName('Datos');
 var factura_sheet= spreadsheet.getSheetByName("Factura")
 
+function showNuevaCliente() {
+  var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Nuevo Cliente")
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function showInactivarCliente() {
+  var html = HtmlService.createHtmlOutputFromFile('menuActivarCliente').setTitle("Activar Cliente")
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function showActivarCliente() {
+  var html = HtmlService.createHtmlOutputFromFile('menuInactivarCliente').setTitle("Inctivar Cliente")
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
 
 function agregarPaises(){
   const paises = [
