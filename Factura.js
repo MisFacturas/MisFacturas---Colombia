@@ -127,6 +127,33 @@ function agregarProductoDesdeFactura(cantidad,producto){
   updateTotalProductCounter(hojaFactura, productStartRow, taxSectionStartRow);
 }
 
+function onImageClick() {
+  // Obtén el rango activo (última celda seleccionada)
+  var range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
+
+  // Obtén la dirección de la celda
+  var cellAddress = range.getA1Notation();
+
+  // Muestra la celda en un diálogo
+  SpreadsheetApp.getUi().alert('La celda activa es: ' + cellAddress);
+}
+function probarInsertarImagen(){
+  insertarImagenBorrarFila(15)
+}
+function insertarImagenBorrarFila(fila){
+  let hojaFcatura=spreadsheet.getSheetByName('Factura');
+  let imagenURL="https://i.postimg.cc/RFZ45sgp/basura3.png"
+  var cell = hojaFcatura.getRange('H'+fila);
+  cell.setHorizontalAlignment('center');
+  var imageBlob = UrlFetchApp.fetch(imagenURL).getBlob();
+  var image = hojaFcatura.insertImage(imageBlob, cell.getColumn(), cell.getRow());
+  var numFactura = hojaFcatura.getRange('A'+fila).getValue();
+  image.assignScript("onImageClick");
+  image.setHeight(20);
+  image.setWidth(20);
+  image.setAnchorCellXOffset(40);
+}
+
 function guardarFacturaHistorial(){
   var hojaFactura = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Factura');
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
