@@ -28,8 +28,8 @@ function inactivarCliente(cliente){
   
 
   let rowDelCliente=datos_sheet.getRange("G2").getValue();
-  let rowMaximaClientesInactivos=hojaClientesInactivos.getLastRow();
-  let rowMaximaClientes=hojaClietnes.getLastRow();
+  let rowMaximaClientesInactivos=hojaClientesInactivos.getLastRow()+1;
+  let rowMaximaClientes=hojaClietnes.getLastRow()+1;
 
   let tipoContacto=datos_sheet.getRange("AB2").getValue();
   let tipoPersona=datos_sheet.getRange("L2").getValue();
