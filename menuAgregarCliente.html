@@ -157,7 +157,7 @@
 
     function buscarPais() {
       var input = document.getElementById('pais').value;
-      google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input);
+      google.script.run.withSuccessHandler(mostrarResultados).buscarPaises(input);
     }
     function mostrarResultados(paises) {
       var resultBox = document.querySelector('.result-box');
