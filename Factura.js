@@ -351,7 +351,7 @@ function insertarImagenBorrarFila(fila){
   image.setAnchorCellXOffset(40);
 }
 
-function guardarFacturaHistorial(){
+function guardarFacturaHistorial() {
   var hojaFactura = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Factura');
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var numeroFactura = hojaFactura.getRange("G2").getValue();
@@ -363,58 +363,66 @@ function guardarFacturaHistorial(){
 
   var lastRow = hojaListado.getLastRow();
   var newRow = lastRow + 1;
-  var celdaNumFactura = hojaListado.getRange("A"+newRow);
+  var celdaNumFactura = hojaListado.getRange("A" + newRow);
   celdaNumFactura.setValue(numeroFactura);
   celdaNumFactura.setHorizontalAlignment('center');
-  celdaNumFactura.setBorder(true,true,true,true,null,null,null,null);
+  celdaNumFactura.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaCliente = hojaListado.getRange("B"+newRow);
+  var celdaCliente = hojaListado.getRange("B" + newRow);
   celdaCliente.setValue(cliente);
   celdaCliente.setHorizontalAlignment('center');
-  celdaCliente.setBorder(true,true,true,true,null,null,null,null);
+  celdaCliente.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaNIF = hojaListado.getRange("C"+newRow);
+  var celdaNIF = hojaListado.getRange("C" + newRow);
   celdaNIF.setValue(nif);
   celdaNIF.setHorizontalAlignment('center');
-  celdaNIF.setBorder(true,true,true,true,null,null,null,null);
+  celdaNIF.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaFecha = hojaListado.getRange("D"+newRow);
+  var celdaFecha = hojaListado.getRange("D" + newRow);
   celdaFecha.setValue(fechaEmision);
   celdaFecha.setHorizontalAlignment('center');
-  celdaFecha.setBorder(true,true,true,true,null,null,null,null);
+  celdaFecha.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaEstado = hojaListado.getRange("E"+newRow);
+  var celdaEstado = hojaListado.getRange("E" + newRow);
   celdaEstado.setValue(estado);
   celdaEstado.setHorizontalAlignment('center');
-  celdaEstado.setBorder(true,true,true,true,null,null,null,null);
+  celdaEstado.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaImagen = hojaListado.getRange("F"+newRow);
+  var celdaImagen = hojaListado.getRange("F" + newRow);
   insertarImagen(newRow);
   celdaImagen.setHorizontalAlignment('center');
-  celdaImagen.setBorder(true,true,true,true,null,null,null,null);
-
+  celdaImagen.setBorder(true, true, true, true, null, null, null, null);
 }
 
 function insertarImagen(fila) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
-  var cell = sheet.getRange('F'+fila);
+  var cell = sheet.getRange('F' + fila);
   cell.setHorizontalAlignment('center');
   var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
   var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
-  var numFactura = sheet.getRange('A'+fila).getValue();
-  image.assignScript("generarPDFfactura");
+  image.assignScript("guardarFilaFactura");
   image.setHeight(20);
   image.setWidth(20);
   image.setAnchorCellXOffset(40);
 }
 
+function guardarFilaFactura() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
+  var cell = sheet.getActiveCell();
+  var fila = cell.getRow();
+  sheet.getRange('Z1').setValue(fila); // Guardar la fila en una celda oculta (Z1)
+  generarPDFfactura();
+}
+
+
 function generarPDFfactura() {
-  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
-  var fila = hoja.getLastRow();
-  var numeroFactura = hoja.getRange('A'+fila).getValue();
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
+  var fila = sheet.getRange('Z1').getValue(); // Leer el número de fila de la celda oculta
+  var numeroFactura = sheet.getRange('A' + fila).getValue(); // Obtener el número de factura
+
   var resultado = obtenerDatosFactura(numeroFactura);
-  if (resultado){
+  if (resultado) {
     var pdfBlob = generarPDF();
   } else {
     Utilities.sleep(5000);
@@ -433,6 +441,7 @@ function generarPDFfactura() {
     .setHeight(100);
   SpreadsheetApp.getUi().showModalDialog(ui, 'Descargar PDF');
 }
+
 
 function generarPDF() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
