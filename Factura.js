@@ -690,7 +690,7 @@ function getInvoiceGeneralInformation() {
     "ExchangeRateDate": "",
     "SalesPerson": "",
     //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(10, 2),//cambia los valroes parak llamar la nota de la factura 
+    "Note": getprefacturaValue(10, 2), //cambia los valores para llamar la nota de la factura
     "ExternalGR": false
     //"AdditionalProperty": AdditionalProperty
   }
@@ -999,7 +999,7 @@ function obtenerDatosFactura(factura){
       if (jsonData) {
         try {
           var invoiceData = JSON.parse(jsonData);
-          
+          var facturaNumero = invoiceData.InvoiceGeneralInformation.InvoiceNumber;
           var cliente = invoiceData.CustomerInformation.RegistrationName;
           var nif = invoiceData.CustomerInformation.Identification;
           var codigo = invoiceData.CustomerInformation.AdditionalAccountID;
@@ -1008,11 +1008,12 @@ function obtenerDatosFactura(factura){
           var poblacion = invoiceData.CustomerInformation.CityName;
           var provincia = invoiceData.CustomerInformation.SubdivisionName;
           var pais = invoiceData.CustomerInformation.CountryName;
-          var fechaEmision = invoiceData.Delivery.DeliveryDate;
-          var formaPago = invoiceData.PaymentSummary.PaymentMeans;
+          var fechaEmision = invoiceData.CustomerInformation.DV;
+          var formaPago = invoiceData.PaymentSummary.PaymentType;
           var listaProductos = invoiceData.ItemInformation;
           var numeroProductos = 0;
-          var valorPagar = invoiceData.PaymentSummary.PaymentNote;
+          var totalFacturaJSON = parseFloat(invoiceData.InvoiceTotal.PayableAmount);
+          var valorPagar = int2word(totalFacturaJSON) //arreglar
           var notaPago = invoiceData.PaymentSummary.PaymentNote;
           var observaciones = invoiceData.InvoiceGeneralInformation.Note;
 
@@ -1138,6 +1139,8 @@ function obtenerDatosFactura(factura){
           var fechaEmisionCeldaHoja = hojaCeldas.getRange('E9').getValue();
           var formaPagoCeldaHoja = hojaCeldas.getRange('E10').getValue();
 
+          //factura
+          var celdaNumFactura = targetSheet.getRange('A9');
           //Datos Cliente
           var clienteCell = targetSheet.getRange(clienteCeldaHoja);
           var nifCell = targetSheet.getRange(nifCeldaHoja);
@@ -1157,13 +1160,19 @@ function obtenerDatosFactura(factura){
           var sumaImpIva = targetSheet.getRange('F'+(29+filasInsertadas));
           var sumaTotal = targetSheet.getRange('H'+(29+filasInsertadas));
 
-
+          celdaNumFactura.setValue("FACTURA DE VENTA NO. "+facturaNumero);
           clienteCell.setValue(cliente);
           nifCell.setValue(nif);
           codigoCell.setValue(codigo);
           direccionCell.setValue(direccion);
           telefonoCell.setValue(telefono);
-          poblacionCell.setValue(poblacion+', '+provincia+', '+pais);
+          if (poblacion == "" || provincia == "" || pais == "") {
+            var columnaPoblacion = poblacionCell.getColumn();
+            var filaPoblacion = poblacionCell.getRow();
+            targetSheet.getRange(filaPoblacion, columnaPoblacion-1).clearContent();
+          } else {
+            poblacionCell.setValue(poblacion+', '+provincia+', '+pais);
+          }
           fechaEmisionCell.setValue(fechaEmision);
           formaPagoCell.setValue(formaPago);
           valorPagarCell.setValue(valorPagar);
@@ -1176,9 +1185,7 @@ function obtenerDatosFactura(factura){
           sumaImpIva.setFormula('=SUM(F'+(27+numeroProductos-1)+':F'+(28+filasInsertadas-1)+')');
           sumaTotal.setFormula('=SUM(H'+(27+numeroProductos-1)+':H'+(28+filasInsertadas-1)+')');
           
-          
-          Logger.log(grupoIva);
-          return;
+          return true;
         } catch (e) {
           Logger.log('Error parsing JSON for row ' + (i + 1) + ': ' + e.message);
         }
@@ -1189,8 +1196,8 @@ function obtenerDatosFactura(factura){
 }
 
 function testWriteNIFToPlantilla() {
-  var invoiceNumber = 'FE947'; // Reemplaza con el número de factura deseado
-  obtenerDatosFactura(invoiceNumber);
+  var invoiceNumber = '192'; // Reemplaza con el número de factura deseado
+  Logger.log(obtenerDatosFactura(invoiceNumber));
 }
 
 function resetPlantilla() {
