@@ -413,9 +413,13 @@ function generarPDFfactura() {
   var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var fila = hoja.getLastRow();
   var numeroFactura = hoja.getRange('A'+fila).getValue();
-  obtenerDatosFactura(numeroFactura);
-  Utilities.sleep(8000);
-  var pdfBlob = generarPDF();
+  var resultado = obtenerDatosFactura(numeroFactura);
+  if (resultado){
+    var pdfBlob = generarPDF();
+  } else {
+    Utilities.sleep(5000);
+    var pdfBlob = generarPDF();
+  }
   var url = generarPdfUrl(pdfBlob);
 
   // Crear un archivo temporal en el Drive para proporcionar un enlace de descarga
