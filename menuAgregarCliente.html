@@ -7,12 +7,6 @@
     .narrow {
       margin-bottom: 0.5rem;
     }
-    .top-right {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-    }
     .center-text {
       text-align: center;
     }
@@ -20,12 +14,15 @@
       background-color: #f0f0f0;
       cursor: pointer;
     }
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="top-right">
-    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
-  </div>
+
   <h3 class="center-text">Clientes</h3>
   <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
   
@@ -147,7 +144,9 @@
     </div>
     <button type="button" class="btn btn-primary" onclick="saveData()">Guardar</button>
   </form>
-  
+  <div class="footer">
+    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
+  </div>
 </body>
   <script>
     function writeDocument(htmlOutput) {
