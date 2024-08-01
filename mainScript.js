@@ -69,7 +69,7 @@ function showNuevaFactura() {
 }
 
 function showAgregarProdcuto() {
-  var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Agregar Producto")
+  var html = HtmlService.createHtmlOutputFromFile('menuAgregarProducto').setTitle("Agregar Producto")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
@@ -250,11 +250,14 @@ function onEdit(e) {
     //Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
     if (colEditada === columnaContactos && rowEditada === rowContactos) {
-      //celda de elegir contacto
+      //celda de elegir contacto en hoja factura
       Logger.log("No se editó un contacto válido");
       verificarYCopiarContacto(e);
       obtenerFechaYHoraActual()
       //generarNumeroFactura()
+      let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
+      let  = hojaInfoUsuario.getRange("B9").getValue();
+      factura_sheet.getRange("B11").setValue(iban)
 
     }
     else if (rowEditada >= productStartRow && colEditada == 1 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
@@ -354,7 +357,7 @@ function getTaxSectionStartRow(sheet) {
 
   // obtenemos la row donde esta la "base imponible, llegando asi al principio "
   for (let row = 22; row <= maxRows; row++) { // 22 porque su row predetermmiado es ese
-    if (sheet.getRange(row, 1).getValue() === 'TOTAL PRODUCTOS') {
+    if (sheet.getRange(row, 1).getValue() === 'Total productos') {
 
       Logger.log("dentro de getTax row " + row)
       return row+1;// tal vez solo dejarlo en Base imponible,se agrega 1 osea 1 mas que base imposnible

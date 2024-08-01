@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .center-text {
+      text-align: center;
+    }
+    .result-box {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    .result-box div:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="number"] {
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    #productForm {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <h3>Agregar producto</h3>
+
+  <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  
+  <form id="productForm">
+    <div class="form-group">
+      <label for="cantidad">Cantidad</label>
+      <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
+    </div>
+    <div class="form-group">
+      <label for="buscarProducto">Buscar producto</label>
+      <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto" autocomplete="off" onkeyup="buscarProductos()">
+      <div class="result-box">
+        <!-- Los resultados se mostrarán aquí -->
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="agregarProducto()">Agregar producto</button>
+    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
+  </form>
+  
+<script>
+    function Back() {
+      google.script.run.showNuevaFactura();
+    }
+
+    function agregarProducto() {
+      var cantidad = document.getElementById('cantidad').value;
+      var producto = document.getElementById('buscarProducto').value;
+
+      console.log("Producto:", producto, "Cantidad:", cantidad);
+      google.script.run.agregarProductoDesdeFactura(cantidad, producto);
+    }
+
+    function buscarProductos() {
+      var input = document.getElementById('buscarProducto').value;
+      google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
+    }
+    
+    function mostrarResultados(productos) {
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = '';
+      productos.forEach(function(producto) {
+        var div = document.createElement('div');
+        div.textContent = producto;
+        div.onclick = function() {
+          seleccionarProducto(producto);
+        };
+        resultBox.appendChild(div);
+      });
+    }
+
+    function seleccionarProducto(producto) {
+      document.getElementById('buscarProducto').value = producto;
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = ''; // Limpiar los resultados
+    }
+</script>
+</body>
+</html>

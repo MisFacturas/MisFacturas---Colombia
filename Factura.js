@@ -9,6 +9,203 @@ var spreadsheet = SpreadsheetApp.getActive();
 var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
+var paisesCodigos = {
+  "Afganistán": "AF",
+  "Albania": "AL",
+  "Alemania": "DE",
+  "Andorra": "AD",
+  "Angola": "AO",
+  "Antigua y Barbuda": "AG",
+  "Arabia Saudita": "SA",
+  "Argelia": "DZ",
+  "Argentina": "AR",
+  "Armenia": "AM",
+  "Australia": "AU",
+  "Austria": "AT",
+  "Azerbaiyán": "AZ",
+  "Bahamas": "BS",
+  "Bangladés": "BD",
+  "Barbados": "BB",
+  "Baréin": "BH",
+  "Bélgica": "BE",
+  "Belice": "BZ",
+  "Benín": "BJ",
+  "Bielorrusia": "BY",
+  "Birmania": "MM",
+  "Bolivia": "BO",
+  "Bosnia y Herzegovina": "BA",
+  "Botsuana": "BW",
+  "Brasil": "BR",
+  "Brunéi": "BN",
+  "Bulgaria": "BG",
+  "Burkina Faso": "BF",
+  "Burundi": "BI",
+  "Bután": "BT",
+  "Cabo Verde": "CV",
+  "Camboya": "KH",
+  "Camerún": "CM",
+  "Canadá": "CA",
+  "Catar": "QA",
+  "Chad": "TD",
+  "Chile": "CL",
+  "China": "CN",
+  "Chipre": "CY",
+  "Ciudad del Vaticano": "VA",
+  "Colombia": "CO",
+  "Comoras": "KM",
+  "Corea del Norte": "KP",
+  "Corea del Sur": "KR",
+  "Costa de Marfil": "CI",
+  "Costa Rica": "CR",
+  "Croacia": "HR",
+  "Cuba": "CU",
+  "Dinamarca": "DK",
+  "Dominica": "DM",
+  "Ecuador": "EC",
+  "Egipto": "EG",
+  "El Salvador": "SV",
+  "Emiratos Árabes Unidos": "AE",
+  "Eritrea": "ER",
+  "Eslovaquia": "SK",
+  "Eslovenia": "SI",
+  "España": "ES",
+  "Estados Unidos": "US",
+  "Estonia": "EE",
+  "Etiopía": "ET",
+  "Filipinas": "PH",
+  "Finlandia": "FI",
+  "Fiyi": "FJ",
+  "Francia": "FR",
+  "Gabón": "GA",
+  "Gambia": "GM",
+  "Georgia": "GE",
+  "Ghana": "GH",
+  "Granada": "GD",
+  "Grecia": "GR",
+  "Guatemala": "GT",
+  "Guyana": "GY",
+  "Guinea": "GN",
+  "Guinea ecuatorial": "GQ",
+  "Guinea-Bisáu": "GW",
+  "Haití": "HT",
+  "Honduras": "HN",
+  "Hungría": "HU",
+  "India": "IN",
+  "Indonesia": "ID",
+  "Irak": "IQ",
+  "Irán": "IR",
+  "Irlanda": "IE",
+  "Islandia": "IS",
+  "Islas Marshall": "MH",
+  "Islas Salomón": "SB",
+  "Israel": "IL",
+  "Italia": "IT",
+  "Jamaica": "JM",
+  "Japón": "JP",
+  "Jordania": "JO",
+  "Kazajistán": "KZ",
+  "Kenia": "KE",
+  "Kirguistán": "KG",
+  "Kiribati": "KI",
+  "Kosovo": "XK",
+  "Kuwait": "KW",
+  "Laos": "LA",
+  "Lesoto": "LS",
+  "Letonia": "LV",
+  "Líbano": "LB",
+  "Liberia": "LR",
+  "Libia": "LY",
+  "Liechtenstein": "LI",
+  "Lituania": "LT",
+  "Luxemburgo": "LU",
+  "Macedonia del Norte": "MK",
+  "Madagascar": "MG",
+  "Malasia": "MY",
+  "Malaui": "MW",
+  "Maldivas": "MV",
+  "Malí": "ML",
+  "Malta": "MT",
+  "Marruecos": "MA",
+  "Mauricio": "MU",
+  "Mauritania": "MR",
+  "México": "MX",
+  "Micronesia": "FM",
+  "Moldavia": "MD",
+  "Mónaco": "MC",
+  "Mongolia": "MN",
+  "Montenegro": "ME",
+  "Mozambique": "MZ",
+  "Namibia": "NA",
+  "Nauru": "NR",
+  "Nepal": "NP",
+  "Nicaragua": "NI",
+  "Níger": "NE",
+  "Nigeria": "NG",
+  "Noruega": "NO",
+  "Nueva Zelanda": "NZ",
+  "Omán": "OM",
+  "Países Bajos": "NL",
+  "Pakistán": "PK",
+  "Palaos": "PW",
+  "Panamá": "PA",
+  "Papúa Nueva Guinea": "PG",
+  "Paraguay": "PY",
+  "Perú": "PE",
+  "Polonia": "PL",
+  "Portugal": "PT",
+  "Reino Unido": "GB",
+  "República Centroafricana": "CF",
+  "República Checa": "CZ",
+  "República del Congo": "CG",
+  "República Democrática del Congo": "CD",
+  "República Dominicana": "DO",
+  "Ruanda": "RW",
+  "Rumania": "RO",
+  "Rusia": "RU",
+  "Samoa": "WS",
+  "San Cristóbal y Nieves": "KN",
+  "San Marino": "SM",
+  "San Vicente y las Granadinas": "VC",
+  "Santa Lucía": "LC",
+  "Santo Tomé y Príncipe": "ST",
+  "Senegal": "SN",
+  "Serbia": "RS",
+  "Seychelles": "SC",
+  "Sierra Leona": "SL",
+  "Singapur": "SG",
+  "Siria": "SY",
+  "Somalia": "SO",
+  "Sri Lanka": "LK",
+  "Suazilandia": "SZ",
+  "Sudáfrica": "ZA",
+  "Sudán": "SD",
+  "Sudán del Sur": "SS",
+  "Suecia": "SE",
+  "Suiza": "CH",
+  "Surinam": "SR",
+  "Tailandia": "TH",
+  "Tanzania": "TZ",
+  "Tayikistán": "TJ",
+  "Timor Oriental": "TL",
+  "Togo": "TG",
+  "Tonga": "TO",
+  "Trinidad y Tobago": "TT",
+  "Túnez": "TN",
+  "Turkmenistán": "TM",
+  "Turquía": "TR",
+  "Tuvalu": "TV",
+  "Ucrania": "UA",
+  "Uganda": "UG",
+  "Uruguay": "UY",
+  "Uzbekistán": "UZ",
+  "Vanuatu": "VU",
+  "Venezuela": "VE",
+  "Vietnam": "VN",
+  "Yemen": "YE",
+  "Yibuti": "DJ",
+  "Zambia": "ZM",
+  "Zimbabue": "ZW"
+};
 
 var diccionarioCaluclarIva={
   "0.21": 0,
@@ -44,7 +241,7 @@ function verificarEstadoValidoFactura() {
 
   let totalProductos=hojaFactura.getRange("A23").getValue();
 
-  if (totalProductos==="TOTAL PRODUCTOS"){
+  if (totalProductos==="Total productos"){
     // no hay necesidad de encontrar TOTAL PRODUCTOS si no esta, porque eso implica que si anadio asi sea 1 prodcuto
     let valorTotalProductos=hojaFactura.getRange("B23").getValue();
     if(valorTotalProductos===0){
@@ -125,6 +322,33 @@ function agregarProductoDesdeFactura(cantidad,producto){
   }
 
   updateTotalProductCounter(hojaFactura, productStartRow, taxSectionStartRow);
+}
+
+function onImageClick() {
+  // Obtén el rango activo (última celda seleccionada)
+  var range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
+
+  // Obtén la dirección de la celda
+  var cellAddress = range.getA1Notation();
+
+  // Muestra la celda en un diálogo
+  SpreadsheetApp.getUi().alert('La celda activa es: ' + cellAddress);
+}
+function probarInsertarImagen(){
+  insertarImagenBorrarFila(15)
+}
+function insertarImagenBorrarFila(fila){
+  let hojaFcatura=spreadsheet.getSheetByName('Factura');
+  let imagenURL="https://i.postimg.cc/RFZ45sgp/basura3.png"
+  var cell = hojaFcatura.getRange('H'+fila);
+  cell.setHorizontalAlignment('center');
+  var imageBlob = UrlFetchApp.fetch(imagenURL).getBlob();
+  var image = hojaFcatura.insertImage(imageBlob, cell.getColumn(), cell.getRow());
+  var numFactura = hojaFcatura.getRange('A'+fila).getValue();
+  image.assignScript("onImageClick");
+  image.setHeight(20);
+  image.setWidth(20);
+  image.setAnchorCellXOffset(40);
 }
 
 function guardarFacturaHistorial(){
@@ -288,7 +512,7 @@ function limpiarHojaFactura(){
 
   //productos no predetrminados
   let totalProductos=hojaFactura.getRange("A23")
-  if(totalProductos==="TOTAL PRODUCTOS"){
+  if(totalProductos==="Total productos"){
     Logger.log("entra en prodcutos no predeterminados priemr if")
     //implica que no se agrego mas productos que los predeterminados, se borra todo en su estado normal
     hojaFactura.getRange("B23").setValue(0)//totalproductos
@@ -308,7 +532,7 @@ function limpiarHojaFactura(){
       let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)
       Logger.log("informacionCelda"+informacionCelda)
-      if(informacionCelda==="TOTAL PRODUCTOS"){
+      if(informacionCelda==="Total productos"){
         //eliminar celdas
         for (let j = i - 3; j >= 21; j--) {
           hojaFactura.deleteRow(j);
@@ -339,8 +563,8 @@ function limpiarHojaFactura(){
 
 function inicarFacturaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let hojaInfoUsuario= spreadsheet.getSheetByName('Info Usuario');
-  let IABN=hojaInfoUsuario.getRange("B7").getValue()
+  let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
+  let IABN=hojaInfoUsuario.getRange("B9").getValue()
   limpiarHojaFactura();
 
   hojaFactura.getRange("B11").setValue(IABN)
@@ -407,6 +631,7 @@ function obtenerFechaYHoraActual(){
 
   sheet.getRange("G4").setValue(fecha)
   sheet.getRange("G3").setValue(hora)
+
 }
 
 function obtenerDatosProductos(sheet,range,e){
@@ -465,7 +690,7 @@ function getInvoiceGeneralInformation() {
     "ExchangeRateDate": "",
     "SalesPerson": "",
     //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(11, 4), //cambia los valores para llamar la nota de la factura
+    "Note": getprefacturaValue(10, 2), //cambia los valores para llamar la nota de la factura
     "ExternalGR": false
     //"AdditionalProperty": AdditionalProperty
   }
@@ -497,15 +722,16 @@ function guardarYGenerarInvoice(){
 
   //obtener el total de prodcutos
   const posicionTotalProductos = prefactura_sheet.getRange("A23").getValue(); // para verificar donde esta el TOTAL
-  if (posicionTotalProductos==="TOTAL PRODUCTOS"){
-    const cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
+  if (posicionTotalProductos==="Total productos"){
+    Logger.log("entra al primer if de json")
+    var cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
   }else{
     const maxRows = prefactura_sheet.getLastRow();
     for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
       let informacionCelda=prefactura_sheet.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)
       Logger.log("informacionCelda"+informacionCelda)
-      if(informacionCelda==="TOTAL PRODUCTOS"){
+      if(informacionCelda==="Total productos"){
         var cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
         
       }
@@ -518,9 +744,16 @@ function guardarYGenerarInvoice(){
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
 
-  let invoiceTaxTotal=[]
+  let invoiceTaxTotal=[];
   var productoInformation = [];
-
+  Logger.log("cantidadProductos"+cantidadProductos)
+  let saltarEspaciosEnBlanco=false
+  let buffer=0
+  if (cantidadProductos<5){
+    Logger.log("entra a saltarEspaciosEnBlanco")
+    saltarEspaciosEnBlanco=true
+    buffer=5
+  }
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
     let filaActual = "A" + String(i) + ":G" + String(i);
@@ -544,7 +777,15 @@ function guardarYGenerarInvoice(){
     let ImpoConsumo = 1// no es un parametro para empresas espanolas
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
     let Iva = LineChargeTotal-Amount;
+    Logger.log("Name +")
+    Logger.log("saltarEspaciosEnBlanco" +saltarEspaciosEnBlanco)
+    Logger.log(i)
+    if(Name==="" && saltarEspaciosEnBlanco){
+      Logger.log("entra dentro del continue")
+      i++
+      continue
 
+    }
 
     //IVA
     let ItemTaxesInformation = [];//taxes del producto en si
@@ -584,7 +825,7 @@ function guardarYGenerarInvoice(){
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
-  }while(i<(15+cantidadProductos));
+  }while(i<(15+cantidadProductos+buffer));//esos 5 son de buffer por si hay espacio entre los prodcutos
 
   /* Aqui empieza el proceso de coger el precio total de la facutra OJO en nuestro caso se agrupan por % de iva, entonces cambia
   algo mucho */
@@ -739,9 +980,7 @@ function guardarYGenerarInvoice(){
   
 }
 
-function guardarInvoice(invoice){
 
-}
 
 
 

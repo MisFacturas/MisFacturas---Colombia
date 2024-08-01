@@ -2,6 +2,394 @@ var spreadsheet = SpreadsheetApp.getActive();
 var datos_sheet = spreadsheet.getSheetByName('Datos');
 var factura_sheet= spreadsheet.getSheetByName("Factura")
 
+function showNuevaCliente() {
+  var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Nuevo Cliente")
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function showInactivarCliente() {
+  var html = HtmlService.createHtmlOutputFromFile('menuInactivarCliente').setTitle("Activar Cliente")
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function showActivarCliente() {
+  var html = HtmlService.createHtmlOutputFromFile('menuActivarCliente').setTitle("Inctivar Cliente")
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function inactivarCliente(cliente){
+  let hojaClientesInactivos=spreadsheet.getSheetByName('ClientesInvalidos');
+  let hojaClietnes=spreadsheet.getSheetByName("Clientes")
+  Logger.log(cliente)
+  datos_sheet.getRange("H2").setValue(cliente)
+  
+
+  let rowDelCliente=datos_sheet.getRange("G2").getValue();
+  let rowMaximaClientesInactivos=hojaClientesInactivos.getLastRow()+1;
+  let rowMaximaClientes=hojaClietnes.getLastRow()+1;
+
+  let tipoContacto=datos_sheet.getRange("AB2").getValue();
+  let tipoPersona=datos_sheet.getRange("L2").getValue();
+  let tipoDoc=datos_sheet.getRange("J2").getValue();
+  let numIdentificacion=datos_sheet.getRange("K2").getValue();
+  let codigoContacto=datos_sheet.getRange("I2").getValue();
+  let regimen=datos_sheet.getRange("M2").getValue();
+  let nomnbreComercial=datos_sheet.getRange("N2").getValue();
+  let primerNombre=datos_sheet.getRange("O2").getValue();
+  let segundoNombre=datos_sheet.getRange("P2").getValue();
+  let primerApellido=datos_sheet.getRange("Q2").getValue();
+  let segundoApellido=datos_sheet.getRange("R2").getValue();
+  let pais=datos_sheet.getRange("S2").getValue();
+  let provicnica=datos_sheet.getRange("AA2").getValue();
+  let poblacion=datos_sheet.getRange("Z2").getValue();
+  let direccion=datos_sheet.getRange("T2").getValue();
+  let codigoPostal=datos_sheet.getRange("U2").getValue();
+  let telefono=datos_sheet.getRange("V2").getValue();
+  let sitioWeb=datos_sheet.getRange("W2").getValue();
+  let email=datos_sheet.getRange("X2").getValue();
+  let estado=datos_sheet.getRange("Y2").getValue();
+
+
+  // Proceso para agregar a la hoja de clientes inactivos
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 1).setValue(estado);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 2).setValue(cliente);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 3).setValue(tipoContacto);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 4).setValue(tipoPersona);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 5).setValue(tipoDoc);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 6).setValue(numIdentificacion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 7).setValue(codigoContacto);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 8).setValue(regimen);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 9).setValue(nomnbreComercial);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 10).setValue(primerNombre);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 11).setValue(segundoNombre);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 12).setValue(primerApellido);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 13).setValue(segundoApellido);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 14).setValue(pais);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 15).setValue(provicnica);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 16).setValue(poblacion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 17).setValue(direccion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 18).setValue(codigoPostal);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 19).setValue(telefono);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 20).setValue(sitioWeb);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 21).setValue(email);
+
+  //eliminar cliente de la hoja clientes
+
+  hojaClietnes.deleteRow(rowDelCliente)
+  hojaClietnes.insertRowAfter(rowMaximaClientes)
+}
+
+function activarCliente(cliente){
+  let hojaClientesInactivos=spreadsheet.getSheetByName('ClientesInvalidos');
+  let hojaClietnes=spreadsheet.getSheetByName("Clientes")
+  Logger.log(cliente)
+  datos_sheet.getRange("I6").setValue(cliente)
+
+  let rowDelCliente=datos_sheet.getRange("G6").getValue();
+  let rowMaximaClientesInactivos=hojaClientesInactivos.getLastRow()+1;
+  let rowMaximaClientes=hojaClietnes.getLastRow()+1;
+
+  let estado = datos_sheet.getRange('H6').getValue();
+  let tipoContacto = datos_sheet.getRange('J6').getValue();
+  let tipoPersona = datos_sheet.getRange('K6').getValue();
+  let tipoDoc = datos_sheet.getRange('L6').getValue();
+  let numIdentificacion = datos_sheet.getRange('M6').getValue();
+  let codigoContacto = datos_sheet.getRange('N6').getValue();
+  let regimen = datos_sheet.getRange('O6').getValue();
+  let nombreComercial = datos_sheet.getRange('P6').getValue();
+  let primerNombre = datos_sheet.getRange('Q6').getValue();
+  let segundoNombre = datos_sheet.getRange('R6').getValue();
+  let primerApellido = datos_sheet.getRange('S6').getValue();
+  let segundoApellido = datos_sheet.getRange('T6').getValue();
+  let pais = datos_sheet.getRange('U6').getValue();
+  let provincia = datos_sheet.getRange('V6').getValue();
+  let poblacion = datos_sheet.getRange('W6').getValue();
+  let direccion = datos_sheet.getRange('X6').getValue();
+  let codigoPostal = datos_sheet.getRange('Y6').getValue();
+  let telefono = datos_sheet.getRange('Z6').getValue();
+  let sitioWeb = datos_sheet.getRange('AA6').getValue();
+  let email = datos_sheet.getRange('AB6').getValue();
+  
+  hojaClietnes.getRange(rowMaximaClientes, 1).setValue(estado);
+  hojaClietnes.getRange(rowMaximaClientes, 2).setValue(cliente);
+  hojaClietnes.getRange(rowMaximaClientes, 3).setValue(tipoContacto);
+  hojaClietnes.getRange(rowMaximaClientes, 4).setValue(tipoPersona);
+  hojaClietnes.getRange(rowMaximaClientes, 5).setValue(tipoDoc);
+  hojaClietnes.getRange(rowMaximaClientes, 6).setValue(numIdentificacion);
+  hojaClietnes.getRange(rowMaximaClientes, 7).setValue(codigoContacto);
+  hojaClietnes.getRange(rowMaximaClientes, 8).setValue(regimen);
+  hojaClietnes.getRange(rowMaximaClientes, 9).setValue(nombreComercial);
+  hojaClietnes.getRange(rowMaximaClientes, 10).setValue(primerNombre);
+  hojaClietnes.getRange(rowMaximaClientes, 11).setValue(segundoNombre);
+  hojaClietnes.getRange(rowMaximaClientes, 12).setValue(primerApellido);
+  hojaClietnes.getRange(rowMaximaClientes, 13).setValue(segundoApellido);
+  hojaClietnes.getRange(rowMaximaClientes, 14).setValue(pais);
+  hojaClietnes.getRange(rowMaximaClientes, 15).setValue(provincia);
+  hojaClietnes.getRange(rowMaximaClientes, 16).setValue(poblacion);
+  hojaClietnes.getRange(rowMaximaClientes, 17).setValue(direccion);
+  hojaClietnes.getRange(rowMaximaClientes, 18).setValue(codigoPostal);
+  hojaClietnes.getRange(rowMaximaClientes, 19).setValue(telefono);
+  hojaClietnes.getRange(rowMaximaClientes, 20).setValue(sitioWeb);
+  hojaClietnes.getRange(rowMaximaClientes, 21).setValue(email);
+
+  hojaClientesInactivos.deleteRow(rowDelCliente)
+  hojaClientesInactivos.insertRowAfter(rowMaximaClientesInactivos)
+}
+function buscarClientes(terminoBusqueda,hojaA) {
+  
+  if(hojaA==="Inactivar"){
+    var sheet = spreadsheet.getSheetByName('Clientes');
+  }else{
+    var sheet = spreadsheet.getSheetByName('ClientesInvalidos');
+  }
+  
+  var ultimaFila = sheet.getLastRow(); 
+  var valores = sheet.getRange(2, 2, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
+
+  var resultados = [];
+  if(terminoBusqueda===""){
+    return resultados
+  }
+  // Recorre los valores obtenidos
+  for (var i = 0; i < valores.length; i++) {
+    var valor = valores[i][0]; // Accede al primer (y único) valor de cada fila
+    
+    // Comprueba si el valor coincide con el término de búsqueda
+    if (valor.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) {
+      resultados.push(valor); // Añade el valor a la lista de resultados si coincide
+    }
+  }
+  
+  // Devuelve los resultados
+  return resultados;
+}
+function buscarPaises(terminoBusqueda){
+  let paises=datos_sheet.getRange(25,1,169,1).getValues();
+  var resultados = [];
+  if(terminoBusqueda===""){
+    return resultados
+  }
+  // Recorre los valores obtenidos
+  for (var i = 0; i < paises.length; i++) {
+    var valor = paises[i][0]; // Accede al primer (y único) valor de cada fila
+    
+    // Comprueba si el valor coincide con el término de búsqueda
+    if (valor.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) {
+      resultados.push(valor); // Añade el valor a la lista de resultados si coincide
+    }
+  }
+  
+  // Devuelve los resultados
+  return resultados;
+}
+
+function agregarPaises(){
+  const paises = [
+    "Afganistán",
+    "Albania",
+    "Alemania",
+    "Andorra",
+    "Angola",
+    "Antigua y Barbuda",
+    "Arabia Saudita",
+    "Argelia",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaiyán",
+    "Bahamas",
+    "Bangladés",
+    "Barbados",
+    "Baréin",
+    "Bélgica",
+    "Belice",
+    "Benín",
+    "Bielorrusia",
+    "Birmania",
+    "Bolivia",
+    "Bosnia y Herzegovina",
+    "Botsuana",
+    "Brasil",
+    "Brunéi",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Bután",
+    "Cabo Verde",
+    "Camboya",
+    "Camerún",
+    "Canadá",
+    "Catar",
+    "Chad",
+    "Chile",
+    "China",
+    "Chipre",
+    "Ciudad del Vaticano",
+    "Colombia",
+    "Comoras",
+    "Corea del Norte",
+    "Corea del Sur",
+    "Costa de Marfil",
+    "Costa Rica",
+    "Croacia",
+    "Cuba",
+    "Dinamarca",
+    "Dominica",
+    "Ecuador",
+    "Egipto",
+    "El Salvador",
+    "Emiratos Árabes Unidos",
+    "Eritrea",
+    "Eslovaquia",
+    "Eslovenia",
+    "España",
+    "Estados Unidos",
+    "Estonia",
+    "Etiopía",
+    "Filipinas",
+    "Finlandia",
+    "Fiyi",
+    "Francia",
+    "Gabón",
+    "Gambia",
+    "Georgia",
+    "Ghana",
+    "Granada",
+    "Grecia",
+    "Guatemala",
+    "Guyana",
+    "Guinea",
+    "Guinea ecuatorial",
+    "Guinea-Bisáu",
+    "Haití",
+    "Honduras",
+    "Hungría",
+    "India",
+    "Indonesia",
+    "Irak",
+    "Irán",
+    "Irlanda",
+    "Islandia",
+    "Islas Marshall",
+    "Islas Salomón",
+    "Israel",
+    "Italia",
+    "Jamaica",
+    "Japón",
+    "Jordania",
+    "Kazajistán",
+    "Kenia",
+    "Kirguistán",
+    "Kiribati",
+    "Kosovo",
+    "Kuwait",
+    "Laos",
+    "Lesoto",
+    "Letonia",
+    "Líbano",
+    "Liberia",
+    "Libia",
+    "Liechtenstein",
+    "Lituania",
+    "Luxemburgo",
+    "Macedonia del Norte",
+    "Madagascar",
+    "Malasia",
+    "Malaui",
+    "Maldivas",
+    "Malí",
+    "Malta",
+    "Marruecos",
+    "Mauricio",
+    "Mauritania",
+    "México",
+    "Micronesia",
+    "Moldavia",
+    "Mónaco",
+    "Mongolia",
+    "Montenegro",
+    "Mozambique",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Nicaragua",
+    "Níger",
+    "Nigeria",
+    "Noruega",
+    "Nueva Zelanda",
+    "Omán",
+    "Países Bajos",
+    "Pakistán",
+    "Palaos",
+    "Panamá",
+    "Papúa Nueva Guinea",
+    "Paraguay",
+    "Perú",
+    "Polonia",
+    "Portugal",
+    "Reino Unido",
+    "República Centroafricana",
+    "República Checa",
+    "República del Congo",
+    "República Democrática del Congo",
+    "República Dominicana",
+    "Ruanda",
+    "Rumania",
+    "Rusia",
+    "Samoa",
+    "San Cristóbal y Nieves",
+    "San Marino",
+    "San Vicente y las Granadinas",
+    "Santa Lucía",
+    "Santo Tomé y Príncipe",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leona",
+    "Singapur",
+    "Siria",
+    "Somalia",
+    "Sri Lanka",
+    "Suazilandia",
+    "Sudáfrica",
+    "Sudán",
+    "Sudán del Sur",
+    "Suecia",
+    "Suiza",
+    "Surinam",
+    "Tailandia",
+    "Tanzania",
+    "Tayikistán",
+    "Timor Oriental",
+    "Togo",
+    "Tonga",
+    "Trinidad y Tobago",
+    "Túnez",
+    "Turkmenistán",
+    "Turquía",
+    "Tuvalu",
+    "Ucrania",
+    "Uganda",
+    "Uruguay",
+    "Uzbekistán",
+    "Vanuatu",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Yibuti",
+    "Zambia",
+    "Zimbabue"
+  ];
+  let Paragg=0
+  for(let i=25;i<paises.length;i++){
+    datos_sheet.getRange("A"+String(i)).setValue(paises[Paragg])
+    Paragg++
+  }
+ }
 
 function obtenerTipoDePersona(e){
   let sheet = e.source.getActiveSheet();
@@ -82,9 +470,9 @@ function verificarDatosObligatorios(e, tipoPersona) {
   }
 
   if (tipoPersona === "Autonomo") {
-    columnasObligatorias = [2,3, 4, 5, 6, 8, 10, 12, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
+    columnasObligatorias = [2,3, 4, 5, 6,7, 8, 10, 12, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
   } else if (tipoPersona === "Empresa") {
-    columnasObligatorias = [2,3, 4, 5, 6, 8,9, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
+    columnasObligatorias = [2,3, 4, 5, 6, 7,8,9, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
   } else {
     Logger.log("Vacio tipo de persona");
   }
@@ -182,6 +570,7 @@ function getCustomerInformation(customer) {
   range = datos_sheet.getRange("W2");
   var WebSiteURI = range.getValue();
 
+  var paisCliente= datos_sheet.getRange("S2").getValue();
 
   if (IdentificationType == "#NUM!") {
     Browser.msgBox("ERROR: Seleccione Tipo de Identificacion en Clientes")
@@ -191,10 +580,10 @@ function getCustomerInformation(customer) {
   var CustomerInformation = {
     "IdentificationType": IdentificationType,
     "Identification": Identification,//.toString(),
-    "DV": DV,
+    "DV": Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy"),
     "RegistrationName": customer,
-    "CountryCode": "ES",
-    "CountryName": "España",
+    "CountryCode": paisesCodigos[paisCliente],//cambia dependiendo del pais
+    "CountryName": paisCliente,
     "SubdivisionCode": "En España no se como funcionan codigo  de provinica",// 11, //Codigo de Municipio
     "SubdivisionName": datos_sheet.getRange("AA2").getValue(),// provicnica
     "CityCode": "Hay dos codigos postales, este solo existe para colombia",
