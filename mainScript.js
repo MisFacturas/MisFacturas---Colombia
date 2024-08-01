@@ -22,6 +22,12 @@ function onOpen() {
   return;
 }
 
+function pruebaLogo(){
+  var hoja = SpreadsheetApp.getSheetByName("Datos de emisor");
+  var celdaLogo = hoja.getRange("B12").getValue();
+  hoja.getRange("B20").setValue(celdaLogo);
+}
+
 function showSidebar() {
   var html = HtmlService.createHtmlOutputFromFile('main')
     .setTitle('Menú prueba');
