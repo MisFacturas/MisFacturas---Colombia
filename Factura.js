@@ -44,7 +44,7 @@ function verificarEstadoValidoFactura() {
 
   let totalProductos=hojaFactura.getRange("A23").getValue();
 
-  if (totalProductos==="TOTAL PRODUCTOS"){
+  if (totalProductos==="Total productos"){
     // no hay necesidad de encontrar TOTAL PRODUCTOS si no esta, porque eso implica que si anadio asi sea 1 prodcuto
     let valorTotalProductos=hojaFactura.getRange("B23").getValue();
     if(valorTotalProductos===0){
@@ -315,7 +315,7 @@ function limpiarHojaFactura(){
 
   //productos no predetrminados
   let totalProductos=hojaFactura.getRange("A23")
-  if(totalProductos==="TOTAL PRODUCTOS"){
+  if(totalProductos==="Total productos"){
     Logger.log("entra en prodcutos no predeterminados priemr if")
     //implica que no se agrego mas productos que los predeterminados, se borra todo en su estado normal
     hojaFactura.getRange("B23").setValue(0)//totalproductos
@@ -335,7 +335,7 @@ function limpiarHojaFactura(){
       let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)
       Logger.log("informacionCelda"+informacionCelda)
-      if(informacionCelda==="TOTAL PRODUCTOS"){
+      if(informacionCelda==="Total productos"){
         //eliminar celdas
         for (let j = i - 3; j >= 21; j--) {
           hojaFactura.deleteRow(j);
@@ -525,7 +525,7 @@ function guardarYGenerarInvoice(){
 
   //obtener el total de prodcutos
   const posicionTotalProductos = prefactura_sheet.getRange("A23").getValue(); // para verificar donde esta el TOTAL
-  if (posicionTotalProductos==="TOTAL PRODUCTOS"){
+  if (posicionTotalProductos==="Total productos"){
     Logger.log("entra al primer if de json")
     var cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
   }else{
@@ -534,7 +534,7 @@ function guardarYGenerarInvoice(){
       let informacionCelda=prefactura_sheet.getRange("A"+String(i)).getValue();
       Logger.log("i"+i)
       Logger.log("informacionCelda"+informacionCelda)
-      if(informacionCelda==="TOTAL PRODUCTOS"){
+      if(informacionCelda==="Total productos"){
         var cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
         
       }

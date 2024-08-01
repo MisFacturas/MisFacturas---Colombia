@@ -357,7 +357,7 @@ function getTaxSectionStartRow(sheet) {
 
   // obtenemos la row donde esta la "base imponible, llegando asi al principio "
   for (let row = 22; row <= maxRows; row++) { // 22 porque su row predetermmiado es ese
-    if (sheet.getRange(row, 1).getValue() === 'TOTAL PRODUCTOS') {
+    if (sheet.getRange(row, 1).getValue() === 'Total productos') {
 
       Logger.log("dentro de getTax row " + row)
       return row+1;// tal vez solo dejarlo en Base imponible,se agrega 1 osea 1 mas que base imposnible
