@@ -87,6 +87,7 @@ function showClientes() {
     .showSidebar(html);
 }
 
+
 function openProductosSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Productos");

@@ -512,7 +512,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
 
 function crearContacto(){
   Logger.log("imprima algo")
-  showClientes()
+  showNuevaCliente()
 
 }
 
