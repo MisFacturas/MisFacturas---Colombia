@@ -166,6 +166,25 @@ function buscarClientes(terminoBusqueda,hojaA) {
   // Devuelve los resultados
   return resultados;
 }
+function buscarPaises(terminoBusqueda){
+  let paises=datos_sheet.getRange(25,1,169,1).getValues();
+  var resultados = [];
+  if(terminoBusqueda===""){
+    return resultados
+  }
+  // Recorre los valores obtenidos
+  for (var i = 0; i < paises.length; i++) {
+    var valor = paises[i][0]; // Accede al primer (y único) valor de cada fila
+    
+    // Comprueba si el valor coincide con el término de búsqueda
+    if (valor.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) {
+      resultados.push(valor); // Añade el valor a la lista de resultados si coincide
+    }
+  }
+  
+  // Devuelve los resultados
+  return resultados;
+}
 
 function agregarPaises(){
   const paises = [
