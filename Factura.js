@@ -1196,7 +1196,7 @@ function obtenerDatosFactura(factura){
 }
 
 function testWriteNIFToPlantilla() {
-  var invoiceNumber = 'FE947'; // Reemplaza con el número de factura deseado
+  var invoiceNumber = '192'; // Reemplaza con el número de factura deseado
   Logger.log(obtenerDatosFactura(invoiceNumber));
 }
 
