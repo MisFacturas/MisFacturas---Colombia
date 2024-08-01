@@ -570,6 +570,7 @@ function getCustomerInformation(customer) {
   range = datos_sheet.getRange("W2");
   var WebSiteURI = range.getValue();
 
+  var paisCliente= datos_sheet.getRange("S2").getValue();
 
   if (IdentificationType == "#NUM!") {
     Browser.msgBox("ERROR: Seleccione Tipo de Identificacion en Clientes")
@@ -581,8 +582,8 @@ function getCustomerInformation(customer) {
     "Identification": Identification,//.toString(),
     "DV": Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy"),
     "RegistrationName": customer,
-    "CountryCode": "ES",//cambia dependiendo del pais
-    "CountryName": "España",
+    "CountryCode": paisesCodigos[paisCliente],//cambia dependiendo del pais
+    "CountryName": paisCliente,
     "SubdivisionCode": "En España no se como funcionan codigo  de provinica",// 11, //Codigo de Municipio
     "SubdivisionName": datos_sheet.getRange("AA2").getValue(),// provicnica
     "CityCode": "Hay dos codigos postales, este solo existe para colombia",
