@@ -20,6 +20,28 @@ function showActivarCliente() {
     .showSidebar(html);
 }
 
+function buscarClientes(terminoBusqueda) {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var hojaCliente = spreadsheet.getSheetByName('Clientes');
+  var ultimaFila = hojaCliente.getLastRow(); 
+  var valores = hojaCliente.getRange(2, 2, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
+
+  var resultados = [];
+  
+  // Recorre los valores obtenidos
+  for (var i = 0; i < valores.length; i++) {
+    var valor = valores[i][0]; // Accede al primer (y único) valor de cada fila
+    
+    // Comprueba si el valor coincide con el término de búsqueda
+    if (valor.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) {
+      resultados.push(valor); // Añade el valor a la lista de resultados si coincide
+    }
+  }
+  
+  // Devuelve los resultados
+  return resultados;
+}
+
 function agregarPaises(){
   const paises = [
     "Afganistán",

@@ -466,7 +466,7 @@ function getInvoiceGeneralInformation() {
     "ExchangeRateDate": "",
     "SalesPerson": "",
     //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(11, 4),//cambia los valroes parak llamar la nota de la factura 
+    "Note": getprefacturaValue(10, 2),//cambia los valroes parak llamar la nota de la factura 
     "ExternalGR": false
     //"AdditionalProperty": AdditionalProperty
   }
