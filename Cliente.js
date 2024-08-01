@@ -27,7 +27,7 @@ function buscarClientes(terminoBusqueda) {
   var valores = hojaCliente.getRange(2, 2, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
 
   var resultados = [];
-  
+  Logger.log("terminoBusqueda"+terminoBusqueda)
   // Recorre los valores obtenidos
   for (var i = 0; i < valores.length; i++) {
     var valor = valores[i][0]; // Accede al primer (y único) valor de cada fila
