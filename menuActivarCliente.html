@@ -8,6 +8,8 @@
       margin: 0;
       padding: 10px;
       box-sizing: border-box;
+      position: relative;
+      min-height: 100vh;
     }
     .center-text {
       text-align: center;
@@ -36,13 +38,15 @@
       width: 100%;
       box-sizing: border-box;
     }
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
   </style>
 </head>
 <body>
   <h3>Activar Cliente</h3>
-  <div class="text-right mb-3">
-    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
-  </div>
   <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
   
   <form id="productForm">
@@ -56,14 +60,17 @@
     <button type="button" class="btn btn-primary" onclick="activar()">Activar</button>
   </form>
   
-<script>
+  <div class="footer">
+    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
+  </div>
+
+  <script>
     function Back() {
-      google.script.run.showNuevaFactura();
+      google.script.run.showSidebar();
     }
 
     function activar() {
       var cliente = document.getElementById('buscarCliente').value;
-
       console.log("cliente:", cliente);
       google.script.run.activarCliente(cliente);
     }
@@ -91,6 +98,6 @@
       var resultBox = document.querySelector('.result-box');
       resultBox.innerHTML = ''; // Limpiar los resultados
     }
-</script>
+  </script>
 </body>
 </html>
