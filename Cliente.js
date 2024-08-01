@@ -20,6 +20,68 @@ function showActivarCliente() {
     .showSidebar(html);
 }
 
+function inactivarCliente(cliente){
+  let hojaClientesInactivos=spreadsheet.getSheetByName('Clientes invalidos');
+  let hojaClietnes=spreadsheet.getSheetByName("Clientes")
+  Logger.log(cliente)
+  datos_sheet.getRange("H2").setValue(cliente)
+  
+
+  let rowDelCliente=datos_sheet.getRange("G2").getValue();
+  let rowMaximaClientesInactivos=hojaClientesInactivos.getLastRow();
+  let rowMaximaClientes=hojaClietnes.getLastRow();
+
+  let tipoContacto=datos_sheet.getRange("AB2").getValue();
+  let tipoPersona=datos_sheet.getRange("L2").getValue();
+  let tipoDoc=datos_sheet.getRange("J2").getValue();
+  let numIdentificacion=datos_sheet.getRange("K2").getValue();
+  let codigoContacto=datos_sheet.getRange("I2").getValue();
+  let regimen=datos_sheet.getRange("M2").getValue();
+  let nomnbreComercial=datos_sheet.getRange("N2").getValue();
+  let primerNombre=datos_sheet.getRange("O2").getValue();
+  let segundoNombre=datos_sheet.getRange("P2").getValue();
+  let primerApellido=datos_sheet.getRange("Q2").getValue();
+  let segundoApellido=datos_sheet.getRange("R2").getValue();
+  let pais=datos_sheet.getRange("S2").getValue();
+  let provicnica=datos_sheet.getRange("AA2").getValue();
+  let poblacion=datos_sheet.getRange("Z2").getValue();
+  let direccion=datos_sheet.getRange("T2").getValue();
+  let codigoPostal=datos_sheet.getRange("U2").getValue();
+  let telefono=datos_sheet.getRange("V2").getValue();
+  let sitioWeb=datos_sheet.getRange("W2").getValue();
+  let email=datos_sheet.getRange("X2").getValue();
+  let estado=datos_sheet.getRange("Y2").getValue();
+
+
+  // Proceso para agregar a la hoja de clientes inactivos
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 1).setValue(estado);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 2).setValue(cliente);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 3).setValue(tipoContacto);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 4).setValue(tipoPersona);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 5).setValue(tipoDoc);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 6).setValue(numIdentificacion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 7).setValue(codigoContacto);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 8).setValue(regimen);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 9).setValue(nomnbreComercial);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 10).setValue(primerNombre);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 11).setValue(segundoNombre);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 12).setValue(primerApellido);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 13).setValue(segundoApellido);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 14).setValue(pais);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 15).setValue(provicnica);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 16).setValue(poblacion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 17).setValue(direccion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 18).setValue(codigoPostal);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 19).setValue(telefono);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 20).setValue(sitioWeb);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 21).setValue(email);
+
+  //eliminar cliente de la hoja clientes
+
+  hojaClietnes.deleteRow(rowDelCliente)
+  hojaClietnes.insertRowAfter(rowMaximaClientes)
+}
+
 function buscarClientes(terminoBusqueda) {
   var spreadsheet = SpreadsheetApp.getActive();
   var hojaCliente = spreadsheet.getSheetByName('Clientes');

@@ -53,7 +53,7 @@
         <!-- Los resultados se mostrarán aquí -->
       </div>
     </div>
-    <button type="button" class="btn btn-primary" onclick="agregarProducto()">Inactivar</button>
+    <button type="button" class="btn btn-primary" onclick="inactivar()">Inactivar</button>
   </form>
   
 <script>
@@ -61,12 +61,11 @@
       google.script.run.showNuevaFactura();
     }
 
-    function agregarProducto() {
-      var cantidad = document.getElementById('cantidad').value;
-      var producto = document.getElementById('buscarCliente').value;
+    function inactivar() {
+      var cliente = document.getElementById('buscarCliente').value;
 
       console.log("Producto:", producto, "Cantidad:", cantidad);
-      google.script.run.agregarProductoDesdeFactura(cantidad, producto);
+      google.script.run.inactivarCliente(cliente);
     }
 
     function buscarClientes() {
