@@ -16,6 +16,10 @@
     .center-text {
       text-align: center;
     }
+    .result-box div:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -173,7 +177,7 @@
     }
 
     function seleccionarPAIS(pais) {
-      document.getElementById('buscarCliente').value = pais;
+      document.getElementById('pais').value = pais;
       var resultBox = document.querySelector('.result-box');
       resultBox.innerHTML = ''; // Limpiar los resultados
     }
