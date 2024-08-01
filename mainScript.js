@@ -23,7 +23,7 @@ function onOpen() {
 }
 
 function pruebaLogo(){
-  var hoja = SpreadsheetApp.getSheetByName("Datos de emisor");
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
   var celdaLogo = hoja.getRange("B12").getValue();
   hoja.getRange("B20").setValue(celdaLogo);
 }
