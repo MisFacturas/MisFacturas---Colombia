@@ -256,7 +256,7 @@ function onEdit(e) {
       obtenerFechaYHoraActual()
       //generarNumeroFactura()
       let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
-      let  = hojaInfoUsuario.getRange("B9").getValue();
+      let  iban= hojaInfoUsuario.getRange("B9").getValue();
       factura_sheet.getRange("B11").setValue(iban)
 
     }
