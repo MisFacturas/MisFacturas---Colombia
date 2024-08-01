@@ -53,7 +53,7 @@
         <!-- Los resultados se mostrarán aquí -->
       </div>
     </div>
-    <button type="button" class="btn btn-primary" onclick="inactivar()">Activar</button>
+    <button type="button" class="btn btn-primary" onclick="activar()">Activar</button>
   </form>
   
 <script>
@@ -61,16 +61,16 @@
       google.script.run.showNuevaFactura();
     }
 
-    function inactivar() {
+    function activar() {
       var cliente = document.getElementById('buscarCliente').value;
 
       console.log("cliente:", cliente);
-      google.script.run.inactivarCliente(cliente);
+      google.script.run.activarCliente(cliente);
     }
 
     function buscarClientes() {
       var input = document.getElementById('buscarCliente').value;
-      google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input,"Inactivar");
+      google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input,"Activar");
     }
     
     function mostrarResultados(clientes) {
