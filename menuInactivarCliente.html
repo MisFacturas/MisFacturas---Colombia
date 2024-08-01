@@ -70,7 +70,7 @@
 
     function buscarClientes() {
       var input = document.getElementById('buscarCliente').value;
-      google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input);
+      google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input,"Inactivar");
     }
     
     function mostrarResultados(clientes) {

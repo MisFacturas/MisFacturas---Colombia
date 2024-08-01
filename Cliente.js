@@ -21,7 +21,7 @@ function showActivarCliente() {
 }
 
 function inactivarCliente(cliente){
-  let hojaClientesInactivos=spreadsheet.getSheetByName('Clientes invalidos');
+  let hojaClientesInactivos=spreadsheet.getSheetByName('ClientesInvalidos');
   let hojaClietnes=spreadsheet.getSheetByName("Clientes")
   Logger.log(cliente)
   datos_sheet.getRange("H2").setValue(cliente)
@@ -82,11 +82,16 @@ function inactivarCliente(cliente){
   hojaClietnes.insertRowAfter(rowMaximaClientes)
 }
 
-function buscarClientes(terminoBusqueda) {
-  var spreadsheet = SpreadsheetApp.getActive();
-  var hojaCliente = spreadsheet.getSheetByName('Clientes');
-  var ultimaFila = hojaCliente.getLastRow(); 
-  var valores = hojaCliente.getRange(2, 2, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
+function buscarClientes(terminoBusqueda,hojaA) {
+  
+  if(hojaA==="Inactivar"){
+    var sheet = spreadsheet.getSheetByName('Clientes');
+  }else{
+    var sheet = spreadsheet.getSheetByName('ClientesInvalidos');
+  }
+  
+  var ultimaFila = sheet.getLastRow(); 
+  var valores = sheet.getRange(2, 2, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
 
   var resultados = [];
   if(terminoBusqueda===""){
