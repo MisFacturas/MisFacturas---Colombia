@@ -4,7 +4,7 @@ var spreadsheet = SpreadsheetApp.getActive();
 
 // directorio alejandro C:\\Users\\catan\\OneDrive\\Documents\\Work\\Appsheets\\MisFacturasApp
 // directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp
-
+// directorio carlos /home/cley/src/MisFacturasApp
 
 function onOpen() {
 
