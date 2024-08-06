@@ -8,28 +8,9 @@
       margin: 0;
       padding: 10px;
       box-sizing: border-box;
-      position: relative;
-      min-height: 100vh;
     }
     .center-text {
       text-align: center;
-    }
-    .result-box {
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-      padding: 5px;
-      box-sizing: border-box;
-    }
-    .result-box div:hover {
-      background-color: #f0f0f0;
-      cursor: pointer;
-    }
-    .form-group input[type="text"],
-    .form-group input[type="number"] {
-      box-sizing: border-box;
-      width: 100%;
     }
     .form-group {
       margin-bottom: 1rem;
@@ -46,58 +27,51 @@
   </style>
 </head>
 <body>
-  <h3>Activar Cliente</h3>
+  <h3>Inactivar Cliente</h3>
+
   <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
   
   <form id="productForm">
     <div class="form-group">
-      <label for="buscarCliente">Buscar cliente para activar</label>
-      <input type="text" id="buscarCliente" class="form-control" placeholder="Buscar producto" autocomplete="off" onkeyup="buscarClientes()">
-      <div class="result-box">
-        <!-- Los resultados se mostrarán aquí -->
-      </div>
+      <label for="clientesInactivos">Seleccione cliente a Inactivar</label>
+      <select id="clientesInactivos" class="form-control">
+        <option value="">Seleccione un cliente</option>
+        <!-- Las opciones de clientes se agregarán aquí -->
+      </select>
     </div>
-    <button type="button" class="btn btn-primary" onclick="activar()">Activar</button>
-  </form>
-  
-  <div class="footer">
+    <button type="button" class="btn btn-primary" onclick="inactivar()">Inactivar</button>
     <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
-  </div>
+  </form>
 
-  <script>
+<script>
     function Back() {
       google.script.run.showSidebar();
     }
 
-    function activar() {
-      var cliente = document.getElementById('buscarCliente').value;
+    function inactivar() {
+      var cliente = document.getElementById('clientesInactivos').value;
+
       console.log("cliente:", cliente);
-      google.script.run.activarCliente(cliente);
+      google.script.run.inactivarCliente(cliente);
     }
 
-    function buscarClientes() {
-      var input = document.getElementById('buscarCliente').value;
-      google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input,"Activar");
+    function cargarClientesInactivos() {
+      google.script.run.withSuccessHandler(mostrarClientesInactivos).buscarClientes("", "Activar");
     }
     
-    function mostrarResultados(clientes) {
-      var resultBox = document.querySelector('.result-box');
-      resultBox.innerHTML = '';
+    function mostrarClientesInactivos(clientes) {
+      var select = document.getElementById('clientesInactivos');
+      select.innerHTML = '<option value="">Seleccione un cliente</option>';
       clientes.forEach(function(cliente) {
-        var div = document.createElement('div');
-        div.textContent = cliente;
-        div.onclick = function() {
-          seleccionarCliente(cliente);
-        };
-        resultBox.appendChild(div);
+        var option = document.createElement('option');
+        option.value = cliente;
+        option.textContent = cliente;
+        select.appendChild(option);
       });
     }
 
-    function seleccionarCliente(producto) {
-      document.getElementById('buscarCliente').value = producto;
-      var resultBox = document.querySelector('.result-box');
-      resultBox.innerHTML = ''; // Limpiar los resultados
-    }
-  </script>
+    // Cargar los clientes inactivos al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarClientesInactivos);
+</script>
 </body>
 </html>

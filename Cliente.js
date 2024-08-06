@@ -139,17 +139,27 @@ function activarCliente(cliente){
   hojaClientesInactivos.insertRowAfter(rowMaximaClientesInactivos)
 }
 function buscarClientes(terminoBusqueda,hojaA) {
-  
+  var resultados = [];
+
   if(hojaA==="Inactivar"){
     var sheet = spreadsheet.getSheetByName('Clientes');
   }else{
+
     var sheet = spreadsheet.getSheetByName('ClientesInvalidos');
-  }
+    var ultimaFila = sheet.getLastRow(); 
+    var valores = sheet.getRange(2, 2, ultimaFila - 1, 1).getValues();
+
+    for (var i = 0; i < valores.length; i++) {
+      var valor = valores[i][0]; // Accede al primer (y único) valor de cada fila
+      resultados.push(valor);}
+      
+    return resultados
+}
   
   var ultimaFila = sheet.getLastRow(); 
   var valores = sheet.getRange(2, 2, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
 
-  var resultados = [];
+
   if(terminoBusqueda===""){
     return resultados
   }
@@ -512,7 +522,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
 
 function crearContacto(){
   Logger.log("imprima algo")
-  showNuevaCliente()
+  showNuevaCliente
 
 }
 

@@ -1025,7 +1025,7 @@ function guardarYGenerarInvoice(){
 
 
 //--------------------------------------------------------------------------------------------//
-function obtenerDatosFactura(factura){
+function obtenerDatosFactura(factura){//comentario
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
   var dataRange = sheet.getDataRange();
   var data = dataRange.getValues();
