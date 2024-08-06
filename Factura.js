@@ -431,7 +431,7 @@ function insertarImagen(fila) {
 }
 
 function descargarFactura() {
-  var html = HtmlService.createHtmlOutputFromFile('descargarFacturaHistorial')
+  var html = HtmlService.createHtmlOutputFromFile('descargaFacturaHistorial')
     .setTitle('Menú');
   SpreadsheetApp.getUi()
     .showSidebar(html);
