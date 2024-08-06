@@ -408,8 +408,11 @@ function ProcesarFormularioFactura(data) {
   } else {
     return 'Factura no encontrada';
   }
+  //Prueba
+  var lista = DriveApp.getFilesByName("Factura");
+  var nuevoId = lista.next().getId();
 
-  var pdf = DriveApp.getFileById(idAsociado);
+  var pdf = DriveApp.getFileById(nuevoId);
   var link = pdf.getDownloadUrl();
   return link;
 }
