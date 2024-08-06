@@ -414,6 +414,7 @@ function ProcesarFormularioFactura(data) {
 
   var pdf = DriveApp.getFileById(nuevoId);
   var link = pdf.getDownloadUrl();
+  Logger.log(nuevoId);
   return link;
 }
 
