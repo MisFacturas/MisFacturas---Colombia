@@ -394,6 +394,26 @@ function guardarFacturaHistorial() {
   celdaImagen.setBorder(true, true, true, true, null, null, null, null);
 }
 
+function ProcesarFormularioFactura(data) {
+  var numFactura = data.numFactura
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
+
+  var range = hoja.getRange('A2:A'); // Rango desde A2 hasta el final de la columna A
+  var textFinder = range.createTextFinder(numFactura);
+  var cell = textFinder.findNext();
+
+  if (cell) {
+    var fila = cell.getRow();
+    var idAsociado = hoja.getRange('B' + fila).getValue();
+  } else {
+    return 'Factura no encontrada';
+  }
+
+  var pdf = DriveApp.getFileById(idAsociado);
+  var link = pdf.getDownloadUrl();
+  return link;
+}
+
 function insertarImagen(fila) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
@@ -401,10 +421,17 @@ function insertarImagen(fila) {
   cell.setHorizontalAlignment('center');
   var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
   var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
-  image.assignScript("guardarFilaFactura");
+  image.assignScript("descargarFactura");
   image.setHeight(20);
   image.setWidth(20);
   image.setAnchorCellXOffset(40);
+}
+
+function descargarFactura() {
+  var html = HtmlService.createHtmlOutputFromFile('descargarFacturaHistorial')
+    .setTitle('Menú');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
 }
 
 function guardarFilaFactura() {
