@@ -409,12 +409,12 @@ function ProcesarFormularioFactura(data) {
     return 'Factura no encontrada';
   }
   //Prueba
-  var lista = DriveApp.getFilesByName("Factura.pdf");
-  var nuevoId = lista.next().getId();
+  //var lista = DriveApp.getFilesByName("Factura.pdf");
+  //var nuevoId = lista.next().getId();
 
-  var pdf = DriveApp.getFileById(nuevoId);
+  var pdf = DriveApp.getFileById(idAsociado);
   var link = pdf.getDownloadUrl();
-  Logger.log(nuevoId);
+  //Logger.log(nuevoId);
   return link;
 }
 
