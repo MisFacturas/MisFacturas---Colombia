@@ -439,7 +439,7 @@ function enviarEmailPostFactura(email) {
   var idArchivo = hoja.getRange("B" + lastRow).getValue();
   var numFactura = hoja.getRange("A" + lastRow).getValue();
   var pdfFile = DriveApp.getFileById(idArchivo).getBlob();
-  var subject = 'Factura '&numFactura;
+  var subject = `Factura ${numFactura}`
   var body = 'Adjunto encontrará la factura en formato PDF.';
 
   if (!email) {
