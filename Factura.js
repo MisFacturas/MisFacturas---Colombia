@@ -10,7 +10,7 @@ var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 var hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
-var fileId = hojaDatosEmisor.getRange("B14").getValue();
+var folderId = hojaDatosEmisor.getRange("B14").getValue();
 var paisesCodigos = {
   "Afganistán": "AF",
   "Albania": "AL",
