@@ -1303,7 +1303,7 @@ function obtenerDatosFactura(factura){
 
           if (!hojaEnBlanco){
             var pdfFactura = generatePdfFromPlantilla();
-            var id = subirFactura(pdfFactura);
+            var id = subirFactura(facturaNumero, pdfFactura);
             resetPlantilla();
             return id;
           }
@@ -1388,9 +1388,9 @@ function pruebaSacar(){
   Logger.log(lista)
 }
 
-function subirFactura(pdfBlob) {
+function subirFactura(nombre, pdfBlob) {
   var folder = DriveApp.getFolderById(folderId);
-  var file = folder.createFile(pdfBlob);
+  var file = folder.createFile(pdfBlob.setName('Factura '&nombre&'.pdf'));
   var id = file.getId();
   return id;
 }
