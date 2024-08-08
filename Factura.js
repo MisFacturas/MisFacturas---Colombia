@@ -1390,7 +1390,7 @@ function pruebaSacar(){
 
 function subirFactura(nombre, pdfBlob) {
   var folder = DriveApp.getFolderById(folderId);
-  var file = folder.createFile(pdfBlob.setName('Facturaaa.pdf'));
+  var file = folder.createFile(pdfBlob.setName(`Factura ${nombre}.pdf`));
   var id = file.getId();
   return id;
 }
