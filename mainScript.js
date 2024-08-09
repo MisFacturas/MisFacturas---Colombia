@@ -4,7 +4,7 @@ var spreadsheet = SpreadsheetApp.getActive();
 
 // directorio alejandro C:\\Users\\catan\\OneDrive\\Documents\\Work\\Appsheets\\MisFacturasApp
 // directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp
-
+// directorio carlos /home/cley/src/MisFacturasApp
 
 function onOpen() {
 
@@ -111,6 +111,20 @@ function inicarFacturaNuevaMain() {
   inicarFacturaNueva();
 }
 
+function showPostFactura() {
+  var html = HtmlService.createHtmlOutputFromFile('postFactura')
+    .setTitle('Post Factura');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function showEnviarEmailPost() {
+  var html = HtmlService.createHtmlOutputFromFile('enviarEmailPost')
+    .setTitle('Enviar Post Email');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
 
 function processForm(data) {
   try {
@@ -166,6 +180,8 @@ function processForm(data) {
 function generatePdfFromPlantilla() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Plantilla');
+  var celdaNumFactura = ss.getSheetByName('Factura').getRange('A9').getValue();
+  var numFactura = celdaNumFactura.substring(20);
 
   if (!sheet) {
     throw new Error('La hoja Plantilla no existe.');
@@ -198,7 +214,7 @@ function generatePdfFromPlantilla() {
     });
 
     if (response.getResponseCode() === 200) {
-      var pdfBlob = response.getBlob().setName('Plantilla.pdf');
+      var pdfBlob = response.getBlob().setName('Factura '&numFactura&'.pdf');
       return pdfBlob;
     } else {
       Logger.log('Error ' + response.getResponseCode() + ': ' + response.getContentText());

@@ -9,6 +9,8 @@ var spreadsheet = SpreadsheetApp.getActive();
 var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
+var hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+var folderId = hojaDatosEmisor.getRange("B14").getValue();
 var paisesCodigos = {
   "Afganistán": "AF",
   "Albania": "AL",
@@ -262,7 +264,7 @@ function guardarFactura(){
     guardarYGenerarInvoice()
     guardarFacturaHistorial()
   }else{
-    Logger.log("Factrua no valida")
+    Logger.log("Factura no valida")
   }
   
 
@@ -392,6 +394,91 @@ function guardarFacturaHistorial() {
   insertarImagen(newRow);
   celdaImagen.setHorizontalAlignment('center');
   celdaImagen.setBorder(true, true, true, true, null, null, null, null);
+
+  var idArchivo = obtenerDatosFactura(numeroFactura);
+  guardarIdArchivo(idArchivo, numeroFactura);
+
+  var html = HtmlService.createHtmlOutputFromFile('postFactura')
+    .setTitle('Menú');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+  
+
+}
+
+function guardarIdArchivo(idArchivo, numeroFactura) {
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
+  var lastRow = hoja.getLastRow();
+  var newRow = lastRow + 1;
+  hoja.getRange("A" + newRow).setValue(numeroFactura).setBorder(true, true, true, true, null, null, null, null);
+  hoja.getRange("B" + newRow).setValue(idArchivo).setBorder(true, true, true, true, null, null, null, null);
+
+}
+
+function linkDescargaFactura() {
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
+  var lastRow = hoja.getLastRow();
+  var idArchivo = hoja.getRange("B" + lastRow).getValue();
+  var numFactura = hoja.getRange("A" + lastRow).getValue();
+  var pdf = DriveApp.getFileById(idArchivo);
+  var url = pdf.getDownloadUrl();
+  return {
+    numFactura: numFactura,
+    url: url
+  };
+}
+
+function getDownloadLink() {
+  var data = linkDescargaFactura();
+  return data;
+}
+
+function enviarEmailPostFactura(email) {
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
+  var lastRow = hoja.getLastRow();
+  var idArchivo = hoja.getRange("B" + lastRow).getValue();
+  var numFactura = hoja.getRange("A" + lastRow).getValue();
+  var pdfFile = DriveApp.getFileById(idArchivo).getBlob();
+  var subject = `Factura ${numFactura}`
+  var body = 'Adjunto encontrará la factura en formato PDF.';
+
+  if (!email) {
+    return "Por favor ingrese una dirección de correo válida.";
+  }
+
+  MailApp.sendEmail({
+    to: email,
+    subject: subject,
+    body: body,
+    attachments: [pdfFile.getAs(MimeType.PDF)]
+  });
+
+  return "PDF generado y enviado por correo electrónico a " + email;
+}
+
+
+function ProcesarFormularioFactura(data) {
+  var numFactura = data.numFactura
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
+
+  var range = hoja.getRange('A2:A'); // Rango desde A2 hasta el final de la columna A
+  var textFinder = range.createTextFinder(numFactura);
+  var cell = textFinder.findNext();
+
+  if (cell) {
+    var fila = cell.getRow();
+    var idAsociado = hoja.getRange('B' + fila).getValue();
+  } else {
+    return 'Factura no encontrada';
+  }
+  //Prueba
+  //var lista = DriveApp.getFilesByName("Factura.pdf");
+  //var nuevoId = lista.next().getId();
+
+  var pdf = DriveApp.getFileById(idAsociado);
+  var link = pdf.getDownloadUrl();
+  //Logger.log(nuevoId);
+  return link;
 }
 
 function insertarImagen(fila) {
@@ -401,10 +488,17 @@ function insertarImagen(fila) {
   cell.setHorizontalAlignment('center');
   var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
   var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
-  image.assignScript("guardarFilaFactura");
+  image.assignScript("descargarFactura");
   image.setHeight(20);
   image.setWidth(20);
   image.setAnchorCellXOffset(40);
+}
+
+function descargarFactura() {
+  var html = HtmlService.createHtmlOutputFromFile('descargaFacturaHistorial')
+    .setTitle('Menú');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
 }
 
 function guardarFilaFactura() {
@@ -1179,6 +1273,7 @@ function obtenerDatosFactura(factura){
           codigoCell.setValue(codigo);
           direccionCell.setValue(direccion);
           telefonoCell.setValue(telefono);
+          // Ajustar la forma en que se ve el pais - IMPORTANTE
           if (poblacion == "" || provincia == "" || pais == "") {
             var columnaPoblacion = poblacionCell.getColumn();
             var filaPoblacion = poblacionCell.getRow();
@@ -1198,7 +1293,22 @@ function obtenerDatosFactura(factura){
           sumaImpIva.setFormula('=SUM(F'+(27+numeroProductos-1)+':F'+(28+filasInsertadas-1)+')');
           sumaTotal.setFormula('=SUM(H'+(27+numeroProductos-1)+':H'+(28+filasInsertadas-1)+')');
           
-          return true;
+          
+          var itemCellPrueba = targetSheet.getRange('A19')
+          var hojaEnBlanco = clienteCell.isBlank() || formaPagoCell.isBlank() || itemCellPrueba.isBlank() || celdaBaseImponible.isBlank();
+          while (hojaEnBlanco) {
+            sleep(1000);
+            hojaEnBlanco = clienteCell.isBlank() || formaPagoCell.isBlank() || itemCellPrueba.isBlank() || celdaBaseImponible.isBlank();
+          }
+
+          if (!hojaEnBlanco){
+            var pdfFactura = generatePdfFromPlantilla();
+            var id = subirFactura(facturaNumero, pdfFactura);
+            resetPlantilla();
+            return id;
+          }
+          
+
         } catch (e) {
           Logger.log('Error parsing JSON for row ' + (i + 1) + ': ' + e.message);
         }
@@ -1276,4 +1386,17 @@ function sacarColumnaFila(celda){
 function pruebaSacar(){
   var lista = sacarColumnaFila("E18")
   Logger.log(lista)
+}
+
+function subirFactura(nombre, pdfBlob) {
+  var folder = DriveApp.getFolderById(folderId);
+  var file = folder.createFile(pdfBlob.setName(`Factura ${nombre}.pdf`));
+  var id = file.getId();
+  return id;
+}
+
+function crearCarpeta() {
+  var folder = DriveApp.createFolder("FacturasApp");
+  var id = folder.getId();
+  hojaDatosEmisor.getRange("B14").setValue(id);
 }
