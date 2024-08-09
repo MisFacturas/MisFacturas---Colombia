@@ -284,7 +284,7 @@ function onEdit(e) {
       factura_sheet.getRange("B11").setValue(iban)
 
     }
-    else if (rowEditada >= productStartRow && colEditada == 2 && rowEditada < posRowTotalProductos) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
+    else if(rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos)  {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
       const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);//1 producto
       Logger.log("lastProductRow " + lastProductRow)
       Logger.log("taxSectionStartRow " + taxSectionStartRow)
@@ -306,7 +306,7 @@ function onEdit(e) {
           factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
           factura_sheet.getRange("D"+String(i)).setValue(0)//unitario SIN 'IVA'
           let iva=diccionarioCaluclarIva[dictInformacionProducto["IVA"]]
-          factura_sheet.getRange("G"+String(i)).setValue(iva)//IVA
+          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
           factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["descuentos"])//Descuento
           factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
           factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
