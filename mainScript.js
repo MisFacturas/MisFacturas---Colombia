@@ -307,8 +307,8 @@ function onEdit(e) {
           factura_sheet.getRange("D"+String(i)).setValue(0)//unitario SIN 'IVA'
           let iva=diccionarioCaluclarIva[dictInformacionProducto["IVA"]]
           factura_sheet.getRange("G"+String(i)).setValue(iva)//IVA
-          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["Descuento"])//Descuento
-          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["Retencion"])//Retencion
+          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["descuentos"])//Descuento
+          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
           factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
         }else{
           factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
@@ -316,9 +316,9 @@ function onEdit(e) {
           factura_sheet.getRange("F"+String(i)).setValue("=(D"+String(i)+"-(D"+String(i)+"*H"+String(i)+"))*C"+String(i))//subtotal
           factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["valor Unitario"])//valor unitario
           let iva=diccionarioCaluclarIva[dictInformacionProducto["IVA"]]
-          factura_sheet.getRange("G"+String(i)).setValue(iva)//IVA
-          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["Descuento"])//Descuento
-          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["Retencion"])//Retencion
+          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
+          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["descuentos"])//Descuento
+          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
           factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
           factura_sheet.getRange("K"+String(i)).setValue("=F"+String(i)+"+(F"+String(i)+"*G"+String(i)+")-(F"+String(i)+"*I"+String(i)+")+(F"+String(i)+"*J"+String(i)+")")//total linea
         }
