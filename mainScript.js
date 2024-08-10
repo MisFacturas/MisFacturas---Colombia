@@ -380,7 +380,7 @@ function calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRo
 
   //base Imponible
   let rowParaFormulaBaseImponible=taxSectionStartRow+1
-  let rowEspacioIvasAgrupacion=taxSectionStartRow+1
+  let rowEspacioIvasAgrupacion=taxSectionStartRow+5
   hojaActual.getRange("A"+String(rowParaFormulaBaseImponible)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B"+String(rowParaFormulaBaseImponible)+":B"+String(rowEspacioIvasAgrupacion)+"; F15:F"+String(lastRowProducto)+"))")
 
   //IVA%
