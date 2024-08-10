@@ -333,16 +333,30 @@ function onEdit(e) {
       //calcularImporteYTotal(hojaActual, rowEditada);
 
     }
+
     //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
     //updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow, celdaEditada);//tengo que revisar esto 
     let lastRowProducto=getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
     if (lastRowProducto===productStartRow){
-      //que pasa ? nada porque no hay necesidad de cambiar nada
       Logger.log("dentro de agg info para TOTLA pero last y start son iguales")
+      //ESTADO DEAFULT
+      //base Imponible
+      hojaActual.getRange("A20").setValue("=ARRAYFORMULA(SUMIF(G15; B20:B24; F15))")
+      //IVA%
+      hojaActual.getRange("=UNIQUE(G15)")
+      //total retenciones
+      hojaActual.getRange("=(SUM(F15)*(SUM(I15)))")
+      //total cargo equivalencia
+      hojaActual.getRange("=(SUM(F15))*(SUM(J15))")
+      //total descuentos
+      hojaActual.getRange("=B18 + SUMPRODUCT(D15; C15) - SUM(F15)")
+      //tota factura
+      hojaActual.getRange("=SUM(K15)")
     }else{
       Logger.log("dentro de agg info para totoal")
       Logger.log("lastRowProducto "+lastRowProducto)
       Logger.log("productStartRow"+productStartRow)
+      calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual)
     }
 
 
@@ -358,18 +372,36 @@ function onEdit(e) {
   }
 }
 
-function calcularImporteYTotal(hojaActual, rowEditada) {
-  Logger.log("rowEditada" + rowEditada)
-  let producto = hojaActual.getRange("A" + String(rowEditada)).getValue(); // Obtiene el producto en la línea seleccionada
-  let dictInformacionProducto = obtenerInformacionProducto(producto);
-  let cantidadProducto = hojaActual.getRange("C" + String(rowEditada)).getValue(); // Asume que la cantidad está en la columna D
-  Logger.log("producto" + producto)
-  Logger.log("cantidadProducto" + cantidadProducto)
-  let importe = cantidadProducto * dictInformacionProducto["valor Unitario"];//
-  let totalDeLinea = cantidadProducto * dictInformacionProducto["precio Con Iva"];//
+function calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual) {
+  Logger.log("Entra a calcular importe")
+  Logger.log("lastRowProducto "+lastRowProducto)
+  Logger.log("productStartRow "+productStartRow )
+  Logger.log("taxSectionStartRow"+taxSectionStartRow)
 
-  hojaActual.getRange("F" + String(rowEditada)).setValue(importe);
-  hojaActual.getRange("G" + String(rowEditada)).setValue(totalDeLinea);
+  //base Imponible
+  let rowParaFormulaBaseImponible=taxSectionStartRow+1
+  hojaActual.getRange("A"+String(rowParaFormulaBaseImponible)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B20:B24; F15:F"+String(lastRowProducto)+"))")
+
+  //IVA%
+  hojaActual.getRange("B"+String(rowParaFormulaBaseImponible)).setValue("=UNIQUE(G15:G"+String(lastRowProducto)+")")
+
+  let rowParaTotales=taxSectionStartRow+10
+  //total retenciones
+  hojaActual.getRange("A"+String(rowParaTotales)).setValue("=(SUM(F15:F"+String(lastRowProducto)+")*(SUM(I15:I"+String(lastRowProducto)+")))")
+
+  //total cargo equivalencia
+  hojaActual.getRange("B"+String(rowParaTotales)).setValue("=(SUM(F15:F"+String(lastRowProducto)+"))*(SUM(J15:J"+String(lastRowProducto)+"))")
+
+  //total descuentos
+  let rowDescuentos=taxSectionStartRow-1
+  hojaActual.getRange("D"+String(rowParaTotales)).setValue("=B"+String(rowDescuentos)+" + SUMPRODUCT(D15:D"+String(lastRowProducto)+"; C15:C"+String(lastRowProducto)+") - SUM(F15:F"+String(lastRowProducto)+")")
+
+  //totalfactura
+  let rowParaTotalFactura=taxSectionStartRow+12
+  hojaActual.getRange("B"+String(rowParaTotalFactura)).setValue("=SUM(K15:K"+String(lastRowProducto)+")")
+
+
+
 }
 
 function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
