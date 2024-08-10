@@ -339,19 +339,21 @@ function onEdit(e) {
     let lastRowProducto=getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
     if (lastRowProducto===productStartRow){
       Logger.log("dentro de agg info para TOTLA pero last y start son iguales")
-      //ESTADO DEAFULT
-      //base Imponible
-      hojaActual.getRange("A20").setValue("=ARRAYFORMULA(SUMIF(G15; B20:B24; F15))")
-      //IVA%
-      hojaActual.getRange("=UNIQUE(G15)")
-      //total retenciones
-      hojaActual.getRange("=(SUM(F15)*(SUM(I15)))")
-      //total cargo equivalencia
-      hojaActual.getRange("=(SUM(F15))*(SUM(J15))")
-      //total descuentos
-      hojaActual.getRange("=B18 + SUMPRODUCT(D15; C15) - SUM(F15)")
-      //tota factura
-      hojaActual.getRange("=SUM(K15)")
+      // //ESTADO DEAFULT
+      // //base Imponible
+      // hojaActual.getRange("A20").setValue("=ARRAYFORMULA(SUMIF(G15; B20:B24; F15))")
+      // //IVA%
+      // hojaActual.getRange("=UNIQUE(G15)")
+      // //total retenciones
+      // hojaActual.getRange("=(SUM(F15)*(SUM(I15)))")
+      // //total cargo equivalencia
+      // hojaActual.getRange("=(SUM(F15))*(SUM(J15))")
+      // //total descuentos
+      // hojaActual.getRange("=B18 + SUMPRODUCT(D15; C15) - SUM(F15)")
+      // //tota factura
+      // hojaActual.getRange("=SUM(K15)")
+      // //summa base imponible=SUM(A21:A25)
+      // hojaActual.getRange("=SUM(A20:A24)")
     }else{
       Logger.log("dentro de agg info para totoal")
       Logger.log("lastRowProducto "+lastRowProducto)
@@ -381,8 +383,11 @@ function calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRo
   //base Imponible
   let rowParaFormulaBaseImponible=taxSectionStartRow+1
   let rowEspacioIvasAgrupacion=taxSectionStartRow+5
+  let rowTotalBaseImponibleEIvaGeneral=taxSectionStartRow+7
   hojaActual.getRange("A"+String(rowParaFormulaBaseImponible)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B"+String(rowParaFormulaBaseImponible)+":B"+String(rowEspacioIvasAgrupacion)+"; F15:F"+String(lastRowProducto)+"))")
-
+    //total base imponible e iva genberal
+    hojaActual.getRange("A"+String(rowTotalBaseImponibleEIvaGeneral)).setValue("=SUM(A"+String(rowParaFormulaBaseImponible)+":A"+String(rowParaFormulaBaseImponible)+")")
+    hojaActual.getRange("C"+String(rowTotalBaseImponibleEIvaGeneral)).setValue("=SUM(A"+String(rowParaFormulaBaseImponible)+":A"+String(rowParaFormulaBaseImponible)+")")
   //IVA%
   hojaActual.getRange("B"+String(rowParaFormulaBaseImponible)).setValue("=UNIQUE(G15:G"+String(lastRowProducto)+")")
 
