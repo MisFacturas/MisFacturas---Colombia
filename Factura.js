@@ -608,63 +608,18 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("B11").setValue("")//IBAN
   hojaFactura.getRange("D11").setValue("")//Nota de pago 
 
-  //productos predeterminados 
-  for(let i=15;i<21;i++){
-    hojaFactura.getRange("A"+String(i)).setValue("")//Producto
-    hojaFactura.getRange("B"+String(i)).setValue("")//referencia
-    hojaFactura.getRange("C"+String(i)).setValue("")//cantidad
-    hojaFactura.getRange("D"+String(i)).setValue(0)//sin iva
-    hojaFactura.getRange("E"+String(i)).setValue(0)//con iva
+
+  //productos
+  const productStartRow = 15;
+  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
+  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+  for(let i=hojaFactura+1;i<=lastProductRow;i++){
+    hojaFactura.deleteRow(i);
   }
 
-  //productos no predetrminados
-  let totalProductos=hojaFactura.getRange("A23")
-  if(totalProductos==="Total productos"){
-    Logger.log("entra en prodcutos no predeterminados priemr if")
-    //implica que no se agrego mas productos que los predeterminados, se borra todo en su estado normal
-    hojaFactura.getRange("B23").setValue(0)//totalproductos
-    hojaFactura.getRange("G24").setValue("")//Cargos
-    hojaFactura.getRange("G25").setValue("")//descuentos
+  hojaFactura.getRange("B15").setValue("")//producto
+  hojaFactura.getRange("C24").setValue("")//cantidad
 
-    for(let i=25;i<30;i++){
-      hojaFactura.getRange("A"+String(i)).setValue("")//base imponible
-      hojaFactura.getRange("B"+String(i)).setValue("")//iva
-    }
-
-  }else{
-    // no esta en su estado predetrminado, toca saber hasta donde van
-    Logger.log("entra en prodcutos no predeterminados segundo if")
-    const maxRows = hojaFactura.getLastRow();
-    for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
-      let informacionCelda=hojaFactura.getRange("A"+String(i)).getValue();
-      Logger.log("i"+i)
-      Logger.log("informacionCelda"+informacionCelda)
-      if(informacionCelda==="Total productos"){
-        //eliminar celdas
-        for (let j = i - 3; j >= 21; j--) {
-          hojaFactura.deleteRow(j);
-          Logger.log("J" + j);
-        }
-
-      }else if(informacionCelda==="Base imponible"){
-        Logger.log("Entra en Base imponible")
-        break
-      }
-    }
-
-    hojaFactura.getRange("B23").setValue(0)//totalproductos
-    hojaFactura.getRange("G24").setValue("")//Cargos
-    hojaFactura.getRange("G25").setValue("")//descuentos
-
-    for(let i=25;i<30;i++){
-      hojaFactura.getRange("A"+String(i)).setValue("")//base imponible
-      hojaFactura.getRange("B"+String(i)).setValue("")//iva
-    }
-
-
-  }
-
-  // hojaFactura.getRange("").setValue("")//
 }
 
 
