@@ -435,10 +435,10 @@ function getTaxSectionStartRow(sheet) {
 
 function updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,taxSectionStartRow) {
   let totalProducts = 0;
-  Logger.log("taxSectionStartRow"+totalProducts)
+  Logger.log(" dentro updateTotalProductCounter")
 
   for(let i=lastRowProducto;i<=productStartRow;i++){
-    if(hojaActual.getRange("B"+String(i)!="")){
+    if(hojaActual.getRange("B"+String(i))!=""){
       totalProducts++
     }
   }
