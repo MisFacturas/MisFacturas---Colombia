@@ -613,7 +613,8 @@ function limpiarHojaFactura(){
   const productStartRow = 15;
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
-  for(let i=hojaFactura+1;i<=lastProductRow;i++){
+  for(let i=productStartRow+1;i<=lastProductRow;i++){
+    Logger
     hojaFactura.deleteRow(i);
   }
 
