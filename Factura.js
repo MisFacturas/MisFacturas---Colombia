@@ -625,6 +625,7 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("H15").setValue("")//descuento
   hojaFactura.getRange("I15").setValue("")//retencion
   hojaFactura.getRange("J15").setValue("")//recargo
+
   hojaFactura.getRange("B16").setValue("")//tptal producto
   hojaFactura.getRange("B17").setValue("")//carrgos
   hojaFactura.getRange("B18").setValue("")//descuentos
