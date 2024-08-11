@@ -610,9 +610,9 @@ function limpiarHojaFactura(){
 
 
   //productos
-  const productStartRow = 15;
+  let productStartRow = 15;
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
-  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+  let lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
   Logger.log("limpiarHojaFactura")
   Logger.log("lastProductRow "+lastProductRow)
   Logger.log("productStartRow+1 "+productStartRow+1)
