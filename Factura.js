@@ -613,12 +613,14 @@ function limpiarHojaFactura(){
   const productStartRow = 15;
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
-
+  Logger.log("limpiarHojaFactura")
+  Logger.log("lastProductRow "+lastProductRow)
+  Logger.log("productStartRow+1 "+productStartRow+1)
   for (let j = lastProductRow; j >= productStartRow+1; j--) {
     //hojaFactura.deleteRow(j);
     Logger.log("J" + j);
   }
-
+  Logger.log("Salta if")
   hojaFactura.getRange("B15").setValue("")//producto
   hojaFactura.getRange("C15").setValue("")//cantidad
   hojaFactura.getRange("A15").setValue("")//referncia
