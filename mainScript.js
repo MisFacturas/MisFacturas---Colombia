@@ -404,6 +404,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
     Logger.log("'Valor celda "+valorCeldaActual)
     if (valorCeldaActual !== '') {
       if(valorCeldaActual==="Total productos"){
+        Logger.log("dentro de if+ lastProductRow"+lastProductRow)
         return lastProductRow
       }else{
         lastProductRow = row;
@@ -412,6 +413,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
       
     }
   }
+  Logger.log("No dentro del if lastProductRow"+lastProductRow)
   //aqui arrelgar error que se agrega una nueva linea cuando hay espacio arriba
   return lastProductRow;
 }
