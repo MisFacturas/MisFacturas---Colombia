@@ -400,7 +400,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
     
-    let valorCeldaActual=sheet.getRange(row, 2).getValue() 
+    let valorCeldaActual=sheet.getRange(row, 1).getValue() 
     Logger.log("'Valor celda "+valorCeldaActual)
     if (valorCeldaActual !== '') {
       if(valorCeldaActual==="Total productos"){
