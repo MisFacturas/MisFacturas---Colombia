@@ -438,7 +438,9 @@ function updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,ta
   Logger.log(" dentro updateTotalProductCounter")
 
   for(let i=productStartRow;i<=lastRowProducto;i++){
-    if(hojaActual.getRange("B"+String(i))!=""){
+    Logger.log("I"+i)
+    Logger.log("lastRowProducto"+lastRowProducto)
+    if(hojaActual.getRange("B"+String(i)).getValue()!=""){
       totalProducts++
     }
   }
