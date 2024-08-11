@@ -615,7 +615,7 @@ function limpiarHojaFactura(){
   let lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
   Logger.log("limpiarHojaFactura")
   Logger.log("lastProductRow "+lastProductRow)
-  Logger.log("productStartRow+1 "+productStartRow+1)
+  Logger.log("productStartRow+1 "+(Number(productStartRow)+1))
   for (let j = lastProductRow; j >= productStartRow+1; j--) {
     //hojaFactura.deleteRow(j);
     Logger.log("J" + j);
