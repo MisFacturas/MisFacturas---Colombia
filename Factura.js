@@ -613,9 +613,10 @@ function limpiarHojaFactura(){
   const productStartRow = 15;
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
-  for(let i=productStartRow+1;i<=lastProductRow;i++){
-    Logger
-    hojaFactura.deleteRow(i);
+
+  for (let j = lastProductRow; j >= productStartRow+1; j--) {
+    //hojaFactura.deleteRow(j);
+    Logger.log("J" + j);
   }
 
   hojaFactura.getRange("B15").setValue("")//producto
