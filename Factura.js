@@ -623,6 +623,7 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("C15").setValue("")//cantidad
   hojaFactura.getRange("A15").setValue("")//referncia
   hojaFactura.getRange("G15").setValue("")//IVA%
+  hojaFactura.getRange("D15").setValue("")//sinIva
   hojaFactura.getRange("H15").setValue("")//descuento
   hojaFactura.getRange("I15").setValue("")//retencion
   hojaFactura.getRange("J15").setValue("")//recargo

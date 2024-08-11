@@ -400,7 +400,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
     
-    let valorCeldaActual=sheet.getRange(row, 1).getValue() 
+    let valorCeldaActual=sheet.getRange(row, 2).getValue() 
     Logger.log("'Valor celda "+valorCeldaActual)
     if (valorCeldaActual !== '') {
       if(valorCeldaActual==="Total productos"){
@@ -446,7 +446,7 @@ function updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,ta
   }
 
   let rowTotalProductos=taxSectionStartRow-3
-  hojaActual.getRange("B"+String(rowTotalProductos)).setValue(rowTotalProductos)
+  hojaActual.getRange("B"+String(rowTotalProductos)).setValue(totalProducts)
 
 }
 
