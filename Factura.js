@@ -842,8 +842,8 @@ function guardarYGenerarInvoice(){
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
     let Iva = LineChargeTotal-Amount;
     let descuento=LineaFactura["descuento"];
-    let retencion=["retencion"];
-    let reCargoEqui=["recargodeequivalencia"];
+    let retencion=LineaFactura["retencion"];
+    let reCargoEqui=LineaFactura["recargodeequivalencia"];
     Logger.log("descuento "+descuento)
     Logger.log("retencion "+retencion)
     Logger.log("reCargoEqui "+reCargoEqui)
