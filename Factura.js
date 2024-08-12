@@ -922,7 +922,7 @@ function guardarYGenerarInvoice(){
   Logger.log("descuento "+descuento)
   // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
   let facturaTotalesBaseImponilbe=String(rangeBaseImponilbeValor.getValues());
-  facturaTotalesBaseImponilbe=facturaTotal.split(",");
+  facturaTotalesBaseImponilbe=facturaTotalesBaseImponilbe.split(",");
   Logger.log("facturaTotales "+facturaTotalesBaseImponilbe)
   let TotalFactura=rangeFacturaTotal.getValue()
 
