@@ -701,8 +701,8 @@ function generarNumeroFactura(){
 function obtenerFechaYHoraActual(){ 
   let sheet = spreadsheet.getSheetByName('Factura');
 
-  let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
-  let hora= Utilities.formatDate(new Date(), "GMT+1", "HH:mm:ss");
+  let fecha = Utilities.formatDate(new Date(), "UTC+1", "dd/MM/yyyy");
+  let hora= Utilities.formatDate(new Date(), "UTC+1", "HH:mm:ss");
 
   sheet.getRange("G4").setValue(fecha)
   sheet.getRange("G3").setValue(hora)
@@ -852,7 +852,7 @@ function guardarYGenerarInvoice(){
 
     //IVA
     let ItemTaxesInformation = [];//taxes del producto en si
-    let percent = LineaFactura["iva"]; //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
+    let percent = convertToPercentage(LineaFactura["iva"]); //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
     Logger.log("percent "+percent)
     let ivaTaxInformation = {
       Id: "01",//Id
@@ -975,7 +975,7 @@ function guardarYGenerarInvoice(){
 
   let nameString = prefactura_sheet.getRange("B2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
-  let fecha = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy");
+  let fecha = Utilities.formatDate(new Date(), "UTC+1", "dd/MM/yyyy");
   let codigoCliente=prefactura_sheet.getRange("B3").getValue();
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
   

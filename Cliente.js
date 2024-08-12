@@ -590,7 +590,7 @@ function getCustomerInformation(customer) {
   var CustomerInformation = {
     "IdentificationType": IdentificationType,
     "Identification": Identification,//.toString(),
-    "DV": Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy"),
+    "DV": Utilities.formatDate(new Date(), "UTC+1", "dd/MM/yyyy"),
     "RegistrationName": customer,
     "CountryCode": paisesCodigos[paisCliente],//cambia dependiendo del pais
     "CountryName": paisCliente,
