@@ -241,11 +241,11 @@ function verificarEstadoValidoFactura() {
     }
   }
 
-  let totalProductos=hojaFactura.getRange("A17").getValue();
+  let totalProductos=hojaFactura.getRange("A16").getValue();
 
   if (totalProductos==="Total productos"){
     // no hay necesidad de encontrar TOTAL PRODUCTOS si no esta, porque eso implica que si anadio asi sea 1 prodcuto
-    let valorTotalProductos=hojaFactura.getRange("B17").getValue();
+    let valorTotalProductos=hojaFactura.getRange("B16").getValue();
     if(valorTotalProductos===0 ||valorTotalProductos===""){
       // no agrego producto
       estaValido=false
@@ -798,7 +798,7 @@ function getPaymentSummary(startingRowTaxation) {
 function guardarYGenerarInvoice(){
 
   //obtener el total de prodcutos
-  let posicionTotalProductos = prefactura_sheet.getRange("A17").getValue(); // para verificar donde esta el TOTAL
+  let posicionTotalProductos = prefactura_sheet.getRange("A16").getValue(); // para verificar donde esta el TOTAL
   if (posicionTotalProductos==="Total productos"){
     Logger.log("entra al primer if de json")
     var cantidadProductos=prefactura_sheet.getRange("B16").getValue();// cantidad total de productos 
