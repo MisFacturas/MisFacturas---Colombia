@@ -852,7 +852,7 @@ function guardarYGenerarInvoice(){
 
     //IVA
     let ItemTaxesInformation = [];//taxes del producto en si
-    let percent = parseFloat(((Iva / Amount) * 100).toFixed(1)); //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
+    let percent = LineaFactura["iva"]; //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
     Logger.log("percent "+percent)
     let ivaTaxInformation = {
       Id: "01",//Id

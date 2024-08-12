@@ -253,6 +253,9 @@ function sendPdfByEmail(email) {
   return "PDF generado y enviado por correo electrónico a " + email;
 }
 
+function convertToPercentage(value) {
+  return (value * 100).toFixed(2).replace('.', ',') + '%';
+}
 
 function onEdit(e) {
   let hojaActual = e.source.getActiveSheet();
@@ -327,6 +330,11 @@ function onEdit(e) {
       let valorEditadoDescuneto = celdaEditada.getValue();
       Logger.log(typeof(valorEditadoDescuneto))
       Logger.log("valorEditadoDescuneto "+valorEditadoDescuneto)
+
+      if(0>valorEditadoDescuneto>1){
+        Logger.log("No se puede pasar de 100% el valor de descuento o menos de 0%")
+        celdaEditada.getValue().setValue("0%")
+      }
 
 
     }
