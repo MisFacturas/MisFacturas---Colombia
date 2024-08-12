@@ -331,7 +331,7 @@ function onEdit(e) {
       Logger.log(typeof(valorEditadoDescuneto))
       Logger.log("valorEditadoDescuneto "+valorEditadoDescuneto)
 
-      if(0.00 < valorEditadoDescuneto && valorEditadoDescuneto < 1.00){
+      if(0.00 > valorEditadoDescuneto || valorEditadoDescuneto > 1.00){
         Logger.log("No se puede pasar de 100% el valor de descuento o menos de 0%")
         celdaEditada.getRange().setValue("0%")
       }
