@@ -305,9 +305,8 @@ function onEdit(e) {
           //tal vez mirara si agrego el 0 de cantidad
           factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
           factura_sheet.getRange("D"+String(i)).setValue(0)//unitario SIN 'IVA'
-          let iva=diccionarioCaluclarIva[dictInformacionProducto["IVA"]]
           factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
-          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["descuentos"])//Descuento
+          
           factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
           factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
         }else{
@@ -315,20 +314,21 @@ function onEdit(e) {
           factura_sheet.getRange("E"+String(i)).setValue("=D"+String(i)+"+(D"+String(i)+"*G"+String(i)+")")//AGG COSA DE CON IVA
           factura_sheet.getRange("F"+String(i)).setValue("=(D"+String(i)+"-(D"+String(i)+"*H"+String(i)+"))*C"+String(i))//subtotal
           factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["valor Unitario"])//valor unitario
-          let iva=diccionarioCaluclarIva[dictInformacionProducto["IVA"]]
           factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
-          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["descuentos"])//Descuento
+          
           factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
           factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
           factura_sheet.getRange("K"+String(i)).setValue("=F"+String(i)+"+(F"+String(i)+"*G"+String(i)+")-(F"+String(i)+"*I"+String(i)+")+(F"+String(i)+"*J"+String(i)+")")//total linea
         }
-        
       }
 
+    }else if(colEditada==8 && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
+      //verificar descuentos
+      let valorEditadoDescuneto = celdaEditada.getValue();
+      Logger.log("valorEditadoDescuneto "+valorEditadoDescuneto)
 
 
-
-    } 
+    }
 
     let lastRowProducto=getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
     if (lastRowProducto===productStartRow){

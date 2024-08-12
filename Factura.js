@@ -235,18 +235,18 @@ function verificarEstadoValidoFactura() {
 
   // Recorrer 
   for (let i = 0; i < listaCombinada.length; i++) {
-    Logger.log(listaCombinada[i])
+    Logger.log("listaCombinada"+listaCombinada[i])
     if(listaCombinada[i]===""){
       estaValido=false
     }
   }
 
-  let totalProductos=hojaFactura.getRange("A23").getValue();
+  let totalProductos=hojaFactura.getRange("A17").getValue();
 
   if (totalProductos==="Total productos"){
     // no hay necesidad de encontrar TOTAL PRODUCTOS si no esta, porque eso implica que si anadio asi sea 1 prodcuto
-    let valorTotalProductos=hojaFactura.getRange("B23").getValue();
-    if(valorTotalProductos===0){
+    let valorTotalProductos=hojaFactura.getRange("B17").getValue();
+    if(valorTotalProductos===0 ||valorTotalProductos===""){
       // no agrego producto
       estaValido=false
     }
@@ -773,9 +773,11 @@ function getInvoiceGeneralInformation() {
 
   return InvoiceGeneralInformation;
 }
-function getPaymentSummary(posicionTotalFactura) {
-  var total_factura = prefactura_sheet.getRange("A"+String(posicionTotalFactura)).getValue();// por ahora esto no lo utilizamos ya que no hay descuentos
-  var monto_neto = prefactura_sheet.getRange("B"+String(posicionTotalFactura+1)).getValue();
+function getPaymentSummary(startingRowTaxation) {
+  let posTotalFactura=startingRowTaxation+7
+  let posMontoNeto=startingRowTaxation+12
+  var total_factura = prefactura_sheet.getRange("A"+String(posTotalFactura)).getValue();// por ahora esto no lo utilizamos ya que no hay descuentos
+  var monto_neto = prefactura_sheet.getRange("B"+String(posMontoNeto)).getValue();
   //var numeros = new Intl.NumberFormat('es-CO', {maximumFractionDigits:0, style: 'currency', currency: 'COP' }).format(monto);
   var numeros_total = new Intl.NumberFormat().format(total_factura);
   var numeros_neto = new Intl.NumberFormat().format(monto_neto);
@@ -796,25 +798,18 @@ function getPaymentSummary(posicionTotalFactura) {
 function guardarYGenerarInvoice(){
 
   //obtener el total de prodcutos
-  const posicionTotalProductos = prefactura_sheet.getRange("A23").getValue(); // para verificar donde esta el TOTAL
+  let posicionTotalProductos = prefactura_sheet.getRange("A17").getValue(); // para verificar donde esta el TOTAL
   if (posicionTotalProductos==="Total productos"){
     Logger.log("entra al primer if de json")
-    var cantidadProductos=prefactura_sheet.getRange("B23").getValue();// cantidad total de productos 
+    var cantidadProductos=prefactura_sheet.getRange("B16").getValue();// cantidad total de productos 
   }else{
-    const maxRows = prefactura_sheet.getLastRow();
-    for(let i = 24;i<maxRows;i++){// 24 - porque 23 es el estado en donde deberia de estar el total prodcutos 
-      let informacionCelda=prefactura_sheet.getRange("A"+String(i)).getValue();
-      Logger.log("i"+i)
-      Logger.log("informacionCelda"+informacionCelda)
-      if(informacionCelda==="Total productos"){
-        var cantidadProductos=prefactura_sheet.getRange("B"+String(i)).getValue();// cantidad total de productos 
-        
-      }
-    }
+    let startingRowTax=getTaxSectionStartRow(prefactura_sheet)
+    let posicionTotalProductos=startingRowTax-3
+    var cantidadProductos=prefactura_sheet.getRange("B"+String(posicionTotalProductos)).getValue();// cantidad total de productos
 
   }
 
-  let llavesParaLinea=prefactura_sheet.getRange("A14:G14");//llamo los headers 
+  let llavesParaLinea=prefactura_sheet.getRange("A14:K14");//llamo los headers 
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
@@ -822,49 +817,43 @@ function guardarYGenerarInvoice(){
   let invoiceTaxTotal=[];
   var productoInformation = [];
   Logger.log("cantidadProductos"+cantidadProductos)
-  let saltarEspaciosEnBlanco=false
-  let buffer=0
-  if (cantidadProductos<5){
-    Logger.log("entra a saltarEspaciosEnBlanco")
-    saltarEspaciosEnBlanco=true
-    buffer=5
-  }
+
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
-    let filaActual = "A" + String(i) + ":G" + String(i);
+    let filaActual = "A" + String(i) + ":K" + String(i);
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
     let productoFilaActual= String(rangoProductoActual.getValues());
     productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
     Logger.log(productoFilaActual)
     let LineaFactura={};
 
-    for (let j=0;j<7;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo, en el nuevo son 7 tal vez 8
+    for (let j=0;j<11;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo
       LineaFactura[llavesFinales[j]]=productoFilaActual[j]
     }
-    Logger.log(LineaFactura)
+    Logger.log("LineaFactura "+LineaFactura)
 
     let Name = LineaFactura['producto'];
     let ItemCode = new Number(LineaFactura['referencia']);
     let MeasureUnitCode = "Sin unidad"
     let Quantity = LineaFactura['cantidad'];
     let Price = LineaFactura['siniva'];
-    let Amount = parseFloat(LineaFactura['importe']);//importe
+    let Amount = parseFloat(LineaFactura['subtotal']);//importe
     let ImpoConsumo = 1// no es un parametro para empresas espanolas
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
     let Iva = LineChargeTotal-Amount;
-    Logger.log("Name +")
-    Logger.log("saltarEspaciosEnBlanco" +saltarEspaciosEnBlanco)
-    Logger.log(i)
-    if(Name==="" && saltarEspaciosEnBlanco){
-      Logger.log("entra dentro del continue")
-      i++
-      continue
+    let descuento=LineaFactura["descuento"];
+    let retencion=["retencion"];
+    let reCargoEqui=["recargodeequivalencia"];
+    Logger.log("descuento "+descuento)
+    Logger.log("retencion "+retencion)
+    Logger.log("reCargoEqui "+reCargoEqui)
 
-    }
+
 
     //IVA
     let ItemTaxesInformation = [];//taxes del producto en si
     let percent = parseFloat(((Iva / Amount) * 100).toFixed(1)); //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
+    Logger.log("percent "+percent)
     let ivaTaxInformation = {
       Id: "01",//Id
       TaxEvidenceIndicator: false,
@@ -872,7 +861,10 @@ function guardarYGenerarInvoice(){
       TaxAmount: Iva,
       Percent: percent,
       BaseUnitMeasure: "",
-      PerUnitAmount: ""
+      PerUnitAmount: "",
+      Descuento:descuento,
+      Retencion:retencion,
+      RecgEquivalencia:reCargoEqui
     };
 
     ItemTaxesInformation.push(ivaTaxInformation);
@@ -900,69 +892,46 @@ function guardarYGenerarInvoice(){
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
-  }while(i<(15+cantidadProductos+buffer));//esos 5 son de buffer por si hay espacio entre los prodcutos
-
-  /* Aqui empieza el proceso de coger el precio total de la facutra OJO en nuestro caso se agrupan por % de iva, entonces cambia
-  algo mucho */
-  
-
-  //pasos para poder procesar todos los valores totales de la facutra agrupados por iva
-  // let k=13;
-  // do{
-
-  //   let rangeLineaFacturaTotal=prefactura_sheet.getRange("A"+String(k)+":D"+String(k));
-  //   let lineaFacturaTotal=String(rangeLineaFacturaTotal.getValues());
-  //   lineaFacturaTotal=lineaFacturaTotal.split(",")
-  //   //comaprador para que cuando encuentre un vacio se salga porque significa que ya acabo de leer
-  //   let baseImponible=lineaFacturaTotal[0];
-  //   let porcentajeIVA=lineaFacturaTotal[1];
-  //   let IVA=lineaFacturaTotal[2];
-  //   let total=lineaFacturaTotal[3];
-
-  //   let invoice_total_2 = {
-  //     "baseImponible": baseImponible,
-  //     "porcentajeIVA": pfSubporcentajeIVATotal,
-  //     "IVA": IVA,
-  //     "total": total,
-  //   }
-  //   Logger.log(invoice_total_2)
-
-  //   k++
-  // }while(k<20);
-
+  }while(i<(15+cantidadProductos));
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = prefactura_sheet.getRange("A32").getValue(); // para verificar donde esta el TOTAL
+  const posicionOriginalTotalFactura = prefactura_sheet.getRange("A31").getValue(); // para verificar donde esta el TOTAL
   let rangeFacturaTotal=""
+  let rangeTotales=""
+  let rangeBaseImponilbeValor=""
   let cargo=0
   let descuento=0
-  let posicionTotalFactura=31
+
+  let startingRowTaxation=getTaxSectionStartRow(prefactura_sheet)
   if (posicionOriginalTotalFactura==="Total factura"){
-    rangeFacturaTotal=prefactura_sheet.getRange(31,1,1,4);
-    cargo = prefactura_sheet.getRange("G24").getValue();
-    descuento=prefactura_sheet.getRange("G25").getValue();
+    rangeBaseImponilbeValor=prefactura_sheet.getRange(26,1,1,3);
+    rangeTotales=prefactura_sheet.getRange(29,1,1,4);
+    rangeFacturaTotal=prefactura_sheet.getRange("B31")
   }else{
-    const maxRows = prefactura_sheet.getLastRow();//creo que maxrow siempre va a hacer la maxima, por ende es donde esta el total
-    rangeFacturaTotal=prefactura_sheet.getRange((maxRows-1),1,1,4);//(maxRows-1) porque no necesito el total
-    cargo = prefactura_sheet.getRange("G"+String(maxRows-8)).getValue();//(maxRows-8)  y -7 porque es donde deberia estar descuento y cargos
-    descuento=prefactura_sheet.getRange("G"+String(maxRows-7)).getValue();
-    posicionTotalFactura=maxRows-1
+    let rowBaseImponilbeValor=startingRowTaxation+7
+    let rowTotales=startingRowTaxation+10
+    let rowTotalFactura=startingRowTaxation+12
+    rangeBaseImponilbeValor=prefactura_sheet.getRange(rowBaseImponilbeValor,1,1,3);
+    rangeTotales=prefactura_sheet.getRange(rowTotales,1,1,4);
+    rangeFacturaTotal=prefactura_sheet.getRange(rowTotalFactura,2);//(maxRows-1) porque no necesito el total
   }
 
-
+  cargo=rangeTotales[2]
+  descuento=rangeTotales[3]
+  Logger.log("cargo "+cargo)
+  Logger.log("descuento "+descuento)
   // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
-  let facturaTotal=String(rangeFacturaTotal.getValues());
-  facturaTotal=facturaTotal.split(",");
-  Logger.log(facturaTotal)
-
-
+  let facturaTotalesBaseImponilbe=String(rangeBaseImponilbeValor.getValues());
+  facturaTotalesBaseImponilbe=facturaTotal.split(",");
+  Logger.log("facturaTotales "+facturaTotalesBaseImponilbe)
+  let TotalFactura=rangeFacturaTotal.getValue()
 
   /*Aqui cambia por completo, por ahora solo voy a dejar los parametros en numeros x 
   ,  solo coinciden el base imponible he IVA */
-  let pfSubTotal = parseFloat(facturaTotal[0]);//base imponible
-  let pfIVA = parseFloat(facturaTotal[2]);//IVA
+  let pfSubTotal = parseFloat(facturaTotalesBaseImponilbe[0]);//base imponible
+  let pfIVA = parseFloat(facturaTotalesBaseImponilbe[2]);//IVA
   let pfImpoconsumo = 0;
-  let pfTotal = parseFloat(facturaTotal[3]);
+  let pfTotal = parseFloat(facturaTotalesBaseImponilbe[0]+facturaTotalesBaseImponilbe[2]);
   let pfRefuente = 0;
   let pfReteICA = 0;
   let pfReteIVA = 0;
@@ -970,52 +939,8 @@ function guardarYGenerarInvoice(){
   let pfAnticipo = descuento;
   let pfTPagar = 0;
 
-  // if (pfRefuente > 0) {
-  //   let Percent = parseFloat((pfRefuente / pfSubTotal * 100).toFixed(2));
-  //   let retefuente_taxinformation = {
-  //     Id: "06",//Id,
-  //     TaxEvidenceIndicator: true,
-  //     TaxableAmount: pfSubTotal,
-  //     TaxAmount: pfRefuente,
-  //     Percent: Percent,
-  //     BaseUnitMeasure: "",
-  //     PerUnitAmount: ""
-  //   };
-  //   invoiceTaxTotal.push(retefuente_taxinformation);
-  // };
-
-  // if (pfReteICA > 0) {
-  //   let Factor = datos_sheet.getRange("B8").getValue();
-  //   let PercentReteICA = (Factor * 100).toFixed(3);
-  //   let invoice_ReteICA = {
-  //     Id: "07",//Id,
-  //     TaxEvidenceIndicator: true,
-  //     TaxableAmount: pfSubTotal,
-  //     TaxAmount: pfReteICA,
-  //     Percent: parseFloat(PercentReteICA),
-  //     BaseUnitMeasure: "",
-  //     PerUnitAmount: ""
-  //   };
-  //   invoiceTaxTotal.push(invoice_ReteICA);
-  // }
-
-  // if (pfReteIVA > 0) {
-  //   let FactorReteIva = pfReteIVA / pfSubTotal;
-  //   let PercentReteIVA = (FactorReteIva * 100).toFixed(2);
-  //   let invoice_reteIVA = {
-  //     Id: "05",
-  //     TaxEvidenceIndicator: true,
-  //     TaxableAmount: pfSubTotal,
-  //     TaxAmount: pfReteIVA,
-  //     Percent: parseFloat(PercentReteIVA),
-  //     BaseUnitMeasure: "",
-  //     PerUnitAmount: ""
-  //   };
-  //   invoiceTaxTotal.push(invoice_reteIVA);
-  // }
-
   //Aqui seguiria el texto, pero en el de carlos nunca lo llama 
-
+  let facturaTotales=String(rangeBaseImponilbeValor.getValues());
   let invoice_total = {
     "LineExtensionAmount": pfSubTotal,
     "TaxExclusiveAmount": pfSubTotal,
@@ -1023,7 +948,9 @@ function guardarYGenerarInvoice(){
     "AllowanceTotalAmount": 0,
     "ChargeTotalAmount": cargo,
     "PrePaidAmount": pfAnticipo,
-    "PayableAmount": (pfTotal-pfAnticipo+cargo) // antes era (pfTotal - pfAnticipo) 
+    "PayableAmount": TotalFactura ,// antes era (pfTotal - pfAnticipo) 
+    "totalRet":rangeTotales[0],
+    "totalCargoEqui":rangeTotales[1],
   }
 
 
@@ -1037,7 +964,7 @@ function guardarYGenerarInvoice(){
     Delivery: getDelivery(),
     AdditionalDocuments: getAdditionalDocuments(),
     AdditionalProperty: getAdditionalProperty(),
-    PaymentSummary: getPaymentSummary(posicionTotalFactura), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
+    PaymentSummary: getPaymentSummary(startingRowTaxation), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
     //Invoice_Note: invoice_note,
     InvoiceTaxTotal: invoiceTaxTotal,
