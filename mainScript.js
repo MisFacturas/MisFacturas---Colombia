@@ -325,6 +325,7 @@ function onEdit(e) {
     }else if(colEditada==8 && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
       //verificar descuentos
       let valorEditadoDescuneto = celdaEditada.getValue();
+      Logger.log(typeof(valorEditadoDescuneto))
       Logger.log("valorEditadoDescuneto "+valorEditadoDescuneto)
 
 
