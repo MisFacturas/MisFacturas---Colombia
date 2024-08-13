@@ -624,6 +624,7 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("B15").setValue("")//producto
   hojaFactura.getRange("C15").setValue("")//cantidad
   hojaFactura.getRange("A15").setValue("")//referncia
+  hojaFactura.getRange("G15").setValue("0")
   hojaFactura.getRange("G15").setNumberFormat("0,00%")//IVA%
   hojaFactura.getRange("D15").setValue("")//sinIva
   hojaFactura.getRange("H15").setValue("")//descuento
@@ -979,7 +980,7 @@ function guardarYGenerarInvoice(){
   let codigoCliente=prefactura_sheet.getRange("B3").getValue();
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
   
-  
+  SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente");
 }
 
 
