@@ -333,6 +333,7 @@ function onEdit(e) {
 
       if(0.00 > valorEditadoDescuneto || valorEditadoDescuneto > 1.00){
         Logger.log("No se puede pasar de 100% el valor de descuento o menos de 0%")
+        SpreadsheetApp.getUi().alert("No es valido un descuento mayor a 100% ni menor a 0%")
         celdaEditada.setValue("0%")
       }
 
