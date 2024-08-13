@@ -344,6 +344,8 @@ function onEdit(e) {
     if (lastRowProducto===productStartRow){
       Logger.log("dentro de agg info para TOTLA pero last y start son iguales")
       // //ESTADO DEAFULT no se hace nada
+      hojaActual.getRange("B31").setValue("=SUM(K15)+C29-B18")
+
 
     }else{
       Logger.log("dentro de agg info para totoal")
@@ -389,13 +391,13 @@ function calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRo
   //total cargo equivalencia
   hojaActual.getRange("B"+String(rowParaTotales)).setValue("=(SUM(F15:F"+String(lastRowProducto)+"))*(SUM(J15:J"+String(lastRowProducto)+"))")
 
-  //total descuentos
+  //total descuentos FACTURA
   let rowDescuentos=taxSectionStartRow-1
   hojaActual.getRange("D"+String(rowParaTotales)).setValue("=B"+String(rowDescuentos)+" + SUMPRODUCT(D15:D"+String(lastRowProducto)+"; C15:C"+String(lastRowProducto)+") - SUM(F15:F"+String(lastRowProducto)+")")
 
   //totalfactura
   let rowParaTotalFactura=taxSectionStartRow+12
-  hojaActual.getRange("B"+String(rowParaTotalFactura)).setValue("=SUM(K15:K"+String(lastRowProducto)+")")
+  hojaActual.getRange("B"+String(rowParaTotalFactura)).setValue("=SUM(K15:K"+String(lastRowProducto)+")+C"+String(rowParaTotales)+"-B"+String(rowDescuentos))
 
 
 
