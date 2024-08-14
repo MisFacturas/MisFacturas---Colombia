@@ -705,7 +705,7 @@ function obtenerFechaYHoraActual(){
   let fecha = Utilities.formatDate(new Date(), "UTC+1", "dd/MM/yyyy");
   let hora= Utilities.formatDate(new Date(), "UTC+1", "HH:mm:ss");
 
-  sheet.getRange("G4").setValue(fecha)
+  sheet.getRange("G4").setValue(String(fecha))
   sheet.getRange("G3").setValue(hora)
 
   let valorFecha=sheet.getRange("G4").getValue();
