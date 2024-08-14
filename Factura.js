@@ -710,6 +710,7 @@ function obtenerFechaYHoraActual(){
 
   let valorFecha=sheet.getRange("G4").getValue();
   Logger.log("valorFecha "+valorFecha)
+  Logger.log("fecha "+fecha)
 
 }
 
