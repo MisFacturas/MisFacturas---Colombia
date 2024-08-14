@@ -708,6 +708,9 @@ function obtenerFechaYHoraActual(){
   sheet.getRange("G4").setValue(fecha)
   sheet.getRange("G3").setValue(hora)
 
+  let valorFecha=sheet.getRange("G4").getValue();
+  Logger.log("valorFecha "+valorFecha)
+
 }
 
 function obtenerDatosProductos(sheet,range,e){
