@@ -711,8 +711,11 @@ function obtenerFechaYHoraActual(){
 
   
   let valorFecha=sheet.getRange("G4").getValue();
+
+  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
   Logger.log("valorFecha "+valorFecha)
   Logger.log("fecha "+fecha)
+  Logger.log("fechaFormateada "+fechaFormateada)
 
 }
 
