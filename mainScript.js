@@ -379,7 +379,7 @@ function verificarDescuentoValido(valorFechaActual,ivaProductoActual){
   //1julio 2022 hasta 30 de junio 2024. 
   Logger.log("ivaProductoActual"+ivaProductoActual)
   Logger.log("Entra a verificar fecha")
-  if(ivaProductoActual==="0.05"){
+  if(ivaProductoActual===0.05){
     Logger.log("fecha es igual a 5%")
   }else{
     Logger.log("No hay producto con 5% interes")
