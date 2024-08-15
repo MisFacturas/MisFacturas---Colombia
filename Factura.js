@@ -719,6 +719,14 @@ function obtenerFechaYHoraActual(){
 
 }
 
+function ObtenerFecha(){
+  let sheet = spreadsheet.getSheetByName('Factura');
+  let valorFecha=sheet.getRange("G4").getValue();
+  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
+
+  return fechaFormateada
+}
+
 function obtenerDatosProductos(sheet,range,e){
     if ( range.getA1Notation() === "A14" || range.getA1Notation()=== "A15" || range.getA1Notation() === "A16" || range.getA1Notation()=== "A17" || range.getA1Notation()=== "A18") {
     Logger.log("entro a obtenerdatos")
@@ -985,7 +993,7 @@ function guardarYGenerarInvoice(){
 
   let nameString = prefactura_sheet.getRange("B2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
-  let fecha = Utilities.formatDate(new Date(), "UTC+1", "dd/MM/yyyy");
+  let fecha =ObtenerFecha();
   let codigoCliente=prefactura_sheet.getRange("B3").getValue();
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
   

@@ -295,6 +295,12 @@ function onEdit(e) {
 
       //proceso para agg el valor de %IVA y precio unitario
       for(let i=productStartRow;i <= lastProductRow;i++){
+
+        let ivaProductoActual=dictInformacionProducto["IVA"]
+        let valorFechaActual=ObtenerFecha()
+    
+        verificarDescuentoValido(valorFechaActual,ivaProductoActual)
+
         //por aca seria el proceso de ver si el IVA del producto esta entre el rango de tiempo
         let productoFilaI = factura_sheet.getRange("B"+String(i)).getValue()
         if(productoFilaI===""){
@@ -364,6 +370,16 @@ function onEdit(e) {
     verificarDatosObligatorios(e,tipoPersona)
   
 
+  }
+}
+
+function verificarDescuentoValido(valorFechaActual,ivaProductoActual){
+  //1julio 2022 hasta 30 de junio 2024. 
+  Logger.log("Entra a verificar fecha")
+  if(ivaProductoActual==="5%"){
+    Logger.log("fecha es igual a 5%")
+  }else{
+    Logger.log("No hay producto con 5% interes")
   }
 }
 
