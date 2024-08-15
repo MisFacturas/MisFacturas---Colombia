@@ -309,7 +309,7 @@ function onEdit(e) {
         let ivaProductoActual=dictInformacionProducto["IVA"]
         let valorFechaActual=ObtenerFecha()
     
-        verificarDescuentoValido(valorFechaActual,ivaProductoActual)
+        let verifcadorFecha=verificarDescuentoValido(valorFechaActual,ivaProductoActual)
 
         if(cantiadProducto===""){
           cantiadProducto=0
@@ -380,10 +380,26 @@ function verificarDescuentoValido(valorFechaActual,ivaProductoActual){
   Logger.log("ivaProductoActual"+ivaProductoActual)
   Logger.log("valorFechaActual"+valorFechaActual)
   Logger.log("Entra a verificar fecha")
+  var fechaInicio = new Date(2022, 6, 1);  // 1 de julio de 2022 (mes 6 porque enero es 0)
+  var fechaFin = new Date(2024, 5, 30);    // 30 de junio de 2024 (mes 5 porque enero es 0)
+  var partesFecha = valorFechaActual.split("/");
+  var dia = parseInt(partesFecha[0]);
+  var mes = parseInt(partesFecha[1]) - 1; // Restar 1 porque los meses en Date empiezan desde 0
+  var anio = parseInt(partesFecha[2]);
+  var fechaActual = new Date(anio, mes, dia);
+
   if(ivaProductoActual===0.05){
     Logger.log("fecha es igual a 5%")
+    if (fechaActual >= fechaInicio && fechaActual <= fechaFin) {
+      Logger.log("Fecha dentro del rango válido");
+      return true;
+    } else {
+      Logger.log("Fecha fuera del rango válido");
+      return false;
+    }
   }else{
     Logger.log("No hay producto con 5% interes")
+    return false
   }
 }
 
