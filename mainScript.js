@@ -296,10 +296,6 @@ function onEdit(e) {
       //proceso para agg el valor de %IVA y precio unitario
       for(let i=productStartRow;i <= lastProductRow;i++){
 
-        let ivaProductoActual=dictInformacionProducto["IVA"]
-        let valorFechaActual=ObtenerFecha()
-    
-        verificarDescuentoValido(valorFechaActual,ivaProductoActual)
 
         //por aca seria el proceso de ver si el IVA del producto esta entre el rango de tiempo
         let productoFilaI = factura_sheet.getRange("B"+String(i)).getValue()
@@ -309,6 +305,12 @@ function onEdit(e) {
         }
         let dictInformacionProducto = obtenerInformacionProducto(productoFilaI);
         let cantiadProducto= factura_sheet.getRange("C"+String(i)).getValue()
+
+        let ivaProductoActual=dictInformacionProducto["IVA"]
+        let valorFechaActual=ObtenerFecha()
+    
+        verificarDescuentoValido(valorFechaActual,ivaProductoActual)
+
         if(cantiadProducto===""){
           cantiadProducto=0
           //tal vez mirara si agrego el 0 de cantidad
