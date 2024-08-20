@@ -284,7 +284,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     dictInformacionProducto = obtenerInformacionProducto(producto);
   }
   
-  
+  let rowParaDatos=lastProductRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
     factura_sheet.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
@@ -297,7 +297,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
-    let rowParaDatos=lastProductRow+1
+    rowParaDatos=+1
     factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
     factura_sheet.getRange("c"+String(rowParaDatos)).setValue(cantidad)
@@ -311,12 +311,14 @@ function agregarProductoDesdeFactura(cantidad,producto){
     factura_sheet.getRange("K"+String(rowParaDatos)).setValue("=F"+String(rowParaDatos)+"+(F"+String(rowParaDatos)+"*G"+String(rowParaDatos)+")-(F"+String(rowParaDatos)+"*I"+String(rowParaDatos)+")+(F"+String(rowParaDatos)+"*J"+String(rowParaDatos)+")")//total linea
   }
 
+  
+
   Logger.log("Pasa verificacion de producto")
   Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
 
 
 
-  updateTotalProductCounter(lastProductRow, productStartRow,hojaFactura, taxSectionStartRow);
+  updateTotalProductCounter(rowParaDatos, productStartRow,hojaFactura, taxSectionStartRow);
 }
 
 function onImageClick() {
