@@ -539,7 +539,7 @@ function generarPDFfactura() {
 
 function generarPDF() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Plantilla');
+  var sheet = ss.getSheetByName('Copia de Plantilla');
 
   if (!sheet) {
     throw new Error('La hoja Plantilla no existe.');
@@ -1274,7 +1274,7 @@ function testWriteNIFToPlantilla() {
 }
 
 function resetPlantilla() {
-  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
+  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Copia de Plantilla');
 
   // Borrar información de productos
   var colProductos = "A";
@@ -1318,7 +1318,7 @@ function resetPlantilla() {
 }
 
 function limpiarTablas(columna, linea){
-  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Plantilla');
+  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Copia de Plantilla');
   var primeraFila = targetSheet.getRange(linea+":"+linea);
   primeraFila.clearContent();
   linea++;

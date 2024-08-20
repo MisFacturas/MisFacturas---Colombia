@@ -185,7 +185,7 @@ function processForm(data) {
 
 function generatePdfFromPlantilla() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Plantilla');
+  var sheet = ss.getSheetByName('Copia de Plantilla');
   var celdaNumFactura = ss.getSheetByName('Factura').getRange('A9').getValue();
   var numFactura = celdaNumFactura.substring(20);
 
