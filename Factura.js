@@ -1093,7 +1093,10 @@ function obtenerDatosFactura(factura){
             
             var celdaIva = targetSheet.getRange('I'+numeroCelda);
             celdaIva.setBorder(true,true,true,true,null,null,null,null);
-            celdaIva.setValue((listaProductos[j].TaxesInformation[0].Percent)/100);
+            var percent = listaProductos[j].TaxesInformation[0].Percent;
+            percent = percent.slice(0, -1);
+            percent = parseFloat(percent);
+            celdaIva.setValue(percent/100);
             celdaIva.setNumberFormat('0.0%');
             celdaIva.setHorizontalAlignment('center');
 
@@ -1116,7 +1119,7 @@ function obtenerDatosFactura(factura){
             celdaRecargoEquivalencia.setHorizontalAlignment('center');
 
             
-            var celdaTotalLinea = targetSheet.getRange('L'+numeroCelda);
+            var celdaTotalLinea = targetSheet.getRange('M'+numeroCelda);
             celdaTotalLinea.setBorder(true,true,true,true,null,null,null,null);
             celdaTotalLinea.setFormula('=H'+numeroCelda+'+(H'+numeroCelda+'*I'+numeroCelda+')-(H'+numeroCelda+'*K'+numeroCelda+')+(H'+numeroCelda+'*L'+numeroCelda+')-(H'+numeroCelda+'*J'+numeroCelda+')');
             celdaTotalLinea.setNumberFormat('€#,##0.00');
@@ -1126,10 +1129,10 @@ function obtenerDatosFactura(factura){
             var producto = listaProductos[j]
             //crea un diccionario que la llave sea el % de iva y el valor sea el total de la linea
             
-            if (grupoIva.hasOwnProperty(producto.TaxesInformation[0].Percent)) {
-              grupoIva[producto.TaxesInformation[0].Percent] += producto.TaxesInformation[0].TaxableAmount;
+            if (grupoIva.hasOwnProperty(percent)) {
+              grupoIva[percent] += producto.TaxesInformation[0].TaxableAmount;
             } else {
-              grupoIva[producto.TaxesInformation[0].Percent] = producto.TaxesInformation[0].TaxableAmount;
+              grupoIva[percent] = producto.TaxesInformation[0].TaxableAmount;
             }
           }
           var contador = 0;
@@ -1241,6 +1244,8 @@ function obtenerDatosFactura(factura){
           totalCrgEquivalencia.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';L19:L'+(19+numeroProductos-1)+')');
           totalCargos.setFormula('='+cargosCell.getA1Notation());
           //totalDescuentos.setFormula('='+descuentosCell.getA1Notation()); preguntar a angie
+          totalDescuentos.setValue(0);
+        
 
           
           
