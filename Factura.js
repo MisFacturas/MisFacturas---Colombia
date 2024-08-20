@@ -289,6 +289,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
   if(cantidadProductos==="Total productos"){
     factura_sheet.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B15").setValue(producto)
+    factura_sheet.getRange("C15").setValue(cantidad)
     factura_sheet.getRange("D15").setValue(dictInformacionProducto["valor Unitario"])
     factura_sheet.getRange("G15").setValue(dictInformacionProducto["IVA"])
     factura_sheet.getRange("I15").setValue(dictInformacionProducto["retencion"])
@@ -299,6 +300,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     let rowParaDatos=lastProductRow+1
     factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
+    factura_sheet.getRange("c"+String(rowParaDatos)).setValue(cantidad)
     factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"+(D"+String(rowParaDatos)+"*G"+String(rowParaDatos)+")")//AGG COSA DE CON IVA
     factura_sheet.getRange("F"+String(rowParaDatos)).setValue("=(D"+String(rowParaDatos)+"-(D"+String(rowParaDatos)+"*H"+String(rowParaDatos)+"))*C"+String(rowParaDatos))//subtotal
     factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["valor Unitario"])//valor unitario
