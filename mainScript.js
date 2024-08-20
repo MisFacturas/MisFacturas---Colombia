@@ -117,6 +117,12 @@ function showPostFactura() {
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
+function showEnviarEmailHistorial(data){
+  var html = HtmlService.createHtmlOutputFromFile('enviarEmailHistorial')
+    .setTitle('Enviar Email Historial');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
 
 function showEnviarEmailPost() {
   var html = HtmlService.createHtmlOutputFromFile('enviarEmailPost')
