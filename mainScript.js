@@ -117,6 +117,12 @@ function showPostFactura() {
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
+function showEnviarEmailHistorial(data){
+  var html = HtmlService.createHtmlOutputFromFile('enviarEmailHistorial')
+    .setTitle('Enviar Email Historial');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
 
 function showEnviarEmailPost() {
   var html = HtmlService.createHtmlOutputFromFile('enviarEmailPost')
@@ -179,7 +185,7 @@ function processForm(data) {
 
 function generatePdfFromPlantilla() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Plantilla');
+  var sheet = ss.getSheetByName('Copia de Plantilla');
   var celdaNumFactura = ss.getSheetByName('Factura').getRange('A9').getValue();
   var numFactura = celdaNumFactura.substring(20);
 
