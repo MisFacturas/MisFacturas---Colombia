@@ -312,6 +312,7 @@ function onEdit(e) {
         let verifcadorFecha=verificarDescuentoValido(valorFechaActual,ivaProductoActual)
         if (verifcadorFecha===false){
           SpreadsheetApp.getUi().alert("Posee un producto con un IVA de 5%, en un rango de fechas invalido")
+          //poner rangos en 0
           continue
         }
 
