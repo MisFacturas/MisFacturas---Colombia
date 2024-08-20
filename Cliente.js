@@ -586,11 +586,11 @@ function getCustomerInformation(customer) {
     Browser.msgBox("ERROR: Seleccione Tipo de Identificacion en Clientes")
     return;
   }
-
+  let valorFecha=ObtenerFecha()
   var CustomerInformation = {
     "IdentificationType": IdentificationType,
     "Identification": Identification,//.toString(),
-    "DV": Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yyyy"),
+    "DV": valorFecha,
     "RegistrationName": customer,
     "CountryCode": paisesCodigos[paisCliente],//cambia dependiendo del pais
     "CountryName": paisCliente,

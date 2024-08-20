@@ -27,19 +27,19 @@
   </style>
 </head>
 <body>
-  <h3>Inactivar Cliente</h3>
+  <h3>Activar Cliente</h3>
 
   <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
   
   <form id="productForm">
     <div class="form-group">
-      <label for="clientesInactivos">Seleccione cliente a Inactivar</label>
+      <label for="clientesInactivos">Seleccione cliente a Activar</label>
       <select id="clientesInactivos" class="form-control">
         <option value="">Seleccione un cliente</option>
         <!-- Las opciones de clientes se agregarán aquí -->
       </select>
     </div>
-    <button type="button" class="btn btn-primary" onclick="inactivar()">Inactivar</button>
+    <button type="button" class="btn btn-primary" onclick="activar()">Activar</button>
     <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
   </form>
 
@@ -48,11 +48,11 @@
       google.script.run.showSidebar();
     }
 
-    function inactivar() {
+    function activar() {
       var cliente = document.getElementById('clientesInactivos').value;
 
       console.log("cliente:", cliente);
-      google.script.run.inactivarCliente(cliente);
+      google.script.run.activarCliente(cliente);
     }
 
     function cargarClientesInactivos() {

@@ -259,6 +259,9 @@ function sendPdfByEmail(email) {
   return "PDF generado y enviado por correo electrónico a " + email;
 }
 
+function convertToPercentage(value) {
+  return (value * 100).toFixed(2).replace('.', ',') + '%';
+}
 
 function onEdit(e) {
   let hojaActual = e.source.getActiveSheet();
@@ -276,6 +279,7 @@ function onEdit(e) {
     const productStartRow = 15; // prodcutos empeiza aca
     const productEndColumn = 8; //   procutos terminan en column H
     let taxSectionStartRow = getTaxSectionStartRow(hojaActual); // Assuming products end at column H
+    let posRowTotalProductos=taxSectionStartRow-3//poscion (row) de Total productos
     //Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
     if (colEditada === columnaContactos && rowEditada === rowContactos) {
@@ -289,56 +293,86 @@ function onEdit(e) {
       factura_sheet.getRange("B11").setValue(iban)
 
     }
-    else if (rowEditada >= productStartRow && colEditada == 1 && rowEditada < taxSectionStartRow) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
-      const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
+    else if(rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos)  {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
+      const lastProductRow = getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);//1 producto
       Logger.log("lastProductRow " + lastProductRow)
-      //Logger.log("entra al primer else if")
-      //Logger.log("next row "+nextRow)
       Logger.log("taxSectionStartRow " + taxSectionStartRow)
 
-      //PRoceso para ingresar la info del producto
-      let valorCelda = celdaEditada.getValue();
-      let dictInformacionProducto = obtenerInformacionProducto(valorCelda);
+
+      //proceso para agg el valor de %IVA y precio unitario
+      for(let i=productStartRow;i <= lastProductRow;i++){
 
 
-      // Insertar una nueva row 
-      let diferencia = Math.abs(taxSectionStartRow - lastProductRow)
-      Logger.log("Differencia" + diferencia)
-      Logger.log("rowEditada" + rowEditada)
-      Logger.log("lastProductRow" + lastProductRow)
-      if (diferencia <= 2 && rowEditada === Number(lastProductRow-2)) {
-        hojaActual.getRange("B" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("D" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
-        //Logger.log("Entra a la comparacion de taxSectionStartRow-lastProductRow")
-        Logger.log("dentro de Differencia" + diferencia)
-        hojaActual.insertRowAfter(Number(lastProductRow-2));//tal vez aca aumntar el tax csoso para el bug
-        taxSectionStartRow += 1
-        //calcularImporteYTotal(hojaActual, rowEditada);
-        hojaActual.getRange("F"+String(rowEditada)).setValue("=C"+String(rowEditada)+"*D"+String(rowEditada))
-        hojaActual.getRange("G"+String(rowEditada)).setValue("=C"+String(rowEditada)+"*E"+String(rowEditada))
+        //por aca seria el proceso de ver si el IVA del producto esta entre el rango de tiempo
+        let productoFilaI = factura_sheet.getRange("B"+String(i)).getValue()
+        if(productoFilaI===""){
+          Logger.log("NO ha elegido producto")
+          continue
+        }
+        let dictInformacionProducto = obtenerInformacionProducto(productoFilaI);
+        let cantiadProducto= factura_sheet.getRange("C"+String(i)).getValue()
 
-      } else if (lastProductRow < taxSectionStartRow) {//erores ? deberia de ser la ultima valida 
-        // insertar cosas del producto en la hoja
+        let ivaProductoActual=dictInformacionProducto["IVA"]
+        let valorFechaActual=ObtenerFecha()
+    
+        let verifcadorFecha=verificarDescuentoValido(valorFechaActual,ivaProductoActual)
+        if (verifcadorFecha===false){
+          SpreadsheetApp.getUi().alert("Posee un producto con un IVA de 5%, en un rango de fechas invalido")
+          continue
+        }
 
-        hojaActual.getRange("B" + String(rowEditada)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaActual.getRange("D" + String(rowEditada)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaActual.getRange("E" + String(rowEditada)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
-        //calcular importe y total de linea apenas se ingrese el valor de cantidad
-
-
-        Logger.log("Entra al segundo if dnetro del else if ")
-        Logger.log("")
-        //calcularImporteYTotal(hojaActual, rowEditada);
+        if(cantiadProducto===""){
+          cantiadProducto=0
+          //tal vez mirara si agrego el 0 de cantidad
+          factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
+          factura_sheet.getRange("D"+String(i)).setValue(0)//unitario SIN 'IVA'
+          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
+          
+          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
+          factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
+        }else{
+          factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
+          factura_sheet.getRange("E"+String(i)).setValue("=D"+String(i)+"+(D"+String(i)+"*G"+String(i)+")")//AGG COSA DE CON IVA
+          factura_sheet.getRange("F"+String(i)).setValue("=(D"+String(i)+"-(D"+String(i)+"*H"+String(i)+"))*C"+String(i))//subtotal
+          factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["valor Unitario"])//valor unitario
+          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
+          
+          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
+          factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
+          factura_sheet.getRange("K"+String(i)).setValue("=F"+String(i)+"+(F"+String(i)+"*G"+String(i)+")-(F"+String(i)+"*I"+String(i)+")+(F"+String(i)+"*J"+String(i)+")")//total linea
+        }
       }
-    } else if (rowEditada >= productStartRow && colEditada == 3 && rowEditada < taxSectionStartRow) {// edita celda cantidad
-      //calcular Importe y Total de linea
-      //calcularImporteYTotal(hojaActual, rowEditada);
+
+    }else if(colEditada==8 && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
+      //verificar descuentos
+      let valorEditadoDescuneto = celdaEditada.getValue();
+      Logger.log(typeof(valorEditadoDescuneto))
+      Logger.log("valorEditadoDescuneto "+valorEditadoDescuneto)
+
+      if(0.00 > valorEditadoDescuneto || valorEditadoDescuneto > 1.00){
+        Logger.log("No se puede pasar de 100% el valor de descuento o menos de 0%")
+        SpreadsheetApp.getUi().alert("No es valido un descuento mayor a 100% ni menor a 0%")
+        celdaEditada.setValue("0%")
+      }
+
 
     }
-    //calcularTaxInformation(celdaEditada,productStartRow,taxSectionStartRow);
-    updateTotalProductCounter(hojaActual, productStartRow, taxSectionStartRow, celdaEditada);//tengo que revisar esto 
 
+    let lastRowProducto=getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
+    if (lastRowProducto===productStartRow){
+      Logger.log("dentro de agg info para TOTLA pero last y start son iguales")
+      // //ESTADO DEAFULT no se hace nada
+      hojaActual.getRange("B31").setValue("=SUM(K15)+C29-B18")
+
+
+    }else{
+      Logger.log("dentro de agg info para totoal")
+      Logger.log("lastRowProducto "+lastRowProducto)
+      Logger.log("productStartRow"+productStartRow)
+      calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual)
+    }
+
+    updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,taxSectionStartRow)
   } else if (hojaActual.getName() === "Clientes") {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
@@ -351,169 +385,129 @@ function onEdit(e) {
   }
 }
 
-function calcularImporteYTotal(hojaActual, rowEditada) {
-  Logger.log("rowEditada" + rowEditada)
-  let producto = hojaActual.getRange("A" + String(rowEditada)).getValue(); // Obtiene el producto en la línea seleccionada
-  let dictInformacionProducto = obtenerInformacionProducto(producto);
-  let cantidadProducto = hojaActual.getRange("C" + String(rowEditada)).getValue(); // Asume que la cantidad está en la columna D
-  Logger.log("producto" + producto)
-  Logger.log("cantidadProducto" + cantidadProducto)
-  let importe = cantidadProducto * dictInformacionProducto["valor Unitario"];//
-  let totalDeLinea = cantidadProducto * dictInformacionProducto["precio Con Iva"];//
+function verificarDescuentoValido(valorFechaActual,ivaProductoActual){
+  //1julio 2022 hasta 30 de junio 2024. 
+  Logger.log("ivaProductoActual"+ivaProductoActual)
+  Logger.log("valorFechaActual"+valorFechaActual)
+  Logger.log("Entra a verificar fecha")
+  var fechaInicio = new Date(2022, 6, 1);  // 1 de julio de 2022 (mes 6 porque enero es 0)
+  var fechaFin = new Date(2024, 5, 30);    // 30 de junio de 2024 (mes 5 porque enero es 0)
+  var partesFecha = valorFechaActual.split("/");
+  var dia = parseInt(partesFecha[0]);
+  var mes = parseInt(partesFecha[1]) - 1; // Restar 1 porque los meses en Date empiezan desde 0
+  var anio = parseInt(partesFecha[2]);
+  var fechaActual = new Date(anio, mes, dia);
 
-  hojaActual.getRange("F" + String(rowEditada)).setValue(importe);
-  hojaActual.getRange("G" + String(rowEditada)).setValue(totalDeLinea);
+  if(ivaProductoActual===0.05){
+    Logger.log("fecha es igual a 5%")
+    if (fechaActual >= fechaInicio && fechaActual <= fechaFin) {
+      Logger.log("Fecha dentro del rango válido");
+      return true;
+    } else {
+      Logger.log("Fecha fuera del rango válido");
+      return false;
+    }
+  }else{
+    Logger.log("No hay producto con 5% interes")
+    return true
+  }
+}
+
+function calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual) {
+  Logger.log("Entra a calcular importe")
+  Logger.log("lastRowProducto "+lastRowProducto)
+  Logger.log("productStartRow "+productStartRow )
+  Logger.log("taxSectionStartRow"+taxSectionStartRow)
+
+  //base Imponible
+  let rowParaFormulaBaseImponible=taxSectionStartRow+1
+  let rowEspacioIvasAgrupacion=taxSectionStartRow+5
+  let rowTotalBaseImponibleEIvaGeneral=taxSectionStartRow+7
+  hojaActual.getRange("A"+String(rowParaFormulaBaseImponible)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B"+String(rowParaFormulaBaseImponible)+":B"+String(rowEspacioIvasAgrupacion)+"; F15:F"+String(lastRowProducto)+"))")
+    //total base imponible e iva genberal
+    hojaActual.getRange("A"+String(rowTotalBaseImponibleEIvaGeneral)).setValue("=SUM(A"+String(rowParaFormulaBaseImponible)+":A"+String(rowEspacioIvasAgrupacion)+")")
+    hojaActual.getRange("C"+String(rowTotalBaseImponibleEIvaGeneral)).setValue("=SUM(C"+String(rowParaFormulaBaseImponible)+":C"+String(rowEspacioIvasAgrupacion)+")")
+  //IVA%
+  hojaActual.getRange("B"+String(rowParaFormulaBaseImponible)).setValue("=UNIQUE(G15:G"+String(lastRowProducto)+")")
+
+  let rowParaTotales=taxSectionStartRow+10
+  //total retenciones
+  hojaActual.getRange("A"+String(rowParaTotales)).setValue("=(SUM(F15:F"+String(lastRowProducto)+")*(SUM(I15:I"+String(lastRowProducto)+")))")
+
+  //total cargo equivalencia
+  hojaActual.getRange("B"+String(rowParaTotales)).setValue("=(SUM(F15:F"+String(lastRowProducto)+"))*(SUM(J15:J"+String(lastRowProducto)+"))")
+
+  //total descuentos FACTURA
+  let rowDescuentos=taxSectionStartRow-1
+  hojaActual.getRange("D"+String(rowParaTotales)).setValue("=B"+String(rowDescuentos)+" + SUMPRODUCT(D15:D"+String(lastRowProducto)+"; C15:C"+String(lastRowProducto)+") - SUM(F15:F"+String(lastRowProducto)+")")
+
+  //totalfactura
+  let rowParaTotalFactura=taxSectionStartRow+12
+  hojaActual.getRange("B"+String(rowParaTotalFactura)).setValue("=SUM(K15:K"+String(lastRowProducto)+")+C"+String(rowParaTotales)+"-B"+String(rowDescuentos))
+
+
+
 }
 
 function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
-  //tal vez se lo tira si no agrega en orden
-  let lastProductRow = productStartRow;
 
+  Logger.log("funcion getLastProductRow")
+  //retorna el numero de fila exacta donde esta el ulitmo producto agregado
+  // si no encuntra producto agg si solo tiene un producto retorna el mismo productStartRow 
+  let lastProductRow = productStartRow;
+  
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
-    if (sheet.getRange(row, 1).getValue() !== '') {
-      lastProductRow = row;
-    }
+    
+    let valorCeldaActual=sheet.getRange(row, 1).getValue() 
+    Logger.log("'Valor celda "+valorCeldaActual)
+
+      if(valorCeldaActual==="Total productos"){
+        Logger.log("dentro de if+ lastProductRow"+lastProductRow)
+        return lastProductRow
+      }else{
+        lastProductRow = row;
+      }
+      Logger.log("lastProductRow "+lastProductRow)
+      
+    
   }
+  Logger.log("No dentro del if lastProductRow"+lastProductRow)
   //aqui arrelgar error que se agrega una nueva linea cuando hay espacio arriba
-  return lastProductRow-1;
+  return lastProductRow;
 }
 
 function getTaxSectionStartRow(sheet) {
-  //obtiene la row donde esta la seccion de taxinformation
-  const maxRows = sheet.getMaxRows();
-  //Logger.log("get tac section star row")
-  //Logger.log(maxRows)
-
-  // obtenemos la row donde esta la "base imponible, llegando asi al principio "
-  for (let row = 22; row <= maxRows; row++) { // 22 porque su row predetermmiado es ese
-    if (sheet.getRange(row, 1).getValue() === 'Total productos') {
+  //obtiene la row donde esta la seccion de taxinformation osea Base imponible
+  const lastRow = sheet.getLastRow();
+  let row = 14
+  
+  for (row; row < lastRow; row++) { // 14 por si esta vacio, pero deberia de dar igual si es desde la 15
+    if (sheet.getRange(row, 1).getValue() === 'Base imponible') {
 
       Logger.log("dentro de getTax row " + row)
-      return row+1;// tal vez solo dejarlo en Base imponible,se agrega 1 osea 1 mas que base imposnible
+      return row;
     }
   }
 
-  // esto puede causar errores
-  return maxRows + 1;
+  
+  return row+1;// por si se borro todos los productos,creo que da igual 
 }
 
-function updateTotalProductCounter(sheet, productStartRow, taxSectionStartRow) {
+function updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,taxSectionStartRow) {
   let totalProducts = 0;
-  
-  Logger.log("taxSectionStartRow"+taxSectionStartRow)
+  Logger.log(" dentro updateTotalProductCounter")
 
-  //toca revisar creo que cuando hay un producto con un espacio en el medio no teien encuenta y se sale 
-  limpiarDict();
-  // calcualr cuando no hay cantidad
-  for (let row = productStartRow; row < Number(taxSectionStartRow-1); row++) {
-    let prodcutoActual = sheet.getRange(row, 1).getValue()
-    if (prodcutoActual === "") {
-      Logger.log("PRODUCTO VACIO")
-    } else {
-      totalProducts++;
-      let dictInformacionProducto = obtenerInformacionProducto(prodcutoActual);
-      //Logger.log("dictInformacionProducto"+dictInformacionProducto)
-      let porcientoIVA = dictInformacionProducto["porciento Iva"];
-
-      Logger.log("porcientoIVA " + porcientoIVA)
-      if (porcientoIVA in diccionarioCaluclarIva) {
-        Logger.log("entra a coger el importe")
-        let importeActual = sheet.getRange("F" + String(row)).getValue();
-        Logger.log("importeActual " + importeActual)
-        Logger.log("Row" + row)
-        diccionarioCaluclarIva[porcientoIVA] += importeActual;
-      }
-    }
-
-    // if (sheet.getRange(row, 2).getValue() !== '') { // Assuming product names are in column B
-    //   totalProducts++;
-    // }
-  }
-
-  Logger.log("Obtener llaves del dict")
-  let llavesDiccionarioProducto = Object.keys(diccionarioCaluclarIva);
-  let posicionTaxInfo = taxSectionStartRow + 1;//tal vez +1 > row?
-  Logger.log("posicionTaxInfo " + posicionTaxInfo)
-  Logger.log("llavesDiccionarioProducto" + llavesDiccionarioProducto)
-  let poscionTaxParaIvaNoPresente = posicionTaxInfo
-  for (let k = 0; k < llavesDiccionarioProducto.length; k++) {
-    let llaveActual = llavesDiccionarioProducto[k];
-    let valorllave = diccionarioCaluclarIva[llaveActual];
-    Logger.log("llaveActual tipo " + typeof (llaveActual))
-    Logger.log("valorllave tipo " + typeof (valorllave))
-    if (valorllave === 0) {
-      // Logger.log("posicionTaxInfo dentro del espacio vacio"+posicionTaxInfo)
-      // //revisar que ya se halla borrado de la lista de total taxes, ya que esto implica que no hay ningun prodcuto con este %de IVA
-      // let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
-      // let IVAsActivos=RangeIVAActivos.getValues();
-      // // no importa, implica que simplemnte no esta entoces borrar el primero que encuentre de abajo para arriba
-      // Logger.log("IVAsActivos sin String " +IVAsActivos)
-      // let IVAsActivos2=String(RangeIVAActivos.getValues());
-      // Logger.log("IVAsActivos CON String " +IVAsActivos2)
-      // for (let i = IVAsActivos.length - 1; i >= 0; i--) {
-      //   Logger.log("IVAsActivos[i]" +IVAsActivos[i])
-      //   Logger.log("llaveActual" +llaveActual)
-      //   if(IVAsActivos[i]==llaveActual){
-      //     let base=sheet.getRange("B"+String(poscionTaxParaIvaNoPresente+i)).getValue()
-      //     Logger.log("celda B algo"+base)
-      //   }
-      // }
-
-
-      continue
-    } else {
-      sheet.getRange("A" + String(posicionTaxInfo)).setValue(valorllave);
-      let valorEnPorcentaje = (llaveActual * 100) + '%';
-      sheet.getRange("B" + String(posicionTaxInfo)).setValue(valorEnPorcentaje);
-      sheet.getRange("B" + String(posicionTaxInfo)).setNumberFormat("0.00%");
-      //Logger.log("SetnumberFormat?")
-      posicionTaxInfo++;
-    }
-
-    // let RangeIVAActivos=sheet.getRange(poscionTaxParaIvaNoPresente,3,5)// 3 porque es donde esta el IVA
-    // let IVAsActivos=RangeIVAActivos.getValues().flat();;
-
-
-  }
-
-  let rangeImporteTotal = sheet.getRange(productStartRow, 6, taxSectionStartRow - productStartRow - 1)
-  let valores = rangeImporteTotal.getValues();
-
-  let suma = 0;
-  Logger.log("valores de rango supuestament" + valores)
-  for (let i = 0; i < valores.length; i++) {
-    if (!isNaN(valores[i][0]) && valores[i][0] !== '') { // Asegurarse de que el valor sea un número y no esté vacío
-      suma += parseFloat(valores[i][0]);
+  for(let i=productStartRow;i<=lastRowProducto;i++){
+    Logger.log("I"+i)
+    Logger.log("lastRowProducto"+lastRowProducto)
+    if(hojaActual.getRange("B"+String(i)).getValue()!=""){
+      totalProducts++
     }
   }
 
-  Logger.log("Suma total de valores en el rango: " + suma);
+  let rowTotalProductos=taxSectionStartRow-3
+  hojaActual.getRange("B"+String(rowTotalProductos)).setValue(totalProducts)
 
-  let rangeBaseImponible = sheet.getRange(taxSectionStartRow + 1, 1, 5)
-  let valores2 = rangeBaseImponible.getValues();
-
-  let suma2 = 0;
-  let limite = true
-
-  for (let i = 0; i < valores2.length; i++) {
-    if (!isNaN(valores2[i][0]) && valores2[i][0] !== '' && limite) { // Asegurarse de que el valor sea un número y no esté vacío
-      suma2 += parseFloat(valores2[i][0]);
-      if (suma === suma2) {
-        Logger.log("eNTRA A LA SUMA ES IGUAL")
-        limite = false
-      }
-    } else {    //ya no es igual implica que lo de aqui en adelante se borra
-      let taxSectionStartRow2 = Number(taxSectionStartRow)
-      let filaABorrar = taxSectionStartRow2 + 1 + i;
-      Logger.log("filaABorrar")
-      sheet.getRange("A" + String(filaABorrar)).setValue("");
-      sheet.getRange("B" + String(filaABorrar)).setValue("");
-    }
-  }
-
-
-  // Set the total products count in cell B27
-  sheet.getRange('B'+String(Number(taxSectionStartRow-1))).setValue(totalProducts);
 }
 
 
