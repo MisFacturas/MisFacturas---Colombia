@@ -283,47 +283,38 @@ function agregarProductoDesdeFactura(cantidad,producto){
     Logger.log("entra a dictInformacionProducto")
     dictInformacionProducto = obtenerInformacionProducto(producto);
   }
+  
+  
+  let cantidadProductos=hojaFactura.getRange("A16").getValue()//estado defaul de total productos
+  if(cantidadProductos==="Total productos"){
+    factura_sheet.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
+    factura_sheet.getRange("B15").setValue(producto)
+    factura_sheet.getRange("D15").setValue(dictInformacionProducto["valor Unitario"])
+    factura_sheet.getRange("G15").setValue(dictInformacionProducto["IVA"])
+    factura_sheet.getRange("I15").setValue(dictInformacionProducto["retencion"])
+    factura_sheet.getRange("J15").setValue(dictInformacionProducto["Recargo de equivalencia"])
+
+  }else{
+    hojaFactura.insertRowAfter(lastProductRow)
+    let rowParaDatos=lastProductRow+1
+    factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
+    factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
+    factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"+(D"+String(rowParaDatos)+"*G"+String(rowParaDatos)+")")//AGG COSA DE CON IVA
+    factura_sheet.getRange("F"+String(rowParaDatos)).setValue("=(D"+String(rowParaDatos)+"-(D"+String(rowParaDatos)+"*H"+String(rowParaDatos)+"))*C"+String(rowParaDatos))//subtotal
+    factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["valor Unitario"])//valor unitario
+    factura_sheet.getRange("G"+String(rowParaDatos)).setValue(dictInformacionProducto["IVA"])//IVA
+    
+    factura_sheet.getRange("I"+String(rowParaDatos)).setValue(dictInformacionProducto["retencion"])//Retencion
+    factura_sheet.getRange("J"+String(rowParaDatos)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
+    factura_sheet.getRange("K"+String(rowParaDatos)).setValue("=F"+String(rowParaDatos)+"+(F"+String(rowParaDatos)+"*G"+String(rowParaDatos)+")-(F"+String(rowParaDatos)+"*I"+String(rowParaDatos)+")+(F"+String(rowParaDatos)+"*J"+String(rowParaDatos)+")")//total linea
+  }
 
   Logger.log("Pasa verificacion de producto")
   Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
 
-  if(Number(taxSectionStartRow)===24){
-    let totalProductos=hojaFactura.getRange("B23").getValue();
-    if(totalProductos===5){
-      hojaFactura.insertRowAfter(20)
-      taxSectionStartRow += 1
-    }
-    Logger.log("lastProductRow dentro de coso ===24" +lastProductRow)
-    for(let i =productStartRow;i<21;i++){
-      let valorProducto= hojaFactura.getRange("A"+String(i)).getValue();
-      if(valorProducto===""){
-        //em estado deafult, sea agrega dentro de las primeras 6 lienas
-        hojaFactura.getRange("A"+String(i)).setValue(producto);//producto
-        hojaFactura.getRange("B" + String(i)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-        hojaFactura.getRange("D" + String(i)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-        hojaFactura.getRange("E" + String(i)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
-        hojaFactura.getRange("C"+String(i)).setValue(cantidad);//cantidad
-        break
-      }
-    }
-  }else{
-    Logger.log("lastProductRow dentro de coso neuvo" +lastProductRow)
-    let rowParaAgregar=Number(lastProductRow-2)
-    Logger.log("rowParaAgregar"+rowParaAgregar)
-    hojaFactura.getRange("A"+String(rowParaAgregar)).setValue(producto);//producto
-    hojaFactura.getRange("B" + String(rowParaAgregar)).setValue(dictInformacionProducto["codigo Producto"]);//referencia
-    hojaFactura.getRange("D" + String(rowParaAgregar)).setValue(dictInformacionProducto["valor Unitario"]);//valor unitario sin iva
-    hojaFactura.getRange("E" + String(rowParaAgregar)).setValue(dictInformacionProducto["precio Con Iva"]);//precio con IVA
-    hojaFactura.getRange("C"+String(rowParaAgregar)).setValue(cantidad);//cantidad
-    //agg fila
-    //tal vez aca aumntar el tax csoso para el bug
-    hojaFactura.insertRowAfter(rowParaAgregar);
-    hojaFactura.getRange("F"+String(rowParaAgregar)).setValue("=C"+String(rowParaAgregar)+"*D"+String(rowParaAgregar))
-    hojaFactura.getRange("G"+String(rowParaAgregar)).setValue("=C"+String(rowParaAgregar)+"*E"+String(rowParaAgregar))
-    taxSectionStartRow += 1
-  }
 
-  updateTotalProductCounter(hojaFactura, productStartRow, taxSectionStartRow);
+
+  updateTotalProductCounter(lastProductRow, productStartRow,hojaFactura, taxSectionStartRow);
 }
 
 function onImageClick() {
