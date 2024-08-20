@@ -1108,20 +1108,21 @@ function obtenerDatosFactura(factura){
 
             var celdaRetencion = targetSheet.getRange('K'+numeroCelda);
             celdaRetencion.setBorder(true,true,true,true,null,null,null,null);
-            celdaRetencion.setValue(listaProductos[j].TaxesInformation[0].Retencion);
+            celdaRetencion.setValue(parseFloat(listaProductos[j].TaxesInformation[0].Retencion));
             celdaRetencion.setNumberFormat('0.0%')
             celdaRetencion.setHorizontalAlignment('center');
 
             var celdaRecargoEquivalencia = targetSheet.getRange('L'+numeroCelda);
             celdaRecargoEquivalencia.setBorder(true,true,true,true,null,null,null,null);
-            celdaRecargoEquivalencia.setValue(listaProductos[j].TaxesInformation[0].RecgEquivalencia);
+            celdaRecargoEquivalencia.setValue(parseFloat(listaProductos[j].TaxesInformation[0].RecgEquivalencia));
             celdaRecargoEquivalencia.setNumberFormat('0.0%')
             celdaRecargoEquivalencia.setHorizontalAlignment('center');
 
             
             var celdaTotalLinea = targetSheet.getRange('M'+numeroCelda);
             celdaTotalLinea.setBorder(true,true,true,true,null,null,null,null);
-            celdaTotalLinea.setFormula('=H'+numeroCelda+'+(H'+numeroCelda+'*I'+numeroCelda+')-(H'+numeroCelda+'*K'+numeroCelda+')+(H'+numeroCelda+'*L'+numeroCelda+')-(H'+numeroCelda+'*J'+numeroCelda+')');
+            //subtotal+(subtotal*iva)+(subtotal*recargo)-(subtotal*retencion)
+            celdaTotalLinea.setFormula('=H'+numeroCelda+'+(H'+numeroCelda+'*I'+numeroCelda+')+(H'+numeroCelda+'*L'+numeroCelda+')-(H'+numeroCelda+'*K'+numeroCelda+')');
             celdaTotalLinea.setNumberFormat('€#,##0.00');
             celdaTotalLinea.setHorizontalAlignment('normal');
             
