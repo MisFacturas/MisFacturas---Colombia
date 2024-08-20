@@ -292,6 +292,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
   }
   Logger.log("dictInformacionProducto "+dictInformacionProducto["codigo Producto"])
   let rowParaDatos=lastProductRow
+  let rowParaTotalTaxes=taxSectionStartRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
     factura_sheet.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
@@ -304,6 +305,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
+    rowParaTotalTaxes=taxSectionStartRow+1
     rowParaDatos=lastProductRow+1
     factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
@@ -325,8 +327,8 @@ function agregarProductoDesdeFactura(cantidad,producto){
 
 
 
-  updateTotalProductCounter(rowParaDatos, productStartRow,hojaFactura, taxSectionStartRow+1);
-  calcularImporteYTotal(rowParaDatos,productStartRow,taxSectionStartRow+1,hojaFactura)
+  updateTotalProductCounter(rowParaDatos, productStartRow,hojaFactura, rowParaTotalTaxes);
+  calcularImporteYTotal(rowParaDatos,productStartRow,rowParaTotalTaxes,hojaFactura)
 }
 
 function onImageClick() {
