@@ -283,7 +283,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     Logger.log("entra a dictInformacionProducto")
     dictInformacionProducto = obtenerInformacionProducto(producto);
   }
-  
+  Logger.log("dictInformacionProducto "+dictInformacionProducto)
   let rowParaDatos=lastProductRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
@@ -313,7 +313,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
 
   
 
-  Logger.log("Pasa verificacion de producto")
+  Logger.log("rowParaDatos "+rowParaDatos)
   Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
 
 
