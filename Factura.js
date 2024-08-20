@@ -285,8 +285,8 @@ function agregarProductoDesdeFactura(cantidad,producto){
   }
   
   
-  let cantidadProductos=hojaFactura.getRange("A16").getValue()//estado defaul de total productos
-  if(cantidadProductos==="Total productos"){
+  let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
+  if(cantidadProductos===0 || cantidadProductos===""){
     factura_sheet.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B15").setValue(producto)
     factura_sheet.getRange("C15").setValue(cantidad)
