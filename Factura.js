@@ -269,7 +269,14 @@ function guardarFactura(){
   
 
 }
-
+function agregarFilaNueva(){
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
+  const productStartRow = 15;
+  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+  logger.log("agregarfILA NUEVAA")
+  hojaFactura.insertRowAfter(lastProductRow)
+}
 function agregarProductoDesdeFactura(cantidad,producto){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
@@ -283,7 +290,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     Logger.log("entra a dictInformacionProducto")
     dictInformacionProducto = obtenerInformacionProducto(producto);
   }
-  Logger.log("dictInformacionProducto "+dictInformacionProducto)
+  Logger.log("dictInformacionProducto "+dictInformacionProducto["codigo Producto"])
   let rowParaDatos=lastProductRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
@@ -297,7 +304,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
-    rowParaDatos=+1
+    rowParaDatos=lastProductRow+1
     factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
     factura_sheet.getRange("C"+String(rowParaDatos)).setValue(cantidad)
@@ -318,7 +325,8 @@ function agregarProductoDesdeFactura(cantidad,producto){
 
 
 
-  updateTotalProductCounter(rowParaDatos, productStartRow,hojaFactura, taxSectionStartRow);
+  updateTotalProductCounter(rowParaDatos, productStartRow,hojaFactura, taxSectionStartRow+1);
+  calcularImporteYTotal(rowParaDatos,productStartRow,taxSectionStartRow+1,hojaFactura)
 }
 
 function onImageClick() {
