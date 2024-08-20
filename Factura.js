@@ -274,7 +274,7 @@ function agregarFilaNueva(){
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
   const productStartRow = 15;
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
-  logger.log("agregarfILA NUEVAA")
+  Logger.log("agregarfILA NUEVAA")
   hojaFactura.insertRowAfter(lastProductRow)
 }
 function agregarProductoDesdeFactura(cantidad,producto){
