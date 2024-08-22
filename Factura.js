@@ -1181,7 +1181,7 @@ function obtenerDatosFactura(factura){
 
             var celdaDescuento = targetSheet.getRange('J'+numeroCelda);
             celdaDescuento.setBorder(true,true,true,true,null,null,null,null);
-            celdaDescuento.setValue(listaProductos[j].TaxesInformation[0].Descuento);
+            celdaDescuento.setValue(parseFloat(listaProductos[j].TaxesInformation[0].Descuento));
             celdaDescuento.setNumberFormat('0.0%')
             celdaDescuento.setHorizontalAlignment('center');
 
