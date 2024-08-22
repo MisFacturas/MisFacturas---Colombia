@@ -939,9 +939,10 @@ function guardarYGenerarInvoice(){
     rangeTotales=prefactura_sheet.getRange(rowTotales,1,1,4);
     rangeFacturaTotal=prefactura_sheet.getRange(rowTotalFactura,2);//(maxRows-1) porque no necesito el total
   }
-
-  cargo=rangeTotales[2]
-  descuento=rangeTotales[3]
+  let totalesValores=String(rangeTotales.getValues())
+  Logger.log("totalesValores"+totalesValores)
+  cargo=totalesValores[2]
+  descuento=totalesValores[3]
   Logger.log("cargo "+cargo)
   Logger.log("descuento "+descuento)
   // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
@@ -973,8 +974,8 @@ function guardarYGenerarInvoice(){
     "ChargeTotalAmount": cargo,
     "PrePaidAmount": pfAnticipo,
     "PayableAmount": TotalFactura ,// antes era (pfTotal - pfAnticipo) 
-    "totalRet":rangeTotales[0],
-    "totalCargoEqui":rangeTotales[1],
+    "totalRet":totalesValores[0],
+    "totalCargoEqui":totalesValores[1]
   }
 
 
@@ -1017,7 +1018,7 @@ function guardarYGenerarInvoice(){
     }
   }
   );
-
+  Logger.log(invoice_total)
   let invoice = JSON.stringify({
     CustomerInformation: CustomerInformation,
     InvoiceGeneralInformation: InvoiceGeneralInformation,
