@@ -839,6 +839,7 @@ function guardarYGenerarInvoice(){
 
   let invoiceTaxTotal=[];
   var productoInformation = [];
+
   Logger.log("cantidadProductos"+cantidadProductos)
 
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
@@ -980,6 +981,42 @@ function guardarYGenerarInvoice(){
   let cliente = prefactura_sheet.getRange("B2").getValue();
   let InvoiceGeneralInformation = getInvoiceGeneralInformation();
   let CustomerInformation = getCustomerInformation(cliente);// tal ves que por ahora no llame al cliente
+  
+  let sheetDatosEmisor=spreadsheet.getSheetByName('Datos de emisor');
+  let userId=sheetDatosEmisor.getRange("B11").getValue()
+  let companyId=sheetDatosEmisor.getRange("B3").getValue()
+  let PaymentSummary=getPaymentSummary(startingRowTaxation)
+
+  let fechParaNuevoInvoice=ConvertirFecha()
+  let fechaVencdioParaNuevoInvoice=SumarDiasAFecha(Number(InvoiceGeneralInformation["DaysOff"]))
+  let nuevoInvoiceResumido=JSON.stringify({
+    "file": "base64",
+    "Document": {
+      "fileName": "nombre documento",
+      "userId": userId,
+      "companyId": companyId,
+      "invoice": {
+        "invoiceType": false,
+        "contactName": cliente,
+        "nif": CustomerInformation["Identification"],
+        "invoiceDate": fechParaNuevoInvoice,
+        "numberInvoice": InvoiceGeneralInformation["InvoiceNumber"],
+        "taxableAmount": parseFloat(facturaTotalesBaseImponilbe[0]),
+        "Percent": 0,
+        "taxAmount": parseFloat(facturaTotalesBaseImponilbe[2]),
+        "surchargeAmount": "el valor no se debe de reportar",
+        "surchargeValue": "el valor no se debe de reportar",
+        "percentageSurchargeEquivalents": 0,
+        "percentRetention": 0,
+        "IRPFValue": "el valor no se debe de reportar",
+        "invoiceTotal": TotalFactura,
+        "payDate":fechaVencdioParaNuevoInvoice,
+        "PaymentType": PaymentSummary["PaymentType"],
+        "Observations": InvoiceGeneralInformation["note"]
+      }
+    }
+  }
+  );
 
   let invoice = JSON.stringify({
     CustomerInformation: CustomerInformation,
@@ -987,7 +1024,7 @@ function guardarYGenerarInvoice(){
     Delivery: getDelivery(),
     AdditionalDocuments: getAdditionalDocuments(),
     AdditionalProperty: getAdditionalProperty(),
-    PaymentSummary: getPaymentSummary(startingRowTaxation), //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
+    PaymentSummary: PaymentSummary, //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
     //Invoice_Note: invoice_note,
     InvoiceTaxTotal: invoiceTaxTotal,
@@ -995,14 +1032,51 @@ function guardarYGenerarInvoice(){
     InvoiceTotal: invoice_total
   });
   Logger.log(invoice)
+  Logger.log(nuevoInvoiceResumido)
 
   let nameString = prefactura_sheet.getRange("B2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
   let fecha =ObtenerFecha();
   let codigoCliente=prefactura_sheet.getRange("B3").getValue();
-  listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice)]);
+  listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice),String(nuevoInvoiceResumido)]);
   
   SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente");
+}
+
+function ConvertirFecha() {
+  // Llama a la función ObtenerFecha para obtener la fecha formateada
+  let fechaFormateada = ObtenerFecha();
+  
+  // Divide la fecha en día, mes y año
+  let [dia, mes, año] = fechaFormateada.split("/");
+
+  // Reorganiza la fecha en formato YYYY-MM-DD
+  let fechaConvertida = `${año}-${mes}-${dia}`;
+
+  return fechaConvertida;
+}
+
+function SumarDiasAFecha(dias) {
+  // Obtiene la fecha en formato yyyy-MM-dd
+  let fechaConvertida = ConvertirFecha();
+  
+  // Descompone la fecha en año, mes y día
+  let [año, mes, dia] = fechaConvertida.split("-").map(Number);
+
+  // Crea un objeto Date con los valores de año, mes y día
+  let fecha = new Date(año, mes - 1, dia); // mes - 1 porque los meses en Date son indexados desde 0
+
+  // Suma el número de días a la fecha
+  fecha.setDate(fecha.getDate() + dias);
+
+  // Formatea la nueva fecha en formato yyyy-MM-dd
+  let nuevoAño = fecha.getFullYear();
+  let nuevoMes = ("0" + (fecha.getMonth() + 1)).slice(-2); // Asegura dos dígitos para el mes
+  let nuevoDia = ("0" + fecha.getDate()).slice(-2); // Asegura dos dígitos para el día
+
+  let nuevaFecha = `${nuevoAño}-${nuevoMes}-${nuevoDia}`;
+
+  return nuevaFecha;
 }
 
 
