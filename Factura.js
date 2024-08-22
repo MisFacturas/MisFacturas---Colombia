@@ -1112,8 +1112,8 @@ function obtenerDatosFactura(factura){
           var formaPago = invoiceData.PaymentSummary.PaymentType;
           var listaProductos = invoiceData.ItemInformation;
           var numeroProductos = 0;
-          var descuentosFactura = invoiceData.InvoiceTotal.PrePaidAmount;
-          var cargosFactura = invoiceData.InvoiceTotal.ChargeTotalAmount;
+          var descuentosFactura = parseFloat(invoiceData.InvoiceTotal.PrePaidAmount);
+          var cargosFactura = parseFloat(invoiceData.InvoiceTotal.ChargeTotalAmount);
           var totalFacturaJSON = parseFloat(invoiceData.InvoiceTotal.PayableAmount);
           var valorPagar = int2word(totalFacturaJSON) //arreglar
           var notaPago = invoiceData.PaymentSummary.PaymentNote;
@@ -1318,8 +1318,11 @@ function obtenerDatosFactura(factura){
           notaPagoCell.setValue(notaPago);
           observacionesCell.setValue(observaciones);
           totalItemsCell.setValue(numeroProductos);
-          descuentosCell.setValue(descuentosFactura);
-          cargosCell.setValue(cargosFactura);
+          //descuentosCell.setValue(descuentosFactura);
+          //cargosCell.setValue(cargosFactura);
+          //prueba
+          descuentosCell.setValue(0);
+          cargosCell.setValue(0);
           sumaBaseImponible.setFormula('=SUM(A'+(30+numeroProductos-1)+':A'+(31+filasInsertadas-1)+')');
           sumaImpIva.setFormula('=SUM(F'+(30+numeroProductos-1)+':F'+(31+filasInsertadas-1)+')');
           sumaTotal.setFormula('=SUM(I'+(30+numeroProductos-1)+':I'+(31+filasInsertadas-1)+')');
