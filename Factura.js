@@ -1167,7 +1167,7 @@ function obtenerDatosFactura(factura){
 
             var celdaSubtotal = targetSheet.getRange('H'+numeroCelda);
             celdaSubtotal.setBorder(true,true,true,true,null,null,null,null);
-            celdaSubtotal.setFormula('=F'+numeroCelda+'*G'+numeroCelda);
+            celdaSubtotal.setFormula('=F'+numeroCelda+'*(G'+numeroCelda+'-(G'+numeroCelda+'*J'+numeroCelda+'))');
             celdaSubtotal.setHorizontalAlignment('normal');
             celdaSubtotal.setNumberFormat('€#,##0.00')
             
@@ -1296,6 +1296,8 @@ function obtenerDatosFactura(factura){
           var totalCargos = targetSheet.getRange('G'+(36+filasInsertadas));
           var totalDescuentos = targetSheet.getRange('K'+(36+filasInsertadas));
 
+          var totalDeFactura = targetSheet.getRange('H'+(38+filasInsertadas));
+
           celdaNumFactura.setValue("FACTURA DE VENTA NO. "+facturaNumero);
           clienteCell.setValue(cliente);
           nifCell.setValue(nif);
@@ -1320,13 +1322,14 @@ function obtenerDatosFactura(factura){
           cargosCell.setValue(cargosFactura);
           sumaBaseImponible.setFormula('=SUM(A'+(30+numeroProductos-1)+':A'+(31+filasInsertadas-1)+')');
           sumaImpIva.setFormula('=SUM(F'+(30+numeroProductos-1)+':F'+(31+filasInsertadas-1)+')');
-          sumaTotal.setFormula('=SUM(H'+(30+numeroProductos-1)+':H'+(31+filasInsertadas-1)+')');
+          sumaTotal.setFormula('=SUM(I'+(30+numeroProductos-1)+':I'+(31+filasInsertadas-1)+')');
           totalRetenciones.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';K19:K'+(19+numeroProductos-1)+')');
           totalCrgEquivalencia.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';L19:L'+(19+numeroProductos-1)+')');
-          totalCargos.setFormula('='+cargosCell.getA1Notation());
-          //totalDescuentos.setFormula('='+descuentosCell.getA1Notation()); preguntar a angie
-          totalDescuentos.setValue(0);
-        
+          totalCargos.setValue(cargosFactura);
+          totalDescuentos.setFormula('='+descuentosFactura+'+SUMPRODUCT(F19:F'+(19+numeroProductos-1)+';J19:J'+(19+numeroProductos-1)+';G19:G'+(19+numeroProductos-1)+')');
+  
+          totalDeFactura.setFormula('=SUM(M19:M'+(19+numeroProductos-1)+')+G'+(36+filasInsertadas)+'-A'+(24+filasInsertadasPorProductos));
+          
 
           
           
