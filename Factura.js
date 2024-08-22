@@ -1328,7 +1328,8 @@ function obtenerDatosFactura(factura){
           sumaTotal.setFormula('=SUM(I'+(30+numeroProductos-1)+':I'+(31+filasInsertadas-1)+')');
           totalRetenciones.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';K19:K'+(19+numeroProductos-1)+')');
           totalCrgEquivalencia.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';L19:L'+(19+numeroProductos-1)+')');
-          totalCargos.setValue(cargosFactura);
+          //totalCargos.setValue(cargosFactura);
+          totalCargos.setValue(0);
           totalDescuentos.setFormula('='+descuentosFactura+'+SUMPRODUCT(F19:F'+(19+numeroProductos-1)+';J19:J'+(19+numeroProductos-1)+';G19:G'+(19+numeroProductos-1)+')');
   
           totalDeFactura.setFormula('=SUM(M19:M'+(19+numeroProductos-1)+')+G'+(36+filasInsertadas)+'-A'+(24+filasInsertadasPorProductos));
