@@ -1166,7 +1166,7 @@ function obtenerDatosFactura(factura){
 
             var celdaSubtotal = targetSheet.getRange('H'+numeroCelda);
             celdaSubtotal.setBorder(true,true,true,true,null,null,null,null);
-            celdaSubtotal.setFormula('=F'+numeroCelda+'*G'+numeroCelda);
+            celdaSubtotal.setFormula('=F'+numeroCelda+'*(G'+numeroCelda+'-(G'+numeroCelda+'*J'+numeroCelda+'))');
             celdaSubtotal.setHorizontalAlignment('normal');
             celdaSubtotal.setNumberFormat('€#,##0.00')
             
@@ -1325,8 +1325,8 @@ function obtenerDatosFactura(factura){
           totalRetenciones.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';K19:K'+(19+numeroProductos-1)+')');
           totalCrgEquivalencia.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';L19:L'+(19+numeroProductos-1)+')');
           totalCargos.setValue(cargosFactura);
-          //totalDescuentos.setFormula('='+descuentosCell.getA1Notation()); preguntar a angie
-          totalDescuentos.setValue(0);
+          totalDescuentos.setFormula('='+descuentosFactura+'+SUMPRODUCT(F19:F'+(19+numeroProductos-1)+';J19:J'+(19+numeroProductos-1)+';G19:G'+(19+numeroProductos-1)+')');
+  
           totalDeFactura.setFormula('=SUM(M19:M'+(19+numeroProductos-1)+')+G'+(36+filasInsertadas)+'-A'+(24+filasInsertadasPorProductos));
           
 
