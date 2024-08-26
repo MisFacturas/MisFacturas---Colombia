@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.css" />
+  <style>
+    .narrow {
+      margin-bottom: 0.5rem;
+    }
+    .top-right {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+    .center-text {
+      text-align: center;
+    }
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .btn-container button {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="btn-container">
+    <button class="btn btn-primary" onclick="addClient()">Agregar Cliente Nuevo</button>
+    <button class="btn btn-secondary" onclick="inactivateClient()">Inactivar Cliente</button>
+    <button class="btn btn-success" onclick="reactivateClient()">Activar Cliente</button>
+  </div>
+
+  <script>
+    function addClient() {
+      google.script.run.showNuevaCliente();
+    }
+
+    function inactivateClient() {
+      google.script.run.showInactivarCliente();
+    }
+
+    function reactivateClient() {
+      google.script.run.showActivarCliente();
+    }
+
+    function Back() {
+      google.script.run.showSidebar();
+    }
+  </script>
+</body>
+</html>
