@@ -1112,8 +1112,8 @@ function obtenerDatosFactura(factura){
           var formaPago = invoiceData.PaymentSummary.PaymentType;
           var listaProductos = invoiceData.ItemInformation;
           var numeroProductos = 0;
-          var descuentosFactura = invoiceData.InvoiceTotal.PrePaidAmount;
-          var cargosFactura = invoiceData.InvoiceTotal.ChargeTotalAmount;
+          var descuentosFactura = parseFloat(invoiceData.InvoiceTotal.PrePaidAmount);
+          var cargosFactura = parseFloat(invoiceData.InvoiceTotal.ChargeTotalAmount);
           var totalFacturaJSON = parseFloat(invoiceData.InvoiceTotal.PayableAmount);
           var valorPagar = int2word(totalFacturaJSON) //arreglar
           var notaPago = invoiceData.PaymentSummary.PaymentNote;
@@ -1182,7 +1182,7 @@ function obtenerDatosFactura(factura){
 
             var celdaDescuento = targetSheet.getRange('J'+numeroCelda);
             celdaDescuento.setBorder(true,true,true,true,null,null,null,null);
-            celdaDescuento.setValue(listaProductos[j].TaxesInformation[0].Descuento);
+            celdaDescuento.setValue(parseFloat(listaProductos[j].TaxesInformation[0].Descuento));
             celdaDescuento.setNumberFormat('0.0%')
             celdaDescuento.setHorizontalAlignment('center');
 
