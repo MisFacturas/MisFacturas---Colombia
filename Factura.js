@@ -263,6 +263,7 @@ function guardarFactura(){
     // generar json
     guardarYGenerarInvoice()
     guardarFacturaHistorial()
+    convertPdfToBase64()
   }else{
     SpreadsheetApp.getUi().alert("Factura no es valida")
   }
@@ -417,6 +418,32 @@ function guardarIdArchivo(idArchivo, numeroFactura) {
   var newRow = lastRow + 1;
   hoja.getRange("A" + newRow).setValue(numeroFactura).setBorder(true, true, true, true, null, null, null, null);
   hoja.getRange("B" + newRow).setValue(idArchivo).setBorder(true, true, true, true, null, null, null, null);
+
+}
+function convertPdfToBase64() {
+  let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
+  let hojaListadoEstao=SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
+  let dataRange=hojaListadoEstao.getDataRange()
+  let data=dataRange.getValues()
+
+  let jsonNuevoCol=13;
+  let lastRow = hojaListadoEstao.getLastRow();
+  let jsonData=data[lastRow-1][jsonNuevoCol]
+  Logger.log("json"+jsonData)
+  let invoiceData=JSON.parse(jsonData)
+  let infoACambiar=invoiceData.file;
+  Logger.log("infoACambiar "+infoACambiar)
+
+
+  let lastRowFacturasId=hoja.getLastRow()
+  var idArchivo = hoja.getRange("B" + lastRowFacturasId).getValue();
+  const file = DriveApp.getFileById(idArchivo);
+  const base64String = Utilities.base64Encode(file.getBlob().getBytes());
+
+  invoiceData.file=  base64String;
+  Logger.log("Nuevo valor de invoiceData.file: " + invoiceData.file);
+  let nuevoJsonData = JSON.stringify(invoiceData);
+  hojaListadoEstao.getRange(lastRow, jsonNuevoCol + 1).setValue(nuevoJsonData);
 
 }
 

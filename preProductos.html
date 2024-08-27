@@ -1,110 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Cover Template · Bootstrap v5.0</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Preformulario</title>
-  <style>
-    body,
-    html {
-      height: 100%;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
 
-    .header {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      padding: 5px;
-      background-color: #f1f1f1;
-      /* Fondo del header */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      /* Sombra del header */
-      position: fixed;
-      /* Fija el header en la parte superior */
-      top: 0;
-    }
-
-    .header img {
-      height: 60px;
-      /* Ajusta la altura del logo según sea necesario */
-      margin-right: 10px;
-    }
-
-    .header h2 {
-      margin: 0;
-      font-size: 24px;
-      color: #333;
-      /* Color del texto */
-      text-align: center;
-    }
-
-    .container {
-      text-align: center;
-      margin-top: 80px;
-      /* Margen para que el contenido no quede debajo del header */
-    }
-
-    .btn-group {
-      width: 250px;
-      margin: 0 auto;
-    }
-
-    .btn-group button {
-      background-color: #04AA6D;
-      /* Green background */
-      border: 1px solid green;
-      /* Green border */
-      color: white;
-      /* White text */
-      padding: 10px 24px;
-      /* Some padding */
-      cursor: pointer;
-      /* Pointer/hand icon */
-      width: 100%;
-      /* Full width */
-      text-align: center;
-      /* Center text */
-      display: block;
-      /* Make the buttons appear below each other */
-    }
-
-    .btn-group button:hover {
-      background-color: #3e8e41;
-    }
-
-    .exit {
-      display: block;
-      width: 100%;
-      margin-top: 10px;
-      background-color: #FF6161;
-      /* Red background */
-      border: 1px solid #861C1C;
-      /* Red border */
-      padding: 10px 24px;
-      /* Some padding */
-      color: white;
-      /* White text */
-    }
-
-    .exit:hover {
-      background-color: #C62727;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    a {
-      text-decoration: none;
-    }
-  </style>
+    <!-- Bootstrap core CSS -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template --><!--
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">-->
+  </head>
   <script>
+    function showMenuPrincipal() {
+          google.script.run.showSidebar();
+    }
     function openProductos() {
       google.script.run.openProductosSheet();
     }
@@ -112,25 +26,64 @@
     function openAgregarProducto() {
       google.script.run.showAggProductos();
     }
-
-    function showMenuPrincipal() {
-      google.script.run.showSidebar();
-    }
-
   </script>
-</head>
+  <body class="d-flex h-100">
+    
+<div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
 
-<body>
-  <div class="header">
-    <img src="https://raw.githubusercontent.com/SebastianCasanova4/Facturas-Ejemplo/master/Logotipo%20FacturasApp.svg" alt="Logo">
-  </div>
-  <div class="btn-group">
-    <button onclick="openProductos()">Lista de productos</button>
-    <button onclick="openAgregarProducto()">Agregar producto</button>
-    <input class="exit" type="button" value="Volver al menú principal" onclick="showMenuPrincipal()"
-      style="margin-top: 20px;" />
-    <input class="exit" type="button" value="Cerrar todo" onclick="google.script.host.close()" />
-  </div>
-</body>
+   <header class="mb-auto">
+    <div id="logo" class="d-flex justify-content-center bg-primary">
+      <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png"   alt="">
+    </div>
 
+    <div class="row mt-4 px-5 gx-0">
+        <div class="col-1 p-0">
+            <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
+          </div>
+          <div class="col-7 p-0 d-flex align-items-center">
+            <h2 class="mb-0 ms-4">Productos</h2>
+          </div>
+          <div class="col-4 p-0 d-flex justify-content-end">
+            <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
+          </div>
+    </div>
+  </header> 
+
+
+
+   <main>
+
+    <div class="row py-3 px-5 mt-3 gx-0">
+      <div class="col-12 py-4">
+      <p>Consulta y añade un nuevo producto sin complicaciones, desde un solo lugar.</p>
+      </div>
+      
+      <a onclick="openProductos()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-list"></i><span>Lista de productos</span></a>
+      <a onclick="openAgregarProducto()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-box-plus"></i><span>Crear producto</span></a>
+
+
+
+  </main>
+
+
+  <footer class="mt-auto">
+    <div class="row p-5 gx-0">
+        <div class="col-12 p-0">
+            <div class="col-12 mt-4 px-0">
+              <a href="#" class="btn btn-primary btn-lg w-100">
+                <div class="row w-100 gx-0">
+                  <div class="col-4"></div>
+                  <div class="col-4 text-center d-flex align-items-center justify-content-center">Salir</div>
+                  <div class="col-4 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-directions-log-log-in me-0"></i></div>
+                </div>
+              </a>
+            </div>
+          </div>
+    </div>
+  </footer>
+</div>
+
+
+    
+  </body>
 </html>
