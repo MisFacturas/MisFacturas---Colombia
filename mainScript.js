@@ -126,9 +126,10 @@ function showEnviarEmailHistorial(data){
 
 function showEnviarEmailPost() {
   var html = HtmlService.createHtmlOutputFromFile('enviarEmailPost')
-    .setTitle('Enviar Post Email');
+    .setWidth(400)
+    .setHeight(300)
   SpreadsheetApp.getUi()
-    .showSidebar(html);
+    .showModalDialog(html,"Digite el email a enviar");
 }
 
 
