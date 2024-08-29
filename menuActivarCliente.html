@@ -1,47 +1,91 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <base target="_top">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" />
-  <style>
-    body {
-      margin: 0;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-    .center-text {
-      text-align: center;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    #productForm {
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .footer {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-    }
-  </style>
-</head>
-<body>
-  <h3>Activar Cliente</h3>
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Activar Cliente</title>
 
-  <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-  
-  <form id="productForm">
-    <div class="form-group">
-      <label for="clientesInactivos">Seleccione cliente a Activar</label>
-      <select id="clientesInactivos" class="form-control">
-        <option value="">Seleccione un cliente</option>
-        <!-- Las opciones de clientes se agregarán aquí -->
-      </select>
+    <!-- Bootstrap core CSS -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet"><!--
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">-->
+  </head>
+  <body class="d-flex h-100">
+    
+<div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+
+   <header class="mb-auto">
+    <div id="logo" class="d-flex justify-content-center bg-primary">
+      <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="Logo">
     </div>
-    <button type="button" class="btn btn-primary" onclick="activar()">Activar</button>
-    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
-  </form>
+
+    <div class="row mt-4 px-5 gx-0">
+        <div class="col-1 p-0">
+            <a href="contactos.html"><i class="icon-left nav-icon"></i></a>
+        </div>
+        <div class="col-7 p-0 d-flex align-items-center">
+            <h2 class="mb-0 ms-4">Activar Cliente</h2>
+        </div>
+        <div class="col-4 p-0 d-flex justify-content-end">
+            <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
+        </div>
+    </div>
+  </header> 
+
+
+ <main>
+
+    <div class="row py-3 px-5 mt-3 gx-0">
+      <div class="col-12 py-4">
+        <p>Selecciona un cliente de tu lista para activarlo.</p>
+      </div>
+
+      <div class="col-12 px-0">
+        <form class="row g-3" id="productForm">
+            <div class="col-10">
+                <label for="clientesInactivos" class="form-label">Buscar Cliente</label> 
+                <select id="clientesInactivos" class="form-control form-control-lg">
+                  <option value="">Seleccione un cliente</option>
+                  <!-- Las opciones de clientes se agregarán aquí -->
+                </select>
+            </div>
+            <div class="col-2 d-flex justify-content-center align-items-end">
+                <a class="btn btn-primary" ><i class="icon-24-outlined-action-main-search m-0"></i></a>
+            </div>
+        </form>
+      </div>
+
+    </div>
+      
+  </main> 
+
+  <footer class="mt-auto">
+    <div class="row p-5 gx-0">
+        <div class="col-6 pe-1">
+            <a onclick="Back()"  class="btn btn-outline-primary btn-lg w-100">
+              <div class="row w-100">
+                <div class="col-2"></div>
+                <div class="col-8 text-center d-flex align-items-center justify-content-center">Home</div>
+                <div class="col-2 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-other-location-home me-0"></i></div>
+              </div>
+            </a>
+        </div>
+        <div class="col-6 ps-1">
+          <a  class="btn btn-primary btn-lg w-100" onclick="activar()">
+            <div class="row w-100">
+              <div class="col-4"></div>
+              <div class="col-4 text-center d-flex align-items-center justify-content-center">Activar</div>
+              <div class="col-4 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-suggested-symbol-check me-0"></i></div>
+            </div>
+          </a>
+        </div>
+    </div>
+  </footer>
+</div>
 
 <script>
     function Back() {
@@ -73,5 +117,6 @@
     // Cargar los clientes inactivos al cargar la página
     document.addEventListener('DOMContentLoaded', cargarClientesInactivos);
 </script>
-</body>
+
+  </body>
 </html>
