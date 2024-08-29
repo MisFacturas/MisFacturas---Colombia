@@ -404,10 +404,10 @@ function guardarFacturaHistorial() {
   var idArchivo = obtenerDatosFactura(numeroFactura);
   guardarIdArchivo(idArchivo, numeroFactura);
 
-  var html = HtmlService.createHtmlOutputFromFile('postFactura')
-    .setTitle('Menú');
-  SpreadsheetApp.getUi()
-    .showSidebar(html);
+  // var html = HtmlService.createHtmlOutputFromFile('postFactura')
+  //   .setTitle('Menú');
+  // SpreadsheetApp.getUi()
+  //   .showSidebar(html);
   
 
 }
@@ -1112,7 +1112,16 @@ function guardarYGenerarInvoice(){
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice),String(nuevoInvoiceResumido)]);
   
   SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente");
+  showCustomDialog()
 }
+
+function showCustomDialog() {
+  var html = HtmlService.createHtmlOutputFromFile('postFactura')
+      .setWidth(400)
+      .setHeight(300);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Elige una opcion');
+}
+
 
 function ConvertirFecha() {
   // Llama a la función ObtenerFecha para obtener la fecha formateada
