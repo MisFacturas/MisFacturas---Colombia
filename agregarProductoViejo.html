@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar producto</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            background-color: #f1f1f1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+        }
+
+        .header img {
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+
+        .btn-group {
+            width: 250px;
+            margin: 0 auto;
+        }
+
+        .btn-group button {
+            background-color: #04AA6D;
+            /* Green background */
+            border: 1px solid green;
+            /* Green border */
+            color: white;
+            /* White text */
+            padding: 10px 24px;
+            /* Some padding */
+            cursor: pointer;
+            /* Pointer/hand icon */
+            width: 100%;
+            /* Full width */
+            text-align: center;
+            /* Center text */
+            display: block;
+            /* Make the buttons appear below each other */
+        }
+
+        .btn-group button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+    <script>
+        function handleSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            google.script.run.withSuccessHandler(function (response) {
+                alert(response);
+            }).processForm(data);
+        }
+
+        function showPreProducto(){
+            google.script.run.showPreProductos();
+        }
+
+        
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <img src="https://raw.githubusercontent.com/SebastianCasanova4/Facturas-Ejemplo/master/Logotipo%20FacturasApp.svg" alt="Logo">
+    </div>
+    <div class="btn-group">
+        <div class="container">
+            <h1>Agregar producto</h1>
+            <form onsubmit="handleSubmit(event)">
+                <label for="codigoReferencia">Código de referencia:</label>
+                <input type="number" id="codigoReferencia" name="codigoReferencia" required>
+                <br>
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required>
+                <br>
+                <label for="valorUnitario">Valor Unitario:</label>
+                <input type="number" id="valorUnitario" name="valorUnitario" required step=".01">
+                <br>
+                <label for="iva">IVA:</label>
+                <select id="iva" name="iva" required>
+                    <option value="0">0%</option>
+                    <option value="4">4%</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                    <option value="21">21%</option>
+                </select>
+                <br>
+                <input type="submit" value="Agregar" style="margin-top: 15px;">
+            </form>
+        </div>
+        <input class="exit" type="button" value="Volver al menú principal"
+            onclick="showPreProducto()" style="margin-top: 20px;" />
+        <input class="exit" type="button" value="Cerrar todo" onclick="google.script.host.close()" />
+    </div>
+
+</body>
+
+</html>

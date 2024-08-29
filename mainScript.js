@@ -141,6 +141,10 @@ function processForm(data) {
     const codigoReferencia = data.codigoReferencia;
     const nombre = data.nombre;
     const valorUnitario = parseFloat(data.valorUnitario);
+    const retenciones=String(data.retenciones+"%")
+    const recargo=String(data.recargo+"%")
+    Logger.log("retenciones"+retenciones)
+    Logger.log("recargo"+recargo)
     const iva = parseFloat(data.iva) / 100;
     const precioConIva = valorUnitario * (1 + iva);
     const impuestos = valorUnitario * iva;
@@ -175,7 +179,8 @@ function processForm(data) {
     sheet.getRange(newRow, 6).setNumberFormat('€#,##0.00');
     sheet.getRange(newRow, 6).setBorder(true,true,true,true,null,null,null,null);
 
-
+    sheet.getRange(newRow, 7).setValue(retenciones);
+    sheet.getRange(newRow, 8).setValue(recargo);
 
     return "Datos guardados correctamente";
   } catch (error) {
