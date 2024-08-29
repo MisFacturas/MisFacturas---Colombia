@@ -30,7 +30,7 @@ function pruebaLogo(){
 
 function showSidebar() {
   var html = HtmlService.createHtmlOutputFromFile('main')
-    .setTitle('Menú prueba');
+    .setTitle('Menú');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
