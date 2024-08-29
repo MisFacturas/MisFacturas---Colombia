@@ -1,17 +1,20 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en" class="h-100">
 <head>
-  <base target="_top">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>Inactivar Cliente</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet"><!--
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">-->
+  
   <style>
-    body {
-      margin: 0;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-    .center-text {
-      text-align: center;
-    }
     .result-box {
       max-height: 200px;
       overflow-y: auto;
@@ -24,78 +27,114 @@
       background-color: #f0f0f0;
       cursor: pointer;
     }
-    .form-group input[type="text"],
-    .form-group input[type="number"] {
-      box-sizing: border-box;
-      width: 100%;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    #productForm {
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .footer {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-    }
   </style>
 </head>
-<body>
-  <h3>Inactivar Cliente</h3>
-
-  <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<body class="d-flex h-100">
   
-  <form id="productForm">
-    <div class="form-group">
-      <label for="buscarCliente">Buscar cliente a Inactivar</label>
-      <input type="text" id="buscarCliente" class="form-control" placeholder="Buscar cliente" autocomplete="off" onkeyup="buscarClientes()">
-      <div class="result-box">
-        <!-- Los resultados se mostrarán aquí -->
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png"  alt="">
       </div>
-    </div>
-    <button type="button" class="btn btn-primary" onclick="inactivar()">Inactivar</button>
-    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
-  </form>
 
-  
+      <div class="row mt-4 px-5 gx-0">
+          <div class="col-1 p-0">
+              <a onclick="showSidebar()"><i class="icon-left nav-icon"></i></a>
+          </div>
+          <div class="col-7 p-0 d-flex align-items-center">
+              <h2 class="mb-0 ms-4">Inactivar Cliente</h2>
+          </div>
+          <div class="col-4 p-0 d-flex justify-content-end">
+              <a href="#"><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
+          </div>
+      </div>
+    </header> 
+
+    <main>
+      <div class="row py-3 px-5 mt-3 gx-0">
+        <div class="col-12 py-4">
+          <p>Selecciona un cliente de tu lista para inactivarlo, puedes activarlo cuando desees.</p>
+        </div>
+
+        <div class="col-12 px-0">
+          <form class="row g-3" id="productForm">
+              <div class="col-10">
+                  <label for="buscarCliente" class="form-label">Buscar cliente a Inactivar</label> 
+                  <input type="text" class="form-control form-control-lg" id="buscarCliente" placeholder="Buscar cliente" autocomplete="off" onkeyup="buscarClientes()">
+              </div>
+      
+              <div class="col-2 d-flex justify-content-center align-items-end">
+                  <a href="#" class="btn btn-primary" onclick="buscarClientes()"><i class="icon-24-outlined-action-main-search m-0"></i></a>
+              </div>
+          </form>
+        </div>
+
+        <div class="col-12">
+          <div class="result-box">
+            <!-- Los resultados se mostrarán aquí -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="mt-auto">
+      <div class="row p-5 gx-0">
+          <div class="col-6 pe-1">
+              <a class="btn btn-outline-primary btn-lg w-100" onclick="Back()">
+                <div class="row w-100">
+                  <div class="col-2"></div>
+                  <div class="col-8 text-center d-flex align-items-center justify-content-center">Back</div>
+                  <div class="col-2 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-left nav-icon"></i></div>
+                </div>
+              </a>
+          </div>
+          <div class="col-6 ps-1">
+            <a class="btn btn-primary btn-lg w-100" onclick="inactivar()">
+              <div class="row w-100">
+                <div class="col-4"></div>
+                <div class="col-4 text-center d-flex align-items-center justify-content-center">Inactivar</div>
+                <div class="col-4 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-suggested-symbol-x me-0"></i></div>
+              </div>
+              </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
 <script>
-    function Back() {
-      google.script.run.showSidebar();
-    }
+  function Back() {
+    google.script.run.showSidebar();
+  }
 
-    function inactivar() {
-      var cliente = document.getElementById('buscarCliente').value;
+  function inactivar() {
+    var cliente = document.getElementById('buscarCliente').value;
+    console.log("cliente:", cliente);
+    google.script.run.inactivarCliente(cliente);
+  }
 
-      console.log("cliente:", cliente);
-      google.script.run.inactivarCliente(cliente);
-    }
+  function buscarClientes() {
+    var input = document.getElementById('buscarCliente').value;
+    google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input,"Inactivar");
+  }
 
-    function buscarClientes() {
-      var input = document.getElementById('buscarCliente').value;
-      google.script.run.withSuccessHandler(mostrarResultados).buscarClientes(input,"Inactivar");
-    }
-    
-    function mostrarResultados(clientes) {
-      var resultBox = document.querySelector('.result-box');
-      resultBox.innerHTML = '';
-      clientes.forEach(function(cliente) {
-        var div = document.createElement('div');
-        div.textContent = cliente;
-        div.onclick = function() {
-          seleccionarCliente(cliente);
-        };
-        resultBox.appendChild(div);
-      });
-    }
+  function mostrarResultados(clientes) {
+    var resultBox = document.querySelector('.result-box');
+    resultBox.innerHTML = '';
+    clientes.forEach(function(cliente) {
+      var div = document.createElement('div');
+      div.textContent = cliente;
+      div.onclick = function() {
+        seleccionarCliente(cliente);
+      };
+      resultBox.appendChild(div);
+    });
+  }
 
-    function seleccionarCliente(producto) {
-      document.getElementById('buscarCliente').value = producto;
-      var resultBox = document.querySelector('.result-box');
-      resultBox.innerHTML = ''; // Limpiar los resultados
-    }
+  function seleccionarCliente(cliente) {
+    document.getElementById('buscarCliente').value = cliente;
+    var resultBox = document.querySelector('.result-box');
+    resultBox.innerHTML = ''; // Limpiar los resultados
+  }
 </script>
 </body>
 </html>
