@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" />
+  <style>
+
+  </style>
+</head>
+<body>
+
+  <h3 class="center-text">Clientes</h3>
+  <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  
+  <form id="clientForm">
+    <!-- Form content -->
+    <div class="form-group">
+      <label for="nombreCliente">Nombre cliente</label>
+      <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre Cliente">
+    </div>
+    <div class="form-group">
+      <label for="tipoContacto">Tipo de contacto</label>
+      <select class="form-control" id="tipoContacto">
+        <option value="Proveedor">Proveedor</option>
+        <option value="Cliente">Cliente</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="tipoPersona">Tipo de persona</label>
+      <select class="form-control" id="tipoPersona">
+        <option value="Autonomo">Autonomo</option>
+        <option value="Empresa">Empresa</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="tipoDocumento">Tipo de documento</label>
+      <select class="form-control" id="tipoDocumento">
+        <option value="NIF">NIF</option>
+        <option value="Pasaporte">Pasaporte</option>
+        <option value="Documento oficial de identificacion">Documento oficial de identificacion</option>
+        <option value="Certificado de residencia">Certificado de residencia</option>
+        <option value="Otro documento">Otro documento</option>
+        <option value="No censado">No censado</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="numeroIdentificacion">Número de identificación</label>
+      <input type="text" class="form-control" id="numeroIdentificacion" placeholder="Número de identificación">
+    </div>
+    <div class="form-group">
+      <label for="codigoContacto">Código contacto</label>
+      <input type="text" class="form-control" id="codigoContacto" placeholder="Código contacto">
+    </div>
+    <div class="form-group">
+      <label for="regimen">Regimen</label>
+      <select class="form-control" id="regimen">
+        <!-- options -->
+        <option value="Operación de régimen general">Operación de régimen general</option>
+        <option value="Exportación">Exportación</option>
+        <option value="Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección">Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección</option>
+        <option value="Régimen especial del oro de inversión">Régimen especial del oro de inversión</option>
+        <option value="Régimen especial de las agencias de viajes">Régimen especial de las agencias de viajes</option>
+        <option value="Régimen especial grupo de entidades en IVA (Nivel Avanzado)">Régimen especial grupo de entidades en IVA (Nivel Avanzado)</option>
+        <option value="Régimen especial del criterio de caja">Régimen especial del criterio de caja</option>
+        <option value="Operaciones sujetas al IPSI / IGIC (Impuesto sobre la producción, los servicios y la importación / Impuesto heneral indirecto canario)">Operaciones sujetas al IPSI / IGIC (Impuesto sobre la producción, los servicios y la importación / Impuesto heneral indirecto canario)</option>
+        <option value="Facturación de las prestaciones de servicios de agencias de viaje que actúan como mediadoras en nombre y por cuenta ajena">Facturación de las prestaciones de servicios de agencias de viaje que actúan como mediadoras en nombre y por cuenta ajena</option>
+        <option value="Cobros por cuenta de terceros de honorarios profesionales o de derechos derivados de la propiedad industrial, de autor u otros por cuenta de sus socios, asociados o colegiados efectuados por sociedades, asociaciones, colegios profesionales u otras entidades que realicen estas funciones de cobro">Cobros por cuenta de terceros de honorarios profesionales o de derechos derivados de la propiedad industrial, de autor u otros por cuenta de sus socios, asociados o colegiados efectuados por sociedades, asociaciones, colegios profesionales u otras entidades que realicen estas funciones de cobro</option>
+        <option value="Operaciones de arrendamiento de local de negocio">Operaciones de arrendamiento de local de negocio</option>
+        <option value="Factura con IVA pendiente de devengo en certificaciones de obra cuyo destinatario sea una Administración pública">Factura con IVA pendiente de devengo en certificaciones de obra cuyo destinatario sea una Administración pública</option>
+        <option value="Factura con IVA pendiente de devengo en operaciones de tracto sucesivo">Factura con IVA pendiente de devengo en operaciones de tracto sucesivo</option>
+        <option value="Régimen simplificado">Régimen simplificado</option>
+        <option value="Recargo de equivalencia">Recargo de equivalencia</option>
+        <option value="Régimen especial de la agricultura">Régimen especial de la agricultura</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="nombreComercial">Nombre comercial</label>
+      <input type="text" class="form-control" id="nombreComercial" placeholder="Nombre comercial">
+    </div>
+    <div class="form-group">
+      <label for="primerNombre">Primer nombre</label>
+      <input type="text" class="form-control" id="primerNombre" placeholder="Primer nombre">
+    </div>
+    <div class="form-group">
+      <label for="segundoNombre">Segundo nombre</label>
+      <input type="text" class="form-control" id="segundoNombre" placeholder="Segundo nombre">
+    </div>
+    <div class="form-group">
+      <label for="primerApellido">Primer apellido</label>
+      <input type="text" class="form-control" id="primerApellido" placeholder="Primer apellido">
+    </div>
+    <div class="form-group">
+      <label for="segundoApellido">Segundo apellido</label>
+      <input type="text" class="form-control" id="segundoApellido" placeholder="Segundo apellido">
+    </div>
+    <div class="form-group">
+        <label for="pais">Buscar pais</label>
+        <input type="text" id="pais" class="form-control" placeholder="Buscar pais" autocomplete="off" onkeyup="buscarPais()">
+        <div class="result-box">
+          <!-- Los resultados se mostrarán aquí -->
+        </div>
+    </div>
+    <div class="form-group">
+      <label for="provincia">Provincia</label>
+      <input type="text" class="form-control" id="provincia" placeholder="Provincia">
+    </div>
+    <div class="form-group">
+      <label for="poblacion">Población</label>
+      <input type="text" class="form-control" id="poblacion" placeholder="Población">
+    </div>
+    <div class="form-group">
+      <label for="direccion">Dirección</label>
+      <input type="text" class="form-control" id="direccion" placeholder="Dirección">
+    </div>
+    <div class="form-group">
+      <label for="codigoPostal">Código Postal</label>
+      <input type="text" class="form-control" id="codigoPostal" placeholder="Código Postal">
+    </div>
+    <div class="form-group">
+      <label for="telefono">Teléfono</label>
+      <input type="text" class="form-control" id="telefono" placeholder="Teléfono">
+    </div>
+    <div class="form-group">
+      <label for="sitioWeb">Sitio web</label>
+      <input type="text" class="form-control" id="sitioWeb" placeholder="Sitio web">
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" class="form-control" id="email" placeholder="Email">
+    </div>
+    <button type="button" class="btn btn-primary" onclick="saveData()">Guardar</button>
+    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
+  </form>
+
+</body>
+  <script>
+    function writeDocument(htmlOutput) {
+      document.open();
+      document.write(htmlOutput);
+      document.close();
+    }
+
+    function Back() {
+      google.script.run.showSidebar();
+    }
+
+    function buscarPais() {
+      var input = document.getElementById('pais').value;
+      google.script.run.withSuccessHandler(mostrarResultados).buscarPaises(input);
+    }
+    function mostrarResultados(paises) {
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = '';
+      paises.forEach(function(pais) {
+        var div = document.createElement('div');
+        div.textContent = pais;
+        div.onclick = function() {
+          seleccionarPAIS(pais);
+        };
+        resultBox.appendChild(div);
+      });
+    }
+
+    function seleccionarPAIS(pais) {
+      document.getElementById('pais').value = pais;
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = ''; // Limpiar los resultados
+    }
+
+    function verificarDatosObligatorios() {
+      const form = document.getElementById('clienteForm');
+      const tipoPersona = document.getElementById('tipoPersona').value;
+      const columnasObligatorias = tipoPersona === 'Autonomo' ? 
+        ['nombreCliente','tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto','regimen',  'primerNombre', 'primerApellido', 'pais',  'direccion', 'codigoPostal','telefono',  'email'] :
+        tipoPersona === 'Empresa' ? 
+        ['nombreCliente','tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion',  'codigoContacto','regimen',  'nombreComercial', 'pais',  'direccion', 'codigoPostal', 'telefono',  'email'] : 
+        [];
+
+      let isValid = true;
+
+      columnasObligatorias.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field.value.trim()) {
+          field.style.backgroundColor = '#FFC7C7';
+          isValid = false;
+        } else {
+          field.style.backgroundColor = '';
+        }
+      });
+
+      return isValid;
+    }
+
+    function saveData() {
+      if (verificarDatosObligatorios()) {
+        const formData = {
+          nombreCliente: document.getElementById('nombreCliente').value,
+          tipoContacto: document.getElementById('tipoContacto').value,
+          tipoPersona: document.getElementById('tipoPersona').value,
+          tipoDocumento: document.getElementById('tipoDocumento').value,
+          numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
+          codigoContacto: document.getElementById('codigoContacto').value,
+          regimen: document.getElementById('regimen').value,
+          nombreComercial: document.getElementById('nombreComercial').value,
+          primerNombre: document.getElementById('primerNombre').value,
+          segundoNombre: document.getElementById('segundoNombre').value,
+          primerApellido: document.getElementById('primerApellido').value,
+          segundoApellido: document.getElementById('segundoApellido').value,
+          pais: document.getElementById('pais').value,
+          provincia: document.getElementById('provincia').value,
+          poblacion: document.getElementById('poblacion').value,
+          direccion: document.getElementById('direccion').value,
+          codigoPostal: document.getElementById('codigoPostal').value,
+          telefono: document.getElementById('telefono').value,
+          sitioWeb: document.getElementById('sitioWeb').value,
+          email: document.getElementById('email').value,
+        };
+
+        google.script.run.saveClientData(formData);
+      } else {
+        alert('Por favor complete todos los campos obligatorios.');
+      }
+    }
+  </script>
+</body>
+</html>

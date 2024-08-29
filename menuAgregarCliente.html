@@ -1,152 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <base target="_top">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" />
-  <style>
-    .narrow {
-      margin-bottom: 0.5rem;
-    }
-    .center-text {
-      text-align: center;
-    }
-    .result-box div:hover {
-      background-color: #f0f0f0;
-      cursor: pointer;
-    }
-    .footer {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-    }
-  </style>
-</head>
-<body>
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Crear Contacto · Bootstrap v5.0</title>
 
-  <h3 class="center-text">Clientes</h3>
-  <p class="center-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-  
-  <form id="clientForm">
-    <!-- Form content -->
-    <div class="form-group">
-      <label for="nombreCliente">Nombre cliente</label>
-      <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre Cliente">
-    </div>
-    <div class="form-group">
-      <label for="tipoContacto">Tipo de contacto</label>
-      <select class="form-control" id="tipoContacto">
-        <option value="Proveedor">Proveedor</option>
-        <option value="Cliente">Cliente</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="tipoPersona">Tipo de persona</label>
-      <select class="form-control" id="tipoPersona">
-        <option value="Autonomo">Autonomo</option>
-        <option value="Empresa">Empresa</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="tipoDocumento">Tipo de documento</label>
-      <select class="form-control" id="tipoDocumento">
-        <option value="NIF">NIF</option>
-        <option value="Pasaporte">Pasaporte</option>
-        <option value="Documento oficial de identificacion">Documento oficial de identificacion</option>
-        <option value="Certificado de residencia">Certificado de residencia</option>
-        <option value="Otro documento">Otro documento</option>
-        <option value="No censado">No censado</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="numeroIdentificacion">Número de identificación</label>
-      <input type="text" class="form-control" id="numeroIdentificacion" placeholder="Número de identificación">
-    </div>
-    <div class="form-group">
-      <label for="codigoContacto">Código contacto</label>
-      <input type="text" class="form-control" id="codigoContacto" placeholder="Código contacto">
-    </div>
-    <div class="form-group">
-      <label for="regimen">Regimen</label>
-      <select class="form-control" id="regimen">
-        <!-- options -->
-        <option value="Operación de régimen general">Operación de régimen general</option>
-        <option value="Exportación">Exportación</option>
-        <option value="Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección">Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección</option>
-        <option value="Régimen especial del oro de inversión">Régimen especial del oro de inversión</option>
-        <option value="Régimen especial de las agencias de viajes">Régimen especial de las agencias de viajes</option>
-        <option value="Régimen especial grupo de entidades en IVA (Nivel Avanzado)">Régimen especial grupo de entidades en IVA (Nivel Avanzado)</option>
-        <option value="Régimen especial del criterio de caja">Régimen especial del criterio de caja</option>
-        <option value="Operaciones sujetas al IPSI / IGIC (Impuesto sobre la producción, los servicios y la importación / Impuesto heneral indirecto canario)">Operaciones sujetas al IPSI / IGIC (Impuesto sobre la producción, los servicios y la importación / Impuesto heneral indirecto canario)</option>
-        <option value="Facturación de las prestaciones de servicios de agencias de viaje que actúan como mediadoras en nombre y por cuenta ajena">Facturación de las prestaciones de servicios de agencias de viaje que actúan como mediadoras en nombre y por cuenta ajena</option>
-        <option value="Cobros por cuenta de terceros de honorarios profesionales o de derechos derivados de la propiedad industrial, de autor u otros por cuenta de sus socios, asociados o colegiados efectuados por sociedades, asociaciones, colegios profesionales u otras entidades que realicen estas funciones de cobro">Cobros por cuenta de terceros de honorarios profesionales o de derechos derivados de la propiedad industrial, de autor u otros por cuenta de sus socios, asociados o colegiados efectuados por sociedades, asociaciones, colegios profesionales u otras entidades que realicen estas funciones de cobro</option>
-        <option value="Operaciones de arrendamiento de local de negocio">Operaciones de arrendamiento de local de negocio</option>
-        <option value="Factura con IVA pendiente de devengo en certificaciones de obra cuyo destinatario sea una Administración pública">Factura con IVA pendiente de devengo en certificaciones de obra cuyo destinatario sea una Administración pública</option>
-        <option value="Factura con IVA pendiente de devengo en operaciones de tracto sucesivo">Factura con IVA pendiente de devengo en operaciones de tracto sucesivo</option>
-        <option value="Régimen simplificado">Régimen simplificado</option>
-        <option value="Recargo de equivalencia">Recargo de equivalencia</option>
-        <option value="Régimen especial de la agricultura">Régimen especial de la agricultura</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="nombreComercial">Nombre comercial</label>
-      <input type="text" class="form-control" id="nombreComercial" placeholder="Nombre comercial">
-    </div>
-    <div class="form-group">
-      <label for="primerNombre">Primer nombre</label>
-      <input type="text" class="form-control" id="primerNombre" placeholder="Primer nombre">
-    </div>
-    <div class="form-group">
-      <label for="segundoNombre">Segundo nombre</label>
-      <input type="text" class="form-control" id="segundoNombre" placeholder="Segundo nombre">
-    </div>
-    <div class="form-group">
-      <label for="primerApellido">Primer apellido</label>
-      <input type="text" class="form-control" id="primerApellido" placeholder="Primer apellido">
-    </div>
-    <div class="form-group">
-      <label for="segundoApellido">Segundo apellido</label>
-      <input type="text" class="form-control" id="segundoApellido" placeholder="Segundo apellido">
-    </div>
-    <div class="form-group">
-        <label for="pais">Buscar pais</label>
-        <input type="text" id="pais" class="form-control" placeholder="Buscar pais" autocomplete="off" onkeyup="buscarPais()">
-        <div class="result-box">
-          <!-- Los resultados se mostrarán aquí -->
-        </div>
-    </div>
-    <div class="form-group">
-      <label for="provincia">Provincia</label>
-      <input type="text" class="form-control" id="provincia" placeholder="Provincia">
-    </div>
-    <div class="form-group">
-      <label for="poblacion">Población</label>
-      <input type="text" class="form-control" id="poblacion" placeholder="Población">
-    </div>
-    <div class="form-group">
-      <label for="direccion">Dirección</label>
-      <input type="text" class="form-control" id="direccion" placeholder="Dirección">
-    </div>
-    <div class="form-group">
-      <label for="codigoPostal">Código Postal</label>
-      <input type="text" class="form-control" id="codigoPostal" placeholder="Código Postal">
-    </div>
-    <div class="form-group">
-      <label for="telefono">Teléfono</label>
-      <input type="text" class="form-control" id="telefono" placeholder="Teléfono">
-    </div>
-    <div class="form-group">
-      <label for="sitioWeb">Sitio web</label>
-      <input type="text" class="form-control" id="sitioWeb" placeholder="Sitio web">
-    </div>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" class="form-control" id="email" placeholder="Email">
-    </div>
-    <button type="button" class="btn btn-primary" onclick="saveData()">Guardar</button>
-    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
-  </form>
-
-</body>
+    <!-- Bootstrap core CSS -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet"><!--
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">-->
+  </head>
   <script>
     function writeDocument(htmlOutput) {
       document.open();
@@ -236,5 +103,183 @@
       }
     }
   </script>
-</body>
+  <body class="d-flex h-100">
+    
+<div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+
+   <header class="mb-auto">
+    <div id="logo" class="d-flex justify-content-center bg-primary">
+      <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+    </div>
+
+    <div class="row mt-4 px-5 gx-0">
+        <div class="col-1 p-0">
+            <a href="nueva-factura.html"><i class="icon-left nav-icon"></i></a>
+          </div>
+          <div class="col-7 p-0 d-flex align-items-center">
+            <h2 class="mb-0 ms-4">Crear contacto</h2>
+          </div>
+          <div class="col-4 p-0 d-flex justify-content-end">
+            <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
+          </div>
+    </div>
+  </header> 
+
+ <main>
+
+    <div class="row py-3 px-5 mt-3 gx-0">
+        <div class="col-12 py-4">
+          <p>Ingresa la información de tu nuevo contacto.</p>
+        </div>
+
+        <div class="col-12 px-0">
+            <form class="row g-3" id="clientForm">
+                <div class="col-12">
+                    <label for="nombreCliente" class="form-label">Nombre cliente</label>
+                    <input type="text" class="form-control form-control-lg" id="nombreCliente" placeholder="Nombre Cliente">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="tipoContacto" class="form-label">Tipo de contacto</label>
+                    <select id="tipoContacto" class="form-select form-select-lg">
+                      <option selected>Proveedor</option>
+                      <option>Cliente</option>
+                    </select>
+                </div>
+
+                <div class="col-md-12">
+                    <label for="tipoPersona" class="form-label">Tipo de persona</label>
+                    <select id="tipoPersona" class="form-select form-select-lg">
+                      <option selected>Autonomo</option>
+                      <option>Empresa</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="tipoDocumento" class="form-label">Tipo de documento</label>
+                    <select id="tipoDocumento" class="form-select form-select-lg">
+                      <option selected>NIF</option>
+                      <option>Pasaporte</option>
+                      <option>Documento oficial de identificación</option>
+                      <option>Certificado de residencia</option>
+                      <option>Otro documento</option>
+                      <option>No censado</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="numeroIdentificacion" class="form-label">Núm. de documento</label>
+                    <input type="text" class="form-control form-control-lg" id="numeroIdentificacion" placeholder="Número de identificación">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="codigoContacto" class="form-label">Código contacto</label>
+                    <input type="text" class="form-control form-control-lg" id="codigoContacto" placeholder="Código contacto">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="regimen" class="form-label">Régimen</label>
+                    <select id="regimen" class="form-select form-select-lg">
+                      <option selected>Operación de régimen general</option>
+                      <option>Exportación</option>
+                      <option>Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección</option>
+                      <option>Régimen especial del oro de inversión</option>
+                      <option>Régimen especial de las agencias de viajes</option>
+                      <option>Régimen especial grupo de entidades en IVA (Nivel Avanzado)</option>
+                      <option>Régimen especial del criterio de caja</option>
+                      <option>Operaciones sujetas al IPSI / IGIC (Impuesto sobre la producción, los servicios y la importación / Impuesto general indirecto canario)</option>
+                      <option>Facturación de las prestaciones de servicios de agencias de viaje que actúan como mediadoras en nombre y por cuenta ajena</option>
+                      <option>Cobros por cuenta de terceros de honorarios profesionales o de derechos derivados de la propiedad industrial, de autor u otros por cuenta de sus socios, asociados o colegiados efectuados por sociedades, asociaciones, colegios profesionales u otras entidades que realicen estas funciones de cobro</option>
+                      <option>Operaciones de arrendamiento de local de negocio</option>
+                      <option>Factura con IVA pendiente de devengo en certificaciones de obra cuyo destinatario sea una Administración pública</option>
+                      <option>Factura con IVA pendiente de devengo en operaciones de tracto sucesivo</option>
+                      <option>Régimen simplificado</option>
+                      <option>Recargo de equivalencia</option>
+                      <option>Régimen especial de la agricultura</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="nombreComercial" class="form-label">Nombre comercial</label>
+                    <input type="text" class="form-control form-control-lg" id="nombreComercial" placeholder="Nombre comercial">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="primerNombre" class="form-label">Primer nombre</label>
+                    <input type="text" class="form-control form-control-lg" id="primerNombre" placeholder="Primer nombre">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="segundoNombre" class="form-label">Segundo nombre</label>
+                    <input type="text" class="form-control form-control-lg" id="segundoNombre" placeholder="Segundo nombre">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="primerApellido" class="form-label">Primer apellido</label>
+                    <input type="text" class="form-control form-control-lg" id="primerApellido" placeholder="Primer apellido">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="segundoApellido" class="form-label">Segundo apellido</label>
+                    <input type="text" class="form-control form-control-lg" id="segundoApellido" placeholder="Segundo apellido">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="pais" class="form-label">Buscar país</label>
+                    <input type="text" id="pais" class="form-control form-control-lg" placeholder="Buscar país" autocomplete="off" onkeyup="buscarPais()">
+                    <div class="result-box">
+                      <!-- Los resultados se mostrarán aquí -->
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <label for="provincia" class="form-label">Provincia</label>
+                    <input type="text" class="form-control form-control-lg" id="provincia" placeholder="Provincia">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="poblacion" class="form-label">Población</label>
+                    <input type="text" class="form-control form-control-lg" id="poblacion" placeholder="Población">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="direccion" class="form-label">Dirección</label>
+                    <input type="text" class="form-control form-control-lg" id="direccion" placeholder="Dirección">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="codigoPostal" class="form-label">Código Postal</label>
+                    <input type="text" class="form-control form-control-lg" id="codigoPostal" placeholder="Código Postal">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="text" class="form-control form-control-lg" id="telefono" placeholder="Teléfono">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="sitioWeb" class="form-label">Sitio web</label>
+                    <input type="text" class="form-control form-control-lg" id="sitioWeb" placeholder="Sitio web">
+                </div>
+
+                <div class="col-md-12">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control form-control-lg" id="email" placeholder="Email">
+                </div>
+
+                <div class="col-md-12 d-grid mt-4">
+                  <button onclick="saveData()" type="button" class="btn btn-primary btn-lg">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</main>
+
+
+
+</div>
+
+
+  </body>
 </html>
