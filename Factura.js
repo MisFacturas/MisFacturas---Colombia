@@ -447,6 +447,49 @@ function convertPdfToBase64() {
 
 }
 
+function convertPdfToBase64Prueba() {
+  let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
+  let hojaListadoEstao = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
+  let dataRange = hojaListadoEstao.getDataRange();
+  let data = dataRange.getValues();
+
+  let jsonNuevoCol = 13;
+  let lastRow = hojaListadoEstao.getLastRow();
+  let jsonData = data[lastRow - 1][jsonNuevoCol];
+  Logger.log("json" + jsonData);
+
+  let invoiceData = JSON.parse(jsonData);
+  let infoACambiar = invoiceData.file;
+  Logger.log("infoACambiar " + infoACambiar);
+
+  let lastRowFacturasId = hoja.getLastRow();
+  let idArchivo = hoja.getRange("B" + lastRowFacturasId).getValue();
+  const file = DriveApp.getFileById(idArchivo);
+  const base64String = Utilities.base64Encode(file.getBlob().getBytes());
+
+  invoiceData.file = base64String;
+  Logger.log("Nuevo valor de invoiceData.file: " + invoiceData.file);
+  
+  let nuevoJsonData = JSON.stringify(invoiceData);
+  Logger.log("Nuevo JSON Data: " + nuevoJsonData);
+
+  // Crear o actualizar el archivo 'prueba.json' en Google Drive
+  let folder = DriveApp.getRootFolder(); // Aquí puedes especificar una carpeta en particular
+  let files = folder.getFilesByName('prueba.json');
+  let jsonFile = folder.createFile('prueba.json', nuevoJsonData, "application/json");
+
+  if (files.hasNext()) {
+    jsonFile = files.next();
+    jsonFile.setContent(nuevoJsonData);
+    Logger.log('Archivo "prueba.json" actualizado.');
+  } else {
+    jsonFile = folder.createFile('prueba.json', nuevoJsonData, MimeType.JSON);
+    Logger.log('Archivo "prueba.json" creado.');
+  }
+}
+
+
+
 function linkDescargaFactura() {
   var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
   var lastRow = hoja.getLastRow();
