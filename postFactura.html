@@ -125,6 +125,10 @@
         function showEnviarEmailPost() {
             google.script.run.showEnviarEmailPost();
         }
+
+        function enviarFactura(){
+            google.script.run.enviarFactura();
+        }
         
     </script>
 </head>
@@ -136,7 +140,7 @@
         <div class="btn-group">
             <button onclick="downloadPdf()">Descargar PDF</button>
             <button onclick="showEnviarEmailPost()">Enviar factura por correo</button>
-
+            <button onclick="enviarFactura()">Enviar factura a facturasApp</button>
         </div>
       </div>
 </body>

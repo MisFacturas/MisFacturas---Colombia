@@ -263,7 +263,7 @@ function guardarFactura(){
     // generar json
     guardarYGenerarInvoice()
     guardarFacturaHistorial()
-    convertPdfToBase64()
+    
   }else{
     SpreadsheetApp.getUi().alert("Factura no es valida")
   }
@@ -402,6 +402,7 @@ function guardarFacturaHistorial() {
   celdaImagen.setBorder(true, true, true, true, null, null, null, null);
 
   var idArchivo = obtenerDatosFactura(numeroFactura);
+  Logger.log("idarchivo"+idArchivo)
   guardarIdArchivo(idArchivo, numeroFactura);
 
   // var html = HtmlService.createHtmlOutputFromFile('postFactura')
@@ -409,7 +410,7 @@ function guardarFacturaHistorial() {
   // SpreadsheetApp.getUi()
   //   .showSidebar(html);
   
-
+  showCustomDialog()
 }
 
 function guardarIdArchivo(idArchivo, numeroFactura) {
@@ -441,12 +442,30 @@ function convertPdfToBase64() {
   const base64String = Utilities.base64Encode(file.getBlob().getBytes());
 
   invoiceData.file=  base64String;
-  Logger.log("Nuevo valor de invoiceData.file: " + invoiceData.file);
+  invoiceData.fileName=String(file.getName())
+  Logger.log("Nuevo valor de invoiceData.file: " + invoiceData.fileName);
   let nuevoJsonData = JSON.stringify(invoiceData);
-  hojaListadoEstao.getRange(lastRow, jsonNuevoCol + 1).setValue(nuevoJsonData);
+
+  return nuevoJsonData
 
 }
+function enviarFactura(){
+  let url ="https://facturasapp-qa.cenet.ws/ApiGateway/InvoiceSync/LoadInvoice/LoadDocument"
+  let json =convertPdfToBase64()
+  let opciones={
+    "method" : "post",
+    "contentType": "application/json",
+    "payload" : json,
+    'muteHttpExceptions': true
+  };
 
+  try {
+    var respuesta = UrlFetchApp.fetch(url, opciones);
+    Logger.log(respuesta.getContentText()); // Muestra la respuesta de la API en los logs
+  } catch (error) {
+    Logger.log("Error al enviar el JSON a la API: " + error.message);
+  }
+}
 function convertPdfToBase64Prueba() {
   let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
   let hojaListadoEstao = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
@@ -674,7 +693,7 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("B2").setValue("")//Cliente
   hojaFactura.getRange("B3").setValue("")//Codigo
 
-  hojaFactura.getRange("G3").setValue("")//hora
+  hojaFactura.getRange("G7").setValue("")//hora
   hojaFactura.getRange("G4").setValue("")//fecha
   hojaFactura.getRange("G5").setValue("")//forma pago
   hojaFactura.getRange("G6").setValue(0)//dias vencimiento
@@ -782,7 +801,7 @@ function obtenerFechaYHoraActual(){
 
   sheet.getRange("G4").setNumberFormat("dd/MM/yyyy");
   sheet.getRange("G4").setValue(String(fecha))
-  sheet.getRange("G3").setValue(hora)
+  sheet.getRange("G7").setValue(hora)
 
   
   let valorFecha=sheet.getRange("G4").getValue();
@@ -794,10 +813,18 @@ function obtenerFechaYHoraActual(){
 
 }
 
-function ObtenerFecha(){
-  let sheet = spreadsheet.getSheetByName('Factura');
-  let valorFecha=sheet.getRange("G4").getValue();
-  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
+function ObtenerFecha(opcion){
+  let fechaFormateada
+  if(opcion=="pago"){
+    let sheet = spreadsheet.getSheetByName('Factura');
+    let valorFecha=sheet.getRange("G3").getValue();
+    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
+  }else{
+    let sheet = spreadsheet.getSheetByName('Factura');
+    let valorFecha=sheet.getRange("G4").getValue();
+    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
+  }
+
 
   return fechaFormateada
 }
@@ -1054,12 +1081,12 @@ function guardarYGenerarInvoice(){
   let CustomerInformation = getCustomerInformation(cliente);// tal ves que por ahora no llame al cliente
   
   let sheetDatosEmisor=spreadsheet.getSheetByName('Datos de emisor');
-  let userId=sheetDatosEmisor.getRange("B11").getValue()
-  let companyId=sheetDatosEmisor.getRange("B3").getValue()
+  let userId = String(sheetDatosEmisor.getRange("B11").getValue());
+  let companyId = String(sheetDatosEmisor.getRange("B3").getValue());
   let PaymentSummary=getPaymentSummary(startingRowTaxation)
 
-  let fechParaNuevoInvoice=ConvertirFecha()
-  let fechaVencdioParaNuevoInvoice=SumarDiasAFecha(Number(InvoiceGeneralInformation["DaysOff"]))
+  let fechParaNuevoInvoice=ConvertirFecha("vacio")
+  let fechaVencdioParaNuevoInvoice=ConvertirFecha("pago")
   let nuevoInvoiceResumido=JSON.stringify({
     "file": "base64",
     "Document": {
@@ -1068,22 +1095,22 @@ function guardarYGenerarInvoice(){
       "companyId": companyId,
       "invoice": {
         "invoiceType": false,
-        "contactName": cliente,
-        "nif": CustomerInformation["Identification"],
-        "invoiceDate": fechParaNuevoInvoice,
-        "numberInvoice": InvoiceGeneralInformation["InvoiceNumber"],
-        "taxableAmount": parseFloat(facturaTotalesBaseImponilbe[0]),
-        "Percent": 0,
-        "taxAmount": parseFloat(facturaTotalesBaseImponilbe[2]),
+        "contactName": String(cliente),
+        "nif": String(CustomerInformation["Identification"]),
+        "invoiceDate": String(fechParaNuevoInvoice),
+        "numberInvoice": String(InvoiceGeneralInformation["InvoiceNumber"]),
+        "taxableAmount": String(parseFloat(facturaTotalesBaseImponilbe[0])),
+        "Percent": "0",
+        "taxAmount": String(parseFloat(facturaTotalesBaseImponilbe[2])),
         "surchargeAmount": "el valor no se debe de reportar",
         "surchargeValue": "el valor no se debe de reportar",
-        "percentageSurchargeEquivalents": 0,
-        "percentRetention": 0,
+        "PercentSurchargeEquivalence": "0",
+        "PercentageRetention": "0",
         "IRPFValue": "el valor no se debe de reportar",
-        "invoiceTotal": TotalFactura,
-        "payDate":fechaVencdioParaNuevoInvoice,
-        "PaymentType": PaymentSummary["PaymentType"],
-        "Observations": InvoiceGeneralInformation["note"]
+        "invoiceTotal": String(TotalFactura),
+        "payDate":String(fechaVencdioParaNuevoInvoice),
+        "PaymentType": String(PaymentSummary["PaymentType"]),
+        "Observations": String(InvoiceGeneralInformation["note"])
       }
     }
   }
@@ -1112,7 +1139,7 @@ function guardarYGenerarInvoice(){
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice),String(nuevoInvoiceResumido)]);
   
   SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente");
-  showCustomDialog()
+  
 }
 
 function showCustomDialog() {
@@ -1123,9 +1150,10 @@ function showCustomDialog() {
 }
 
 
-function ConvertirFecha() {
+function ConvertirFecha(opcion) {
+  
   // Llama a la función ObtenerFecha para obtener la fecha formateada
-  let fechaFormateada = ObtenerFecha();
+  let fechaFormateada = ObtenerFecha(opcion);
   
   // Divide la fecha en día, mes y año
   let [dia, mes, año] = fechaFormateada.split("/");
@@ -1171,10 +1199,16 @@ function obtenerDatosFactura(factura){
   
   var invoiceColIndex = 5; // Columna F (indexada desde 0)
   var jsonColIndex = 12; // Columna M (indexada desde 0)
-  
+  Logger.log("factura "+factura)
+  Logger.log("data length "+data.length)
+  Logger.log(typeof(factura))
+  //Logger.log("data +"+data)
   for (var i = 1; i < data.length; i++) { // Comienza en 1 para saltar la fila de encabezado
+    Logger.log(data[i][invoiceColIndex])
+    Logger.log(typeof(data[i][invoiceColIndex]))
     if (data[i][invoiceColIndex] == factura) {
       var jsonData = data[i][jsonColIndex];
+      Logger.log("jsondata "+jsonData)
       if (jsonData) {
         try {
           var invoiceData = JSON.parse(jsonData);
@@ -1336,6 +1370,7 @@ function obtenerDatosFactura(factura){
 
               contador += 1;
               Logger.log('IVA: ' + key + '%');
+              
             }
           }
 
@@ -1420,6 +1455,7 @@ function obtenerDatosFactura(factura){
           }
 
           if (!hojaEnBlanco){
+            Logger.log("entrar hoja en blanco")
             var pdfFactura = generatePdfFromPlantilla();
             var id = subirFactura(facturaNumero, pdfFactura);
             resetPlantilla();
@@ -1431,6 +1467,7 @@ function obtenerDatosFactura(factura){
           Logger.log('Error parsing JSON for row ' + (i + 1) + ': ' + e.message);
         }
       }
+      break//ojo esto debo de quitarlo
     }
   }
   Logger.log('Invoice number ' + factura + ' not found.');
