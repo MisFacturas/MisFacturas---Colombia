@@ -33,176 +33,66 @@
   </script>
   <body class="d-flex h-100">
     
-<div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+    <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
 
-   <header class="mb-auto">
-    <div id="logo" class="d-flex justify-content-center bg-primary">
-      <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png"  alt="">
-    </div>
-
-    <div class="row mt-4 px-5 gx-0">
-        <div class="col-1 p-0">
-            <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
-          </div>
-          <div class="col-7 p-0 d-flex align-items-center">
-            <h2 class="mb-0 ms-4">Facturación</h2>
-          </div>
-          <div class="col-4 p-0 d-flex justify-content-end">
-            <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
-          </div>
-    </div>
-  </header> 
-
-
-
-   <main>
-
-    <div class="row py-3 px-5 mt-3 gx-0">
-      <div class="col-12 py-4">
-      <p>Gestiona, genera y envía con facilidad. Revisa el historial de todas tus facturas, todo desde un solo lugar.</p>
-      </div>
-      
-      <a onclick="openNuevaFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-file-plus"></i><span>Nueva factura</span></a>
-      <a onclick="showEnviarEmail()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-list"></i><span>Listado de facturas</span></a>
-
-
-  </main>
-
-
-  <!-- <main class="py-3 px-5">
-    <div class="row">
-      <div class="col-1 p-0">
-        <a href=""><i class="icon-left nav-icon"></i></a>
-      </div>
-      <div class="col-7 p-0 d-flex align-items-center">
-        <h2 class="mb-0 ms-3">Nueva factura</h2>
-      </div>
-      <div class="col-4 p-0 d-flex justify-content-end">
-        <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-12 py-4">
-      <p>Crea, guarda y visualiza tus facturas en Google Sheets.</p>
-
-      <p class="text-center">
-      <img src="images/nueva-factura.png" class="m-auto" alt="">
-      </p>
-      </div>
-      
-      <a href="#" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-file-plus"></i><span>Nueva factura</span></a>
-      <a href="#" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-list"></i><span>Listado de facturas</span></a>
-
-      <div class="col-12 mt-4 px-0">
-        <div class="row">
-          <div class="col-6">
-            <button type="submit" class="btn btn-secondary btn-lg w-100">
-              <i class="icon-plus me-0"></i><span>Agregar <br>producto</span>
-            </button>
-        </div>
-        <div class="col-6">
-          <button type="submit" class="btn btn-secondary btn-lg w-100">
-            <i class="icon-erase me-0"></i><span>Limpiar <br>factura</span>
-          </button>
-      </div>
-      
-      </div>
-    
-    </div>
-
-
-
-    
-      <div class="col-12 mt-4 px-0">
-        <div class="row">
-          <div class="col-6">
-            <button type="submit" class="btn btn-outline-primary btn-lg w-100">
-              <div class="row w-100">
-                <div class="col-2"></div>
-                <div class="col-8 text-center d-flex align-items-center justify-content-center">Home</div>
-                <div class="col-2 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-other-location-home me-0"></i></div>
-              </div>
-              </button>
-        </div>
-        <div class="col-6">
-          <button type="submit" class="btn btn-primary btn-lg w-100">
-            <div class="row w-100">
-              <div class="col-4"></div>
-              <div class="col-4 text-center d-flex align-items-center justify-content-center">Salir</div>
-              <div class="col-4 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-directions-log-log-in me-0"></i></div>
-            </div>
-            </button>
-      </div>
-      
-      </div>
-    
-    </div>
-
-
-
-  </main> -->
-
-  <!-- <main class="p-5">
-    <h1>Cover your page.</h1>
-    <h2>heading 2</h2>
-
-    <p class="lead">Cover is a one-page template for building simple and beautiful home pages. Download, edit the text, and add your own fullscreen background photo to make it your own.</p>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus officia accusantium sit.</p>
- 
-      <a href="#" class="btn btn-lg btn-primary"><i class="icon-24-edit"></i><span>Facturación</span></a>
-      <a href="#" class="btn btn-lg btn-outline-primary"><i class="icon-24-edit"></i><span>Facturación</span></a>
-      <a href="#" class="btn btn-lg btn-secondary"><i class="icon-24-edit"></i><span>Facturación</span></a>
-      <a href="#" class="btn btn-lg btn-outline-secondary"><i class="icon-24-edit"></i><span>Facturación</span></a>
+      <header class="mb-auto">
+       <div id="logo" class="d-flex justify-content-center bg-primary">
+         <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png"alt="">
+       </div>
    
-
-    <form class="row g-3">
-      <div class="col-md-12">
-        <label for="inputEmail4" class="form-label">Email</label>
-        <input type="email" class="form-control form-control-lg" id="inputEmail4">
-      </div>
-      <div class="col-12">
-        <label for="inputAddress" class="form-label">Address</label>
-        <input type="text" class="form-control  form-control-lg" id="inputAddress" placeholder="1234 Main St">
-      </div>
-      <div class="col-md-4">
-        <label for="inputState" class="form-label">State</label>
-        <select id="inputState" class="form-select form-select-lg">
-          <option selected>Choose...</option>
-          <option>...</option>
-        </select>
-      </div>
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
-      </div>
-    </form>
-
-
-  </main> -->
-
-  <footer class="mt-auto">
-    <div class="row p-5 gx-0">
-        <div class="col-6 pe-1">
-            <a onclick="showMenuPrincipal()"  class="btn btn-outline-primary btn-lg w-100">
-              <div class="row w-100">
-                <div class="col-2"></div>
-                <div class="col-8 text-center d-flex align-items-center justify-content-center">Home</div>
-                <div class="col-2 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-other-location-home me-0"></i></div>
-              </div>
-            </a>
-        </div>
-        <div class="col-6 ps-1">
-          <a onclick="google.script.host.close()"  class="btn btn-primary btn-lg w-100">
-            <div class="row w-100">
-              <div class="col-4"></div>
-              <div class="col-4 text-center d-flex align-items-center justify-content-center">Salir</div>
-              <div class="col-4 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-directions-log-log-in me-0"></i></div>
-            </div>
-            </a>
-      </div>
-    </div>
-  </footer>
-</div>
-
+       <div class="row mt-4 px-4 gx-0">
+           <div class="col-1 p-0">
+               <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
+             </div>
+             <div class="col-7 p-0 d-flex align-items-center">
+               <h2 class="mb-0 ms-4">Facturación</h2>
+             </div>
+             <div class="col-4 p-0 d-flex justify-content-end">
+               <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
+             </div>
+       </div>
+     </header>
+   
+   
+   
+      <main>
+   
+       <div class="row py-3 px-4 gx-0">
+         <div class="col-12 py-4">
+         <p>Gestiona, genera y envía con facilidad. Revisa el historial de todas tus facturas, todo desde un solo lugar.</p>
+         </div>
+   
+         <a onclick="openNuevaFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-file-plus"></i><span>Nueva factura</span></a>
+         <a onclick="showEnviarEmail()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-list"></i><span>Listado de facturas</span></a>
+   
+   
+     </main>
+   
+   
+   
+     <footer class="mt-auto">
+       <div class="row p-4 gx-0">
+           <div class="col-6 pe-1">
+               <a onclick="showMenuPrincipal()"  class="btn btn-outline-primary btn-lg w-100 btn-menu">
+                   <span class="pe-4">Home</span>
+                   <i class="icon-24-outlined-other-location-home"></i>
+               </a>
+           </div>
+           <div class="col-6 ps-1">
+             <a onclick="google.script.host.close()"  class="btn btn-primary btn-lg w-100 btn-menu">
+                 <span class="pe-4">Salir</span>
+                 <i class="icon-24-outlined-directions-log-log-in"></i>
+             </a>
+   
+         </div>
+       </div>
+     </footer>
+   
+   
+   
+   
+   </div>
+   
 
     
   </body>
