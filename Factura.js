@@ -440,9 +440,10 @@ function convertPdfToBase64() {
   var idArchivo = hoja.getRange("B" + lastRowFacturasId).getValue();
   const file = DriveApp.getFileById(idArchivo);
   const base64String = Utilities.base64Encode(file.getBlob().getBytes());
-
+  invoiceData.Document.fileName=String(file.getName())
+  Logger.log(JSON.stringify(invoiceData))
   invoiceData.file=  base64String;
-  invoiceData.fileName=String(file.getName())
+  
   Logger.log("Nuevo valor de invoiceData.file: " + invoiceData.fileName);
   let nuevoJsonData = JSON.stringify(invoiceData);
 
@@ -725,9 +726,9 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("I15").setValue("")//retencion
   hojaFactura.getRange("J15").setValue("")//recargo
 
-  hojaFactura.getRange("B16").setValue("")//tptal producto
-  hojaFactura.getRange("B17").setValue("")//carrgos
-  hojaFactura.getRange("B18").setValue("")//descuentos
+  hojaFactura.getRange("B16").setValue("0")//tptal producto
+  hojaFactura.getRange("B17").setValue(0)//carrgos
+  hojaFactura.getRange("B18").setValue(0)//descuentos
 }
 
 
@@ -968,6 +969,10 @@ function guardarYGenerarInvoice(){
     Logger.log("descuento "+descuento)
     Logger.log("retencion "+retencion)
     Logger.log("reCargoEqui "+reCargoEqui)
+    
+    if (descuento==""){
+      Logger.log("hay un producto con descuento vacio")
+    }
 
 
 
@@ -1020,6 +1025,8 @@ function guardarYGenerarInvoice(){
   let rangeFacturaTotal=""
   let rangeTotales=""
   let rangeBaseImponilbeValor=""
+  let cargoTotal=0
+  let descuentoTotal=0
   let cargo=0
   let descuento=0
 
@@ -1028,6 +1035,7 @@ function guardarYGenerarInvoice(){
     rangeBaseImponilbeValor=prefactura_sheet.getRange(26,1,1,3);
     rangeTotales=prefactura_sheet.getRange(29,1,1,4);
     rangeFacturaTotal=prefactura_sheet.getRange("B31")
+    
   }else{
     let rowBaseImponilbeValor=startingRowTaxation+7
     let rowTotales=startingRowTaxation+10
@@ -1037,11 +1045,12 @@ function guardarYGenerarInvoice(){
     rangeFacturaTotal=prefactura_sheet.getRange(rowTotalFactura,2);//(maxRows-1) porque no necesito el total
   }
   let totalesValores=String(rangeTotales.getValues())
+  totalesValores=totalesValores.split(",")
   Logger.log("totalesValores"+totalesValores)
-  cargo=totalesValores[2]
-  descuento=totalesValores[3]
-  Logger.log("cargo "+cargo)
-  Logger.log("descuento "+descuento)
+  cargoTotal=totalesValores[2]
+  descuentoTotal=totalesValores[3]
+  Logger.log("cargo "+cargoTotal)
+  Logger.log("descuento "+descuentoTotal)
   // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
   let facturaTotalesBaseImponilbe=String(rangeBaseImponilbeValor.getValues());
   facturaTotalesBaseImponilbe=facturaTotalesBaseImponilbe.split(",");
@@ -1058,7 +1067,7 @@ function guardarYGenerarInvoice(){
   let pfReteICA = 0;
   let pfReteIVA = 0;
   let pfTRetenciones = 0; 
-  let pfAnticipo = descuento;
+  let pfAnticipo = descuentoTotal;
   let pfTPagar = 0;
 
   //Aqui seguiria el texto, pero en el de carlos nunca lo llama 
@@ -1068,7 +1077,9 @@ function guardarYGenerarInvoice(){
     "TaxExclusiveAmount": pfSubTotal,
     "TaxInclusiveAmount": pfTotal,
     "AllowanceTotalAmount": 0,
-    "ChargeTotalAmount": cargo,
+    "GeneralChargeTotalAmount": cargo,
+    "ChargeTotalAmount": cargoTotal,
+    "GeneralPrePaidAmount": descuento,
     "PrePaidAmount": pfAnticipo,
     "PayableAmount": TotalFactura ,// antes era (pfTotal - pfAnticipo) 
     "totalRet":totalesValores[0],
@@ -1087,6 +1098,18 @@ function guardarYGenerarInvoice(){
 
   let fechParaNuevoInvoice=ConvertirFecha("vacio")
   let fechaVencdioParaNuevoInvoice=ConvertirFecha("pago")
+
+  let PercentSurchargeEquivalence;
+  let PercentageRetention;
+
+  if(totalesValores[0]==="" || totalesValores[0]===0||totalesValores[0]===null){
+//futuro para calcuclar bien estos valores
+  }else{
+
+  }
+
+  
+  calcularPorcentaje()
   let nuevoInvoiceResumido=JSON.stringify({
     "file": "base64",
     "Document": {
@@ -1140,6 +1163,10 @@ function guardarYGenerarInvoice(){
   
   SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente");
   
+}
+
+function calcularPorcentaje(valor, total) {
+  return (valor / total) * 100;
 }
 
 function showCustomDialog() {
