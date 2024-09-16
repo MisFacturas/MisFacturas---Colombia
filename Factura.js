@@ -698,6 +698,7 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("G4").setValue("")//fecha
   hojaFactura.getRange("G5").setValue("")//forma pago
   hojaFactura.getRange("G6").setValue(0)//dias vencimiento
+  hojaFactura.getRange("G3").setValue("")
 
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//IBAN
@@ -972,8 +973,14 @@ function guardarYGenerarInvoice(){
     
     if (descuento==""){
       Logger.log("hay un producto con descuento vacio")
+      descuento=0
     }
-
+    if(retencion==""){
+      retencion=0
+    }
+    if(reCargoEqui==""){
+      reCargoEqui=0
+    }
 
 
     //IVA
@@ -1027,30 +1034,38 @@ function guardarYGenerarInvoice(){
   let rangeBaseImponilbeValor=""
   let cargoTotal=0
   let descuentoTotal=0
-  let cargo=0
-  let descuento=0
+  let cargoFactura=0
+  let descuentoFactura=0
 
   let startingRowTaxation=getTaxSectionStartRow(prefactura_sheet)
   if (posicionOriginalTotalFactura==="Total factura"){
     rangeBaseImponilbeValor=prefactura_sheet.getRange(26,1,1,3);
     rangeTotales=prefactura_sheet.getRange(29,1,1,4);
     rangeFacturaTotal=prefactura_sheet.getRange("B31")
+    cargoFactura=prefactura_sheet.getRange("B17").getValue()
+    descuentoFactura=prefactura_sheet.getRange("B18").getValue()
     
   }else{
     let rowBaseImponilbeValor=startingRowTaxation+7
     let rowTotales=startingRowTaxation+10
     let rowTotalFactura=startingRowTaxation+12
+    let rowCargoFactura=startingRowTaxation-2
+    let rowDescuentoFactura=startingRowTaxation-1
     rangeBaseImponilbeValor=prefactura_sheet.getRange(rowBaseImponilbeValor,1,1,3);
     rangeTotales=prefactura_sheet.getRange(rowTotales,1,1,4);
     rangeFacturaTotal=prefactura_sheet.getRange(rowTotalFactura,2);//(maxRows-1) porque no necesito el total
+    cargoFactura=prefactura_sheet.getRange("B"+String(rowCargoFactura)).getValue()
+    descuentoFactura=prefactura_sheet.getRange("B"+String(rowDescuentoFactura)).getValue()
   }
   let totalesValores=String(rangeTotales.getValues())
   totalesValores=totalesValores.split(",")
   Logger.log("totalesValores"+totalesValores)
   cargoTotal=totalesValores[2]
   descuentoTotal=totalesValores[3]
-  Logger.log("cargo "+cargoTotal)
-  Logger.log("descuento "+descuentoTotal)
+  Logger.log("cargoTotal "+cargoTotal)
+  Logger.log("descuentoTotal "+descuentoTotal)
+  Logger.log("cargoFactura "+cargoFactura)
+  Logger.log("descuentoFactura "+descuentoFactura)
   // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
   let facturaTotalesBaseImponilbe=String(rangeBaseImponilbeValor.getValues());
   facturaTotalesBaseImponilbe=facturaTotalesBaseImponilbe.split(",");
@@ -1077,9 +1092,9 @@ function guardarYGenerarInvoice(){
     "TaxExclusiveAmount": pfSubTotal,
     "TaxInclusiveAmount": pfTotal,
     "AllowanceTotalAmount": 0,
-    "GeneralChargeTotalAmount": cargo,
+    "GeneralChargeTotalAmount": cargoFactura,
     "ChargeTotalAmount": cargoTotal,
-    "GeneralPrePaidAmount": descuento,
+    "GeneralPrePaidAmount": descuentoFactura,
     "PrePaidAmount": pfAnticipo,
     "PayableAmount": TotalFactura ,// antes era (pfTotal - pfAnticipo) 
     "totalRet":totalesValores[0],
@@ -1253,6 +1268,7 @@ function obtenerDatosFactura(factura){
           var listaProductos = invoiceData.ItemInformation;
           var numeroProductos = 0;
           var descuentosFactura = parseFloat(invoiceData.InvoiceTotal.PrePaidAmount);
+          let descuentoGeneralesFactura=parseFloat(invoiceData.InvoiceTotal.GeneralPrePaidAmount);
           var cargosFactura = parseFloat(invoiceData.InvoiceTotal.ChargeTotalAmount);
           var totalFacturaJSON = parseFloat(invoiceData.InvoiceTotal.PayableAmount);
           var valorPagar = int2word(totalFacturaJSON) //arreglar
@@ -1459,7 +1475,7 @@ function obtenerDatosFactura(factura){
           notaPagoCell.setValue(notaPago);
           observacionesCell.setValue(observaciones);
           totalItemsCell.setValue(numeroProductos);
-          descuentosCell.setValue(descuentosFactura);
+          descuentosCell.setValue(descuentoGeneralesFactura);
           cargosCell.setValue(cargosFactura);
           sumaBaseImponible.setFormula('=SUM(A'+(30+numeroProductos-1)+':A'+(31+filasInsertadas-1)+')');
           sumaImpIva.setFormula('=SUM(F'+(30+numeroProductos-1)+':F'+(31+filasInsertadas-1)+')');
@@ -1467,7 +1483,7 @@ function obtenerDatosFactura(factura){
           totalRetenciones.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';K19:K'+(19+numeroProductos-1)+')');
           totalCrgEquivalencia.setFormula('=SUMPRODUCT(H19:H'+(19+numeroProductos-1)+';L19:L'+(19+numeroProductos-1)+')');
           totalCargos.setValue(cargosFactura);
-          totalDescuentos.setFormula('='+descuentosFactura+'+SUMPRODUCT(F19:F'+(19+numeroProductos-1)+';J19:J'+(19+numeroProductos-1)+';G19:G'+(19+numeroProductos-1)+')');
+          totalDescuentos.setFormula(descuentosFactura);
   
           totalDeFactura.setFormula('=SUM(M19:M'+(19+numeroProductos-1)+')+G'+(36+filasInsertadas)+'-A'+(24+filasInsertadasPorProductos));
           
