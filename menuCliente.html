@@ -47,7 +47,7 @@
             <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
           </div>
           <div class="col-7 p-0 d-flex align-items-center">
-            <h2 class="mb-0 ms-4">Crear contacto</h2>
+            <h2 class="mb-0 ms-4"> Contactos</h2>
           </div>
           <div class="col-4 p-0 d-flex justify-content-end">
             <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
@@ -96,21 +96,23 @@
 
   <footer class="mt-auto">
     <div class="row p-4 gx-0">
-        <div class="col-6 pe-1">
-            <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100 btn-menu">
-                <span class="pe-4">Home</span>
-                <i class="icon-24-outlined-other-location-home"></i>
-            </a>
-        </div>
-        <div class="col-6 ps-1">
-          <a onclick="google.script.host.close()"  class="btn btn-primary btn-lg w-100 btn-menu">
-              <span class="pe-4">Salir</span>
-              <i class="icon-24-outlined-directions-log-log-in"></i>
-          </a>
-
+      <div class="col-6 pe-1">
+        <!-- Botón Home ajustado -->
+        <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100 btn-menu d-flex align-items-center justify-content-between">
+          <span>Home</span>
+          <i class="icon-24-outlined-other-location-home"></i>
+        </a>
+      </div>
+      <div class="col-6 ps-1">
+        <!-- Botón Salir ajustado -->
+        <a onclick="google.script.host.close()" class="btn btn-primary btn-lg w-100 btn-menu d-flex align-items-center justify-content-between">
+          <span>Salir</span>
+          <i class="icon-24-outlined-directions-log-log-in"></i>
+        </a>
       </div>
     </div>
   </footer>
+  
 
 
 
