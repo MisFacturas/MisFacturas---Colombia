@@ -263,6 +263,7 @@ function guardarFactura(){
     // generar json
     guardarYGenerarInvoice()
     guardarFacturaHistorial()
+    limpiarHojaFactura()
     
   }else{
     SpreadsheetApp.getUi().alert("Factura no es valida")
@@ -463,8 +464,10 @@ function enviarFactura(){
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
     Logger.log(respuesta.getContentText()); // Muestra la respuesta de la API en los logs
+    SpreadsheetApp.getUi().alert("Factura enviada correctamente a FacturasApp. Si desea verla ingrese a https://facturasapp-qa.cenet.ws/Aplicacion/");
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
+    SpreadsheetApp.getUi().alert("Error al enviar la factura a FacturasApp. Intente de nuevo si el error presiste comuniquese con soporte");
   }
 }
 function convertPdfToBase64Prueba() {
@@ -1057,6 +1060,15 @@ function guardarYGenerarInvoice(){
     cargoFactura=prefactura_sheet.getRange("B"+String(rowCargoFactura)).getValue()
     descuentoFactura=prefactura_sheet.getRange("B"+String(rowDescuentoFactura)).getValue()
   }
+
+  if(cargoFactura==""){
+    cargoFactura=0
+  }
+
+  if(descuentoFactura==""){
+    descuentoFactura=0
+  }
+  
   let totalesValores=String(rangeTotales.getValues())
   totalesValores=totalesValores.split(",")
   Logger.log("totalesValores"+totalesValores)
@@ -1176,7 +1188,7 @@ function guardarYGenerarInvoice(){
   let codigoCliente=prefactura_sheet.getRange("B3").getValue();
   listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice),String(nuevoInvoiceResumido)]);
   
-  SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente");
+  SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente, aguarde unos segundos");
   
 }
 

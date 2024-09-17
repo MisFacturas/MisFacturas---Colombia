@@ -1,112 +1,74 @@
-<!DOCTYPE html>
-<html lang="es">
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Cover Template · Bootstrap v5.0</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Generar y Enviar PDF</title>
-  <style>
-    body, html {
-      height: 100%;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
 
-    .header {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      padding: 5px;
-      background-color: #f1f1f1;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      position: fixed;
-      top: 0;
-    }
+    <!-- Bootstrap core CSS -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
 
-    .header img {
-      height: 60px;
-      margin-right: 10px;
-    }
+    <script>
+      function sendPdfByEmail() {
+        var email = document.getElementById('email').value;
+        google.script.run.withSuccessHandler(function(response) {
+          alert(response);
+        }).enviarEmailPostFactura(email);
+      }
+      function openFactura() {
+        google.script.run.showPostFactura();
+      }
+    </script>
+  </head>
+  
+  <body class="d-flex h-100">
 
-    .container {
-      text-align: center;
-      margin-top: 80px;
-    }
 
-    .btn-group {
-      width: 250px;
-      margin: 0 auto;
-    }
 
-    .btn-group button {
-      background-color: #04AA6D;
-      border: 1px solid green;
-      color: white;
-      padding: 10px 24px;
-      cursor: pointer;
-      width: 100%;
-      text-align: center;
-      display: block;
-      margin-top: 10px;
-    }
+<!-- Modal Enviar por correo -->
 
-    .btn-group button:hover {
-      background-color: #3e8e41;
-    }
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body pt-0">
+        <div class="row py-3 px-4 gx-0">
+          <div class="col-12 text-center pt-4">
+            <h1>Generar y enviar PDF</h1>
+          <p>Digite el email a enviar</p>
+          </div>
 
-    .exit {
-      display: block;
-      width: 100%;
-      margin-top: 10px;
-      background-color: #FF6161;
-      border: 1px solid #861C1C;
-      padding: 10px 24px;
-      color: white;
-    }
+      <form class="row g-3 mt-0 pt-0" action="">
 
-    .exit:hover {
-      background-color: #C62727;
-    }
+            <div class="col-md-12">
+              <label for="inputEmail4" class="form-label">Email</label>
+              <input type="email" class="form-control form-control-lg" placeholder="Coreo electrónico" id="inputEmail4">
+            </div>
+            <div class="col-12">
+                <a onclick="sendPdfByEmail()"  class="btn btn-primary btn-lg w-100 btn-menu">
+                  <span class="pe-4">Enviar PDF</span>
+                  <i class="icon-send"></i>
+              </a>
+            </div>
 
-    h1 {
-      text-align: center;
-    }
+      </form>
 
-    input[type="email"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-  </style>
-  <script>
-    function sendPdfByEmail() {
-      var email = document.getElementById('email').value;
-      google.script.run.withSuccessHandler(function(response) {
-        alert(response);
-      }).enviarEmailPostFactura(email);
-    }
-    function openFactura() {
-      google.script.run.showPostFactura();
-    }
-  </script>
-</head>
-
-<body>
-  <div class="container">
-    <h1>Generar y Enviar PDF</h1>
-    <div class="btn-group">
-      <input type="email" id="email" placeholder="Ingrese el correo electrónico" required>
-      <button onclick="sendPdfByEmail()">Enviar PDF</button>
-
+        </div>
+      </div>
     </div>
   </div>
-</body>
 
+
+
+
+
+
+<script src="js/bootstrap.min.js"></script>
+
+  </body>
 </html>
