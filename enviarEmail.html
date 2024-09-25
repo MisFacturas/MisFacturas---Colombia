@@ -25,6 +25,9 @@
         alert(response);
       }).sendPdfByEmail(email);
     }
+    function showMenuPrincipal() {
+          google.script.run.showSidebar();
+    }
   </script>
   <body class="d-flex h-100">
     
@@ -41,9 +44,6 @@
           </div>
           <div class="col-7 p-0 d-flex align-items-center">
             <h2 class="mb-0 ms-4">Generar y enviar</h2>
-          </div>
-          <div class="col-4 p-0 d-flex justify-content-end">
-            <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
           </div>
     </div>
   </header> 
@@ -85,7 +85,7 @@
   <footer class="mt-auto">
     <div class="row p-5 gx-0">
         <div class="col-6 pe-1">
-            <a href="index.html"  class="btn btn-outline-primary btn-lg w-100">
+            <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100">
               <div class="row w-100">
                 <div class="col-2"></div>
                 <div class="col-8 text-center d-flex align-items-center justify-content-center">Home</div>

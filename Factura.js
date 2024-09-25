@@ -806,6 +806,7 @@ function obtenerFechaYHoraActual(){
 
   sheet.getRange("G4").setNumberFormat("dd/MM/yyyy");
   sheet.getRange("G4").setValue(String(fecha))
+  sheet.getRange("G3").setValue(String(fecha))
   sheet.getRange("G7").setValue(hora)
 
   

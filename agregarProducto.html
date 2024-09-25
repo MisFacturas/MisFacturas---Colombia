@@ -31,6 +31,10 @@
         function showPreProducto(){
             google.script.run.showPreProductos();
         }
+        
+    function showMenuPrincipal() {
+          google.script.run.showSidebar();
+    }
     </script>
   </head>
 
@@ -121,8 +125,8 @@
       <footer class="mt-auto">
         <div class="row p-4 gx-0">
             <div class="col-6 pe-1">
-                <a onclick="showPreProducto()" class="btn btn-outline-primary btn-lg w-100">
-                    <span class="pe-4">Volver</span>
+                <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100">
+                    <span class="pe-4">Home</span>
                     
                 </a>
             </div>
