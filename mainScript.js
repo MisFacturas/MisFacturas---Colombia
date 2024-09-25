@@ -363,7 +363,18 @@ function onEdit(e) {
       }
 
 
-    }
+    }else if (colEditada == 7 && rowEditada == 6) {
+      // Entra a verificar días de vencimiento
+      let valorDiasVencimiento = celdaEditada.getValue();
+    
+      // Verifica si es un entero positivo
+      if (!Number.isInteger(valorDiasVencimiento) || valorDiasVencimiento <= 0) {
+        // Muestra una alerta
+        SpreadsheetApp.getUi().alert('El valor de días de vencimiento debe ser un entero positivo.');
+    
+        // Restablece el valor a 0
+        celdaEditada.setValue(0);
+      }}
 
     let lastRowProducto=getLastProductRow(hojaActual, productStartRow, taxSectionStartRow);
     if (lastRowProducto===productStartRow){
