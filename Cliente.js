@@ -9,13 +9,13 @@ function showNuevaCliente() {
 }
 
 function showInactivarCliente() {
-  var html = HtmlService.createHtmlOutputFromFile('menuInactivarCliente').setTitle("Activar Cliente")
+  var html = HtmlService.createHtmlOutputFromFile('menuInactivarCliente').setTitle("Inactivar Cliente")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 
 function showActivarCliente() {
-  var html = HtmlService.createHtmlOutputFromFile('menuActivarCliente').setTitle("Inctivar Cliente")
+  var html = HtmlService.createHtmlOutputFromFile('menuActivarCliente').setTitle("Activar Cliente")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }

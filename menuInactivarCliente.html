@@ -11,23 +11,10 @@
     <!-- Bootstrap core CSS -->
     <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet"><!--
-    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">-->
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
   
-  <style>
-    .result-box {
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-      padding: 5px;
-      box-sizing: border-box;
-    }
-    .result-box div:hover {
-      background-color: #f0f0f0;
-      cursor: pointer;
-    }
-  </style>
+
 </head>
 <body class="d-flex h-100">
   
@@ -39,14 +26,12 @@
 
       <div class="row mt-4 px-5 gx-0">
           <div class="col-1 p-0">
-              <a onclick="showSidebar()"><i class="icon-left nav-icon"></i></a>
+              <a onclick="Back()"><i class="icon-left nav-icon"></i></a>
           </div>
           <div class="col-7 p-0 d-flex align-items-center">
               <h2 class="mb-0 ms-4">Inactivar Cliente</h2>
           </div>
-          <div class="col-4 p-0 d-flex justify-content-end">
-              <a href="#"><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
-          </div>
+
       </div>
     </header> 
 
@@ -78,25 +63,20 @@
     </main>
 
     <footer class="mt-auto">
-      <div class="row p-5 gx-0">
-          <div class="col-6 pe-1">
-              <a class="btn btn-outline-primary btn-lg w-100" onclick="Back()">
-                <div class="row w-100">
-                  <div class="col-2"></div>
-                  <div class="col-8 text-center d-flex align-items-center justify-content-center">Back</div>
-                  <div class="col-2 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-left nav-icon"></i></div>
-                </div>
-              </a>
-          </div>
-          <div class="col-6 ps-1">
-            <a class="btn btn-primary btn-lg w-100" onclick="inactivar()">
-              <div class="row w-100">
-                <div class="col-4"></div>
-                <div class="col-4 text-center d-flex align-items-center justify-content-center">Inactivar</div>
-                <div class="col-4 text-end d-flex align-items-center justify-content-end p-0"><i class="icon-24-outlined-suggested-symbol-x me-0"></i></div>
-              </div>
-              </a>
+      <div class="row p-4 gx-0">
+        <div class="col-6 pe-1">
+          <a onclick="Back()" class="btn btn-outline-primary btn-lg w-100 btn-menu d-flex justify-content-between align-items-center">
+            <span>Home</span>
+            <i class="icon-24-outlined-other-location-home"></i>
+          </a>
         </div>
+        <div class="col-6 ps-1">
+          <a onclick="inactivar()" class="btn btn-primary btn-lg w-100 btn-menu d-flex justify-content-between align-items-center">
+            <span>Inactivar</span>
+            <i class="icon-24-outlined-suggested-symbol-x"></i>
+          </a>
+        </div>
+        
       </div>
     </footer>
   </div>
