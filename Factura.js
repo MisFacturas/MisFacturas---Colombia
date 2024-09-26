@@ -1359,13 +1359,13 @@ function obtenerDatosFactura(factura){
             var celdaRetencion = targetSheet.getRange('K'+numeroCelda);
             celdaRetencion.setBorder(true,true,true,true,null,null,null,null);
             celdaRetencion.setValue(parseFloat(listaProductos[j].TaxesInformation[0].Retencion));
-            celdaRetencion.setNumberFormat('0.0%')
+            celdaRetencion.setNumberFormat('0%')
             celdaRetencion.setHorizontalAlignment('center');
 
             var celdaRecargoEquivalencia = targetSheet.getRange('L'+numeroCelda);
             celdaRecargoEquivalencia.setBorder(true,true,true,true,null,null,null,null);
             celdaRecargoEquivalencia.setValue(parseFloat(listaProductos[j].TaxesInformation[0].RecgEquivalencia));
-            celdaRecargoEquivalencia.setNumberFormat('0.0%')
+            celdaRecargoEquivalencia.setNumberFormat('0.00%')
             celdaRecargoEquivalencia.setHorizontalAlignment('center');
 
             
