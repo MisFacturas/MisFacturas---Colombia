@@ -15,19 +15,23 @@
     <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
 
     <script>
-        function handleSubmit(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            google.script.run.withSuccessHandler(function (response) {
-                alert(response);
-            }).processForm(data);
-        }
+    function submitForm() {
+      const form = document.getElementById('productForm');
+      form.dispatchEvent(new Event('submit'));  // Manually trigger form submission
+    }
 
+    function handleSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+      google.script.run.withSuccessHandler(function (response) {
+        alert(response);
+      }).processForm(data);
+    }
         function showPreProducto(){
             google.script.run.showPreProductos();
         }
@@ -52,9 +56,7 @@
           <div class="col-7 p-0 d-flex align-items-center">
               <h2 class="mb-0 ms-4">Crear producto</h2>
           </div>
-          <div class="col-4 p-0 d-flex justify-content-end">
-              <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
-          </div>
+
         </div>
       </header> 
 
@@ -65,7 +67,7 @@
           </div>
 
           <div class="col-12 px-0">
-            <form class="row g-3" onsubmit="handleSubmit(event)">
+            <form class="row g-3" onsubmit="handleSubmit(event)" id="productForm">
               <div class="col-12">
                 <label for="nombre" class="form-label">Nombre</label>
                 <input type="text" class="form-control form-control-lg" id="nombre" name="nombre" required>
@@ -77,7 +79,7 @@
               </div>
 
               <div class="col-6">
-                <label for="codigoReferencia" class="form-label">Código de referencia</label>
+                <label for="codigoReferencia" class="form-label">Código referencia</label>
                 <input type="number" class="form-control form-control-lg" id="codigoReferencia" name="codigoReferencia" required>
               </div>
 
@@ -92,19 +94,15 @@
                 </select>
               </div>
 
-              <div class="col-6">
-                <label for="descuento" class="form-label">Descuento</label>
-                <input type="text" class="form-control form-control-lg" id="descuento" name="descuento" placeholder="">
-              </div>
+
 
               <div class="col-12">
                 <label for="retenciones" class="form-label">Retenciones</label>
                 <select id="retenciones" name="retenciones" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
-                  <option value="5,20">5,20%</option>
-                  <option value="1,40">1,40%</option>
-                  <option value="0,50">0,50%</option>
-                  <option value="1,75">1,75%</option>
+                  <option value="7">7%</option>
+                  <option value="15">15%</option>
+                  <option value="19">19%</option>
                 </select>
               </div>
 
@@ -112,9 +110,10 @@
                 <label for="recargo" class="form-label">Recargo de equivalencias</label>
                 <select id="recargo" name="recargo" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
-                  <option value="7">7%</option>
-                  <option value="15">15%</option>
-                  <option value="19">19%</option>
+                  <option value="5,20">5,20%</option>
+                  <option value="1,40">1,40%</option>
+                  <option value="0,50">0,50%</option>
+                  <option value="1,75">1,75%</option>
                 </select>
               </div>
 
@@ -131,7 +130,7 @@
                 </a>
             </div>
             <div class="col-6 ps-1">
-              <a onclick="handleSubmit(event)" class="btn btn-primary btn-lg w-100">
+              <a onclick="submitForm()" class="btn btn-primary btn-lg w-100">
                   <span class="pe-4">Guardar</span>
                   
               </a>
