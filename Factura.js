@@ -464,10 +464,10 @@ function enviarFactura(){
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
     Logger.log(respuesta.getContentText()); // Muestra la respuesta de la API en los logs
-    SpreadsheetApp.getUi().alert("Factura enviada correctamente a FacturasApp. Si desea verla ingrese a https://facturasapp-qa.cenet.ws/Aplicacion/");
+    SpreadsheetApp.getUi().alert("Factura enviada correctamente a MisFacturas. Si desea verla ingrese a https://facturasapp-qa.cenet.ws/Aplicacion/");
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
-    SpreadsheetApp.getUi().alert("Error al enviar la factura a FacturasApp. Intente de nuevo si el error presiste comuniquese con soporte");
+    SpreadsheetApp.getUi().alert("Error al enviar la factura a MisFacturas. Intente de nuevo si el error presiste comuniquese con soporte");
   }
 }
 function convertPdfToBase64Prueba() {
@@ -1615,7 +1615,7 @@ function subirFactura(nombre, pdfBlob) {
 }
 
 function crearCarpeta() {
-  var folder = DriveApp.createFolder("FacturasApp");
+  var folder = DriveApp.createFolder("MisFacturas");
   var id = folder.getId();
   hojaDatosEmisor.getRange("B14").setValue(id);
 }
