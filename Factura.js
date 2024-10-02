@@ -741,8 +741,7 @@ function inicarFacturaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
   let IABN=hojaInfoUsuario.getRange("B9").getValue()
-  limpiarHojaFactura();
-
+  
   hojaFactura.getRange("B11").setValue(IABN)
   generarNumeroFactura(); 
   obtenerFechaYHoraActual();
