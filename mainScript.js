@@ -141,14 +141,14 @@ function processForm(data) {
 
     const codigoReferencia = data.codigoReferencia;
     const nombre = data.nombre;
-    const valorUnitario = parseFloat(data.valorUnitario);
+    const precioUnitario = parseFloat(data.precioUnitario);
     const retenciones=String(data.retenciones+"%")
     const recargo=String(data.recargo+"%")
     Logger.log("retenciones"+retenciones)
     Logger.log("recargo"+recargo)
     const iva = parseFloat(data.iva) / 100;
-    const precioConIva = valorUnitario * (1 + iva);
-    const impuestos = valorUnitario * iva;
+    const precioConIva = precioUnitario * (1 + iva);
+    const impuestos = precioUnitario * iva;
 
     sheet.getRange(newRow, 1).setValue(codigoReferencia);
     sheet.getRange(newRow, 1).setHorizontalAlignment('center');
@@ -158,7 +158,7 @@ function processForm(data) {
     sheet.getRange(newRow, 2).setHorizontalAlignment('center');
     sheet.getRange(newRow, 2).setBorder(true,true,true,true,null,null,null,null);
 
-    sheet.getRange(newRow, 3).setValue(valorUnitario);
+    sheet.getRange(newRow, 3).setValue(precioUnitario);
     sheet.getRange(newRow,3).setHorizontalAlignment('normal');
     sheet.getRange(newRow, 3).setNumberFormat('€#,##0.00');
     sheet.getRange(newRow, 3).setBorder(true,true,true,true,null,null,null,null);
@@ -761,12 +761,12 @@ function cienes(n) {
 }
 
 function int2word(n) {
-  var euros = Math.floor(n);
-  var centimos = Math.round((n - euros) * 100);
+  var pesos = Math.floor(n);
+  var centavos = Math.round((n - pesos) * 100);
 
-  var megas = Math.floor(euros / 1000 / 1000);
-  var kilos = Math.floor((euros - megas * 1000000) / 1000);
-  var ones = euros - megas * 1000000 - kilos * 1000;
+  var megas = Math.floor(pesos / 1000 / 1000);
+  var kilos = Math.floor((pesos - megas * 1000000) / 1000);
+  var ones = pesos - megas * 1000000 - kilos * 1000;
 
   var letras = '';
   if (megas >= 1) {
@@ -792,8 +792,8 @@ function int2word(n) {
     }
   }
 
-  if (centimos > 0) {
-    letras = letras + 'Euros' + `Con ${cienes(centimos)}Céntimos`;
+  if (centavos > 0) {
+    letras = letras + 'pesos' + `con ${cienes(centavos)} centavos`;
   }
 
   return letras;
@@ -819,7 +819,7 @@ function getDelivery() {
     "SubdivisionCode": "",//getdatosValueA1("D61"),//Departamento Codigo
     "SubdivisionName": "",//getdatosValueA1("G61"),///Departamento Nombre
     "CityCode": "",//getdatosValueA1("E61"),//Codigo Municipio
-    "CityName": "",//getdatosValueA1("F61"),//Nombre Municip
+    "CityName": "",//getdatosValueA1("F61"),//Nombre Municipio
     "ContactPerson": "",
     "DeliveryDate": "",
     "DeliveryCompany": ""

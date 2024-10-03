@@ -1400,3 +1400,11 @@ var reteRentaValores = {
 "Retencion en colocacion independiente de juegos de suerte y azar":3.00,
 "Contratos de construccion y urbanizacion":2.00
 };
+
+var diccionarioCaluclarIva={
+  "0.21": "21,00",
+  "0.1": "1,00",
+  "0.05": "5,00",
+  "0.04": "4,00",
+  "0": 0
+}

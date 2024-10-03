@@ -9,27 +9,22 @@ function obtenerInformacionProducto(producto) {
   
   
     let codigoProducto = datos_sheet.getRange("H11").getValue();
-    let valorUnitario = datos_sheet.getRange("J11").getValue();
-    let porcientoIva = datos_sheet.getRange("K11").getValue();
-    let precioConIva = datos_sheet.getRange("L11").getValue();
-    let impuestos = datos_sheet.getRange("M11").getValue();
-    let descunetos=datos_sheet.getRange("N11").getValue();
-    let retencion=datos_sheet.getRange("O11").getValue();
-    let RecgEquivalencia=datos_sheet.getRange("P11").getValue();
-    // Logger.log("Dentro de funcion dict porcientoIva "+ porcientoIva)
-    // Logger.log("Dentro de funcion dict porcientoIva sin string"+ datos_sheet.getRange("K11").getValue())
-    
+    let precioUnitario = datos_sheet.getRange("J11").getValue();
+    let tarifaImpuesto = datos_sheet.getRange("K11").getValue();
+    let precioImpuesto = datos_sheet.getRange("L11").getValue();
+    let tarifaRetencion = datos_sheet.getRange("M11").getValue();
+    let valorRetencion=datos_sheet.getRange("N11").getValue();
+
+
 
     let informacionProducto = {
       "codigo Producto": codigoProducto,
-      "valor Unitario": valorUnitario,
-      "IVA": porcientoIva,
-      "precio Con Iva": precioConIva,
-      "impuestos": impuestos,
+      "precio Unitario": precioUnitario,
+      "impuestos": tarifaImpuesto,
+      "precio impuesto": precioImpuesto,
+      "retencion": impuestos,
       "descuentos": descunetos,
-      "retencion":retencion,
-      "Recargo de equivalencia":RecgEquivalencia
-
+      "tarifa Retencion": tarifaRetencion,
 
     };
   

@@ -11,211 +11,7 @@ var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 var hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
 var folderId = hojaDatosEmisor.getRange("B13").getValue();
-var paisesCodigos = {
-  "Afganistán": "AF",
-  "Albania": "AL",
-  "Alemania": "DE",
-  "Andorra": "AD",
-  "Angola": "AO",
-  "Antigua y Barbuda": "AG",
-  "Arabia Saudita": "SA",
-  "Argelia": "DZ",
-  "Argentina": "AR",
-  "Armenia": "AM",
-  "Australia": "AU",
-  "Austria": "AT",
-  "Azerbaiyán": "AZ",
-  "Bahamas": "BS",
-  "Bangladés": "BD",
-  "Barbados": "BB",
-  "Baréin": "BH",
-  "Bélgica": "BE",
-  "Belice": "BZ",
-  "Benín": "BJ",
-  "Bielorrusia": "BY",
-  "Birmania": "MM",
-  "Bolivia": "BO",
-  "Bosnia y Herzegovina": "BA",
-  "Botsuana": "BW",
-  "Brasil": "BR",
-  "Brunéi": "BN",
-  "Bulgaria": "BG",
-  "Burkina Faso": "BF",
-  "Burundi": "BI",
-  "Bután": "BT",
-  "Cabo Verde": "CV",
-  "Camboya": "KH",
-  "Camerún": "CM",
-  "Canadá": "CA",
-  "Catar": "QA",
-  "Chad": "TD",
-  "Chile": "CL",
-  "China": "CN",
-  "Chipre": "CY",
-  "Ciudad del Vaticano": "VA",
-  "Colombia": "CO",
-  "Comoras": "KM",
-  "Corea del Norte": "KP",
-  "Corea del Sur": "KR",
-  "Costa de Marfil": "CI",
-  "Costa Rica": "CR",
-  "Croacia": "HR",
-  "Cuba": "CU",
-  "Dinamarca": "DK",
-  "Dominica": "DM",
-  "Ecuador": "EC",
-  "Egipto": "EG",
-  "El Salvador": "SV",
-  "Emiratos Árabes Unidos": "AE",
-  "Eritrea": "ER",
-  "Eslovaquia": "SK",
-  "Eslovenia": "SI",
-  "España": "ES",
-  "Estados Unidos": "US",
-  "Estonia": "EE",
-  "Etiopía": "ET",
-  "Filipinas": "PH",
-  "Finlandia": "FI",
-  "Fiyi": "FJ",
-  "Francia": "FR",
-  "Gabón": "GA",
-  "Gambia": "GM",
-  "Georgia": "GE",
-  "Ghana": "GH",
-  "Granada": "GD",
-  "Grecia": "GR",
-  "Guatemala": "GT",
-  "Guyana": "GY",
-  "Guinea": "GN",
-  "Guinea ecuatorial": "GQ",
-  "Guinea-Bisáu": "GW",
-  "Haití": "HT",
-  "Honduras": "HN",
-  "Hungría": "HU",
-  "India": "IN",
-  "Indonesia": "ID",
-  "Irak": "IQ",
-  "Irán": "IR",
-  "Irlanda": "IE",
-  "Islandia": "IS",
-  "Islas Marshall": "MH",
-  "Islas Salomón": "SB",
-  "Israel": "IL",
-  "Italia": "IT",
-  "Jamaica": "JM",
-  "Japón": "JP",
-  "Jordania": "JO",
-  "Kazajistán": "KZ",
-  "Kenia": "KE",
-  "Kirguistán": "KG",
-  "Kiribati": "KI",
-  "Kosovo": "XK",
-  "Kuwait": "KW",
-  "Laos": "LA",
-  "Lesoto": "LS",
-  "Letonia": "LV",
-  "Líbano": "LB",
-  "Liberia": "LR",
-  "Libia": "LY",
-  "Liechtenstein": "LI",
-  "Lituania": "LT",
-  "Luxemburgo": "LU",
-  "Macedonia del Norte": "MK",
-  "Madagascar": "MG",
-  "Malasia": "MY",
-  "Malaui": "MW",
-  "Maldivas": "MV",
-  "Malí": "ML",
-  "Malta": "MT",
-  "Marruecos": "MA",
-  "Mauricio": "MU",
-  "Mauritania": "MR",
-  "México": "MX",
-  "Micronesia": "FM",
-  "Moldavia": "MD",
-  "Mónaco": "MC",
-  "Mongolia": "MN",
-  "Montenegro": "ME",
-  "Mozambique": "MZ",
-  "Namibia": "NA",
-  "Nauru": "NR",
-  "Nepal": "NP",
-  "Nicaragua": "NI",
-  "Níger": "NE",
-  "Nigeria": "NG",
-  "Noruega": "NO",
-  "Nueva Zelanda": "NZ",
-  "Omán": "OM",
-  "Países Bajos": "NL",
-  "Pakistán": "PK",
-  "Palaos": "PW",
-  "Panamá": "PA",
-  "Papúa Nueva Guinea": "PG",
-  "Paraguay": "PY",
-  "Perú": "PE",
-  "Polonia": "PL",
-  "Portugal": "PT",
-  "Reino Unido": "GB",
-  "República Centroafricana": "CF",
-  "República Checa": "CZ",
-  "República del Congo": "CG",
-  "República Democrática del Congo": "CD",
-  "República Dominicana": "DO",
-  "Ruanda": "RW",
-  "Rumania": "RO",
-  "Rusia": "RU",
-  "Samoa": "WS",
-  "San Cristóbal y Nieves": "KN",
-  "San Marino": "SM",
-  "San Vicente y las Granadinas": "VC",
-  "Santa Lucía": "LC",
-  "Santo Tomé y Príncipe": "ST",
-  "Senegal": "SN",
-  "Serbia": "RS",
-  "Seychelles": "SC",
-  "Sierra Leona": "SL",
-  "Singapur": "SG",
-  "Siria": "SY",
-  "Somalia": "SO",
-  "Sri Lanka": "LK",
-  "Suazilandia": "SZ",
-  "Sudáfrica": "ZA",
-  "Sudán": "SD",
-  "Sudán del Sur": "SS",
-  "Suecia": "SE",
-  "Suiza": "CH",
-  "Surinam": "SR",
-  "Tailandia": "TH",
-  "Tanzania": "TZ",
-  "Tayikistán": "TJ",
-  "Timor Oriental": "TL",
-  "Togo": "TG",
-  "Tonga": "TO",
-  "Trinidad y Tobago": "TT",
-  "Túnez": "TN",
-  "Turkmenistán": "TM",
-  "Turquía": "TR",
-  "Tuvalu": "TV",
-  "Ucrania": "UA",
-  "Uganda": "UG",
-  "Uruguay": "UY",
-  "Uzbekistán": "UZ",
-  "Vanuatu": "VU",
-  "Venezuela": "VE",
-  "Vietnam": "VN",
-  "Yemen": "YE",
-  "Yibuti": "DJ",
-  "Zambia": "ZM",
-  "Zimbabue": "ZW"
-};
 
-var diccionarioCaluclarIva={
-  "0.21": "21,00",
-  "0.1": "1,00",
-  "0.05": "5,00",
-  "0.04": "4,00",
-  "0": 0
-}
 
 function verificarEstadoValidoFactura() {
   // en esta funcion se debe de verificar si el numero de factura ya fue utiliazado en alguna otra factura
@@ -300,10 +96,9 @@ function agregarProductoDesdeFactura(cantidad,producto){
     factura_sheet.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B15").setValue(producto)
     factura_sheet.getRange("C15").setValue(cantidad)
-    factura_sheet.getRange("D15").setValue(dictInformacionProducto["valor Unitario"])
-    factura_sheet.getRange("G15").setValue(dictInformacionProducto["IVA"])
-    factura_sheet.getRange("I15").setValue(dictInformacionProducto["retencion"])
-    factura_sheet.getRange("J15").setValue(dictInformacionProducto["Recargo de equivalencia"])
+    factura_sheet.getRange("D15").setValue(dictInformacionProducto["precio Unitario"])
+    factura_sheet.getRange("F15").setValue(dictInformacionProducto["impuestos"])
+    factura_sheet.getRange("H15").setValue(dictInformacionProducto["retencion"])
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
@@ -312,14 +107,13 @@ function agregarProductoDesdeFactura(cantidad,producto){
     factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
     factura_sheet.getRange("C"+String(rowParaDatos)).setValue(cantidad)
-    factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"+(D"+String(rowParaDatos)+"*G"+String(rowParaDatos)+")")//AGG COSA DE CON IVA
-    factura_sheet.getRange("F"+String(rowParaDatos)).setValue("=(D"+String(rowParaDatos)+"-(D"+String(rowParaDatos)+"*H"+String(rowParaDatos)+"))*C"+String(rowParaDatos))//subtotal
-    factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["valor Unitario"])//valor unitario
-    factura_sheet.getRange("G"+String(rowParaDatos)).setValue(dictInformacionProducto["IVA"])//IVA
-    
-    factura_sheet.getRange("I"+String(rowParaDatos)).setValue(dictInformacionProducto["retencion"])//Retencion
-    factura_sheet.getRange("J"+String(rowParaDatos)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
-    factura_sheet.getRange("K"+String(rowParaDatos)).setValue("=F"+String(rowParaDatos)+"+(F"+String(rowParaDatos)+"*G"+String(rowParaDatos)+")-(F"+String(rowParaDatos)+"*I"+String(rowParaDatos)+")+(F"+String(rowParaDatos)+"*J"+String(rowParaDatos)+")")//total linea
+    factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//valor unitario
+    factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos)+")")//Subtotal
+
+    factura_sheet.getRange("F"+String(rowParaDatos)).setValue(dictInformacionProducto["impuestos"])//Porcentaje Impuestos
+    factura_sheet.getRange("G"+String(rowParaDatos)).setValue(dictInformacionProducto["descuentos"])//Descuetos
+    factura_sheet.getRange("H"+String(rowParaDatos)).setValue(dictInformacionProducto["retencion"])//Porcentaje Retencion
+    factura_sheet.getRange("I"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"+(D"+String(rowParaDatos)+"*F"+String(rowParaDatos)+")-(D"+String(rowParaDatos)+"*I"+String(rowParaDatos)+")+(F"+String(rowParaDatos)+"*J"+String(rowParaDatos)+")")//total linea
   }
 
   
@@ -368,7 +162,7 @@ function guardarFacturaHistorial() {
   var fechaEmision = hojaFactura.getRange("G4").getValue();
   var estado = "Creada";
   var informacionCliente = getCustomerInformation(cliente);
-  var nif = informacionCliente.Identification;
+  var numeroIdentificacion = informacionCliente.Identification;
 
   var lastRow = hojaListado.getLastRow();
   var newRow = lastRow + 1;
@@ -382,10 +176,10 @@ function guardarFacturaHistorial() {
   celdaCliente.setHorizontalAlignment('center');
   celdaCliente.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaNIF = hojaListado.getRange("C" + newRow);
-  celdaNIF.setValue(nif);
-  celdaNIF.setHorizontalAlignment('center');
-  celdaNIF.setBorder(true, true, true, true, null, null, null, null);
+  var celdaNumeroIdentificacion = hojaListado.getRange("C" + newRow);
+  celdaNumeroIdentificacion.setValue(numeroIdentificacion);
+  celdaNumeroIdentificacion.setHorizontalAlignment('center');
+  celdaNumeroIdentificacion.setBorder(true, true, true, true, null, null, null, null);
 
   var celdaFecha = hojaListado.getRange("D" + newRow);
   celdaFecha.setValue(fechaEmision);
@@ -569,13 +363,9 @@ function ProcesarFormularioFactura(data) {
   } else {
     return 'Factura no encontrada';
   }
-  //Prueba
-  //var lista = DriveApp.getFilesByName("Factura.pdf");
-  //var nuevoId = lista.next().getId();
 
   var pdf = DriveApp.getFileById(idAsociado);
   var link = pdf.getDownloadUrl();
-  //Logger.log(nuevoId);
   return link;
 }
 
@@ -696,6 +486,7 @@ function limpiarHojaFactura(){
   //total productos
   hojaFactura.getRange("B2").setValue("")//Cliente
   hojaFactura.getRange("B3").setValue("")//Codigo
+  hojaFactura.getRange("B4").setValue("")//Consumidor Final
 
   hojaFactura.getRange("G7").setValue("")//hora
   hojaFactura.getRange("G4").setValue("")//fecha
@@ -704,8 +495,8 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("G3").setValue("")
 
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
-  hojaFactura.getRange("B11").setValue("")//IBAN
-  hojaFactura.getRange("D11").setValue("")//Nota de pago 
+  hojaFactura.getRange("B11").setValue("")//Nota de pago 
+  
 
 
   //productos
@@ -738,11 +529,6 @@ function limpiarHojaFactura(){
 
 
 function inicarFacturaNueva(){
-  let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
-  let IABN=hojaInfoUsuario.getRange("B9").getValue()
-  
-  hojaFactura.getRange("B11").setValue(IABN)
   generarNumeroFactura(); 
   obtenerFechaYHoraActual();
 }
@@ -752,12 +538,11 @@ function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
   if (numeroFila>20 && numeroFila<hojaTax){
     hoja.deleteRow(numeroFila)
   }else{
-    hoja.getRange("A"+String(numeroFila)).setValue("");//producto
-    hoja.getRange("B"+String(numeroFila)).setValue("");//ref
+    hoja.getRange("A"+String(numeroFila)).setValue("");//referencia
+    hoja.getRange("B"+String(numeroFila)).setValue("");//producto
     hoja.getRange("C"+String(numeroFila)).setValue("");//cantidad
-    hoja.getRange("D"+String(numeroFila)).setValue(0);//CON IVa
-    hoja.getRange("E"+String(numeroFila)).setValue(0);//sin iva
-    //sheet.getRange("C"+String(posicionTaxInfo)).setValue(valorEnPorcentaje);
+    hoja.getRange("D"+String(numeroFila)).setValue(0);//precio unitario
+
   }
 }
 
@@ -801,8 +586,8 @@ function generarNumeroFactura(){
 function obtenerFechaYHoraActual(){ 
   let sheet = spreadsheet.getSheetByName('Factura');
 
-  let fecha = Utilities.formatDate(new Date(), "UTC+1", "dd/MM/yyyy");
-  let hora= Utilities.formatDate(new Date(), "UTC+1", "HH:mm:ss");
+  let fecha = Utilities.formatDate(new Date(), "UTC+5", "dd/MM/yyyy");
+  let hora= Utilities.formatDate(new Date(), "UTC+5", "HH:mm:ss");
 
   sheet.getRange("G4").setNumberFormat("dd/MM/yyyy");
   sheet.getRange("G4").setValue(String(fecha))
@@ -811,28 +596,20 @@ function obtenerFechaYHoraActual(){
   
   let valorFecha=sheet.getRange("G4").getValue();
 
-  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
+  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+5", "dd/MM/yyyy");
   Logger.log("valorFecha "+valorFecha)
   Logger.log("fecha "+fecha)
   Logger.log("fechaFormateada "+fechaFormateada)
 
 }
 
-function ObtenerFecha(opcion){
-  let fechaFormateada
-  if(opcion=="pago"){
-    let sheet = spreadsheet.getSheetByName('Factura');
-    let valorFecha=sheet.getRange("G3").getValue();
-    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
-  }else{
+function ObtenerFechaFormatedada(opcion){
     let sheet = spreadsheet.getSheetByName('Factura');
     let valorFecha=sheet.getRange("G4").getValue();
-    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
-  }
-
-
+    let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+5", "dd/MM/yyyy");
   return fechaFormateada
 }
+
 
 function obtenerDatosProductos(sheet,range,e){
     if ( range.getA1Notation() === "A14" || range.getA1Notation()=== "A15" || range.getA1Notation() === "A16" || range.getA1Notation()=== "A17" || range.getA1Notation()=== "A18") {
@@ -849,8 +626,7 @@ function obtenerDatosProductos(sheet,range,e){
       Logger.log(selectedProduct)
       if (data[i][1] == selectedProduct) {  
         sheet.getRange("B14").setValue(data[i][0]);  // Código de referencia
-        sheet.getRange("D14").setValue(data[i][2]);  // Valor unitario
-        sheet.getRange("E14").setValue(data[i][4]);  // Otros datos,  segun sea necesario
+        sheet.getRange("D14").setValue(data[i][2]);  // Precio unitario
         break;
       }
     }
@@ -885,7 +661,7 @@ function getInvoiceGeneralInformation() {
     "PreinvoiceNumber": invoice_number,
     "InvoiceNumber": invoice_number,
     "DaysOff": DaysOff,
-    "Currency": "EUR",
+    "Currency": "COP",
     "ExchangeRate": "",
     "ExchangeRateDate": "",
     "SalesPerson": "",
@@ -934,7 +710,7 @@ function guardarYGenerarInvoice(){
 
   }
 
-  let llavesParaLinea=prefactura_sheet.getRange("A14:K14");//llamo los headers 
+  let llavesParaLinea=prefactura_sheet.getRange("A14:I14");//llamo los headers 
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
@@ -946,7 +722,7 @@ function guardarYGenerarInvoice(){
 
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
-    let filaActual = "A" + String(i) + ":K" + String(i);
+    let filaActual = "A" + String(i) + ":I" + String(i);
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
     let productoFilaActual= String(rangoProductoActual.getValues());
     productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
@@ -962,7 +738,7 @@ function guardarYGenerarInvoice(){
     let ItemCode = new Number(LineaFactura['referencia']);
     let MeasureUnitCode = "Sin unidad"
     let Quantity = LineaFactura['cantidad'];
-    let Price = LineaFactura['siniva'];
+    let Price = LineaFactura['precio unitario'];
     let Amount = parseFloat(LineaFactura['subtotal']);//importe
     let ImpoConsumo = 1// no es un parametro para empresas espanolas
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
@@ -1146,7 +922,7 @@ function guardarYGenerarInvoice(){
       "invoice": {
         "invoiceType": false,
         "contactName": String(cliente),
-        "nif": String(CustomerInformation["Identification"]),
+        "numeroIdentificacion": String(CustomerInformation["Identification"]),
         "invoiceDate": String(fechParaNuevoInvoice),
         "numberInvoice": String(InvoiceGeneralInformation["InvoiceNumber"]),
         "taxableAmount": String(parseFloat(facturaTotalesBaseImponilbe[0])),
@@ -1268,7 +1044,7 @@ function obtenerDatosFactura(factura){
           var invoiceData = JSON.parse(jsonData);
           var facturaNumero = invoiceData.InvoiceGeneralInformation.InvoiceNumber;
           var cliente = invoiceData.CustomerInformation.RegistrationName;
-          var nif = invoiceData.CustomerInformation.Identification;
+          var numeroIdentificacion = invoiceData.CustomerInformation.Identification;
           var codigo = invoiceData.CustomerInformation.AdditionalAccountID;
           var direccion = invoiceData.CustomerInformation.AddressLine;
           var telefono = invoiceData.CustomerInformation.Telephone;
@@ -1291,7 +1067,7 @@ function obtenerDatosFactura(factura){
           var filasInsertadasPorProductos = 0;
           var grupoIva = {};
 
-          var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Copia de Plantilla'); // Hoja donde quieres insertar el NIF
+          var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Copia de Plantilla'); // Hoja donde quieres insertar el NumeroIdentificacion
           if (!targetSheet) {
             targetSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet('Copia de Plantilla');
           }
@@ -1431,7 +1207,7 @@ function obtenerDatosFactura(factura){
 
           //Extaccion celdas de datos cliente
           var clienteCeldaHoja = hojaCeldas.getRange('E3').getValue();
-          var nifCeldaHoja = hojaCeldas.getRange('E4').getValue();
+          var numeroIdentificacionCeldaHoja = hojaCeldas.getRange('E4').getValue();
           var codigoCeldaHoja = hojaCeldas.getRange('E8').getValue();
           var direccionCeldaHoja = hojaCeldas.getRange('E5').getValue();
           var telefonoCeldaHoja = hojaCeldas.getRange('E7').getValue();
@@ -1443,7 +1219,7 @@ function obtenerDatosFactura(factura){
           var celdaNumFactura = targetSheet.getRange('A9');
           //Datos Cliente
           var clienteCell = targetSheet.getRange(clienteCeldaHoja);
-          var nifCell = targetSheet.getRange(nifCeldaHoja);
+          var numeroIdentificacionCell = targetSheet.getRange(numeroIdentificacionCeldaHoja);
           var codigoCell = targetSheet.getRange(codigoCeldaHoja);
           var direccionCell = targetSheet.getRange(direccionCeldaHoja);
           var telefonoCell = targetSheet.getRange(telefonoCeldaHoja);
@@ -1469,7 +1245,7 @@ function obtenerDatosFactura(factura){
 
           celdaNumFactura.setValue("FACTURA DE VENTA NO. "+facturaNumero);
           clienteCell.setValue(cliente);
-          nifCell.setValue(nif);
+          numeroIdentificacionCell.setValue(numeroIdentificacion);
           codigoCell.setValue(codigo);
           direccionCell.setValue(direccion);
           telefonoCell.setValue(telefono);
@@ -1528,7 +1304,7 @@ function obtenerDatosFactura(factura){
   Logger.log('Invoice number ' + factura + ' not found.');
 }
 
-function testWriteNIFToPlantilla() {
+function testWriteNumeroIdentificacionToPlantilla() {
   var invoiceNumber = '192'; // Reemplaza con el número de factura deseado
   Logger.log(obtenerDatosFactura(invoiceNumber));
 }
