@@ -63,7 +63,7 @@
       <main>
         <div class="row py-3 px-5 mt-3 gx-0">
           <div class="col-12 py-4">
-            <p>Ingresa la información de tu nuevo producto.</p>
+            <p>Ingresa la informacion de tu nuevo producto.</p>
           </div>
 
           <div class="col-12 px-0">
@@ -79,7 +79,7 @@
               </div>
 
               <div class="col-6">
-                <label for="codigoReferencia" class="form-label">Código referencia</label>
+                <label for="codigoReferencia" class="form-label">Codigo referencia</label>
                 <input type="number" class="form-control form-control-lg" id="codigoReferencia" name="codigoReferencia" required>
               </div>
 
@@ -129,24 +129,62 @@
               </script>
 
               <div class="col-12">
-                <label for="ReteIva" class="form-label">Retención sobre el IVA</label>
+                <label for="ReteIva" class="form-label">Retencion sobre el IVA</label>
                 <select id="ReteIva" name="ReteIva" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
                   <option value="15">15%</option>
                   <option value="100">100%</option>
                 </select>
               </div>
-
+              
               <div class="col-12">
-                <label for="ReteRenta" class="form-label">Retención sobre Renta</label>
-                <select id="ReteRenta" name="ReteRenta" class="form-select form-select-lg">
+                <label for="conceptos" class="form-label">Tipo retencion de renta</label>
+                <select id="conceptos" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
-                  <option value="2">2%</option>
-                  <option value="4">4%</option>
-                  <option value="8">8%</option>
-                  <option value="16">16%</option>
+                  <option>Compras generales (declarantes)</option>
+                  <option>Compras generales (no declarantes)</option>
+                  <option>Compras con tarjeta debito o credito</option>
+                  <option>Compras de bienes o productos agricolas o pecuarios sin procesamiento industrial</option>
+                  <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial (declarantes)</option>
+                  <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial declarantes (no declarantes)</option>
+                  <option>Compras de cafe pergamino o cereza</option>
+                  <option>Compras de combustibles derivados del petroleo</option>
+                  <option>Enajenacion de activos fijos de personas naturales (notarias y transito son agentes retenedores)</option>
+                  <option>Compras de vehiculos</option>
+                  <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (por las primeras 20.000 UVT, es decir hasta $637.780.000)</option>
+                  <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (exceso de las primeras 20.000 UVT, es decir superior a $637.780.000)</option>
+                  <option>Compras de bienes raices cuya destinacion y uso sea distinto a vivienda de habitacion</option>
+                  <option>Servicios generales (declarantes)</option>
+                  <option>Servicios generales (no declarantes)</option>
+                  <option>Por emolumentos eclesiasticos (declarantes)</option>
+                  <option>Por emolumentos eclesiasticos (no declarantes)</option>
+                  <option>Servicios de transporte de carga</option>
+                  <option>Servicios de transporte nacional de pasajeros por via terrestre (declarantes)</option>
+                  <option>Servicios de transporte nacional de pasajeros por via terrestre (no declarantes)</option>
+                  <option>Servicios de transporte nacional de pasajeros por via aerea o maritima</option>
+                  <option>Servicios prestados por empresas de servicios temporales (sobre AIU)</option>
+                  <option>Servicios prestados por empresas de vigilancia y aseo (sobre AIU)</option>
+                  <option>Servicios integrales de salud prestados por IPS</option>
+                  <option>Servicios de hoteles y restaurantes (declarantes)</option>
+                  <option>Servicios de hoteles y restaurantes (no declarantes)</option>
+                  <option>Arrendamiento de bienes muebles</option>
+                  <option>Arrendamiento de bienes inmuebles (declarantes)</option>
+                  <option>Arrendamiento de bienes inmuebles (no declarantes)</option>
+                  <option>Otros ingresos tributarios (declarantes)</option>
+                  <option>Otros ingresos tributarios (no declarantes)</option>
+                  <option>Honorarios y comisiones (personas juridicas)</option>
+                  <option>Honorarios y comisiones personas naturales que suscriban contrato o cuya sumatoria de los pagos o abonos en cuenta superen las 3.300 UVT ($105.135.000)</option>
+                  <option>Honorarios y comisiones (no declarantes)</option>
+                  <option>Servicios de licenciamiento o derecho de uso de software</option>
+                  <option>Intereses o rendimientos financieros</option>
+                  <option>Comisiones del Fondo Nacional de Garantias</option>
+                  <option>Rendimientos financieros provenientes de titulos de renta fija</option>
+                  <option>Loterias, rifas, apuestas y similares</option>
+                  <option>Retencion en colocacion independiente de juegos de suerte y azar</option>
+                  <option>Contratos de construccion y urbanizacion</option>
                 </select>
               </div>
+              
 
             </form>
           </div>
