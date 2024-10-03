@@ -52,10 +52,10 @@
     function verificarDatosObligatorios() {
       const form = document.getElementById('clienteForm');
       const tipoPersona = document.getElementById('tipoPersona').value;
-      const columnasObligatorias = tipoPersona === 'Autonomo' ? 
-        ['nombreCliente','tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto','regimen',  'primerNombre', 'primerApellido', 'pais',  'direccion', 'codigoPostal','telefono',  'email'] :
-        tipoPersona === 'Empresa' ? 
-        ['nombreCliente','tipoContacto', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion',  'codigoContacto','regimen',  'nombreComercial', 'pais',  'direccion', 'codigoPostal', 'telefono',  'email'] : 
+      const columnasObligatorias = tipoPersona === 'Natural' ? 
+        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto','regimen', 'primerNombre', 'primerApellido', 'pais', 'direccion', 'codigoPostal','telefono',  'email'] :
+        tipoPersona === 'Juridica' ? 
+        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto','regimen', 'nombreComercial', 'pais', 'direccion', 'codigoPostal', 'telefono',  'email'] : 
         [];
 
       let isValid = true;
@@ -77,7 +77,7 @@
       if (verificarDatosObligatorios()) {
         const formData = {
           nombreCliente: document.getElementById('nombreCliente').value,
-          tipoContacto: document.getElementById('tipoContacto').value,
+          tipoTercero: document.getElementById('tipoTercero').value,
           tipoPersona: document.getElementById('tipoPersona').value,
           tipoDocumento: document.getElementById('tipoDocumento').value,
           numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
@@ -89,13 +89,14 @@
           primerApellido: document.getElementById('primerApellido').value,
           segundoApellido: document.getElementById('segundoApellido').value,
           pais: document.getElementById('pais').value,
-          provincia: document.getElementById('provincia').value,
-          poblacion: document.getElementById('poblacion').value,
+          departamento: document.getElementById('departamento').value,
+          municipio: document.getElementById('municipio').value,
           direccion: document.getElementById('direccion').value,
           codigoPostal: document.getElementById('codigoPostal').value,
           telefono: document.getElementById('telefono').value,
           sitioWeb: document.getElementById('sitioWeb').value,
           email: document.getElementById('email').value,
+
         };
 
         google.script.run.saveClientData(formData);
@@ -139,8 +140,8 @@
                 </div>
 
                 <div class="col-md-12">
-                    <label for="tipoContacto" class="form-label">Tipo de contacto</label>
-                    <select id="tipoContacto" class="form-select form-select-lg">
+                    <label for="tipoTercero" class="form-label">Tipo de contacto</label>
+                    <select id="tipoTercero" class="form-select form-select-lg">
                       <option selected>Cliente</option>
                       <option>Proveedor</option>
                     </select>
@@ -149,20 +150,25 @@
                 <div class="col-md-12">
                     <label for="tipoPersona" class="form-label">Tipo de persona</label>
                     <select id="tipoPersona" class="form-select form-select-lg">
-                      <option selected>Autonomo</option>
-                      <option>Empresa</option>
+                      <option selected>Natural</option>
+                      <option>Juridica</option>
                     </select>
                 </div>
 
                 <div class="col-md-6">
                     <label for="tipoDocumento" class="form-label">Tipo de documento</label>
                     <select id="tipoDocumento" class="form-select form-select-lg">
-                      <option selected>NIF</option>
+                      <option selected>Seleccione</option>
+                      <option>Cédula de ciudadanía</option>
+                      <option>Tarjeta de extranjería</option>
+                      <option>Cédula de extranjería</option>
+                      <option>NIT</option>
                       <option>Pasaporte</option>
-                      <option>Documento oficial de identificación</option>
-                      <option>Certificado de residencia</option>
-                      <option>Otro documento</option>
-                      <option>No censado</option>
+                      <option>Documento de identificación extranjero</option>
+                      <option>PEP (Permiso Especial de Permanencia)</option>
+                      <option>PPT (Permiso Protección Temporal)</option>
+                      <option>NIT de otro país</option>
+                      <option>NUIP</option>
                     </select>
                 </div>
 
@@ -179,22 +185,9 @@
                 <div class="col-md-6">
                     <label for="regimen" class="form-label">Régimen</label>
                     <select id="regimen" class="form-select form-select-lg">
-                      <option selected>Operación de régimen general</option>
-                      <option>Exportación</option>
-                      <option>Operaciones a las que se aplique el régimen especial de bienes usados, objetos de arte, antigüedades y objetos de colección</option>
-                      <option>Régimen especial del oro de inversión</option>
-                      <option>Régimen especial de las agencias de viajes</option>
-                      <option>Régimen especial grupo de entidades en IVA (Nivel Avanzado)</option>
-                      <option>Régimen especial del criterio de caja</option>
-                      <option>Operaciones sujetas al IPSI / IGIC (Impuesto sobre la producción, los servicios y la importación / Impuesto general indirecto canario)</option>
-                      <option>Facturación de las prestaciones de servicios de agencias de viaje que actúan como mediadoras en nombre y por cuenta ajena</option>
-                      <option>Cobros por cuenta de terceros de honorarios profesionales o de derechos derivados de la propiedad industrial, de autor u otros por cuenta de sus socios, asociados o colegiados efectuados por sociedades, asociaciones, colegios profesionales u otras entidades que realicen estas funciones de cobro</option>
-                      <option>Operaciones de arrendamiento de local de negocio</option>
-                      <option>Factura con IVA pendiente de devengo en certificaciones de obra cuyo destinatario sea una Administración pública</option>
-                      <option>Factura con IVA pendiente de devengo en operaciones de tracto sucesivo</option>
-                      <option>Régimen simplificado</option>
-                      <option>Recargo de equivalencia</option>
-                      <option>Régimen especial de la agricultura</option>
+                      <option selected>Seleccione</option>
+                      <option>Impuesto sobre las ventas - IVA</option>
+                      <option>No responsable de IVA</option> 
                     </select>
                 </div>
 
@@ -232,13 +225,13 @@
                 </div>
 
                 <div class="col-md-12">
-                    <label for="provincia" class="form-label">Provincia</label>
-                    <input type="text" class="form-control form-control-lg" id="provincia" placeholder="Provincia">
+                    <label for="departamento" class="form-label">Departamento</label>
+                    <input type="text" class="form-control form-control-lg" id="departamento" placeholder="Departamento">
                 </div>
 
                 <div class="col-md-12">
-                    <label for="poblacion" class="form-label">Población</label>
-                    <input type="text" class="form-control form-control-lg" id="poblacion" placeholder="Población">
+                    <label for="municipio" class="form-label">Municipio</label>
+                    <input type="text" class="form-control form-control-lg" id="municipio" placeholder="Población">
                 </div>
 
                 <div class="col-md-12">

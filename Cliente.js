@@ -31,50 +31,56 @@ function inactivarCliente(cliente){
   let rowMaximaClientesInactivos=hojaClientesInactivos.getLastRow()+1;
   let rowMaximaClientes=hojaClietnes.getLastRow()+1;
 
-  let tipoContacto=datos_sheet.getRange("AB2").getValue();
-  let tipoPersona=datos_sheet.getRange("L2").getValue();
+  let codigoContacto=datos_sheet.getRange("I2").getValue();
   let tipoDoc=datos_sheet.getRange("J2").getValue();
   let numIdentificacion=datos_sheet.getRange("K2").getValue();
-  let codigoContacto=datos_sheet.getRange("I2").getValue();
+  let tipoPersona=datos_sheet.getRange("L2").getValue();
   let regimen=datos_sheet.getRange("M2").getValue();
-  let nomnbreComercial=datos_sheet.getRange("N2").getValue();
+  let nombreComercial=datos_sheet.getRange("N2").getValue();
   let primerNombre=datos_sheet.getRange("O2").getValue();
   let segundoNombre=datos_sheet.getRange("P2").getValue();
   let primerApellido=datos_sheet.getRange("Q2").getValue();
   let segundoApellido=datos_sheet.getRange("R2").getValue();
   let pais=datos_sheet.getRange("S2").getValue();
-  let provicnica=datos_sheet.getRange("AA2").getValue();
-  let poblacion=datos_sheet.getRange("Z2").getValue();
   let direccion=datos_sheet.getRange("T2").getValue();
   let codigoPostal=datos_sheet.getRange("U2").getValue();
   let telefono=datos_sheet.getRange("V2").getValue();
   let sitioWeb=datos_sheet.getRange("W2").getValue();
   let email=datos_sheet.getRange("X2").getValue();
   let estado=datos_sheet.getRange("Y2").getValue();
+  let municipio=datos_sheet.getRange("AZ2").getValue();
+  let departamento=datos_sheet.getRange("AA2").getValue();
+  let detallesTributarios=datos_sheet.getRange("AB2").getValue();
+  let responsabilidadFiscal=datos_sheet.getRange("AC2").getValue();
+  let tipoTercero=datos_sheet.getRange("AD2").getValue();
+
 
 
   // Proceso para agregar a la hoja de clientes inactivos
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 1).setValue(estado);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 2).setValue(cliente);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 3).setValue(tipoContacto);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 3).setValue(tipoTercero);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 4).setValue(tipoPersona);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 5).setValue(tipoDoc);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 6).setValue(numIdentificacion);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 7).setValue(codigoContacto);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 8).setValue(regimen);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 9).setValue(nomnbreComercial);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 9).setValue(nombreComercial);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 10).setValue(primerNombre);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 11).setValue(segundoNombre);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 12).setValue(primerApellido);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 13).setValue(segundoApellido);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 14).setValue(pais);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 15).setValue(provicnica);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 16).setValue(poblacion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 15).setValue(departamento);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 16).setValue(municipio);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 17).setValue(direccion);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 18).setValue(codigoPostal);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 19).setValue(telefono);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 20).setValue(sitioWeb);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 21).setValue(email);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 22).setValue(detallesTributarios);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 23).setValue(responsabilidadFiscal);
+
 
   //eliminar cliente de la hoja clientes
 
@@ -93,7 +99,7 @@ function activarCliente(cliente){
   let rowMaximaClientes=hojaClietnes.getLastRow()+1;
 
   let estado = datos_sheet.getRange('H6').getValue();
-  let tipoContacto = datos_sheet.getRange('J6').getValue();
+  let tipoTercero = datos_sheet.getRange('J6').getValue();
   let tipoPersona = datos_sheet.getRange('K6').getValue();
   let tipoDoc = datos_sheet.getRange('L6').getValue();
   let numIdentificacion = datos_sheet.getRange('M6').getValue();
@@ -105,17 +111,19 @@ function activarCliente(cliente){
   let primerApellido = datos_sheet.getRange('S6').getValue();
   let segundoApellido = datos_sheet.getRange('T6').getValue();
   let pais = datos_sheet.getRange('U6').getValue();
-  let provincia = datos_sheet.getRange('V6').getValue();
-  let poblacion = datos_sheet.getRange('W6').getValue();
+  let departamento = datos_sheet.getRange('V6').getValue();
+  let municipio = datos_sheet.getRange('W6').getValue();
   let direccion = datos_sheet.getRange('X6').getValue();
   let codigoPostal = datos_sheet.getRange('Y6').getValue();
   let telefono = datos_sheet.getRange('Z6').getValue();
   let sitioWeb = datos_sheet.getRange('AA6').getValue();
   let email = datos_sheet.getRange('AB6').getValue();
+  let detallesTributarios = datos_sheet.getRange('AC6').getValue();
+  let responsabilidadFiscal = datos_sheet.getRange('AD6').getValue();
   
   hojaClietnes.getRange(rowMaximaClientes, 1).setValue(estado);
   hojaClietnes.getRange(rowMaximaClientes, 2).setValue(cliente);
-  hojaClietnes.getRange(rowMaximaClientes, 3).setValue(tipoContacto);
+  hojaClietnes.getRange(rowMaximaClientes, 3).setValue(tipoTercero);
   hojaClietnes.getRange(rowMaximaClientes, 4).setValue(tipoPersona);
   hojaClietnes.getRange(rowMaximaClientes, 5).setValue(tipoDoc);
   hojaClietnes.getRange(rowMaximaClientes, 6).setValue(numIdentificacion);
@@ -127,13 +135,15 @@ function activarCliente(cliente){
   hojaClietnes.getRange(rowMaximaClientes, 12).setValue(primerApellido);
   hojaClietnes.getRange(rowMaximaClientes, 13).setValue(segundoApellido);
   hojaClietnes.getRange(rowMaximaClientes, 14).setValue(pais);
-  hojaClietnes.getRange(rowMaximaClientes, 15).setValue(provincia);
-  hojaClietnes.getRange(rowMaximaClientes, 16).setValue(poblacion);
+  hojaClietnes.getRange(rowMaximaClientes, 15).setValue(departamento);
+  hojaClietnes.getRange(rowMaximaClientes, 16).setValue(municipio);
   hojaClietnes.getRange(rowMaximaClientes, 17).setValue(direccion);
   hojaClietnes.getRange(rowMaximaClientes, 18).setValue(codigoPostal);
   hojaClietnes.getRange(rowMaximaClientes, 19).setValue(telefono);
   hojaClietnes.getRange(rowMaximaClientes, 20).setValue(sitioWeb);
   hojaClietnes.getRange(rowMaximaClientes, 21).setValue(email);
+  hojaClietnes.getRange(rowMaximaClientes, 22).setValue(detallesTributarios);
+  hojaClietnes.getRange(rowMaximaClientes, 23).setValue(responsabilidadFiscal);
 
   hojaClientesInactivos.deleteRow(rowDelCliente)
   hojaClientesInactivos.insertRowAfter(rowMaximaClientesInactivos)
@@ -437,7 +447,7 @@ function saveClientData(formData) {
 
   const values = [
     formData.nombreCliente,
-    formData.tipoContacto,
+    formData.tipoTercero,
     formData.tipoPersona,
     formData.tipoDocumento,
     formData.numeroIdentificacion,
@@ -449,13 +459,15 @@ function saveClientData(formData) {
     formData.primerApellido,
     formData.segundoApellido,
     formData.pais,
-    formData.provincia,
-    formData.poblacion,
+    formData.departamento,
+    formData.municipio,
     formData.direccion,
     formData.codigoPostal,
     formData.telefono,
     formData.sitioWeb,
-    formData.email
+    formData.email,
+    formData.detallesTributarios,
+    formData.responsabilidadFiscal
   ];
 
   sheet.getRange(emptyRow, 2, 1, values.length).setValues([values]);
@@ -535,82 +547,88 @@ function getCustomerInformation(customer) {
   let celdaCliente = datos_sheet.getRange("H2");
   celdaCliente.setValue(customer);
 
+  //Codigo de cliente
+  var customerCode = datos_sheet.getRange("I2").getValue();
 
-  // var range = datos_sheet.getRange("D50");
-  // var Customer = range.getValue();
+  //Tipo de identificacion 
+  let identificationType=datos_sheet.getRange("J2").getValue();
 
-  var range = datos_sheet.getRange("I2");
-  var CustomerCode = range.getValue();
-
-  //range = datos_sheet.getRange("C51");// aqui agarra es el numero mas no el tipo en si
-  //var IdentificationType = range.getValue();
-  let IdentificationType=datos_sheet.getRange("J2").getValue();
-
-  range = datos_sheet.getRange("K2");
-  var Identification = range.getValue();//numero de identificacion
-
+  //Numero de identificacion
+  var identification = datos_sheet.getRange("K2").getValue();//numero de identificacion
   
   var DV = 0;//no existe en espana, predeterminado 0
 
-  range = datos_sheet.getRange("T2");
-  var Address = range.getValue();// aqui lo dividia entre 2 por el psotalcode
+  //Direccion
+  var address =  datos_sheet.getRange("T2").getValue();// aqui lo dividia entre 2 por el psotalcode
   
-  
+  //Ciudad
+  var cityId = datos_sheet.getRange("S2").getValue();
 
-  range = datos_sheet.getRange("S2");//cambie en vez de ciudad pais, porque en espana no hay parametro ciudad
-  var CityID = range.getValue();
+  //Telefono
+  var telephone = datos_sheet.getRange("V2").getValue();
 
-  range = datos_sheet.getRange("V2");
-  var Telephone = range.getValue();
-
-  // switch (datos_sheet.getRange("C1").getValue()) {
-  //   case "Pruebas":
-  //     var range = datos_sheet.getRange("E1");
-  //     break;
-  //   case "Produccion":
-  //     var range = datos_sheet.getRange("B63");
-  //     break;
-  //   default:
-  //     Logger.log("Oops!...Error Ambiente")
-  //     return;
-  // }
-  var range = datos_sheet.getRange("X2");
-  var Email = range.getValue();
+  //Email
+  var email = datos_sheet.getRange("X2").getValue();
   //Browser.msgBox(Email);
 
+  //Sitio web
+  var webSiteURI = datos_sheet.getRange("W2").getValue();
 
-  range = datos_sheet.getRange("W2");
-  var WebSiteURI = range.getValue();
-
+  //Pais
   var paisCliente= datos_sheet.getRange("S2").getValue();
 
-  if (IdentificationType == "#NUM!") {
+  //Departamento
+  var departamentoCliente= datos_sheet.getRange("AA2").getValue();
+
+  //Municipio
+  var municipioCliente= datos_sheet.getRange("Z2").getValue();
+
+  //Validar codigo tipo persona
+  var tipoPersona = datos_sheet.getRange("K2").getValue();
+  function validarTipoPersona(tipoPersona) {
+    if (tipoPersona == "Juridica") {
+      return 2;
+    } else {
+      return 1;
+    }
+  }
+
+  var regimen = datos_sheet.getRange("M2").getValue();
+  function validarCodigoRegimen(regimen) {
+    if (regimen == "Impuesto sobre las ventas - IVA") {
+      return 48;
+    } else {
+      return 49;
+    }
+  }
+
+  if (identificationType == "#NUM!") {
     Browser.msgBox("ERROR: Seleccione Tipo de Identificacion en Clientes")
     return;
   }
   let valorFecha=ObtenerFecha()
   var CustomerInformation = {
-    "IdentificationType": IdentificationType,
-    "Identification": Identification,//.toString(),
+    "IdentificationType": identificationType,
+    "Identification": identification,//.toString(),
     "DV": valorFecha,
     "RegistrationName": customer,
-    "CountryCode": paisesCodigos[paisCliente],//cambia dependiendo del pais
+    "CountryCode": paisesCodigos[paisCliente],
     "CountryName": paisCliente,
-    "SubdivisionCode": "En España no se como funcionan codigo  de provinica",// 11, //Codigo de Municipio
-    "SubdivisionName": datos_sheet.getRange("AA2").getValue(),// provicnica
-    "CityCode": "Hay dos codigos postales, este solo existe para colombia",
-    "CityName": datos_sheet.getRange("Z2").getValue(),//polbacion
-    "AddressLine": String(Address),
-    "PostalZone": datos_sheet.getRange("U2").getValue(),//Confundido con el codigo postal hay 2, de recepcion y de 
-    "Email": Email,
-    "CustomerCode": CustomerCode,
-    "Telephone": Telephone,
-    "WebSiteURI": WebSiteURI,
-    "AdditionalAccountID": "Numero que representa el tipo de persona, en España no se sabe si se utiliza o no",//"1",//1, //1: Juridica, 2: Natural
-    "TaxLevelCodeListName": "numero que representa unos impuestos, no se si en España exista",//"48" Impuesto sobre las ventas IVA 49 – No responsable de impuesto sobre las ventas IVA
+    "SubdivisionCode": departamentosCodigos[departamentoCliente],
+    "SubdivisionName": departamentoCliente,
+    "CityCode": municipiosCodigos[municipioCliente],
+    "CityName": municipioCliente,
+    "AddressLine": String(address),
+    "PostalZone": datos_sheet.getRange("U2").getValue(),
+    "Email": email,
+    "CustomerCode": customerCode,
+    "Telephone": telephone,
+    "WebSiteURI": webSiteURI,
+    "AdditionalAccountID": validarTipoPersona(tipoPersona),
+    "TaxLevelCodeListName": validarCodigoRegimen(regimen),
     "TaxSchemeCode": "Numero que representa algo, no se si en España exista ",
     "TaxSchemeName": "Numero que representa algo, no se si en España exista ",
-    "FiscalResponsabilities": "Responsabiliades fiscales, no se si en España exista",
+    "FiscalResponsabilities": datos_sheet.getRange("AC2").getValue(),
 
     "PartecipationPercent": 100,
     "AdditionalCustomer": []
@@ -629,12 +647,12 @@ function obtenerInformacionCliente(cliente) {
   let codigoContacto = datos_sheet.getRange("I2").getValue();
   let direccion = datos_sheet.getRange("T2").getValue();
   let pais = datos_sheet.getRange("S2").getValue();
-  let provincia = datos_sheet.getRange("AA2").getValue();
-  let poblacion = datos_sheet.getRange("Z2").getValue();
+  let departamento = datos_sheet.getRange("AA2").getValue();
+  let municipio = datos_sheet.getRange("Z2").getValue();
   let telefono = datos_sheet.getRange("V2").getValue();
   let estado = datos_sheet.getRange("Y2").getValue();
 
-  let ubicacion = poblacion + ", " + provincia + ", " + pais;
+  let ubicacion = municipio + ", " + departamento + ", " + pais;
 
   let informacionCliente = {
     "Código cliente": codigoContacto,

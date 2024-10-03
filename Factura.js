@@ -10,7 +10,7 @@ var prefactura_sheet = spreadsheet.getSheetByName('Factura');
 var unidades_sheet = spreadsheet.getSheetByName('Unidades');
 var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
 var hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
-var folderId = hojaDatosEmisor.getRange("B14").getValue();
+var folderId = hojaDatosEmisor.getRange("B13").getValue();
 var paisesCodigos = {
   "Afganistán": "AF",
   "Albania": "AL",
@@ -806,7 +806,6 @@ function obtenerFechaYHoraActual(){
 
   sheet.getRange("G4").setNumberFormat("dd/MM/yyyy");
   sheet.getRange("G4").setValue(String(fecha))
-  sheet.getRange("G3").setValue(String(fecha))
   sheet.getRange("G7").setValue(hora)
 
   
@@ -1273,8 +1272,8 @@ function obtenerDatosFactura(factura){
           var codigo = invoiceData.CustomerInformation.AdditionalAccountID;
           var direccion = invoiceData.CustomerInformation.AddressLine;
           var telefono = invoiceData.CustomerInformation.Telephone;
-          var poblacion = invoiceData.CustomerInformation.CityName;
-          var provincia = invoiceData.CustomerInformation.SubdivisionName;
+          var municipio = invoiceData.CustomerInformation.CityName;
+          var departamento = invoiceData.CustomerInformation.SubdivisionName;
           var pais = invoiceData.CustomerInformation.CountryName;
           var fechaEmision = invoiceData.CustomerInformation.DV;
           var formaPago = invoiceData.PaymentSummary.PaymentType;
@@ -1436,7 +1435,7 @@ function obtenerDatosFactura(factura){
           var codigoCeldaHoja = hojaCeldas.getRange('E8').getValue();
           var direccionCeldaHoja = hojaCeldas.getRange('E5').getValue();
           var telefonoCeldaHoja = hojaCeldas.getRange('E7').getValue();
-          var poblacionCeldaHoja = hojaCeldas.getRange('E6').getValue();
+          var municipioCeldaHoja = hojaCeldas.getRange('E6').getValue();
           var fechaEmisionCeldaHoja = hojaCeldas.getRange('E9').getValue();
           var formaPagoCeldaHoja = hojaCeldas.getRange('E10').getValue();
 
@@ -1448,7 +1447,7 @@ function obtenerDatosFactura(factura){
           var codigoCell = targetSheet.getRange(codigoCeldaHoja);
           var direccionCell = targetSheet.getRange(direccionCeldaHoja);
           var telefonoCell = targetSheet.getRange(telefonoCeldaHoja);
-          var poblacionCell = targetSheet.getRange(poblacionCeldaHoja);
+          var municipioCell = targetSheet.getRange(municipioCeldaHoja);
           var fechaEmisionCell = targetSheet.getRange(fechaEmisionCeldaHoja);
           var formaPagoCell = targetSheet.getRange(formaPagoCeldaHoja);
           var valorPagarCell = targetSheet.getRange('B'+(41+filasInsertadas));
@@ -1475,12 +1474,12 @@ function obtenerDatosFactura(factura){
           direccionCell.setValue(direccion);
           telefonoCell.setValue(telefono);
           // Ajustar la forma en que se ve el pais - IMPORTANTE
-          if (poblacion == "" || provincia == "" || pais == "") {
-            var columnaPoblacion = poblacionCell.getColumn();
-            var filaPoblacion = poblacionCell.getRow();
-            targetSheet.getRange(filaPoblacion, columnaPoblacion-1).clearContent();
+          if (municipio == "" || departamento == "" || pais == "") {
+            var columnaMunicipio = municipioCell.getColumn();
+            var filaMunicipio = municipioCell.getRow();
+            targetSheet.getRange(filaMunicipio, columnaMunicipio-1).clearContent();
           } else {
-            poblacionCell.setValue(poblacion+', '+provincia+', '+pais);
+            municipioCell.setValue(municipio+', '+departamento+', '+pais);
           }
           fechaEmisionCell.setValue(fechaEmision);
           formaPagoCell.setValue(formaPago);

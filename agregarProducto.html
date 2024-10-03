@@ -84,36 +84,67 @@
               </div>
 
               <div class="col-6">
-                <label for="iva" class="form-label">Impuesto IVA</label>
-                <select id="iva" name="iva" class="form-select form-select-lg" required>
-                  <option value="0">0%</option>
-                  <option value="4">4%</option>
-                  <option value="5">5%</option>
-                  <option value="10">10%</option>
-                  <option value="21">21%</option>
-                </select>
-              </div>
-
-
-
-              <div class="col-12">
-                <label for="retenciones" class="form-label">Retenciones</label>
-                <select id="retenciones" name="retenciones" class="form-select form-select-lg">
+                <label for="IVA">
+                  <input type="checkbox" id="IVA" name="IVA" value="IVA">
+                  IVA
+                </label>
+                <label for="iva" class="form-label">Tarifa IVA</label>
+                <select id="iva" name="iva" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
-                  <option value="7">7%</option>
-                  <option value="15">15%</option>
+                  <option value="5">5%</option>
+                  <option value="16">16%</option>
                   <option value="19">19%</option>
                 </select>
               </div>
 
-              <div class="col-12">
-                <label for="recargo" class="form-label">Recargo de equivalencias</label>
-                <select id="recargo" name="recargo" class="form-select form-select-lg">
+              <div class="col-6">
+                <label for="INC">
+                  <input type="checkbox" id="INC" name="INC" value="INC">
+                  INC
+                </label>
+                <label for="inc" class="form-label">Tarifa INC</label>
+                <select id="inc" name="inc" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
-                  <option value="5,20">5,20%</option>
-                  <option value="1,40">1,40%</option>
-                  <option value="0,50">0,50%</option>
-                  <option value="1,75">1,75%</option>
+                  <option value="2">2%</option>
+                  <option value="4">4%</option>
+                  <option value="8">8%</option>
+                  <option value="16">16%</option>
+                </select>
+              </div>
+
+              <script>
+                document.getElementById('IVA').addEventListener('change', function() {
+                  document.getElementById('INC').checked = false;
+                  document.getElementById('inc').disabled = true;
+                  document.getElementById('inc').value = ''; // Set value to empty
+                  document.getElementById('iva').disabled = !this.checked;
+                });
+              
+                document.getElementById('INC').addEventListener('change', function() {
+                  document.getElementById('IVA').checked = false;
+                  document.getElementById('iva').disabled = true;
+                  document.getElementById('iva').value = ''; // Set value to empty
+                  document.getElementById('inc').disabled = !this.checked;
+                });
+              </script>
+
+              <div class="col-12">
+                <label for="ReteIva" class="form-label">Retención sobre el IVA</label>
+                <select id="ReteIva" name="ReteIva" class="form-select form-select-lg">
+                  <option selected>Seleccione</option>
+                  <option value="15">15%</option>
+                  <option value="100">100%</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label for="ReteRenta" class="form-label">Retención sobre Renta</label>
+                <select id="ReteRenta" name="ReteRenta" class="form-select form-select-lg">
+                  <option selected>Seleccione</option>
+                  <option value="2">2%</option>
+                  <option value="4">4%</option>
+                  <option value="8">8%</option>
+                  <option value="16">16%</option>
                 </select>
               </div>
 
@@ -140,3 +171,4 @@
     </div>
   </body>
 </html>
+
