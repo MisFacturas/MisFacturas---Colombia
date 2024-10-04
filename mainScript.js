@@ -138,50 +138,53 @@ function processForm(data) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Productos");
     const lastRow = sheet.getLastRow();
     const newRow = lastRow + 1;
-
+    //Crea las variables para guardar los datos del producto
     const codigoReferencia = data.codigoReferencia;
     const nombre = data.nombre;
     const precioUnitario = parseFloat(data.precioUnitario);
-    const retenciones=String(data.retenciones+"%")
-    const recargo=String(data.recargo+"%")
-    Logger.log("retenciones"+retenciones)
-    Logger.log("recargo"+recargo)
-    const iva = parseFloat(data.iva) / 100;
-    const precioConIva = precioUnitario * (1 + iva);
-    const impuestos = precioUnitario * iva;
+    const referenciaAdicional = data.referenciaAdicional;
+    const numeroReferenciaAdicional = validarReferenciaAdicional(referenciaAdicional);
+    const impuestos = data.impuestos;
+    const tarifaImpuestos = String(validarImpuestos(impuestos, data.tarifaIva, data.tarifaInc)+"%");
+    const tarifaRetencion = String(data.retencion+"%");
+    Logger.log("tarifaRetencion "+tarifaRetencion)
+    const retencionConcepto = data.retencion;
 
+    //Asigna los valores a los campos en el sheet
+
+    //Codigo Referencia
     sheet.getRange(newRow, 1).setValue(codigoReferencia);
     sheet.getRange(newRow, 1).setHorizontalAlignment('center');
-    sheet.getRange(newRow, 1).setBorder(true,true,true,true,null,null,null,null);
-
+    //Nombre
     sheet.getRange(newRow, 2).setValue(nombre);
     sheet.getRange(newRow, 2).setHorizontalAlignment('center');
-    sheet.getRange(newRow, 2).setBorder(true,true,true,true,null,null,null,null);
+    //Referencia Adicional
+    sheet.getRange(newRow, 3).setValue(referenciaAdicional);
+    //Codigo Referencia Adicional
+    sheet.getRange(newRow, 4).setValue(numeroReferenciaAdicional);
+    //Precio Unitario
+    sheet.getRange(newRow, 5).setValue(precioUnitario);
+    sheet.getRange(newRow,5).setHorizontalAlignment('normal');
+    sheet.getRange(newRow, 5).setNumberFormat('$#,##0');
+    //Impuestos (IVA o INC)
+    sheet.getRange(newRow, 7).setValue(impuestos);
+    //Tarifa Impuestos (formatea la celda como porcentaje)
+    const tarifaImpuestosCell = sheet.getRange(newRow, 8);
+    tarifaImpuestosCell.setHorizontalAlignment('center');
+    tarifaImpuestosCell.setValue(tarifaImpuestos); // Establece el valor del IVA como decimal
+    //Precio con impuesto
+    precioImpuesto = precioUnitario + precioUnitario * (parseFloat(tarifaImpuestos) / 100);
+    Logger.log("precioImpuesto "+precioImpuesto)
+    sheet.getRange(newRow, 9).setValue(precioImpuesto);
+    //Retencion concepto
+    sheet.getRange(newRow, 10).setValue(data.retencionConcepto);
+    //Tarifa Retencion (formatea la celda como porcentaje)
+    const tarifaRetencionCell = sheet.getRange(newRow, 11);
+    tarifaRetencionCell.setHorizontalAlignment('center');
+    Logger.log("tarifaRetencion "+tarifaRetencion)
+    tarifaRetencionCell.setValue(tarifaRetencion); // Establece el valor del IVA como decimal
+    tarifaRetencionCell.setNumberFormat('0%'); // Formatea la celda como porcentaje con dos decimales
 
-    sheet.getRange(newRow, 3).setValue(precioUnitario);
-    sheet.getRange(newRow,3).setHorizontalAlignment('normal');
-    sheet.getRange(newRow, 3).setNumberFormat('€#,##0.00');
-    sheet.getRange(newRow, 3).setBorder(true,true,true,true,null,null,null,null);
-    
-    // Establece el IVA y formatea la celda como porcentaje
-    const ivaCell = sheet.getRange(newRow, 4);
-    ivaCell.setBorder(true,true,true,true,null,null,null,null);
-    ivaCell.setHorizontalAlignment('center');
-    ivaCell.setValue(iva); // Establece el valor del IVA como decimal
-    ivaCell.setNumberFormat('0.00%'); // Formatea la celda como porcentaje con dos decimales
-
-    sheet.getRange(newRow, 5).setValue(precioConIva); // Guarda el precio con IVA
-    sheet.getRange(newRow, 5).setHorizontalAlignment('normal');
-    sheet.getRange(newRow, 5).setNumberFormat('€#,##0.00');
-    sheet.getRange(newRow, 5).setBorder(true,true,true,true,null,null,null,null);
-
-    sheet.getRange(newRow, 6).setValue(impuestos); // Guarda el valor de los impuestos
-    sheet.getRange(newRow, 6).setHorizontalAlignment('normal');
-    sheet.getRange(newRow, 6).setNumberFormat('€#,##0.00');
-    sheet.getRange(newRow, 6).setBorder(true,true,true,true,null,null,null,null);
-
-    sheet.getRange(newRow, 7).setValue(retenciones);
-    sheet.getRange(newRow, 8).setValue(recargo);
 
     return "Datos guardados correctamente";
   } catch (error) {
@@ -295,8 +298,8 @@ function onEdit(e) {
       obtenerFechaYHoraActual()
       //generarNumeroFactura()
       let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
-      let  iban= hojaInfoUsuario.getRange("B9").getValue();
-      factura_sheet.getRange("B11").setValue(iban)
+
+
 
     }
     else if(rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos)  {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)

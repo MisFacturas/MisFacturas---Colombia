@@ -1,5 +1,47 @@
 var spreadsheet = SpreadsheetApp.getActive();
 
+
+function saveProductData(formData) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Productos');
+  if (!sheet) {
+    throw new Error('La hoja "Productos" no existe.');
+  }
+
+  const lastRow = sheet.getLastRow();
+  const dataRange = sheet.getRange(2, 1, lastRow, 12).getValues(); // Obtener desde la columna B hasta la S (19 columnas)
+
+  let emptyRow = 0;
+  for (let i = 0; i < dataRange.length; i++) {
+    const row = dataRange[i];
+    const isEmpty = row.every(cell => cell === ''); // Verificar si todas las celdas de la fila están vacías
+
+    if (isEmpty) {
+      emptyRow = i + 2; // i + 2 porque dataRange empieza en la fila 2
+      break;
+    }
+  }
+
+  if (emptyRow === 0) {
+    emptyRow = lastRow + 1; // Si no se encontró ninguna fila vacía, usar la siguiente fila después de la última
+  }
+
+  const values = [
+    formData.codigoReferencia,
+    formData.nombre,
+    formData.referenciaAdicional,
+    formData.precioUnitario,
+    formData.unidadMedida,
+    formData.impuestos,
+    formData.tarifaImpuestos,
+    formData.retencion,
+    formData.tarifaRetencion,
+  ];
+
+  sheet.getRange(emptyRow, 1, 1, values.length).setValues([values]);
+  SpreadsheetApp.getUi().alert("Nuevo producto generado satisfactoriamente");
+}
+
+
 // a cambiar cuando se pregunte y agg los otros porcinetos
 function obtenerInformacionProducto(producto) {
     let celdaProducto = datos_sheet.getRange("I11");
@@ -21,11 +63,9 @@ function obtenerInformacionProducto(producto) {
       "codigo Producto": codigoProducto,
       "precio Unitario": precioUnitario,
       "impuestos": tarifaImpuesto,
-      "precio impuesto": precioImpuesto,
-      "retencion": impuestos,
-      "descuentos": descunetos,
+      "precio Impuesto": precioImpuesto,
       "tarifa Retencion": tarifaRetencion,
-
+      "valor Retencion": valorRetencion
     };
   
     return informacionProducto;
@@ -46,6 +86,30 @@ function obtenerInformacionProducto(producto) {
   
     return productosFiltrados;
   }
-   
 
+  function validarImpuestos(impuestos, tarifaIva, tarifaInc) {
+    let tarifaImpuestos = 0;
+    if (impuestos === "IVA") {
+      tarifaImpuestos = tarifaIva;
+    } else {
+      tarifaImpuestos = tarifaInc;
+    }
+    return tarifaImpuestos;
+  }
+
+  function validarReferenciaAdicional(referenciaAdicional) {
+    let numeroReferenciaAdicional = 0;
+    if (referenciaAdicional === "UNSPSC") {
+      numeroReferenciaAdicional = 1;
+    } else if (referenciaAdicional === "GTIN") {
+      numeroReferenciaAdicional = 10;
+    } else if (referenciaAdicional === "Partida Arancelarias") {
+      numeroReferenciaAdicional = 20;
+    } else if (referenciaAdicional === "Estándar de adopción del contribuyente") {
+      numeroReferenciaAdicional = 999;
+    } else if (referenciaAdicional === "No Aplica") {
+      numeroReferenciaAdicional = 0;
+    }
+    return numeroReferenciaAdicional;
+  }
   

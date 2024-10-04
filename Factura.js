@@ -97,6 +97,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     factura_sheet.getRange("B15").setValue(producto)
     factura_sheet.getRange("C15").setValue(cantidad)
     factura_sheet.getRange("D15").setValue(dictInformacionProducto["precio Unitario"])
+    factura_sheet.getRange("E15").setValue(dictInformacionProducto["precio Impuestos"])
     factura_sheet.getRange("F15").setValue(dictInformacionProducto["impuestos"])
     factura_sheet.getRange("H15").setValue(dictInformacionProducto["retencion"])
 
@@ -511,18 +512,19 @@ function limpiarHojaFactura(){
     Logger.log("J" + j);
   }
   Logger.log("Salta if")
+
+  hojaFactura.getRange("A15").setValue("")//referncia
   hojaFactura.getRange("B15").setValue("")//producto
   hojaFactura.getRange("C15").setValue("")//cantidad
-  hojaFactura.getRange("A15").setValue("")//referncia
-  hojaFactura.getRange("H15").setValue("0")
-  hojaFactura.getRange("G15").setValue("")//IVA%
-  hojaFactura.getRange("G15").setNumberFormat("0.00%");
-  hojaFactura.getRange("D15").setValue("")//sinIva
-  hojaFactura.getRange("H15").setNumberFormat("0.00%")//descuento
-  hojaFactura.getRange("I15").setValue("")//retencion
-  hojaFactura.getRange("J15").setValue("")//recargo
+  hojaFactura.getRange("D15").setValue("")//precio unitario
+  hojaFactura.getRange("F15").setValue("")//Impuestos
+  hojaFactura.getRange("F15").setNumberFormat("0.00%");
+  hojaFactura.getRange("G15").setValue("")//descuento
+  hojaFactura.getRange("G15").setNumberFormat("0.00%")
+  hojaFactura.getRange("H15").setValue("")//retencion
+  hojaFactura.getRange("H15").setNumberFormat("0.00%");
 
-  hojaFactura.getRange("B16").setValue("0")//tptal producto
+  hojaFactura.getRange("B16").setValue("0")//total producto
   hojaFactura.getRange("B17").setValue(0)//carrgos
   hojaFactura.getRange("B18").setValue(0)//descuentos
 }
@@ -586,8 +588,8 @@ function generarNumeroFactura(){
 function obtenerFechaYHoraActual(){ 
   let sheet = spreadsheet.getSheetByName('Factura');
 
-  let fecha = Utilities.formatDate(new Date(), "UTC+5", "dd/MM/yyyy");
-  let hora= Utilities.formatDate(new Date(), "UTC+5", "HH:mm:ss");
+  let fecha = Utilities.formatDate(new Date(), "UTC-5", "dd/MM/yyyy");
+  let hora= Utilities.formatDate(new Date(), "UTC-5", "HH:mm:ss");
 
   sheet.getRange("G4").setNumberFormat("dd/MM/yyyy");
   sheet.getRange("G4").setValue(String(fecha))
@@ -596,7 +598,7 @@ function obtenerFechaYHoraActual(){
   
   let valorFecha=sheet.getRange("G4").getValue();
 
-  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+5", "dd/MM/yyyy");
+  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC-5", "dd/MM/yyyy");
   Logger.log("valorFecha "+valorFecha)
   Logger.log("fecha "+fecha)
   Logger.log("fechaFormateada "+fechaFormateada)
@@ -606,7 +608,7 @@ function obtenerFechaYHoraActual(){
 function ObtenerFechaFormatedada(opcion){
     let sheet = spreadsheet.getSheetByName('Factura');
     let valorFecha=sheet.getRange("G4").getValue();
-    let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+5", "dd/MM/yyyy");
+    let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC-5", "dd/MM/yyyy");
   return fechaFormateada
 }
 
@@ -740,15 +742,14 @@ function guardarYGenerarInvoice(){
     let Quantity = LineaFactura['cantidad'];
     let Price = LineaFactura['precio unitario'];
     let Amount = parseFloat(LineaFactura['subtotal']);//importe
-    let ImpoConsumo = 1// no es un parametro para empresas espanolas
+    let Impuestos = LineaFactura['impuetos']
     let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
     let Iva = LineChargeTotal-Amount;
     let descuento=LineaFactura["descuento"];
     let retencion=LineaFactura["retencion"];
-    let reCargoEqui=LineaFactura["recargodeequivalencia"];
     Logger.log("descuento "+descuento)
     Logger.log("retencion "+retencion)
-    Logger.log("reCargoEqui "+reCargoEqui)
+
     
     if (descuento==""){
       Logger.log("hay un producto con descuento vacio")
@@ -770,7 +771,7 @@ function guardarYGenerarInvoice(){
       Id: "01",//Id
       TaxEvidenceIndicator: false,
       TaxableAmount: Amount,
-      TaxAmount: Iva,
+      TaxAmount: Impuestos,
       Percent: percent,
       BaseUnitMeasure: "",
       PerUnitAmount: "",
@@ -783,7 +784,7 @@ function guardarYGenerarInvoice(){
     invoiceTaxTotal.push(ivaTaxInformation);
 
     let LineExtensionAmount = Amount;
-    let LineTotalTaxes = Iva + ImpoConsumo;
+    let LineTotalTaxes = Impuestos;
 
     let productoI = {//aqui organizamos todos los parametros necesarios para 
       ItemReference: ItemCode,
