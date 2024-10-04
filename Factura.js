@@ -109,7 +109,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
     factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
     factura_sheet.getRange("C"+String(rowParaDatos)).setValue(cantidad)
     factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//valor unitario
-    factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos)+")")//Subtotal
+    factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos))//Subtotal
 
     factura_sheet.getRange("F"+String(rowParaDatos)).setValue(dictInformacionProducto["impuestos"])//Porcentaje Impuestos
     factura_sheet.getRange("G"+String(rowParaDatos)).setValue(dictInformacionProducto["descuentos"])//Descuetos
@@ -1108,13 +1108,13 @@ function obtenerDatosFactura(factura){
             celdaPrecioUnitario.setBorder(true,true,true,true,null,null,null,null);
             celdaPrecioUnitario.setValue(listaProductos[j].Price);
             celdaPrecioUnitario.setHorizontalAlignment('normal');
-            celdaPrecioUnitario.setNumberFormat('€#,##0.00')
+            celdaPrecioUnitario.setNumberFormat('$#,##0')
 
             var celdaSubtotal = targetSheet.getRange('H'+numeroCelda);
             celdaSubtotal.setBorder(true,true,true,true,null,null,null,null);
             celdaSubtotal.setFormula('=F'+numeroCelda+'*(G'+numeroCelda+'-(G'+numeroCelda+'*J'+numeroCelda+'))');
             celdaSubtotal.setHorizontalAlignment('normal');
-            celdaSubtotal.setNumberFormat('€#,##0.00')
+            celdaSubtotal.setNumberFormat('$#,##0')
             
             var celdaIva = targetSheet.getRange('I'+numeroCelda);
             celdaIva.setBorder(true,true,true,true,null,null,null,null);
@@ -1148,7 +1148,7 @@ function obtenerDatosFactura(factura){
             celdaTotalLinea.setBorder(true,true,true,true,null,null,null,null);
             //subtotal+(subtotal*iva)+(subtotal*recargo)-(subtotal*retencion)
             celdaTotalLinea.setFormula('=H'+numeroCelda+'+(H'+numeroCelda+'*I'+numeroCelda+')+(H'+numeroCelda+'*L'+numeroCelda+')-(H'+numeroCelda+'*K'+numeroCelda+')');
-            celdaTotalLinea.setNumberFormat('€#,##0.00');
+            celdaTotalLinea.setNumberFormat('$#,##0');
             celdaTotalLinea.setHorizontalAlignment('normal');
             
 
@@ -1179,7 +1179,7 @@ function obtenerDatosFactura(factura){
               var celdaBaseImponible = targetSheet.getRange('A'+numeroCelda);
               celdaBaseImponible.setBorder(true,true,true,true,null,null,null,null);
               celdaBaseImponible.setValue(grupoIva[key]);
-              celdaBaseImponible.setNumberFormat('€#,##0.00');
+              celdaBaseImponible.setNumberFormat('$#,##0');
               celdaBaseImponible.setHorizontalAlignment('normal');
               
               var celdaPorcentajeIva = targetSheet.getRange('E'+numeroCelda);
@@ -1191,13 +1191,13 @@ function obtenerDatosFactura(factura){
               var celdaIVA = targetSheet.getRange('F'+numeroCelda);
               celdaIVA.setBorder(true,true,true,true,null,null,null,null);
               celdaIVA.setFormula('=A'+numeroCelda+'*E'+numeroCelda);
-              celdaIVA.setNumberFormat('€#,##0.00');
+              celdaIVA.setNumberFormat('$#,##0');
               celdaIVA.setHorizontalAlignment('normal');
               
               var celdaTotal = targetSheet.getRange('I'+numeroCelda);
               celdaTotal.setBorder(true,true,true,true,null,null,null,null);
               celdaTotal.setFormula('=A'+numeroCelda+'+F'+numeroCelda);
-              celdaTotal.setNumberFormat('€#,##0.00');
+              celdaTotal.setNumberFormat('$#,##0');
               celdaTotal.setHorizontalAlignment('normal');
 
               contador += 1;

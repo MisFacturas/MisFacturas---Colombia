@@ -1,99 +1,102 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <base target="_top">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/css/bootstrap.min.css" />
-  <style>
-    body {
-      margin: 0;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-    .center-text {
-      text-align: center;
-    }
-    .result-box {
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-      padding: 5px;
-      box-sizing: border-box;
-    }
-    .result-box div:hover {
-      background-color: #f0f0f0;
-      cursor: pointer;
-    }
-    .form-group input[type="text"],
-    .form-group input[type="number"] {
-      box-sizing: border-box;
-      width: 100%;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    #productForm {
-      width: 100%;
-      box-sizing: border-box;
-    }
-  </style>
-</head>
-<body>
-  <h3>Agregar producto</h3>
+<!doctype html>
+<html lang="es" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Agregar producto</title>
+      <!-- Bootstrap core CSS -->
+      <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+      <!-- Custom styles for this template -->
+      <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+      <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
 
-  
-  <form id="productForm">
-    <div class="form-group">
-      <label for="cantidad">Cantidad</label>
-      <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
-    </div>
-    <div class="form-group">
-      <label for="buscarProducto">Buscar producto</label>
-      <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto" autocomplete="off" onkeyup="buscarProductos()">
-      <div class="result-box">
-        <!-- Los resultados se mostrarán aquí -->
-      </div>
-    </div>
-    <button type="button" class="btn btn-primary" onclick="agregarProducto()">Agregar producto</button>
-    <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
-  </form>
-  
-<script>
-    function Back() {
-      google.script.run.showNuevaFactura();
-    }
+  </head>
+  <body class="d-flex h-100">
 
-    function agregarProducto() {
-      var cantidad = document.getElementById('cantidad').value;
-      var producto = document.getElementById('buscarProducto').value;
+    <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+      
+      <header class="mb-auto">
+        <div id="logo" class="d-flex justify-content-center bg-primary">
+          <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+        </div>
+        <div class="row mt-4 px-5 gx-0">
+          <div class="col-7 p-0 d-flex align-items-center">
+              <h2 class="mb-0 ms-4">Agregar producto</h2>
+          </div>
+        </div>
+      </header> 
 
-      console.log("Producto:", producto, "Cantidad:", cantidad);
-      google.script.run.agregarProductoDesdeFactura(cantidad, producto);
-    }
-
-    function buscarProductos() {
-      var input = document.getElementById('buscarProducto').value;
-      google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
-    }
     
-    function mostrarResultados(productos) {
-      var resultBox = document.querySelector('.result-box');
-      resultBox.innerHTML = '';
-      productos.forEach(function(producto) {
-        var div = document.createElement('div');
-        div.textContent = producto;
-        div.onclick = function() {
-          seleccionarProducto(producto);
-        };
-        resultBox.appendChild(div);
-      });
-    }
 
-    function seleccionarProducto(producto) {
-      document.getElementById('buscarProducto').value = producto;
-      var resultBox = document.querySelector('.result-box');
-      resultBox.innerHTML = ''; // Limpiar los resultados
-    }
-</script>
-</body>
+      <main>
+        <div class="row py-3 px-5 mt-3 gx-0">
+          <div class="col-12 py-4">
+            <p>Ingresa la informacion de tu nuevo producto.</p>
+          </div> 
+
+          <div class="col-12">
+            <form class="row g-3" id="productForm">
+              <div class="col-12">
+                <label for="cantidad"class="form-label">Cantidad</label>
+                <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
+              </div>
+
+              <div class="col-12">
+                <label for="buscarProducto"class="form-label">Buscar producto</label>
+                <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto" autocomplete="off" onkeyup="buscarProductos()">
+                <div class="result-box">
+                  <!-- Los resultados se mostrarán aquí -->
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="agregarProducto()">Agregar producto</button>
+              <button type="button" class="btn btn-secondary" onclick="Back()">Back</button>
+    
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    
+    <script>
+        function Back() {
+          google.script.run.showNuevaFactura();
+        }
+
+        function agregarProducto() {
+          var cantidad = document.getElementById('cantidad').value;
+          var producto = document.getElementById('buscarProducto').value;
+
+          console.log("Producto:", producto, "Cantidad:", cantidad);
+          google.script.run.agregarProductoDesdeFactura(cantidad, producto);
+        }
+
+        function buscarProductos() {
+          var input = document.getElementById('buscarProducto').value;
+          google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
+        }
+        
+        function mostrarResultados(productos) {
+          var resultBox = document.querySelector('.result-box');
+          resultBox.innerHTML = '';
+          productos.forEach(function(producto) {
+            var div = document.createElement('div');
+            div.textContent = producto;
+            div.onclick = function() {
+              seleccionarProducto(producto);
+            };
+            resultBox.appendChild(div);
+          });
+        }
+
+        function seleccionarProducto(producto) {
+          document.getElementById('buscarProducto').value = producto;
+          var resultBox = document.querySelector('.result-box');
+          resultBox.innerHTML = ''; // Limpiar los resultados
+        }
+    </script>
+  </body>
 </html>
