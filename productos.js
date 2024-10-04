@@ -97,6 +97,26 @@ function obtenerInformacionProducto(producto) {
     return tarifaImpuestos;
   }
 
+  function validarTipoRetencion(retencion, tarifaReteRenta) {
+    let tipoRetencion = "";
+    if(retencion === "ReteIva"){
+      tipoRetencion = "Retencion sobre el IVA";
+    }else {
+      tipoRetencion = tarifaReteRenta;
+    }
+    return tipoRetencion;
+  }
+
+  function validarTarifaRetencion(retencion, tarifaReteIva, tarifaReteRenta) {
+    let tarifaRetencion = 0;
+    if (retencion === "ReteIva") {
+      tarifaRetencion = tarifaReteIva;
+    } else {
+      tarifaRetencion = reteRentaValores[tarifaReteRenta];
+    }
+    return tarifaRetencion;
+  }
+
   function validarReferenciaAdicional(referenciaAdicional) {
     let numeroReferenciaAdicional = 0;
     if (referenciaAdicional === "UNSPSC") {

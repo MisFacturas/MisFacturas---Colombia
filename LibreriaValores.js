@@ -1408,33 +1408,3 @@ var diccionarioCaluclarIva={
   "0.04": "4,00",
   "0": 0
 }
-
-const reteRentaOptions = {
-  "Seleccione": "",
-  "Compras generales (declarantes)": 2.5,
-  "Compras generales (no declarantes)": 3.5,
-  "Compras con tarjeta débito o crédito": 1.5,
-  "Compras de bienes o productos agrícolas o pecuarios sin procesamiento industrial": 1.5,
-  "Compras de bienes o productos agrícolas o pecuarios con procesamiento industrial (declarantes)": 2.5,
-  "Compras de bienes o productos agrícolas o pecuarios con procesamiento industrial declarantes (no declarantes)": 3.5,
-  "Compras de café pergamino o cereza": 0.5,
-  "Compras de combustibles derivados del petróleo": 0.1,
-  "Enajenación de activos fijos de personas naturales (notarías y tránsito son agentes retenedores)": 1.0,
-  "Compras de vehículos": 1.0,
-  "Compras de bienes raíces cuya destinación y uso sea vivienda de habitación (por las primeras 20.000 UVT, es decir hasta $637.780.000)": 1.0,
-  "Compras de bienes raíces cuya destinación y uso sea vivienda de habitación (exceso de las primeras 20.000 UVT, es decir superior a $637.780.000)": 2.5,
-  "Compras de bienes raíces cuya destinación y uso sea distinto a vivienda de habitación": 2.5,
-  "Servicios generales (declarantes)": 4.0,
-  "Servicios generales (no declarantes)": 6.0,
-  "Por emolumentos eclesiásticos (declarantes)": 4.0,
-  "Por emolumentos eclesiásticos (no declarantes)": 3.5,
-  "Servicios de transporte de carga": 1.0,
-  "Servicios de transporte nacional de pasajeros por vía terrestre (declarantes)": 3.5,
-  "Servicios de transporte nacional de pasajeros por vía terrestre (no declarantes)": 3.5,
-  "Servicios de transporte nacional de pasajeros por vía aérea o marítima": 1.0,
-  "Servicios prestados por empresas de servicios temporales (sobre AIU)": 1.0,
-  "Servicios prestados por empresas de vigilancia y aseo (sobre AIU)": 2.0,
-  "Servicios integrales de salud prestados por IPS": 2.0,
-  "Servicios de hoteles y restaurantes (declarantes)": 3.5,
-  "Servicios de hoteles y restaurantes (no declarantes)": 3.5
-};

@@ -139,6 +139,7 @@ function processForm(data) {
     const lastRow = sheet.getLastRow();
     const newRow = lastRow + 1;
     //Crea las variables para guardar los datos del producto
+    const tipo = data.tipo;
     const codigoReferencia = data.codigoReferencia;
     const nombre = data.nombre;
     const precioUnitario = parseFloat(data.precioUnitario);
@@ -146,49 +147,53 @@ function processForm(data) {
     const numeroReferenciaAdicional = validarReferenciaAdicional(referenciaAdicional);
     const impuestos = data.impuestos;
     const tarifaImpuestos = String(validarImpuestos(impuestos, data.tarifaIva, data.tarifaInc)+"%");
-    const tarifaRetencion = String(data.retencion+"%");
-    Logger.log("tarifaRetencion "+tarifaRetencion)
-    const retencionConcepto = data.retencion;
+    const retencionConcepto = validarTipoRetencion(data.retencion, data.tarifaReteRenta);
+    const tarifaRetencion = String(validarTarifaRetencion(data.retencion, data.tarifaReteIva, data.tarifaReteRenta)+"%");
+ 
 
     //Asigna los valores a los campos en el sheet
-
-    //Codigo Referencia
-    sheet.getRange(newRow, 1).setValue(codigoReferencia);
+    //Tipo
+    sheet.getRange(newRow, 1).setValue(tipo);
     sheet.getRange(newRow, 1).setHorizontalAlignment('center');
-    //Nombre
-    sheet.getRange(newRow, 2).setValue(nombre);
+    //Codigo Referencia
+    sheet.getRange(newRow, 2).setValue(codigoReferencia);
     sheet.getRange(newRow, 2).setHorizontalAlignment('center');
+    //Nombre
+    sheet.getRange(newRow, 3).setValue(nombre);
+    sheet.getRange(newRow, 3).setHorizontalAlignment('center');
     //Referencia Adicional
-    sheet.getRange(newRow, 3).setValue(referenciaAdicional);
+    sheet.getRange(newRow, 4).setValue(referenciaAdicional);
     //Codigo Referencia Adicional
-    sheet.getRange(newRow, 4).setValue(numeroReferenciaAdicional);
+    sheet.getRange(newRow, 5).setValue(numeroReferenciaAdicional);
     //Precio Unitario
-    sheet.getRange(newRow, 5).setValue(precioUnitario);
-    sheet.getRange(newRow,5).setHorizontalAlignment('normal');
-    sheet.getRange(newRow, 5).setNumberFormat('$#,##0');
+    sheet.getRange(newRow, 6).setValue(precioUnitario);
+    sheet.getRange(newRow,6).setHorizontalAlignment('normal');
+    sheet.getRange(newRow, 6).setNumberFormat('$#,##0');
     //Impuestos (IVA o INC)
-    sheet.getRange(newRow, 7).setValue(impuestos);
+    sheet.getRange(newRow, 8).setValue(impuestos);
     //Tarifa Impuestos (formatea la celda como porcentaje)
-    const tarifaImpuestosCell = sheet.getRange(newRow, 8);
+    const tarifaImpuestosCell = sheet.getRange(newRow, 9);
     tarifaImpuestosCell.setHorizontalAlignment('center');
     tarifaImpuestosCell.setValue(tarifaImpuestos); // Establece el valor del IVA como decimal
-    //Precio con impuesto
-    precioImpuesto = precioUnitario + precioUnitario * (parseFloat(tarifaImpuestos) / 100);
-    Logger.log("precioImpuesto "+precioImpuesto)
-    sheet.getRange(newRow, 9).setValue(precioImpuesto);
+    //Precio impuesto
+    precioImpuesto = precioUnitario * (parseFloat(tarifaImpuestos) / 100);
+    sheet.getRange(newRow, 10).setValue(precioImpuesto);
     //Retencion concepto
-    sheet.getRange(newRow, 10).setValue(data.retencionConcepto);
+    sheet.getRange(newRow, 11).setValue(retencionConcepto);
     //Tarifa Retencion (formatea la celda como porcentaje)
-    const tarifaRetencionCell = sheet.getRange(newRow, 11);
+    const tarifaRetencionCell = sheet.getRange(newRow, 12);
     tarifaRetencionCell.setHorizontalAlignment('center');
-    Logger.log("tarifaRetencion "+tarifaRetencion)
     tarifaRetencionCell.setValue(tarifaRetencion); // Establece el valor del IVA como decimal
     tarifaRetencionCell.setNumberFormat('0%'); // Formatea la celda como porcentaje con dos decimales
+    //Valor Retencion
+    valorRetencion = precioUnitario * (parseFloat(tarifaRetencion) / 100);
+    sheet.getRange(newRow, 13).setValue(valorRetencion);
 
 
-    return "Datos guardados correctamente";
+    
+    return SpreadsheetApp.getUi().alert("Nuevo producto creado satisfactoriamente");
   } catch (error) {
-    return "Error al guardar los datos: " + error.message;
+    return SpreadsheetApp.getUi().alert("Error al guardar los datos: " + error.message);
   }
 }
 

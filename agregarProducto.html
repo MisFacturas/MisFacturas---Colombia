@@ -71,6 +71,32 @@
 
           <div class="col-12 px-0">
             <form class="row g-3" onsubmit="handleSubmit(event)" id="productForm">
+
+              <div class="col-12">
+                <label for="productoCheckbox">
+                  <input type="checkbox" id="productoCheckbox" name="tipo" value="Producto" onclick="toggleCheckbox('productoCheckbox', 'servicioCheckbox')">
+                  Producto
+                </label>
+                <label for="servicioCheckbox">
+                  <input type="checkbox" id="servicioCheckbox" name="tipo" value="Servicio" onclick="toggleCheckbox('servicioCheckbox', 'productoCheckbox')">
+                  Servicio
+                </label>
+              </div>
+              
+              <script>
+                function toggleCheckbox(selectedId, otherId) {
+                  var selectedCheckbox = document.getElementById(selectedId);
+                  var otherCheckbox = document.getElementById(otherId);
+              
+                  if (selectedCheckbox.checked) {
+                    otherCheckbox.disabled = true;
+                  } else {
+                    otherCheckbox.disabled = false;
+                  }
+                }
+              </script>
+
+
               <div class="col-12">
                 <label for="nombre" class="form-label">Nombre</label>
                 <input type="text" class="form-control form-control-lg" id="nombre" name="nombre" required>
@@ -89,11 +115,11 @@
               <div class="col-12">
                 <label for="referenciaAdicional" class="form-label">Referencia adicional</label>
                 <select id="referenciaAdicional" name="referenciaAdicional" class="form-select form-select-lg">
-                  <option selected>Seleccione</option>
+                  <option value="" selected>Seleccione</option>
                   <option>UNSPSC</option>
                   <option>GTIN</option>
                   <option>Partida Arancelarias</option>
-                  <option>Estándar de adopción del contribuyente</option>
+                  <option>Estandar de adopcion del contribuyente</option>
                   <option>No aplica</option>
                 </select>
               </div>
@@ -142,8 +168,11 @@
               </script>
 
               <div class="col-12">
-                <label for="ReteIva" class="form-label">Retencion sobre el IVA</label>
-                <select id="retencion" name="ReteIva" class="form-select form-select-lg">
+                <label for="ReteIva">
+                  <input type="checkbox" id="reteIvaCheckbox" name="retencion" value="ReteIva" onclick="toggleCheckbox('reteIvaCheckbox', 'reteRentaCheckbox')">
+                  Retencion sobre el IVA
+                </label>
+                <select id="tarifaReteIva" name="tarifaReteIva" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
                   <option value="15">15%</option>
                   <option value="100">100%</option>
@@ -151,30 +180,33 @@
               </div>
 
               <div class="col-12">
-                <label for="ReteRenta" class="form-label">Tipo retención de renta</label>
-                <select id="retencion" name="ReteRenta" class="form-select form-select-lg">
+                <label for="ReteRenta">
+                  <input type="checkbox" id="reteRentaCheckbox" name="retencion" value="ReteRenta" onclick="toggleCheckbox('reteRentaCheckbox', 'reteIvaCheckbox')">
+                  Retencion sobre renta
+                </label>
+                <select id="tarifaReteRenta" name="tarifaReteRenta" class="form-select form-select-lg">
                   <option selected>Seleccione</option>
                   <option>Compras generales (declarantes)</option>
                   <option>Compras generales (no declarantes)</option>
-                  <option>Compras con tarjeta débito o crédito</option>
-                  <option>Compras de bienes o productos agrícolas o pecuarios sin procesamiento industrial</option>
-                  <option>Compras de bienes o productos agrícolas o pecuarios con procesamiento industrial (declarantes)</option>
-                  <option>Compras de bienes o productos agrícolas o pecuarios con procesamiento industrial declarantes (no declarantes)</option>
-                  <option>Compras de café pergamino o cereza</option>
-                  <option>Compras de combustibles derivados del petróleo</option>
-                  <option>Enajenación de activos fijos de personas naturales (notarías y tránsito son agentes retenedores)</option>
-                  <option>Compras de vehículos</option>
-                  <option>Compras de bienes raíces cuya destinación y uso sea vivienda de habitación (por las primeras 20.000 UVT, es decir hasta $637.780.000)</option>
-                  <option>Compras de bienes raíces cuya destinación y uso sea vivienda de habitación (exceso de las primeras 20.000 UVT, es decir superior a $637.780.000)</option>
-                  <option>Compras de bienes raíces cuya destinación y uso sea distinto a vivienda de habitación</option>
+                  <option>Compras con tarjeta debito o credito</option>
+                  <option>Compras de bienes o productos agricolas o pecuarios sin procesamiento industrial</option>
+                  <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial (declarantes)</option>
+                  <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial declarantes (no declarantes)</option>
+                  <option>Compras de cafe pergamino o cereza</option>
+                  <option>Compras de combustibles derivados del petroleo</option>
+                  <option>Enajenacion de activos fijos de personas naturales (notarias y transito son agentes retenedores)</option>
+                  <option>Compras de vehiculos</option>
+                  <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (por las primeras 20.000 UVT, es decir hasta $637.780.000)</option>
+                  <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (exceso de las primeras 20.000 UVT, es decir superior a $637.780.000)</option>
+                  <option>Compras de bienes raices cuya destinacion y uso sea distinto a vivienda de habitacion</option>
                   <option>Servicios generales (declarantes)</option>
                   <option>Servicios generales (no declarantes)</option>
-                  <option>Por emolumentos eclesiásticos (declarantes)</option>
-                  <option>Por emolumentos eclesiásticos (no declarantes)</option>
+                  <option>Por emolumentos eclesiasticos (declarantes)</option>
+                  <option>Por emolumentos eclesiasticos (no declarantes)</option>
                   <option>Servicios de transporte de carga</option>
-                  <option>Servicios de transporte nacional de pasajeros por vía terrestre (declarantes)</option>
-                  <option>Servicios de transporte nacional de pasajeros por vía terrestre (no declarantes)</option>
-                  <option>Servicios de transporte nacional de pasajeros por vía aérea o marítima</option>
+                  <option>Servicios de transporte nacional de pasajeros por via terrestre (declarantes)</option>
+                  <option>Servicios de transporte nacional de pasajeros por via terrestre (no declarantes)</option>
+                  <option>Servicios de transporte nacional de pasajeros por via aerea o maritima</option>
                   <option>Servicios prestados por empresas de servicios temporales (sobre AIU)</option>
                   <option>Servicios prestados por empresas de vigilancia y aseo (sobre AIU)</option>
                   <option>Servicios integrales de salud prestados por IPS</option>
@@ -185,19 +217,34 @@
                   <option>Arrendamiento de bienes inmuebles (no declarantes)</option>
                   <option>Otros ingresos tributarios (declarantes)</option>
                   <option>Otros ingresos tributarios (no declarantes)</option>
-                  <option>Honorarios y comisiones (personas jurídicas)</option>
+                  <option>Honorarios y comisiones (personas juridicas)</option>
                   <option>Honorarios y comisiones personas naturales que suscriban contrato o cuya sumatoria de los pagos o abonos en cuenta superen las 3.300 UVT ($105.135.000)</option>
                   <option>Honorarios y comisiones (no declarantes)</option>
                   <option>Servicios de licenciamiento o derecho de uso de software</option>
                   <option>Intereses o rendimientos financieros</option>
-                  <option>Comisiones del Fondo Nacional de Garantías</option>
-                  <option>Rendimientos financieros provenientes de títulos de renta fija</option>
-                  <option>Loterías, rifas, apuestas y similares</option>
-                  <option>Retención en colocación independiente de juegos de suerte y azar</option>
-                  <option>Contratos de construcción y urbanización</option>
+                  <option>Comisiones del Fondo Nacional de Garantias</option>
+                  <option>Rendimientos financieros provenientes de titulos de renta fija</option>
+                  <option>Loterias, rifas, apuestas y similares</option>
+                  <option>Retencion en colocacion independiente de juegos de suerte y azar</option>
+                  <option>Contratos de construccion y urbanizacion</option>
                 </select>
               </div>
+
+              <script>
+                document.getElementById('reteIvaCheckbox').addEventListener('change', function() {
+                  document.getElementById('reteRentaCheckbox').checked = false;
+                  document.getElementById('tarifaReteRenta').disabled = true;
+                  document.getElementById('tarifaReteRenta').value = ''; // Set value to empty
+                  document.getElementById('tarifaReteIva').disabled = !this.checked;
+                });
               
+                document.getElementById('reteRentaCheckbox').addEventListener('change', function() {
+                  document.getElementById('reteIvaCheckbox').checked = false;
+                  document.getElementById('tarifaReteIva').disabled = true;
+                  document.getElementById('tarifaReteIva').value = ''; // Set value to empty
+                  document.getElementById('tarifaReteRenta').disabled = !this.checked;
+                });
+              </script>
 
             </form>
           </div>
