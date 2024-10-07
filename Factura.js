@@ -160,7 +160,7 @@ function guardarFacturaHistorial() {
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   var numeroFactura = hojaFactura.getRange("G2").getValue();
   var cliente = hojaFactura.getRange("B2").getValue();
-  var fechaEmision = hojaFactura.getRange("G4").getValue();
+  var fechaEmision = hojaFactura.getRange("H4").getValue();
   var estado = "Creada";
   var informacionCliente = getCustomerInformation(cliente);
   var numeroIdentificacion = informacionCliente.Identification;
@@ -489,8 +489,8 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("B3").setValue("")//Codigo
   hojaFactura.getRange("B4").setValue("")//Consumidor Final
 
-  hojaFactura.getRange("G7").setValue("")//hora
-  hojaFactura.getRange("G4").setValue("")//fecha
+  hojaFactura.getRange("H6").setValue("")//hora
+  hojaFactura.getRange("H4").setValue("")//fecha
   hojaFactura.getRange("G5").setValue("")//forma pago
   hojaFactura.getRange("G6").setValue(0)//dias vencimiento
   hojaFactura.getRange("G3").setValue("")
@@ -526,7 +526,7 @@ function limpiarHojaFactura(){
 
   hojaFactura.getRange("B16").setValue("0")//total producto
   hojaFactura.getRange("B17").setValue(0)//carrgos
-  hojaFactura.getRange("B18").setValue(0)//descuentos
+  hojaFactura.getRange("D18").setValue(0)//descuentos
 }
 
 
@@ -588,15 +588,15 @@ function generarNumeroFactura(){
 function obtenerFechaYHoraActual(){ 
   let sheet = spreadsheet.getSheetByName('Factura');
 
-  let fecha = Utilities.formatDate(new Date(), "UTC-5", "dd/MM/yyyy");
-  let hora= Utilities.formatDate(new Date(), "UTC-5", "HH:mm:ss");
+  let fecha = Utilities.formatDate(new Date(), "-5", "dd/MM/yyyy");
+  let hora= Utilities.formatDate(new Date(), "-5", "HH:mm:ss");
 
-  sheet.getRange("G4").setNumberFormat("dd/MM/yyyy");
-  sheet.getRange("G4").setValue(String(fecha))
-  sheet.getRange("G7").setValue(hora)
+  sheet.getRange("H4").setNumberFormat("dd/MM/yyyy");
+  sheet.getRange("H4").setValue(String(fecha))
+  sheet.getRange("H6").setValue(hora)
 
   
-  let valorFecha=sheet.getRange("G4").getValue();
+  let valorFecha=sheet.getRange("H4").getValue();
 
   let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC-5", "dd/MM/yyyy");
   Logger.log("valorFecha "+valorFecha)
@@ -607,7 +607,7 @@ function obtenerFechaYHoraActual(){
 
 function ObtenerFechaFormatedada(opcion){
     let sheet = spreadsheet.getSheetByName('Factura');
-    let valorFecha=sheet.getRange("G4").getValue();
+    let valorFecha=sheet.getRange("H4").getValue();
     let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC-5", "dd/MM/yyyy");
   return fechaFormateada
 }
@@ -821,9 +821,9 @@ function guardarYGenerarInvoice(){
   if (posicionOriginalTotalFactura==="Total factura"){
     rangeBaseImponilbeValor=prefactura_sheet.getRange(26,1,1,3);
     rangeTotales=prefactura_sheet.getRange(29,1,1,4);
-    rangeFacturaTotal=prefactura_sheet.getRange("B31")
+    rangeFacturaTotal=prefactura_sheet.getRange("K25")
     cargoFactura=prefactura_sheet.getRange("B17").getValue()
-    descuentoFactura=prefactura_sheet.getRange("B18").getValue()
+    descuentoFactura=prefactura_sheet.getRange("D18").getValue()
     
   }else{
     let rowBaseImponilbeValor=startingRowTaxation+7
@@ -1331,7 +1331,7 @@ function resetPlantilla() {
   targetSheet.getRange('K12').clearContent();
   targetSheet.getRange('K13').clearContent();
   targetSheet.getRange('K14').clearContent();
-  targetSheet.getRange('K15').clearContent();
+  targetSheet.getRange('J15').clearContent();
   
   // Borrar valor a pagar, nota de pago y observaciones
   targetSheet.getRange('B41').clearContent();
