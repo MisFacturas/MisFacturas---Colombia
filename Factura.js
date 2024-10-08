@@ -22,16 +22,18 @@ function verificarEstadoValidoFactura() {
 
   let clienteActual = hojaFactura.getRange("B2").getValue();
   let informacionFactura1 = hojaFactura.getRange(2, 6, 5, 2).getValues();
-  let informacionFactura2 = hojaFactura.getRange(2, 9, 5, 1).getValues();
+  let informacionFactura2 = hojaFactura.getRange(2, 9, 6, 1).getValues();
 
 
   // Crear una lista combinada
   let listaCombinada = [clienteActual];  // Añadir clienteActual al array
   for (let i = 0; i < informacionFactura1.length; i++) {
     listaCombinada.push(informacionFactura1[i][0]); // Añadir cada valor de informacionFactura1
+    
   }
   for (let j = 0; j < informacionFactura2.length; j++) {
     listaCombinada.push(informacionFactura2[j][0]); // Añadir cada valor de informacionFactura2
+  
   }
 
   // Recorrer 

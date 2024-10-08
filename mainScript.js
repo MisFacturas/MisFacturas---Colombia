@@ -15,10 +15,9 @@ function onOpen() {
   ui.createMenu('Sidebar')
     .addItem('Sidebar', 'showSidebar')
     .addToUi()
-    .addItem('Producto', 'showPreProductos')
-    .addToUi();
 
 
+  showSidebar();
   return;
 }
 
@@ -385,6 +384,7 @@ function onEdit(e) {
     }
 
     updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,taxSectionStartRow)
+    
   } else if (hojaActual.getName() === "Clientes") {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
