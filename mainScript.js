@@ -324,37 +324,23 @@ function onEdit(e) {
           continue
         }
         let dictInformacionProducto = obtenerInformacionProducto(productoFilaI);
-        let cantiadProducto= factura_sheet.getRange("C"+String(i)).getValue()
+        let cantidadProducto= factura_sheet.getRange("C"+String(i)).getValue()
 
-        let ivaProductoActual=dictInformacionProducto["IVA"]
-        let valorFechaActual=ObtenerFecha()
-    
-        let verifcadorFecha=verificarDescuentoValido(valorFechaActual,ivaProductoActual)
-        if (verifcadorFecha===false){
-          SpreadsheetApp.getUi().alert("Posee un producto con un IVA de 5%, en un rango de fechas invalido")
-          //poner rangos en 0
-          continue
-        }
-
-        if(cantiadProducto===""){
-          cantiadProducto=0
+        if(cantidadProducto===""){
+          cantidadProducto=0
           //tal vez mirara si agrego el 0 de cantidad
           factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
-          factura_sheet.getRange("D"+String(i)).setValue(0)//unitario SIN 'IVA'
-          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
+          factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
+          factura_sheet.getRange("F"+String(i)).setValue(dictInformacionProducto["precio Impuesto"])//impuestos
           
-          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
-          factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
+          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["valor Retencion"])//Retencion
         }else{
           factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
-          factura_sheet.getRange("E"+String(i)).setValue("=D"+String(i)+"+(D"+String(i)+"*G"+String(i)+")")//AGG COSA DE CON IVA
-          factura_sheet.getRange("F"+String(i)).setValue("=(D"+String(i)+"-(D"+String(i)+"*H"+String(i)+"))*C"+String(i))//subtotal
-          factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["valor Unitario"])//valor unitario
-          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["IVA"])//IVA
-          
-          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["retencion"])//Retencion
-          factura_sheet.getRange("J"+String(i)).setValue(dictInformacionProducto["Recargo de equivalencia"])//Recargo de equivalencia
-          factura_sheet.getRange("K"+String(i)).setValue("=F"+String(i)+"+(F"+String(i)+"*G"+String(i)+")-(F"+String(i)+"*I"+String(i)+")+(F"+String(i)+"*J"+String(i)+")")//total linea
+          factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
+          factura_sheet.getRange("E"+String(i)).setValue("=D"+String(i)+"*C"+String(i))//Subtotal
+          factura_sheet.getRange("F"+String(i)).setValue(dictInformacionProducto["precio Impuesto"])//Impuestos
+          factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["valor Retencion"])//Retencion
+          factura_sheet.getRange("J"+String(i)).setValue("=(E"+String(i)+"+F"+String(i)+"+H"+String(i)+")-(G"+String(i)+"+I"+String(i)+")")//total linea
         }
       }
 

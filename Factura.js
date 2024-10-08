@@ -21,18 +21,23 @@ function verificarEstadoValidoFactura() {
   let estaValido = true;
 
   let clienteActual = hojaFactura.getRange("B2").getValue();
-  let informacionFactura = hojaFactura.getRange(2, 7, 5, 1).getValues();
+  let informacionFactura1 = hojaFactura.getRange(2, 6, 5, 2).getValues();
+  let informacionFactura2 = hojaFactura.getRange(2, 9, 5, 1).getValues();
+
 
   // Crear una lista combinada
   let listaCombinada = [clienteActual];  // Añadir clienteActual al array
-  for (let i = 0; i < informacionFactura.length; i++) {
-    listaCombinada.push(informacionFactura[i][0]);  // Añadir cada valor de informacionFactura
+  for (let i = 0; i < informacionFactura1.length; i++) {
+    listaCombinada.push(informacionFactura1[i][0]); // Añadir cada valor de informacionFactura1
+  }
+  for (let j = 0; j < informacionFactura2.length; j++) {
+    listaCombinada.push(informacionFactura2[j][0]); // Añadir cada valor de informacionFactura2
   }
 
   // Recorrer 
-  for (let i = 0; i < listaCombinada.length; i++) {
-    Logger.log("listaCombinada"+listaCombinada[i])
-    if(listaCombinada[i]===""){
+  for (let k = 0; k < listaCombinada.length; k++) {
+    Logger.log("listaCombinada"+listaCombinada[k])
+    if(listaCombinada[k]===""){
       estaValido=false
     }
   }
@@ -97,9 +102,10 @@ function agregarProductoDesdeFactura(cantidad,producto){
     factura_sheet.getRange("B15").setValue(producto)
     factura_sheet.getRange("C15").setValue(cantidad)
     factura_sheet.getRange("D15").setValue(dictInformacionProducto["precio Unitario"])
-    factura_sheet.getRange("E15").setValue(dictInformacionProducto["precio Impuestos"])
-    factura_sheet.getRange("F15").setValue(dictInformacionProducto["impuestos"])
-    factura_sheet.getRange("H15").setValue(dictInformacionProducto["retencion"])
+    factura_sheet.getRange("E15").setValue("=D15*C15")
+    factura_sheet.getRange("F15").setValue("=E15*("+dictInformacionProducto["tarifa Impuesto"]+")")
+
+    factura_sheet.getRange("I15").setValue("=D15*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
@@ -108,14 +114,12 @@ function agregarProductoDesdeFactura(cantidad,producto){
     factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
     factura_sheet.getRange("C"+String(rowParaDatos)).setValue(cantidad)
-    factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//valor unitario
+    factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
     factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos))//Subtotal
-
-    factura_sheet.getRange("F"+String(rowParaDatos)).setValue(dictInformacionProducto["impuestos"])//Porcentaje Impuestos
-    factura_sheet.getRange("G"+String(rowParaDatos)).setValue(dictInformacionProducto["descuentos"])//Descuetos
-    factura_sheet.getRange("H"+String(rowParaDatos)).setValue(dictInformacionProducto["retencion"])//Porcentaje Retencion
-    factura_sheet.getRange("I"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"+(D"+String(rowParaDatos)+"*F"+String(rowParaDatos)+")-(D"+String(rowParaDatos)+"*I"+String(rowParaDatos)+")+(F"+String(rowParaDatos)+"*J"+String(rowParaDatos)+")")//total linea
-  }
+    factura_sheet.getRange("F"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Impuesto"]+"*"+cantidad+")")//Valor de los Impuestos
+    factura_sheet.getRange("I"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")//Valor de los Impuestos
+    factura_sheet.getRange("J"+String(rowParaDatos)).setValue("=(E"+String(rowParaDatos)+"+F"+String(rowParaDatos)+"+H"+String(rowParaDatos)+")-(G"+String(rowParaDatos)+"+I"+String(rowParaDatos)+")")//Total
+  } 
 
   
 
@@ -518,14 +522,11 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("C15").setValue("")//cantidad
   hojaFactura.getRange("D15").setValue("")//precio unitario
   hojaFactura.getRange("F15").setValue("")//Impuestos
-  hojaFactura.getRange("F15").setNumberFormat("0.00%");
   hojaFactura.getRange("G15").setValue("")//descuento
-  hojaFactura.getRange("G15").setNumberFormat("0.00%")
   hojaFactura.getRange("H15").setValue("")//retencion
-  hojaFactura.getRange("H15").setNumberFormat("0.00%");
 
   hojaFactura.getRange("B16").setValue("0")//total producto
-  hojaFactura.getRange("B17").setValue(0)//carrgos
+  hojaFactura.getRange("D17").setValue(0)//cargos
   hojaFactura.getRange("D18").setValue(0)//descuentos
 }
 
@@ -588,8 +589,8 @@ function generarNumeroFactura(){
 function obtenerFechaYHoraActual(){ 
   let sheet = spreadsheet.getSheetByName('Factura');
 
-  let fecha = Utilities.formatDate(new Date(), "-5", "dd/MM/yyyy");
-  let hora= Utilities.formatDate(new Date(), "-5", "HH:mm:ss");
+  let fecha = Utilities.formatDate(new Date(), "America/Bogota", "dd/MM/yyyy");
+  let hora= Utilities.formatDate(new Date(), "America/Bogota", "HH:mm:ss");
 
   sheet.getRange("H4").setNumberFormat("dd/MM/yyyy");
   sheet.getRange("H4").setValue(String(fecha))
@@ -598,7 +599,7 @@ function obtenerFechaYHoraActual(){
   
   let valorFecha=sheet.getRange("H4").getValue();
 
-  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC-5", "dd/MM/yyyy");
+  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "dd/MM/yyyy");
   Logger.log("valorFecha "+valorFecha)
   Logger.log("fecha "+fecha)
   Logger.log("fechaFormateada "+fechaFormateada)
@@ -608,7 +609,7 @@ function obtenerFechaYHoraActual(){
 function ObtenerFechaFormatedada(opcion){
     let sheet = spreadsheet.getSheetByName('Factura');
     let valorFecha=sheet.getRange("H4").getValue();
-    let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC-5", "dd/MM/yyyy");
+    let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "dd/MM/yyyy");
   return fechaFormateada
 }
 
@@ -822,7 +823,7 @@ function guardarYGenerarInvoice(){
     rangeBaseImponilbeValor=prefactura_sheet.getRange(26,1,1,3);
     rangeTotales=prefactura_sheet.getRange(29,1,1,4);
     rangeFacturaTotal=prefactura_sheet.getRange("K25")
-    cargoFactura=prefactura_sheet.getRange("B17").getValue()
+    cargoFactura=prefactura_sheet.getRange("D17").getValue()
     descuentoFactura=prefactura_sheet.getRange("D18").getValue()
     
   }else{

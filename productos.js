@@ -62,7 +62,7 @@ function obtenerInformacionProducto(producto) {
     let informacionProducto = {
       "codigo Producto": codigoProducto,
       "precio Unitario": precioUnitario,
-      "impuestos": tarifaImpuesto,
+      "tarifa Impuesto": tarifaImpuesto,
       "precio Impuesto": precioImpuesto,
       "tarifa Retencion": tarifaRetencion,
       "valor Retencion": valorRetencion
@@ -75,7 +75,7 @@ function obtenerInformacionProducto(producto) {
     var spreadsheet = SpreadsheetApp.getActive();
     var hojaProductos = spreadsheet.getSheetByName('Productos');
     var ultimaFila = hojaProductos.getLastRow();
-    var valores = hojaProductos.getRange(2, 2, ultimaFila - 1, 1).getValues();
+    var valores = hojaProductos.getRange(1, 2, ultimaFila - 1, 1).getValues();
   
     // Filtrar los productos que coincidan con el término de búsqueda
     var productosFiltrados = valores
