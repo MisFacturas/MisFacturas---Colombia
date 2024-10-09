@@ -96,6 +96,8 @@
           telefono: document.getElementById('telefono').value,
           sitioWeb: document.getElementById('sitioWeb').value,
           email: document.getElementById('email').value,
+          detallesTributarios: document.getElementById('detallesTributarios').value,
+          responsabilidadFiscal: document.getElementById('responsabilidadFiscal').value
 
         };
 
@@ -231,7 +233,7 @@
 
                 <div class="col-md-12">
                     <label for="municipio" class="form-label">Municipio</label>
-                    <input type="text" class="form-control form-control-lg" id="municipio" placeholder="Población">
+                    <input type="text" class="form-control form-control-lg" id="municipio" placeholder="Municipio">
                 </div>
 
                 <div class="col-md-12">
@@ -259,6 +261,27 @@
                     <input type="email" class="form-control form-control-lg" id="email" placeholder="Email">
                 </div>
 
+                <div class="col-12">
+                  <label for="detallesTributarios" class="form-label">Detalles tributarios</label>
+                  <select id="detallesTributarios" class="form-select form-select-lg">
+                    <option selected>Seleccione</option>
+                    <option>IVA</option>
+                    <option>INC</option>
+                    <option>IVA e INC</option>
+                    <option>No aplica</option>
+                  </select>
+              </div>
+
+              <div class="col-12">
+                <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal</label>
+                <select id="responsabilidadFiscal" class="form-select form-select-lg">
+                  <option selected>Seleccione</option>
+                  <option>Gran contribuyente</option>
+                  <option>Autorretenedor</option>
+                  <option>Regimen simple de tributacion</option>
+                  <option>No aplica – Otros</option>
+                </select>
+            </div>
             </form>
         </div>
     </div>

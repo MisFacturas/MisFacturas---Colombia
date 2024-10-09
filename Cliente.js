@@ -187,7 +187,7 @@ function buscarClientes(terminoBusqueda,hojaA) {
   return resultados;
 }
 function buscarPaises(terminoBusqueda){
-  let paises=datos_sheet.getRange(25,1,169,1).getValues();
+  let paises=datos_sheet.getRange(25,1,170,1).getValues();
   var resultados = [];
   if(terminoBusqueda===""){
     return resultados
@@ -205,6 +205,7 @@ function buscarPaises(terminoBusqueda){
   // Devuelve los resultados
   return resultados;
 }
+
 
 function agregarPaises(){
   const paises = [
