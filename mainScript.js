@@ -142,12 +142,14 @@ function processForm(data) {
     const codigoReferencia = data.codigoReferencia;
     const nombre = data.nombre;
     const precioUnitario = parseFloat(data.precioUnitario);
+    const unidadDeMedida = data.unidadDeMedida;
     const referenciaAdicional = data.referenciaAdicional;
     const numeroReferenciaAdicional = validarReferenciaAdicional(referenciaAdicional);
     const impuestos = data.impuestos;
     const tarifaImpuestos = String(validarImpuestos(impuestos, data.tarifaIva, data.tarifaInc)+"%");
     const retencionConcepto = validarTipoRetencion(data.retencion, data.tarifaReteRenta);
     const tarifaRetencion = String(validarTarifaRetencion(data.retencion, data.tarifaReteIva, data.tarifaReteRenta)+"%");
+
  
 
     //Asigna los valores a los campos en el sheet
@@ -168,6 +170,9 @@ function processForm(data) {
     sheet.getRange(newRow, 6).setValue(precioUnitario);
     sheet.getRange(newRow,6).setHorizontalAlignment('normal');
     sheet.getRange(newRow, 6).setNumberFormat('$#,##0');
+    //Unidad de Medida
+    Logger.log("Unidad de medida: "+unidadDeMedida);
+    sheet.getRange(newRow, 7).setValue(unidadDeMedida);
     //Impuestos (IVA o INC)
     sheet.getRange(newRow, 8).setValue(impuestos);
     //Tarifa Impuestos (formatea la celda como porcentaje)

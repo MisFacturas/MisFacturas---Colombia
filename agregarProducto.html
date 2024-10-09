@@ -28,9 +28,7 @@
             formData.forEach((value, key) => {
                 data[key] = value;
             });
-            google.script.run.withSuccessHandler(function (response) {
-                alert(response);
-            }).processForm(data);
+            google.script.run.processForm(data);
           }
 
           function showMenuPrincipal() {
@@ -39,6 +37,7 @@
           function showPreProducto(){
             google.script.run.showPreProductos();
           }
+   
 
 
   
@@ -105,6 +104,11 @@
               <div class="col-12">
                 <label for="precioUnitario" class="form-label">Precio unitario</label>
                 <input type="number" class="form-control form-control-lg" id="precioUnitario" name="precioUnitario" required>
+              </div>
+
+              <div class="col-12">
+                <label for="unidadDeMedida" class="form-label">Unidad de medida</label>
+                <input type="text" id="unidadDeMedida" class="form-control form-control-lg" name="unidadDeMedida">
               </div>
 
               <div class="col-12">

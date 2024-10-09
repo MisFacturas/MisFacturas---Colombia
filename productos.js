@@ -1,5 +1,24 @@
 var spreadsheet = SpreadsheetApp.getActive();
 
+function buscarUnidadesDeMedida(terminoBusqueda){
+  let unidadesDeMedida=datos_sheet.getRange(35,3,365,1).getValues();
+  var resultados = [];
+  if(terminoBusqueda===""){
+    return resultados
+  }
+  // Recorre los valores obtenidos
+  for (var i = 0; i < unidadesDeMedida.length; i++) {
+    var valor = unidadesDeMedida[i][0]; // Accede al primer (y único) valor de cada fila
+    
+    // Comprueba si el valor coincide con el término de búsqueda
+    if (valor.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) {
+      resultados.push(valor); // Añade el valor a la lista de resultados si coincide
+    }
+  }
+  
+  // Devuelve los resultados
+  return resultados;
+}
 
 function saveProductData(formData) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Productos');
@@ -30,7 +49,7 @@ function saveProductData(formData) {
     formData.nombre,
     formData.referenciaAdicional,
     formData.precioUnitario,
-    formData.unidadMedida,
+    formData.unidadDeMedida,
     formData.impuestos,
     formData.tarifaImpuestos,
     formData.retencion,
