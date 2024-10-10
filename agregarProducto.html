@@ -81,19 +81,6 @@
                   Servicio
                 </label>
               </div>
-              
-              <script>
-                function toggleCheckbox(selectedId, otherId) {
-                  var selectedCheckbox = document.getElementById(selectedId);
-                  var otherCheckbox = document.getElementById(otherId);
-              
-                  if (selectedCheckbox.checked) {
-                    otherCheckbox.disabled = true;
-                  } else {
-                    otherCheckbox.disabled = false;
-                  }
-                }
-              </script>
 
 
               <div class="col-12">
@@ -130,11 +117,11 @@
 
               <div class="col-12">
                 <label for="IVA">
-                  <input type="checkbox" id="ivaCheckbox" name="impuestos" value="IVA" onclick="toggleCheckbox('ivaCheckbox', 'incCheckbox')">
+                  <input type="checkbox" id="IVA" name="IVA" value="IVA" >
                   IVA
                 </label>
                 <select id="tarifaIva" name="tarifaIva" class="form-select form-select-lg">
-                  <option value="0" selected>Tarifa IVA</option>
+                  <option value="0">Extento</option>
                   <option value="5">5%</option>
                   <option value="16">16%</option>
                   <option value="19">19%</option>
@@ -143,11 +130,11 @@
               
               <div class="col-12">
                 <label for="INC">
-                  <input type="checkbox" id="incCheckbox" name="impuestos" value="INC" onclick="toggleCheckbox('incCheckbox', 'ivaCheckbox')">
+                  <input type="checkbox" id="INC" name="INC" value="INC">
                   INC
                 </label>
                 <select id="tarifaInc" name="tarifaInc" class="form-select form-select-lg">
-                  <option value="0" selected>Tarifa INC</option>
+                  <option value="0"></option>
                   <option value="2">2%</option>
                   <option value="4">4%</option>
                   <option value="8">8%</option>
@@ -156,19 +143,17 @@
               </div>
 
               <script>
-                document.getElementById('ivaCheckbox').addEventListener('change', function() {
-                  document.getElementById('incCheckbox').checked = false;
-                  document.getElementById('tarifaInc').disabled = true;
-                  document.getElementById('tarifaInc').value = ''; // Set value to empty
-                  document.getElementById('tarifaIva').disabled = !this.checked;
-                });
+                function toggleSelect(checkboxId, selectId) {
+                  var checkbox = document.getElementById(checkboxId);
+                  var select = document.getElementById(selectId);
               
-                document.getElementById('incCheckbox').addEventListener('change', function() {
-                  document.getElementById('ivaCheckbox').checked = false;
-                  document.getElementById('tarifaIva').disabled = true;
-                  document.getElementById('tarifaIva').value = ''; // Set value to empty
-                  document.getElementById('tarifaInc').disabled = !this.checked;
-                });
+                  if (checkbox.checked) {
+                    select.disabled = false;
+                  } else {
+                    select.disabled = true;
+                    select.selectedIndex = 0; // Resetea la selección a la primera opción
+                  }
+                }
               </script>
 
               <div class="col-12">

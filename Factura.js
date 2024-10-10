@@ -551,24 +551,24 @@ function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
   }
 }
 
-function verificarYCopiarContacto(e) {
+function verificarYCopiarCliente(e) {
   let hojaFacturas = e.source.getSheetByName('Factura');
-  let hojaContactos = e.source.getSheetByName('Clientes');
+  let hojaClientes = e.source.getSheetByName('Clientes');
   let celdaEditada = e.range;
 
 
 
-  let nombreContacto = celdaEditada.getValue();
-  let ultimaColumnaPermitida = 20; // Columna del estado en la hoja de contactos
-  let datosARetornar = ["B", "O","M","L","N","Q"]; // Columnas que quiero de la hoja de contactos
+  let nombreCliente = celdaEditada.getValue();
+  let ultimaColumnaPermitida = 20; // Columna del estado en la hoja de clientes
+  let datosARetornar = ["B", "O","M","L","N","Q"]; // Columnas que quiero de la hoja de clientes
 
 
-  if (nombreContacto==="Cliente"){
+  if (nombreCliente==="Cliente"){
     Logger.log("Estado default")
   }else{
-    let listaConInformacion = obtenerInformacionCliente(nombreContacto);
+    let listaConInformacion = obtenerInformacionCliente(nombreCliente);
     if (listaConInformacion["Estado"]==="No Valido"){
-      SpreadsheetApp.getUi().alert("Error: El contacto seleccionado no es válido.");
+      SpreadsheetApp.getUi().alert("Error: El cliente seleccionado no es válido.");
     }else{
       //asigna el valor del coldigo solamente porque ese fue lo que me pidieron no mas
       hojaFacturas.getRange("B3").setValue(listaConInformacion["Código cliente"]);

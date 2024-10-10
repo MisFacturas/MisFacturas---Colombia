@@ -31,7 +31,7 @@ function inactivarCliente(cliente){
   let rowMaximaClientesInactivos=hojaClientesInactivos.getLastRow()+1;
   let rowMaximaClientes=hojaClietnes.getLastRow()+1;
 
-  let codigoContacto=datos_sheet.getRange("I2").getValue();
+  let codigoCliente=datos_sheet.getRange("I2").getValue();
   let tipoDoc=datos_sheet.getRange("J2").getValue();
   let numIdentificacion=datos_sheet.getRange("K2").getValue();
   let tipoPersona=datos_sheet.getRange("L2").getValue();
@@ -63,7 +63,7 @@ function inactivarCliente(cliente){
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 4).setValue(tipoPersona);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 5).setValue(tipoDoc);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 6).setValue(numIdentificacion);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 7).setValue(codigoContacto);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 7).setValue(codigoCliente);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 8).setValue(regimen);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 9).setValue(nombreComercial);
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 10).setValue(primerNombre);
@@ -103,7 +103,7 @@ function activarCliente(cliente){
   let tipoPersona = datos_sheet.getRange('K6').getValue();
   let tipoDoc = datos_sheet.getRange('L6').getValue();
   let numIdentificacion = datos_sheet.getRange('M6').getValue();
-  let codigoContacto = datos_sheet.getRange('N6').getValue();
+  let codigoCliente = datos_sheet.getRange('N6').getValue();
   let regimen = datos_sheet.getRange('O6').getValue();
   let nombreComercial = datos_sheet.getRange('P6').getValue();
   let primerNombre = datos_sheet.getRange('Q6').getValue();
@@ -127,7 +127,7 @@ function activarCliente(cliente){
   hojaClietnes.getRange(rowMaximaClientes, 4).setValue(tipoPersona);
   hojaClietnes.getRange(rowMaximaClientes, 5).setValue(tipoDoc);
   hojaClietnes.getRange(rowMaximaClientes, 6).setValue(numIdentificacion);
-  hojaClietnes.getRange(rowMaximaClientes, 7).setValue(codigoContacto);
+  hojaClietnes.getRange(rowMaximaClientes, 7).setValue(codigoCliente);
   hojaClietnes.getRange(rowMaximaClientes, 8).setValue(regimen);
   hojaClietnes.getRange(rowMaximaClientes, 9).setValue(nombreComercial);
   hojaClietnes.getRange(rowMaximaClientes, 10).setValue(primerNombre);
@@ -452,7 +452,7 @@ function saveClientData(formData) {
     formData.tipoPersona,
     formData.tipoDocumento,
     formData.numeroIdentificacion,
-    formData.codigoContacto,
+    formData.codigoCliente,
     formData.regimen,
     formData.nombreComercial,
     formData.primerNombre,
@@ -535,7 +535,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
 }
 
 
-function crearContacto(){
+function crearCliente(){
   Logger.log("imprima algo")
   showNuevaCliente()
 
@@ -645,7 +645,7 @@ function obtenerInformacionCliente(cliente) {
 
 
 
-  let codigoContacto = datos_sheet.getRange("I2").getValue();
+  let codigoCliente = datos_sheet.getRange("I2").getValue();
   let direccion = datos_sheet.getRange("T2").getValue();
   let pais = datos_sheet.getRange("S2").getValue();
   let departamento = datos_sheet.getRange("AA2").getValue();
@@ -656,7 +656,7 @@ function obtenerInformacionCliente(cliente) {
   let ubicacion = municipio + ", " + departamento + ", " + pais;
 
   let informacionCliente = {
-    "Código cliente": codigoContacto,
+    "Código cliente": codigoCliente,
     "Dirección": direccion,
     "Ubicación": ubicacion,
     "Teléfono": telefono,

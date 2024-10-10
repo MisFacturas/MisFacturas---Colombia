@@ -145,8 +145,10 @@ function processForm(data) {
     const unidadDeMedida = data.unidadDeMedida;
     const referenciaAdicional = data.referenciaAdicional;
     const numeroReferenciaAdicional = validarReferenciaAdicional(referenciaAdicional);
-    const impuestos = data.impuestos;
-    const tarifaImpuestos = String(validarImpuestos(impuestos, data.tarifaIva, data.tarifaInc)+"%");
+    const iva = data.IVA;
+    const tarifaIva = String(data.tarifaIva)+"%";
+    const inc = data.INC;
+    const tarifaInc = String(data.tarifaInc)+"%";
     const retencionConcepto = validarTipoRetencion(data.retencion, data.tarifaReteRenta);
     const tarifaRetencion = String(validarTarifaRetencion(data.retencion, data.tarifaReteIva, data.tarifaReteRenta)+"%");
 
@@ -173,25 +175,31 @@ function processForm(data) {
     //Unidad de Medida
     Logger.log("Unidad de medida: "+unidadDeMedida);
     sheet.getRange(newRow, 7).setValue(unidadDeMedida);
-    //Impuestos (IVA o INC)
-    sheet.getRange(newRow, 8).setValue(impuestos);
-    //Tarifa Impuestos (formatea la celda como porcentaje)
-    const tarifaImpuestosCell = sheet.getRange(newRow, 9);
-    tarifaImpuestosCell.setHorizontalAlignment('center');
-    tarifaImpuestosCell.setValue(tarifaImpuestos); // Establece el valor del IVA como decimal
+    //Columna IVA
+    sheet.getRange(newRow, 8).setValue(iva);
+    //Tarifa IVA (formatea la celda como porcentaje)
+    const tarifaIVA = sheet.getRange(newRow, 9);
+    tarifaIVA.setHorizontalAlignment('center');
+    tarifaIVA.setValue(tarifaIva); // Establece el valor del IVA como decimal
+    //Columna INC
+    sheet.getRange(newRow, 10).setValue(inc);
+    //Tarifa INC (formatea la celda como porcentaje)
+    const tarifaINC = sheet.getRange(newRow, 11);
+    tarifaINC.setHorizontalAlignment('center');
+    tarifaINC.setValue(tarifaInc); // Establece el valor del IVA como decimal
     //Precio impuesto
-    precioImpuesto = precioUnitario * (parseFloat(tarifaImpuestos) / 100);
-    sheet.getRange(newRow, 10).setValue(precioImpuesto);
+    precioImpuesto = precioUnitario * (parseFloat(data.tarifaIva) / 100) + precioUnitario * (parseFloat(data.tarifaInc) / 100);
+    sheet.getRange(newRow, 12).setValue(precioImpuesto);
     //Retencion concepto
-    sheet.getRange(newRow, 11).setValue(retencionConcepto);
+    sheet.getRange(newRow, 13).setValue(retencionConcepto);
     //Tarifa Retencion (formatea la celda como porcentaje)
-    const tarifaRetencionCell = sheet.getRange(newRow, 12);
+    const tarifaRetencionCell = sheet.getRange(newRow, 14);
     tarifaRetencionCell.setHorizontalAlignment('center');
     tarifaRetencionCell.setValue(tarifaRetencion); // Establece el valor del IVA como decimal
     tarifaRetencionCell.setNumberFormat('0%'); // Formatea la celda como porcentaje con dos decimales
     //Valor Retencion
     valorRetencion = precioUnitario * (parseFloat(tarifaRetencion) / 100);
-    sheet.getRange(newRow, 13).setValue(valorRetencion);
+    sheet.getRange(newRow, 15).setValue(valorRetencion);
 
 
     
@@ -290,8 +298,8 @@ function onEdit(e) {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
-    let columnaContactos = 2; // Ajusta según sea necesario
-    let rowContactos = 2;
+    let columnaClientes = 2; // Ajusta según sea necesario
+    let rowClientes = 2;
 
 
     const productStartRow = 15; // prodcutos empeiza aca
@@ -300,10 +308,10 @@ function onEdit(e) {
     let posRowTotalProductos=taxSectionStartRow-3//poscion (row) de Total productos
     //Logger.log("taxSectionStartRow "+taxSectionStartRow)
 
-    if (colEditada === columnaContactos && rowEditada === rowContactos) {
-      //celda de elegir contacto en hoja factura
-      Logger.log("No se editó un contacto válido");
-      verificarYCopiarContacto(e);
+    if (colEditada === columnaClientes && rowEditada === rowClientes) {
+      //celda de elegir cliente en hoja factura
+      Logger.log("No se editó un cliente válido");
+      verificarYCopiarCliente(e);
       obtenerFechaYHoraActual()
       //generarNumeroFactura()
       let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
@@ -847,7 +855,7 @@ Output: no tiene output pero regresa un mensaje en caso de que sea erroneo el ti
 
   if (sheet.getName() === "Clientes") {//aca filtro de hoja, por cada hoja verifica cosas distintas
     let numIdentificacion = sheet.getRange("D2:D1000");
-    let codigoContacto = sheet.getRange("E2:E1000");
+    let codigoCliente = sheet.getRange("E2:E1000");
     let nomberComercial=sheet.getRange("G2:G1000");
     let primerNombre = sheet.getRange("H2:H1000");
     let segundoNombre = sheet.getRange("I2:I1000");
@@ -865,7 +873,7 @@ Output: no tiene output pero regresa un mensaje en caso de que sea erroneo el ti
 
     esCeldaEnRango(numIdentificacion, editedCell, undefined, e);
     esCeldaEnRango(nomberComercial,editedCell,"string",e)
-    esCeldaEnRango(codigoContacto, editedCell, undefined, e);
+    esCeldaEnRango(codigoCliente, editedCell, undefined, e);
     esCeldaEnRango(primerNombre, editedCell, "string", e);
     esCeldaEnRango(segundoNombre, editedCell, "string", e);
     esCeldaEnRango(primeraApellido, editedCell, "string", e);

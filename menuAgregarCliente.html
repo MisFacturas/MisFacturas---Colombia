@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
-    <title>Crear Contacto · Bootstrap v5.0</title>
+    <title>Crear Cliente · Bootstrap v5.0</title>
 
     <!-- Bootstrap core CSS -->
     <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
@@ -53,9 +53,9 @@
       const form = document.getElementById('clienteForm');
       const tipoPersona = document.getElementById('tipoPersona').value;
       const columnasObligatorias = tipoPersona === 'Natural' ? 
-        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto','regimen', 'primerNombre', 'primerApellido', 'pais', 'direccion', 'codigoPostal','telefono',  'email'] :
+        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente','regimen', 'primerNombre', 'primerApellido', 'pais', 'direccion', 'codigoPostal','telefono',  'email'] :
         tipoPersona === 'Juridica' ? 
-        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoContacto','regimen', 'nombreComercial', 'pais', 'direccion', 'codigoPostal', 'telefono',  'email'] : 
+        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente','regimen', 'nombreComercial', 'pais', 'direccion', 'codigoPostal', 'telefono',  'email'] : 
         [];
 
       let isValid = true;
@@ -81,7 +81,7 @@
           tipoPersona: document.getElementById('tipoPersona').value,
           tipoDocumento: document.getElementById('tipoDocumento').value,
           numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
-          codigoContacto: document.getElementById('codigoContacto').value,
+          codigoCliente: document.getElementById('codigoCliente').value,
           regimen: document.getElementById('regimen').value,
           nombreComercial: document.getElementById('nombreComercial').value,
           primerNombre: document.getElementById('primerNombre').value,
@@ -121,7 +121,7 @@
           <a onclick="Back()"><i class="icon-left nav-icon"></i></a>
         </div>
         <div class="col-7 p-0 d-flex align-items-center">
-          <h2 class="mb-0 ms-4">Crear contacto</h2>
+          <h2 class="mb-0 ms-4">Crear cliente</h2>
         </div>
       </div>
 
@@ -131,7 +131,7 @@
 
     <div class="row py-3 px-5 gx-0">
         <div class="col-12 py-4">
-          <p>Ingresa la información de tu nuevo contacto.</p>
+          <p>Ingresa la información de tu nuevo cliente.</p>
         </div>
 
         <div class="col-12 px-0">
@@ -142,7 +142,7 @@
                 </div>
 
                 <div class="col-md-12">
-                    <label for="tipoTercero" class="form-label">Tipo de contacto</label>
+                    <label for="tipoTercero" class="form-label">Tipo de cliente</label>
                     <select id="tipoTercero" class="form-select form-select-lg">
                       <option selected>Cliente</option>
                       <option>Proveedor</option>
@@ -180,8 +180,8 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label for="codigoContacto" class="form-label">Código contacto</label>
-                    <input type="text" class="form-control form-control-lg" id="codigoContacto" placeholder="Código contacto">
+                    <label for="codigoCliente" class="form-label">Código cliente</label>
+                    <input type="text" class="form-control form-control-lg" id="codigoCliente" placeholder="Código cliente">
                 </div>
 
                 <div class="col-md-6">
