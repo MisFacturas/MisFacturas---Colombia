@@ -64,14 +64,12 @@ function saveProductData(formData) {
 // a cambiar cuando se pregunte y agg los otros porcinetos
 function obtenerInformacionProducto(producto) {
     let celdaProducto = datos_sheet.getRange("I11");
-    Logger.log("producto dentro de obtener "+producto)
     celdaProducto.setValue(producto);
-  
-  
   
     let codigoProducto = datos_sheet.getRange("H11").getValue();
     let precioUnitario = datos_sheet.getRange("J11").getValue();
-    let tarifaImpuesto = datos_sheet.getRange("K11").getValue();
+    let tarifaIVA = datos_sheet.getRange("K11").getValue();
+    let tarifaINC = datos_sheet.getRange("L11").getValue();
     let precioImpuesto = datos_sheet.getRange("L11").getValue();
     let tarifaRetencion = datos_sheet.getRange("M11").getValue();
     let valorRetencion=datos_sheet.getRange("N11").getValue();
@@ -81,7 +79,8 @@ function obtenerInformacionProducto(producto) {
     let informacionProducto = {
       "codigo Producto": codigoProducto,
       "precio Unitario": precioUnitario,
-      "tarifa Impuesto": tarifaImpuesto,
+      "tarifa IVA": tarifaIVA,
+      "tarifa INC": tarifaINC,
       "precio Impuesto": precioImpuesto,
       "tarifa Retencion": tarifaRetencion,
       "valor Retencion": valorRetencion

@@ -344,13 +344,16 @@ function onEdit(e) {
           factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
           factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
           factura_sheet.getRange("F"+String(i)).setValue(dictInformacionProducto["precio Impuesto"])//impuestos
-          
+          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
+          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
           factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["valor Retencion"])//Retencion
         }else{
           factura_sheet.getRange("A"+String(i)).setValue(dictInformacionProducto["codigo Producto"])
           factura_sheet.getRange("D"+String(i)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
           factura_sheet.getRange("E"+String(i)).setValue("=D"+String(i)+"*C"+String(i))//Subtotal
           factura_sheet.getRange("F"+String(i)).setValue(dictInformacionProducto["precio Impuesto"])//Impuestos
+          factura_sheet.getRange("G"+String(i)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
+          factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
           factura_sheet.getRange("I"+String(i)).setValue(dictInformacionProducto["valor Retencion"])//Retencion
           factura_sheet.getRange("J"+String(i)).setValue("=(E"+String(i)+"+F"+String(i)+"+H"+String(i)+")-(G"+String(i)+"+I"+String(i)+")")//total linea
         }
@@ -438,41 +441,7 @@ function verificarDescuentoValido(valorFechaActual,ivaProductoActual){
   }
 }
 
-function calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual) {
-  Logger.log("Entra a calcular importe")
-  Logger.log("lastRowProducto "+lastRowProducto)
-  Logger.log("productStartRow "+productStartRow )
-  Logger.log("taxSectionStartRow"+taxSectionStartRow)
 
-  //base Imponible
-  let rowParaFormulaBaseImponible=taxSectionStartRow+1
-  let rowEspacioIvasAgrupacion=taxSectionStartRow+5
-  let rowTotalBaseImponibleEIvaGeneral=taxSectionStartRow+7
-  hojaActual.getRange("A"+String(rowParaFormulaBaseImponible)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B"+String(rowParaFormulaBaseImponible)+":B"+String(rowEspacioIvasAgrupacion)+"; F15:F"+String(lastRowProducto)+"))")
-    //total base imponible e iva genberal
-    hojaActual.getRange("A"+String(rowTotalBaseImponibleEIvaGeneral)).setValue("=SUM(A"+String(rowParaFormulaBaseImponible)+":A"+String(rowEspacioIvasAgrupacion)+")")
-    hojaActual.getRange("C"+String(rowTotalBaseImponibleEIvaGeneral)).setValue("=SUM(C"+String(rowParaFormulaBaseImponible)+":C"+String(rowEspacioIvasAgrupacion)+")")
-  //IVA%
-  hojaActual.getRange("B"+String(rowParaFormulaBaseImponible)).setValue("=UNIQUE(G15:G"+String(lastRowProducto)+")")
-
-  let rowParaTotales=taxSectionStartRow+10
-  //total retenciones
-  hojaActual.getRange("A"+String(rowParaTotales)).setValue("=(SUM(F15:F"+String(lastRowProducto)+")*(SUM(I15:I"+String(lastRowProducto)+")))")
-
-  //total cargo equivalencia
-  hojaActual.getRange("B"+String(rowParaTotales)).setValue("=(SUM(F15:F"+String(lastRowProducto)+"))*(SUM(J15:J"+String(lastRowProducto)+"))")
-
-  //total descuentos FACTURA
-  let rowDescuentos=taxSectionStartRow-1
-  hojaActual.getRange("D"+String(rowParaTotales)).setValue("=B"+String(rowDescuentos)+" + SUMPRODUCT(D15:D"+String(lastRowProducto)+"; C15:C"+String(lastRowProducto)+") - SUM(F15:F"+String(lastRowProducto)+")")
-
-  //totalfactura
-  let rowParaTotalFactura=taxSectionStartRow+12
-  hojaActual.getRange("B"+String(rowParaTotalFactura)).setValue("=SUM(J15:K"+String(lastRowProducto)+")+C"+String(rowParaTotales)+"-B"+String(rowDescuentos))
-
-
-
-}
 
 function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
 
@@ -507,7 +476,7 @@ function getTaxSectionStartRow(sheet) {
   let row = 14
   
   for (row; row < lastRow; row++) { // 14 por si esta vacio, pero deberia de dar igual si es desde la 15
-    if (sheet.getRange(row, 1).getValue() === 'Base imponible') {
+    if (sheet.getRange(row, 1).getValue() === 'Cargos y/o Descuentos') {
 
       Logger.log("dentro de getTax row " + row)
       return row;

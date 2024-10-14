@@ -82,6 +82,15 @@ function agregarFilaNueva(){
   Logger.log("agregarfILA NUEVAA")
   hojaFactura.insertRowAfter(lastProductRow)
 }
+function agregarFilaCargoDescuento(){
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
+  const productStartRow = 15;
+  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+  Logger.log("agregarfILA NUEVAA")
+  hojaFactura.insertRowAfter(lastProductRow)
+}
+
 function agregarProductoDesdeFactura(cantidad,producto){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
@@ -100,27 +109,28 @@ function agregarProductoDesdeFactura(cantidad,producto){
   let rowParaTotalTaxes=taxSectionStartRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
-    factura_sheet.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
-    factura_sheet.getRange("B15").setValue(producto)
-    factura_sheet.getRange("C15").setValue(cantidad)
-    factura_sheet.getRange("D15").setValue(dictInformacionProducto["precio Unitario"])
-    factura_sheet.getRange("E15").setValue("=D15*C15")
-    factura_sheet.getRange("F15").setValue("=E15*("+dictInformacionProducto["tarifa Impuesto"]+")")
+    hojaFactura.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
+    hojaFactura.getRange("B15").setValue(producto)
+    Logger.log("producto "+producto)
+    hojaFactura.getRange("C15").setValue(cantidad)
+    hojaFactura.getRange("D15").setValue(dictInformacionProducto["precio Unitario"])
+    hojaFactura.getRange("E15").setValue("=D15*C15")
+    hojaFactura.getRange("F15").setValue("=E15*("+dictInformacionProducto["tarifa Impuesto"]+")")
 
-    factura_sheet.getRange("I15").setValue("=D15*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")
+    hojaFactura.getRange("I15").setValue("=D15*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
     rowParaTotalTaxes=taxSectionStartRow+1
     rowParaDatos=lastProductRow+1
-    factura_sheet.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
-    factura_sheet.getRange("B"+String(rowParaDatos)).setValue(producto)
-    factura_sheet.getRange("C"+String(rowParaDatos)).setValue(cantidad)
-    factura_sheet.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
-    factura_sheet.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos))//Subtotal
-    factura_sheet.getRange("F"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Impuesto"]+"*"+cantidad+")")//Valor de los Impuestos
-    factura_sheet.getRange("I"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")//Valor de los Impuestos
-    factura_sheet.getRange("J"+String(rowParaDatos)).setValue("=(E"+String(rowParaDatos)+"+F"+String(rowParaDatos)+"+H"+String(rowParaDatos)+")-(G"+String(rowParaDatos)+"+I"+String(rowParaDatos)+")")//Total
+    hojaFactura.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
+    hojaFactura.getRange("B"+String(rowParaDatos)).setValue(producto)
+    hojaFactura.getRange("C"+String(rowParaDatos)).setValue(cantidad)
+    hojaFactura.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
+    hojaFactura.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos))//Subtotal
+    hojaFactura.getRange("F"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Impuesto"]+"*"+cantidad+")")//Valor de los Impuestos
+    hojaFactura.getRange("I"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")//Valor de los Impuestos
+    hojaFactura.getRange("J"+String(rowParaDatos)).setValue("=(E"+String(rowParaDatos)+"+F"+String(rowParaDatos)+"+H"+String(rowParaDatos)+")-(G"+String(rowParaDatos)+"+I"+String(rowParaDatos)+")")//Total
   } 
 
   
@@ -691,11 +701,11 @@ function getPaymentSummary(startingRowTaxation) {
 
   Logger.log("total_factura"+total_factura)
   Logger.log("monto_neto"+monto_neto)
-  var PaymentTypeTxt = prefactura_sheet.getRange("G5").getValue();
-  var PaymentMeansTxt = prefactura_sheet.getRange("E4").getValue();
+  var PaymentTypeTxt = prefactura_sheet.getRange("J2").getValue();
+  var PaymentMeansTxt = prefactura_sheet.getRange("J3").getValue();
   var PaymentSummary = {
     "PaymentType": PaymentTypeTxt,
-    "PaymentMeans": "PaymentMeansTxt: No hay medio de pago",//a qui habia getPaymentMeans(PaymentMeansTxt)
+    "PaymentMeans": getPaymentMeans(PaymentMeansTxt),
     "PaymentNote": `Total Factura: $${numeros_total} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}`
   }
   return PaymentSummary;
@@ -706,16 +716,14 @@ function guardarYGenerarInvoice(){
   //obtener el total de prodcutos
   let posicionTotalProductos = prefactura_sheet.getRange("A16").getValue(); // para verificar donde esta el TOTAL
   if (posicionTotalProductos==="Total productos"){
-    Logger.log("entra al primer if de json")
     var cantidadProductos=prefactura_sheet.getRange("B16").getValue();// cantidad total de productos 
   }else{
     let startingRowTax=getTaxSectionStartRow(prefactura_sheet)
-    let posicionTotalProductos=startingRowTax-3
+    let posicionTotalProductos=startingRowTax-2
     var cantidadProductos=prefactura_sheet.getRange("B"+String(posicionTotalProductos)).getValue();// cantidad total de productos
-
   }
 
-  let llavesParaLinea=prefactura_sheet.getRange("A14:I14");//llamo los headers 
+  let llavesParaLinea=prefactura_sheet.getRange("A14:L14");//llamo los headers 
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
@@ -814,7 +822,7 @@ function guardarYGenerarInvoice(){
   const posicionOriginalTotalFactura = prefactura_sheet.getRange("A31").getValue(); // para verificar donde esta el TOTAL
   let rangeFacturaTotal=""
   let rangeTotales=""
-  let rangeBaseImponilbeValor=""
+  let rangeImpuestosValor=""
   let cargoTotal=0
   let descuentoTotal=0
   let cargoFactura=0
@@ -822,19 +830,19 @@ function guardarYGenerarInvoice(){
 
   let startingRowTaxation=getTaxSectionStartRow(prefactura_sheet)
   if (posicionOriginalTotalFactura==="Total factura"){
-    rangeBaseImponilbeValor=prefactura_sheet.getRange(26,1,1,3);
-    rangeTotales=prefactura_sheet.getRange(29,1,1,4);
+    rangeImpuestosValor=prefactura_sheet.getRange(22,1,1,3);
+    rangeTotales=prefactura_sheet.getRange(29,1,1,4);//va a cambiar
     rangeFacturaTotal=prefactura_sheet.getRange("K25")
     cargoFactura=prefactura_sheet.getRange("D17").getValue()
     descuentoFactura=prefactura_sheet.getRange("D18").getValue()
     
   }else{
-    let rowBaseImponilbeValor=startingRowTaxation+7
+    let rowImpuestosValor=startingRowTaxation+7//va a cambiar
     let rowTotales=startingRowTaxation+10
     let rowTotalFactura=startingRowTaxation+12
     let rowCargoFactura=startingRowTaxation-2
     let rowDescuentoFactura=startingRowTaxation-1
-    rangeBaseImponilbeValor=prefactura_sheet.getRange(rowBaseImponilbeValor,1,1,3);
+    rangeImpuestosValor=prefactura_sheet.getRange(rowImpuestosValor,1,1,3); //va a cambiar
     rangeTotales=prefactura_sheet.getRange(rowTotales,1,1,4);
     rangeFacturaTotal=prefactura_sheet.getRange(rowTotalFactura,2);//(maxRows-1) porque no necesito el total
     cargoFactura=prefactura_sheet.getRange("B"+String(rowCargoFactura)).getValue()
@@ -859,7 +867,7 @@ function guardarYGenerarInvoice(){
   Logger.log("cargoFactura "+cargoFactura)
   Logger.log("descuentoFactura "+descuentoFactura)
   // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
-  let facturaTotalesBaseImponilbe=String(rangeBaseImponilbeValor.getValues());
+  let facturaTotalesBaseImponilbe=String(rangeImpuestosValor.getValues());
   facturaTotalesBaseImponilbe=facturaTotalesBaseImponilbe.split(",");
   Logger.log("facturaTotales "+facturaTotalesBaseImponilbe)
   let TotalFactura=rangeFacturaTotal.getValue()
@@ -878,7 +886,7 @@ function guardarYGenerarInvoice(){
   let pfTPagar = 0;
 
   //Aqui seguiria el texto, pero en el de carlos nunca lo llama 
-  let facturaTotales=String(rangeBaseImponilbeValor.getValues());
+  let facturaTotales=String(rangeImpuestosValor.getValues());
   let invoice_total = {
     "LineExtensionAmount": pfSubTotal,
     "TaxExclusiveAmount": pfSubTotal,
