@@ -336,6 +336,7 @@ function onEdit(e) {
           continue
         }
         let dictInformacionProducto = obtenerInformacionProducto(productoFilaI);
+        Logger.log("dictInformacionProducto "+dictInformacionProducto)
         let cantidadProducto= factura_sheet.getRange("C"+String(i)).getValue()
 
         if(cantidadProducto===""){
@@ -389,14 +390,15 @@ function onEdit(e) {
     if (lastRowProducto===productStartRow){
       Logger.log("dentro de agg info para TOTLA pero last y start son iguales")
       // //ESTADO DEAFULT no se hace nada
-      hojaActual.getRange("K25").setValue("=SUM(J15)+D17-D18")
+      hojaActual.getRange("K29").setValue("=L15")
+      hojaActual.getRange("L29").setValue("=L15-J29")
 
 
     }else{
       Logger.log("dentro de agg info para totoal")
       Logger.log("lastRowProducto "+lastRowProducto)
       Logger.log("productStartRow"+productStartRow)
-      calcularImporteYTotal(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual)
+      calcularDescuentosCargosYTotales(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual)
     }
 
     updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,taxSectionStartRow)
@@ -442,10 +444,34 @@ function verificarDescuentoValido(valorFechaActual,ivaProductoActual){
 }
 
 
+function calcularDescuentosCargosYTotales(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual) {
+
+  let rowSeccionCargosYDescuentos=taxSectionStartRow+2
+  let rowEspacioIvasAgrupacion=taxSectionStartRow+6
+
+
+  //IVA%
+  hojaActual.getRange("B"+String(rowEspacioIvasAgrupacion)).setValue("=UNIQUE(G15:G"+String(lastRowProducto)+")")
+
+  let rowParaTotales=taxSectionStartRow+11
+  //total retenciones
+  hojaActual.getRange("E"+String(rowParaTotales)).setValue("=SUM(K15:F"+String(lastRowProducto)+")")
+
+  //total descuentos FACTURA
+  let totalDescuentosSeccionCargosyDescuentos = calcularDescuentosSeccionCargYDescu(hojaActual,rowSeccionCargosYDescuentos,lastRowProducto)
+
+  hojaActual.getRange("F"+String(rowParaTotales)).setValue("SUMPRODUCT(E15:E"+String(lastRowProducto)+"; I15:I"+String(lastRowProducto)+")")
+
+  //totalfactura
+  hojaActual.getRange("B"+String(rowParaTotales)).setValue("=SUM(K15:K"+String(lastRowProducto)+")+C"+String(rowParaTotales)+"-B"+String(rowDescuentos))
+
+
+
+}
+
 
 function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
 
-  Logger.log("funcion getLastProductRow")
   //retorna el numero de fila exacta donde esta el ulitmo producto agregado
   // si no encuntra producto agg si solo tiene un producto retorna el mismo productStartRow 
   let lastProductRow = productStartRow;
@@ -453,37 +479,37 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   for (let row = productStartRow; row < taxSectionStartRow; row++) {
     
     let valorCeldaActual=sheet.getRange(row, 1).getValue() 
-    Logger.log("'Valor celda "+valorCeldaActual)
-
       if(valorCeldaActual==="Total productos"){
-        Logger.log("dentro de if+ lastProductRow"+lastProductRow)
         return lastProductRow
       }else{
         lastProductRow = row;
-      }
-      Logger.log("lastProductRow "+lastProductRow)
-      
-    
+      }   
   }
-  Logger.log("No dentro del if lastProductRow"+lastProductRow)
   //aqui arrelgar error que se agrega una nueva linea cuando hay espacio arriba
   return lastProductRow;
 }
+function getLastCargoDescuentoRow(sheet, taxSectionStartRow) {
+  //obtiene la row donde esta el final de la seccion de cargos y descuentos
+  const lastRow = sheet.getLastRow();
+  let row = 21
+
+  for (row; row < lastRow; row++) { // 14 por si esta vacio, pero deberia de dar igual si es desde la 15
+    if (sheet.getRange(row, 1).getValue() === 'Tipo Impuesto') {
+      return row-3;
+    }
+  }
+}
 
 function getTaxSectionStartRow(sheet) {
-  //obtiene la row donde esta la seccion de taxinformation osea Base imponible
+  //obtiene la row donde esta la seccion de taxinformation
   const lastRow = sheet.getLastRow();
   let row = 14
   
   for (row; row < lastRow; row++) { // 14 por si esta vacio, pero deberia de dar igual si es desde la 15
     if (sheet.getRange(row, 1).getValue() === 'Cargos y/o Descuentos') {
-
-      Logger.log("dentro de getTax row " + row)
       return row;
     }
   }
-
-  
   return row+1;// por si se borro todos los productos,creo que da igual 
 }
 
@@ -499,7 +525,7 @@ function updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,ta
     }
   }
 
-  let rowTotalProductos=taxSectionStartRow-3
+  let rowTotalProductos=taxSectionStartRow-2
   hojaActual.getRange("B"+String(rowTotalProductos)).setValue(totalProducts)
 
 }

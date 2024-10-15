@@ -79,16 +79,13 @@ function agregarFilaNueva(){
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
   const productStartRow = 15;
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
-  Logger.log("agregarfILA NUEVAA")
   hojaFactura.insertRowAfter(lastProductRow)
 }
 function agregarFilaCargoDescuento(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
-  const productStartRow = 15;
-  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
-  Logger.log("agregarfILA NUEVAA")
-  hojaFactura.insertRowAfter(lastProductRow)
+  const lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura, taxSectionStartRow);
+  hojaFactura.insertRowAfter(lastCargoDescuentoRow)
 }
 
 function agregarProductoDesdeFactura(cantidad,producto){
@@ -101,23 +98,22 @@ function agregarProductoDesdeFactura(cantidad,producto){
   if(producto==="" || cantidad==="" || cantidad===0){
     throw new Error('Porfavor elige un producto y un cantidad adecuado');
   }else{
-    Logger.log("entra a dictInformacionProducto")
     dictInformacionProducto = obtenerInformacionProducto(producto);
   }
-  Logger.log("dictInformacionProducto "+dictInformacionProducto["codigo Producto"])
+
   let rowParaDatos=lastProductRow
   let rowParaTotalTaxes=taxSectionStartRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
     hojaFactura.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
     hojaFactura.getRange("B15").setValue(producto)
-    Logger.log("producto "+producto)
     hojaFactura.getRange("C15").setValue(cantidad)
     hojaFactura.getRange("D15").setValue(dictInformacionProducto["precio Unitario"])
     hojaFactura.getRange("E15").setValue("=D15*C15")
-    hojaFactura.getRange("F15").setValue("=E15*("+dictInformacionProducto["tarifa Impuesto"]+")")
-
-    hojaFactura.getRange("I15").setValue("=D15*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")
+    hojaFactura.getRange("F15").setValue(dictInformacionProducto["precio Impuesto"])
+    hojaFactura.getRange("G15").setValue(dictInformacionProducto["tarifa INC"])
+    hojaFactura.getRange("H15").setValue(dictInformacionProducto["tarifa IVA"])
+    hojaFactura.getRange("K15").setValue("=D15*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
@@ -128,20 +124,13 @@ function agregarProductoDesdeFactura(cantidad,producto){
     hojaFactura.getRange("C"+String(rowParaDatos)).setValue(cantidad)
     hojaFactura.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
     hojaFactura.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos))//Subtotal
-    hojaFactura.getRange("F"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Impuesto"]+"*"+cantidad+")")//Valor de los Impuestos
-    hojaFactura.getRange("I"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")//Valor de los Impuestos
-    hojaFactura.getRange("J"+String(rowParaDatos)).setValue("=(E"+String(rowParaDatos)+"+F"+String(rowParaDatos)+"+H"+String(rowParaDatos)+")-(G"+String(rowParaDatos)+"+I"+String(rowParaDatos)+")")//Total
+    hojaFactura.getRange("F"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Impuesto"])//precio de los Impuestos
+    hojaFactura.getRange("G"+String(rowParaDatos)).setValue(dictInformacionProducto["tarifa INC"])//%INC
+    hojaFactura.getRange("H"+String(rowParaDatos)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
+    hojaFactura.getRange("K"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")//Valor de los Impuestos
   } 
-
-  
-
-  Logger.log("rowParaDatos "+rowParaDatos)
-  Logger.log("Number(taxSectionStartRow-1) "+Number(taxSectionStartRow-1))
-
-
-
   updateTotalProductCounter(rowParaDatos, productStartRow,hojaFactura, rowParaTotalTaxes);
-  calcularImporteYTotal(rowParaDatos,productStartRow,rowParaTotalTaxes,hojaFactura)
+  calcularDescuentosCargosYTotales(rowParaDatos,productStartRow,rowParaTotalTaxes,hojaFactura)
 }
 
 function onImageClick() {
@@ -503,13 +492,15 @@ function limpiarHojaFactura(){
   //total productos
   hojaFactura.getRange("B2").setValue("")//Cliente
   hojaFactura.getRange("B3").setValue("")//Codigo
-  hojaFactura.getRange("B4").setValue("")//Consumidor Final
 
   hojaFactura.getRange("H6").setValue("")//hora
   hojaFactura.getRange("H4").setValue("")//fecha
-  hojaFactura.getRange("G5").setValue("")//forma pago
-  hojaFactura.getRange("G6").setValue(0)//dias vencimiento
-  hojaFactura.getRange("G3").setValue("")
+  hojaFactura.getRange("J2").setValue("")//forma pago
+  hojaFactura.getRange("H5").setValue(0)//dias vencimiento
+  hojaFactura.getRange("J3").setValue(0)//tipo de pago
+  hojaFactura.getRange("J4").setValue("")//moneda
+  hojaFactura.getRange("J5").setValue("")//tasa de cambio
+  hojaFactura.getRange("J6").setValue("")//fecha tasa de cambio
 
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//Nota de pago 
@@ -533,13 +524,17 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("B15").setValue("")//producto
   hojaFactura.getRange("C15").setValue("")//cantidad
   hojaFactura.getRange("D15").setValue("")//precio unitario
-  hojaFactura.getRange("F15").setValue("")//Impuestos
-  hojaFactura.getRange("G15").setValue("")//descuento
-  hojaFactura.getRange("H15").setValue("")//retencion
+  hojaFactura.getRange("E15").setValue("")//Subtotal
+  hojaFactura.getRange("F15").setValue("")//impuestos
+  hojaFactura.getRange("G15").setValue("")//%inc
+  hojaFactura.getRange("H15").setValue("")//%iva
+  hojaFactura.getRange("I15").setValue("")//descuento producto
+  hojaFactura.getRange("J15").setValue("")//cargos
+  hojaFactura.getRange("K15").setValue("")//retencion
+  
 
   hojaFactura.getRange("B16").setValue("0")//total producto
-  hojaFactura.getRange("D17").setValue(0)//cargos
-  hojaFactura.getRange("D18").setValue(0)//descuentos
+
 }
 
 
@@ -606,6 +601,7 @@ function obtenerFechaYHoraActual(){
 
   sheet.getRange("H4").setNumberFormat("dd/MM/yyyy");
   sheet.getRange("H4").setValue(String(fecha))
+  
   sheet.getRange("H6").setValue(hora)
 
   
