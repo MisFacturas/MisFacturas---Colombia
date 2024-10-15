@@ -74,8 +74,7 @@ function obtenerInformacionProducto(producto) {
     let tarifaRetencion = datos_sheet.getRange("M11").getValue();
     let valorRetencion=datos_sheet.getRange("N11").getValue();
 
-
-
+    
     let informacionProducto = {
       "codigo Producto": codigoProducto,
       "precio Unitario": precioUnitario,
@@ -85,6 +84,15 @@ function obtenerInformacionProducto(producto) {
       "tarifa Retencion": tarifaRetencion,
       "valor Retencion": valorRetencion
     };
+    if (informacionProducto["tarifa IVA"] == ""){
+      informacionProducto["tarifa IVA"] = 0;
+    }
+    if (informacionProducto["tarifa INC"] == ""){
+      informacionProducto["tarifa INC"] = 0;
+    }
+
+
+
   
     return informacionProducto;
   }

@@ -21,24 +21,21 @@ function verificarEstadoValidoFactura() {
   let estaValido = true;
 
   let clienteActual = hojaFactura.getRange("B2").getValue();
-  let informacionFactura1 = hojaFactura.getRange(2, 6, 5, 2).getValues();
-  let informacionFactura2 = hojaFactura.getRange(2, 9, 6, 1).getValues();
+  let informacionFactura1 = hojaFactura.getRange(2, 6, 5, 3).getValues();
+  let informacionFactura2 = hojaFactura.getRange(2, 9, 5, 2).getValues();
 
 
   // Crear una lista combinada
   let listaCombinada = [clienteActual];  // Añadir clienteActual al array
   for (let i = 0; i < informacionFactura1.length; i++) {
-    listaCombinada.push(informacionFactura1[i][0]); // Añadir cada valor de informacionFactura1
-    
+    listaCombinada.push(informacionFactura1[i][2]); // Añadir cada valor de informacionFactura1
   }
   for (let j = 0; j < informacionFactura2.length; j++) {
-    listaCombinada.push(informacionFactura2[j][0]); // Añadir cada valor de informacionFactura2
-  
+    listaCombinada.push(informacionFactura2[j][1]); // Añadir cada valor de informacionFactura2
   }
 
   // Recorrer 
   for (let k = 0; k < listaCombinada.length; k++) {
-    Logger.log("listaCombinada"+listaCombinada[k])
     if(listaCombinada[k]===""){
       estaValido=false
     }
@@ -69,7 +66,7 @@ function guardarFactura(){
     limpiarHojaFactura()
     
   }else{
-    SpreadsheetApp.getUi().alert("Factura no es valida")
+    SpreadsheetApp.getUi().alert("La factura no es valida")
   }
   
 
@@ -493,14 +490,16 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("B2").setValue("")//Cliente
   hojaFactura.getRange("B3").setValue("")//Codigo
 
-  hojaFactura.getRange("H6").setValue("")//hora
   hojaFactura.getRange("H4").setValue("")//fecha
-  hojaFactura.getRange("J2").setValue("")//forma pago
   hojaFactura.getRange("H5").setValue(0)//dias vencimiento
-  hojaFactura.getRange("J3").setValue(0)//tipo de pago
+  hojaFactura.getRange("H6").setValue("")//hora
+
+  hojaFactura.getRange("J2").setValue("")//forma pago
+  hojaFactura.getRange("J3").setValue("")//tipo de pago
   hojaFactura.getRange("J4").setValue("")//moneda
   hojaFactura.getRange("J5").setValue("")//tasa de cambio
   hojaFactura.getRange("J6").setValue("")//fecha tasa de cambio
+
 
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//Nota de pago 
@@ -613,13 +612,15 @@ function obtenerFechaYHoraActual(){
   Logger.log("fechaFormateada "+fechaFormateada)
 
 }
-
-function ObtenerFechaFormatedada(opcion){
-    let sheet = spreadsheet.getSheetByName('Factura');
-    let valorFecha=sheet.getRange("H4").getValue();
-    let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "dd/MM/yyyy");
+function ObtenerFecha(opcion){
+  let fechaFormateada
+  let sheet = spreadsheet.getSheetByName('Factura');
+  let valorFecha=sheet.getRange("H4").getValue();
+  fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "dd/MM/yyyy");
   return fechaFormateada
 }
+
+
 
 
 function obtenerDatosProductos(sheet,range,e){
@@ -741,7 +742,7 @@ function guardarYGenerarInvoice(){
     for (let j=0;j<11;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo
       LineaFactura[llavesFinales[j]]=productoFilaActual[j]
     }
-    Logger.log("LineaFactura "+LineaFactura)
+    
 
     let Name = LineaFactura['producto'];
     let ItemCode = new Number(LineaFactura['referencia']);
@@ -765,9 +766,7 @@ function guardarYGenerarInvoice(){
     if(retencion==""){
       retencion=0
     }
-    if(reCargoEqui==""){
-      reCargoEqui=0
-    }
+
 
 
     //IVA
@@ -784,7 +783,7 @@ function guardarYGenerarInvoice(){
       PerUnitAmount: "",
       Descuento:descuento,
       Retencion:retencion,
-      RecgEquivalencia:reCargoEqui
+      
     };
 
     ItemTaxesInformation.push(ivaTaxInformation);
