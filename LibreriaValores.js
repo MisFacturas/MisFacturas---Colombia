@@ -1401,6 +1401,31 @@ var reteRentaValores = {
 "Contratos de construccion y urbanizacion":2.00
 };
 
+var tiposDocumento = {
+  "Registro civil": 11,
+  "Tarjeta de identidad": 12,
+  "Cédula de ciudadanía": 13,
+  "Tarjeta de extranjería": 21,
+  "Cédula de extranjería": 22,
+  "NIT": 31,
+  "Pasaporte": 41,
+  "Documento de identificación extranjero": 42,
+  "PEP (Permiso Especial de Permanencia)": 47,
+  "PPT (Permiso Protección Temporal)": 48,
+  "NIT de otro país": 50,
+  "NUIP": 91
+};
+
+var tiposPersona = {
+  "Natural": 1,
+  "Juridica": 2
+};
+
+var codigosRegimenes = {
+  "Impuesto sobre las ventas - IVA": 48,
+  "No responsable de IVA": 49
+};
+
 var diccionarioCaluclarIva={
   "0.21": "21,00",
   "0.1": "1,00",
@@ -1408,3 +1433,18 @@ var diccionarioCaluclarIva={
   "0.04": "4,00",
   "0": 0
 }
+
+var detallesTributariosLib = {
+  "IVA": "01",
+  "INC": "04",
+  "IVA e INC": "ZA",
+  "No aplica": "ZZ"
+};
+
+var responsabilidadFiscalLib = {
+  "Gran contribuyente": "O-13",
+  "Autorretenedor": "O-15",
+  "Agente de retencion IVA": "O-23",
+  "Regimen simple de tributacion": "O-47",
+  "No aplica – Otros": "R-99-PN"
+};

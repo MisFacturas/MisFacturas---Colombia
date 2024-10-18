@@ -536,105 +536,89 @@ function verificarDatosObligatorios(e, tipoPersona) {
 
 
 function crearCliente(){
-  Logger.log("imprima algo")
   showNuevaCliente()
 
 }
 
-function getCustomerInformation(customer) {
-  /*esta funcion debe de cambiar para obtener son los datos directamente de la hoja cliente */
-  // ojo de donde esta cogiendo el datosheet ?
-
+function getCustomerInformation(cliente) {
   let celdaCliente = datos_sheet.getRange("H2");
-  celdaCliente.setValue(customer);
+  celdaCliente.setValue(cliente);
 
   //Codigo de cliente
-  var customerCode = datos_sheet.getRange("I2").getValue();
+  var codigoCliente = datos_sheet.getRange("I2").getValue();
 
   //Tipo de identificacion 
-  let identificationType=datos_sheet.getRange("J2").getValue();
+  let tipoIdentificacion = datos_sheet.getRange("J2").getValue();
 
   //Numero de identificacion
-  var identification = datos_sheet.getRange("K2").getValue();//numero de identificacion
+  var numeroIdentificacion = datos_sheet.getRange("K2").getValue();//numero de identificacion
   
-  var DV = 0;//no existe en espana, predeterminado 0
+  //Digito de verificacion
+  var DV = 0;
 
   //Direccion
-  var address =  datos_sheet.getRange("T2").getValue();// aqui lo dividia entre 2 por el psotalcode
+  var direccion = datos_sheet.getRange("T2").getValue();
   
-  //Ciudad
-  var cityId = datos_sheet.getRange("S2").getValue();
-
   //Telefono
-  var telephone = datos_sheet.getRange("V2").getValue();
+  var telefono = datos_sheet.getRange("V2").getValue();
 
   //Email
   var email = datos_sheet.getRange("X2").getValue();
-  //Browser.msgBox(Email);
 
   //Sitio web
   var webSiteURI = datos_sheet.getRange("W2").getValue();
 
   //Pais
-  var paisCliente= datos_sheet.getRange("S2").getValue();
+  var paisCliente = datos_sheet.getRange("S2").getValue();
 
   //Departamento
   var departamentoCliente= datos_sheet.getRange("AA2").getValue();
 
   //Municipio
-  var municipioCliente= datos_sheet.getRange("Z2").getValue();
+  var municipioCliente= (datos_sheet.getRange("Z2").getValue()).toUpperCase();
 
-  //Validar codigo tipo persona
-  var tipoPersona = datos_sheet.getRange("K2").getValue();
-  function validarTipoPersona(tipoPersona) {
-    if (tipoPersona == "Juridica") {
-      return 2;
-    } else {
-      return 1;
-    }
-  }
+  //Codigo tipo persona
+  var tipoPersona = datos_sheet.getRange("L2").getValue();
 
+  //Codigo regimen
   var regimen = datos_sheet.getRange("M2").getValue();
-  function validarCodigoRegimen(regimen) {
-    if (regimen == "Impuesto sobre las ventas - IVA") {
-      return 48;
-    } else {
-      return 49;
-    }
-  }
 
-  if (identificationType == "#NUM!") {
+  //Detalles tributarios
+  var detallesTributarios = datos_sheet.getRange("AB2").getValue();
+
+  //Responsabilidad fiscal
+  var responsabilidadFiscal = datos_sheet.getRange("AC2").getValue();
+
+
+  if (tipoIdentificacion == "#NUM!") {
     Browser.msgBox("ERROR: Seleccione Tipo de Identificacion en Clientes")
     return;
   }
-  let valorFecha=ObtenerFecha()
+
+
   var CustomerInformation = {
-    "IdentificationType": identificationType,
-    "Identification": identification,//.toString(),
-    "DV": valorFecha,
-    "RegistrationName": customer,
+    "IdentificationType": Number(tiposDocumento[tipoIdentificacion]),
+    "Identification": Number(numeroIdentificacion),
+    "DV": DV,
+    "RegistrationName": cliente,
     "CountryCode": paisesCodigos[paisCliente],
     "CountryName": paisCliente,
-    "SubdivisionCode": departamentosCodigos[departamentoCliente],
+    "SubdivisionCode": String(departamentosCodigos[departamentoCliente]),
     "SubdivisionName": departamentoCliente,
-    "CityCode": municipiosCodigos[municipioCliente],
+    "CityCode": String(municipiosCodigos[municipioCliente]),
     "CityName": municipioCliente,
-    "AddressLine": String(address),
-    "PostalZone": datos_sheet.getRange("U2").getValue(),
+    "AddressLine": String(direccion),
+    "Telephone": String(telefono),
     "Email": email,
-    "CustomerCode": customerCode,
-    "Telephone": telephone,
-    "WebSiteURI": webSiteURI,
-    "AdditionalAccountID": validarTipoPersona(tipoPersona),
-    "TaxLevelCodeListName": validarCodigoRegimen(regimen),
-    "TaxSchemeCode": "Numero que representa algo, no se si en España exista ",
-    "TaxSchemeName": "Numero que representa algo, no se si en España exista ",
-    "FiscalResponsabilities": datos_sheet.getRange("AC2").getValue(),
-
+    "CustomerCode": String(codigoCliente),
+    "AdditionalAccountID": Number(tiposPersona[tipoPersona]),
+    "TaxLevelCodeListName": codigosRegimenes[regimen],
+    "PostalZone": String(datos_sheet.getRange("U2").getValue()),
+    "TaxSchemeCode": detallesTributariosLib[detallesTributarios],
+    "TaxSchemeName": detallesTributarios,
+    "FiscalResponsabilities": responsabilidadFiscalLib[responsabilidadFiscal],
     "PartecipationPercent": 100,
     "AdditionalCustomer": []
-
-
   }
   return CustomerInformation;
 }

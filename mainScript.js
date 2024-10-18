@@ -12,8 +12,8 @@ function onOpen() {
   var ui = SpreadsheetApp.getUi();
   // https://developers.google.com/apps-script/guides/menus
 
-  ui.createMenu('Sidebar')
-    .addItem('Sidebar', 'showSidebar')
+  ui.createMenu('misfacturas')
+    .addItem('Inicio', 'showSidebar')
     .addToUi()
 
 
@@ -98,13 +98,13 @@ function openProductosSheet() {
   var sheet = ss.getSheetByName("Productos");
   SpreadsheetApp.setActiveSheet(sheet);
 }
-
+/*
 function showEnviarEmail() {
   var html = HtmlService.createHtmlOutputFromFile('enviarEmail')
     .setTitle('Enviar Email');
   SpreadsheetApp.getUi()
     .showSidebar(html);
-}
+}*/
 
 function inicarFacturaNuevaMain() {
   inicarFacturaNueva();
@@ -122,6 +122,7 @@ function showEnviarEmailHistorial(data){
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
+
 
 function showEnviarEmailPost() {
   var html = HtmlService.createHtmlOutputFromFile('enviarEmailPost')
@@ -266,6 +267,7 @@ function getPdfUrl() {
   return `data:${contentType};base64,${base64Data}`;
 }
 
+/*
 function sendPdfByEmail(email) {
   var pdfFile = generatePdfFromFactura();
   var subject = 'Factura';
@@ -284,9 +286,10 @@ function sendPdfByEmail(email) {
 
   return "PDF generado y enviado por correo electrónico a " + email;
 }
+*/
 
 function convertToPercentage(value) {
-  return (value * 100).toFixed(2).replace('.', ',') + '%';
+  return (value * 100).toFixed(2);
 }
 
 function onEdit(e) {
@@ -408,33 +411,6 @@ function onEdit(e) {
   }
 }
 
-function verificarDescuentoValido(valorFechaActual,ivaProductoActual){
-  //1julio 2022 hasta 30 de junio 2024. 
-  Logger.log("ivaProductoActual"+ivaProductoActual)
-  Logger.log("valorFechaActual"+valorFechaActual)
-  Logger.log("Entra a verificar fecha")
-  var fechaInicio = new Date(2022, 6, 1);  // 1 de julio de 2022 (mes 6 porque enero es 0)
-  var fechaFin = new Date(2024, 5, 30);    // 30 de junio de 2024 (mes 5 porque enero es 0)
-  var partesFecha = valorFechaActual.split("/");
-  var dia = parseInt(partesFecha[0]);
-  var mes = parseInt(partesFecha[1]) - 1; // Restar 1 porque los meses en Date empiezan desde 0
-  var anio = parseInt(partesFecha[2]);
-  var fechaActual = new Date(anio, mes, dia);
-
-  if(ivaProductoActual===0.05){
-    Logger.log("fecha es igual a 5%")
-    if (fechaActual >= fechaInicio && fechaActual <= fechaFin) {
-      Logger.log("Fecha dentro del rango válido");
-      return true;
-    } else {
-      Logger.log("Fecha fuera del rango válido");
-      return false;
-    }
-  }else{
-    Logger.log("No hay producto con 5% interes")
-    return true
-  }
-}
 
 
 function calcularDescuentosCargosYTotales(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual) {
@@ -502,9 +478,20 @@ function getLastCargoDescuentoRow(sheet, taxSectionStartRow) {
   const lastRow = sheet.getLastRow();
   let row = 21
 
-  for (row; row < lastRow; row++) { // 14 por si esta vacio, pero deberia de dar igual si es desde la 15
+  for (row; row < lastRow; row++) { 
     if (sheet.getRange(row, 1).getValue() === 'Tipo Impuesto') {
       return row-3;
+    }
+  }
+}
+function getTotalesLinea(sheet) {
+  //obtiene la row donde esta la linea de totales
+  const lastRow = sheet.getLastRow();
+  let row = 28
+
+  for (row; row < lastRow; row++) { 
+    if (sheet.getRange(row, 1).getValue() === 'Subtotal') {
+      return row;
     }
   }
 }
@@ -516,7 +503,6 @@ function getTaxSectionStartRow(sheet) {
   
   for (row; row < lastRow; row++) { // 14 por si esta vacio, pero deberia de dar igual si es desde la 15
     if (sheet.getRange(row, 1).getValue() === 'Cargos y/o Descuentos') {
-      Logger.log("row"+row)
       return row;
     }
   }
@@ -932,10 +918,7 @@ function getsheetValueA1(sheet, column, row) {
 }
 
 
-function getsheetValue(sheet, column, row) {
-  var range = sheet.getRange(column, row);
-  return range.getValue();
-}
+
 
 function updatesheetValueA1(sheet, column, row, value) {
   var cell = column + row;

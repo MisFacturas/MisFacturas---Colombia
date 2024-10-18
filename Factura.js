@@ -160,7 +160,7 @@ function insertarImagenBorrarFila(fila){
 function guardarFacturaHistorial() {
   var hojaFactura = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Factura');
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
-  var numeroFactura = hojaFactura.getRange("G2").getValue();
+  var numeroFactura = hojaFactura.getRange("H2").getValue();
   var cliente = hojaFactura.getRange("B2").getValue();
   var fechaEmision = hojaFactura.getRange("H4").getValue();
   var estado = "Creada";
@@ -221,14 +221,15 @@ function guardarIdArchivo(idArchivo, numeroFactura) {
 }
 function convertPdfToBase64() {
   let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
-  let hojaListadoEstao=SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
-  let dataRange=hojaListadoEstao.getDataRange()
+  let hojaListadoEstado=SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
+  let dataRange=hojaListadoEstado.getDataRange()
   let data=dataRange.getValues()
+  Logger.log("data "+data)
 
   let jsonNuevoCol=13;
-  let lastRow = hojaListadoEstao.getLastRow();
+  let lastRow = hojaListadoEstado.getLastRow();
   let jsonData=data[lastRow-1][jsonNuevoCol]
-  Logger.log("json"+jsonData)
+  Logger.log("json prueba de jason : "+jsonData)
   let invoiceData=JSON.parse(jsonData)
   let infoACambiar=invoiceData.file;
   Logger.log("infoACambiar "+infoACambiar)
@@ -249,6 +250,7 @@ function convertPdfToBase64() {
 
 }
 function enviarFactura(){
+  Logger.log("enviarFactura")
   let url ="https://facturasapp-qa.cenet.ws/ApiGateway/InvoiceSync/LoadInvoice/LoadDocument"
   let json =convertPdfToBase64()
   let opciones={
@@ -267,6 +269,7 @@ function enviarFactura(){
     SpreadsheetApp.getUi().alert("Error al enviar la factura a MisFacturas. Intente de nuevo si el error presiste comuniquese con soporte");
   }
 }
+
 function convertPdfToBase64Prueba() {
   let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
   let hojaListadoEstao = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
@@ -533,6 +536,7 @@ function limpiarHojaFactura(){
   
 
   hojaFactura.getRange("B16").setValue("0")//total producto
+  hojaFactura.getRange("J29").setValue("0")//anticipos
 
 }
 
@@ -595,32 +599,40 @@ function generarNumeroFactura(){
 function obtenerFechaYHoraActual(){ 
   let sheet = spreadsheet.getSheetByName('Factura');
 
-  let fecha = Utilities.formatDate(new Date(), "America/Bogota", "dd/MM/yyyy");
-  let hora= Utilities.formatDate(new Date(), "America/Bogota", "HH:mm:ss");
+  let fecha = new Date();
+  let fechaFormateada = Utilities.formatDate(fecha, "America/Bogota", "yyyy-MM-dd");
+  let horaFormateada = Utilities.formatDate(fecha, "America/Bogota", "HH:mm:ss");
 
-  sheet.getRange("H4").setNumberFormat("dd/MM/yyyy");
-  sheet.getRange("H4").setValue(String(fecha))
-  
-  sheet.getRange("H6").setValue(hora)
+  sheet.getRange("H4").setNumberFormat("@");
+  sheet.getRange("H4").setValue(fechaFormateada);
 
-  
-  let valorFecha=sheet.getRange("H4").getValue();
-
-  let fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "dd/MM/yyyy");
-  Logger.log("valorFecha "+valorFecha)
-  Logger.log("fecha "+fecha)
-  Logger.log("fechaFormateada "+fechaFormateada)
+  sheet.getRange("H6").setNumberFormat("@");
+  sheet.getRange("H6").setValue(horaFormateada);
 
 }
 function ObtenerFecha(opcion){
   let fechaFormateada
   let sheet = spreadsheet.getSheetByName('Factura');
   let valorFecha=sheet.getRange("H4").getValue();
-  fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "dd/MM/yyyy");
+  fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "yyyy-MM-dd");
   return fechaFormateada
 }
 
+function ObtenerFecha1(opcion){
+  let fechaFormateada
+  if(opcion=="pago"){
+    let sheet = spreadsheet.getSheetByName('Factura');
+    let valorFecha=sheet.getRange("G3").getValue();
+    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
+  }else{
+    let sheet = spreadsheet.getSheetByName('Factura');
+    let valorFecha=sheet.getRange("G4").getValue();
+    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
+  }
 
+
+  return fechaFormateada
+}
 
 
 function obtenerDatosProductos(sheet,range,e){
@@ -628,6 +640,7 @@ function obtenerDatosProductos(sheet,range,e){
     Logger.log("entro a obtenerdatos")
     var selectedProduct = range.getValue();
     
+
     // Referencia a la hoja de productos
     var productSheet = e.source.getSheetByName("Productos");
     var data = productSheet.getDataRange().getValues();
@@ -650,60 +663,52 @@ function getprefacturaValueA1(column, row) {
   return getsheetValueA1(prefactura_sheet, column, row);
 }
 
-function getprefacturaValue(column, row) {
-  return getsheetValue(prefactura_sheet, column, row);
-}
-
 function updateprefacturaValue(column, row, value) {
   updatesheetValue(prefactura_sheet, column, row, value);
   return;
 }
 
 function getInvoiceGeneralInformation() {
-  //Browser.msgBox('getInvoiceGeneralInformation()');
 
-  var InvoiceAuthorizationNumber = "nulo"//Resolución Autorización
-  //
-  range = prefactura_sheet.getRange("G6");//dias de vencimiento
-  var DaysOff = range.getValue();
+  //Recuperar los datos de la factura del sheets
+  var numeroAutorizacion = prefactura_sheet.getRange("H3").getValue();//Resolución DIAN
+  var numeroFactura = prefactura_sheet.getRange("H2").getValue();
+  var fechaEmision = prefactura_sheet.getRange("H4").getValue() + "T" + prefactura_sheet.getRange("H6").getValue();//fecha de emision
+  var diasVencimiento = prefactura_sheet.getRange("H5").getValue();//dias de vencimiento
+  var exchangeRate = prefactura_sheet.getRange("J5").getValue();//tasa de cambio
+  var exchangeRateDate = prefactura_sheet.getRange("J6").getValue();//fecha de tasa de cambio
+  var observaciones = prefactura_sheet.getRange("B10").getValue();//observaciones
+  var fechaVencimiento = SumarDiasAFecha(diasVencimiento, prefactura_sheet.getRange("H4").getValue());
 
-  var invoice_number = getprefacturaValue(2, 7);//cambiamos los valores para llamar el numero de factura
+  //Agregar para el json
   var InvoiceGeneralInformation = {
-    "InvoiceAuthorizationNumber": InvoiceAuthorizationNumber,
-    "PreinvoiceNumber": invoice_number,
-    "InvoiceNumber": invoice_number,
-    "DaysOff": DaysOff,
+    "InvoiceAuthorizationNumber": String(numeroAutorizacion),
+    "PreinvoiceNumber": String(numeroFactura),
+    "InvoiceNumber": String(numeroFactura),
+    "IssueDate": fechaEmision,
+    "Prefix": "SETT",
+    "DaysOff": String(diasVencimiento),
     "Currency": "COP",
     "ExchangeRate": "",
     "ExchangeRateDate": "",
+    "CustomizationID": "10",
     "SalesPerson": "",
-    //"InvoiceDueDate": null,
-    "Note": getprefacturaValue(10, 2), //cambia los valores para llamar la nota de la factura
-    "ExternalGR": false
-    //"AdditionalProperty": AdditionalProperty
+    "Note": observaciones,
+    "ExternalGR": false,
+    "StartDateTime": "0001-01-01T00:00:00",
+    "EndDateTime": "0001-01-01T00:00:00",
+    "InvoiceDueDate": fechaVencimiento
   }
-
-
   return InvoiceGeneralInformation;
 }
-function getPaymentSummary(startingRowTaxation) {
-  let posTotalFactura=startingRowTaxation+7
-  let posMontoNeto=startingRowTaxation+12
-  var total_factura = prefactura_sheet.getRange("A"+String(posTotalFactura)).getValue();// por ahora esto no lo utilizamos ya que no hay descuentos
-  var monto_neto = prefactura_sheet.getRange("B"+String(posMontoNeto)).getValue();
-  //var numeros = new Intl.NumberFormat('es-CO', {maximumFractionDigits:0, style: 'currency', currency: 'COP' }).format(monto);
-  var numeros_total = new Intl.NumberFormat().format(total_factura);
-  var numeros_neto = new Intl.NumberFormat().format(monto_neto);
-  //Browser.msgBox(`${numeros_total}  ${numeros_neto}`);
 
-  Logger.log("total_factura"+total_factura)
-  Logger.log("monto_neto"+monto_neto)
+function getPaymentSummary(pfTotal, pfNetoAPagar) {
   var PaymentTypeTxt = prefactura_sheet.getRange("J2").getValue();
   var PaymentMeansTxt = prefactura_sheet.getRange("J3").getValue();
   var PaymentSummary = {
     "PaymentType": PaymentTypeTxt,
     "PaymentMeans": getPaymentMeans(PaymentMeansTxt),
-    "PaymentNote": `Total Factura: $${numeros_total} \r Neto a Pagar  $${numeros_neto}: ${int2word(monto_neto)}`
+    "PaymentNote": "NA"
   }
   return PaymentSummary;
 }
@@ -728,83 +733,80 @@ function guardarYGenerarInvoice(){
   let invoiceTaxTotal=[];
   var productoInformation = [];
 
-  Logger.log("cantidadProductos"+cantidadProductos)
-
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do{
-    let filaActual = "A" + String(i) + ":I" + String(i);
+    let filaActual = "A" + String(i) + ":L" + String(i);
     let rangoProductoActual=prefactura_sheet.getRange(filaActual);
     let productoFilaActual= String(rangoProductoActual.getValues());
     productoFilaActual=productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
-    Logger.log(productoFilaActual)
     let LineaFactura={};
 
-    for (let j=0;j<11;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo
+    for (let j=0;j<12;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo
       LineaFactura[llavesFinales[j]]=productoFilaActual[j]
     }
     
-
-    let Name = LineaFactura['producto'];
-    let ItemCode = new Number(LineaFactura['referencia']);
+    let ItemReference = String(LineaFactura['referencia']);
+    let Name = String(LineaFactura['producto']);
+    let Quantity = String(LineaFactura['cantidad']);
+    let Price = Number(LineaFactura['preciounitario']);
+    let LineAllowanceTotal = 0.0;
+    let LineChargeTotal = parseFloat(LineaFactura['cargos']);
+    let LineTotalTaxes = parseFloat(LineaFactura['impuetos']);
+    let LineTotal = parseFloat(LineaFactura['totaldelinea']);
+    let LineExtensionAmount = parseFloat(LineaFactura['subtotal']);
     let MeasureUnitCode = "Sin unidad"
-    let Quantity = LineaFactura['cantidad'];
-    let Price = LineaFactura['precio unitario'];
-    let Amount = parseFloat(LineaFactura['subtotal']);//importe
-    let Impuestos = LineaFactura['impuetos']
-    let LineChargeTotal = parseFloat(LineaFactura['totaldelinea']);
-    let Iva = LineChargeTotal-Amount;
-    let descuento=LineaFactura["descuento"];
-    let retencion=LineaFactura["retencion"];
-    Logger.log("descuento "+descuento)
-    Logger.log("retencion "+retencion)
-
-    
-    if (descuento==""){
-      Logger.log("hay un producto con descuento vacio")
-      descuento=0
-    }
-    if(retencion==""){
-      retencion=0
-    }
-
 
 
     //IVA
     let ItemTaxesInformation = [];//taxes del producto en si
-    let percent = convertToPercentage(LineaFactura["iva"]); //aqui deberia de calcular el porcentaje pero como todavia no tengo IVA solo por ahora no
-    Logger.log("percent "+percent)
+    let percentIva = convertToPercentage(LineaFactura["iva%"]);
     let ivaTaxInformation = {
       Id: "01",//Id
       TaxEvidenceIndicator: false,
-      TaxableAmount: Amount,
-      TaxAmount: Impuestos,
-      Percent: percent,
-      BaseUnitMeasure: "",
-      PerUnitAmount: "",
-      Descuento:descuento,
-      Retencion:retencion,
-      
+      TaxableAmount: LineExtensionAmount,
+      TaxAmount: LineExtensionAmount*LineaFactura["iva%"],
+      Percent: percentIva,
+      BaseUnitMeasure: 0,
+      PerUnitAmount: 0,
+    };
+    if (LineaFactura["iva%"]>0){
+      ItemTaxesInformation.push(ivaTaxInformation);
+    }
+
+    let percentInc = convertToPercentage(LineaFactura["inc%"]);
+    let incTaxInformation = {
+      Id: "02",//Id
+      TaxEvidenceIndicator: false,
+      TaxableAmount: LineExtensionAmount,
+      TaxAmount: LineExtensionAmount*LineaFactura["inc%"],
+      Percent: percentInc,
+      BaseUnitMeasure: 0,
+      PerUnitAmount: 0,      
     };
 
-    ItemTaxesInformation.push(ivaTaxInformation);
+    if  (LineaFactura["inc%"]>0){
+      ItemTaxesInformation.push(incTaxInformation);
+    }
+
     invoiceTaxTotal.push(ivaTaxInformation);
 
-    let LineExtensionAmount = Amount;
-    let LineTotalTaxes = Impuestos;
+
 
     let productoI = {//aqui organizamos todos los parametros necesarios para 
-      ItemReference: ItemCode,
+      ItemReference: ItemReference,
       Name: Name,
       Quatity: new Number(Quantity),
       Price: new Number(Price),
-      LineAllowanceTotal: 0.0,
-      LineChargeTotal: 0.0,// que pasa aca ?
+      
+      LineAllowanceTotal: LineAllowanceTotal,
+      LineChargeTotal: LineChargeTotal,
       LineTotalTaxes: LineTotalTaxes,
-      LineTotal: LineChargeTotal,
+      LineTotal: LineTotal,
       LineExtensionAmount: LineExtensionAmount,
       MeasureUnitCode: MeasureUnitCode,
       FreeOFChargeIndicator: false,
       AdditionalReference: [],
+      Nota: "",
       AdditionalProperty: [],
       TaxesInformation: ItemTaxesInformation,
       AllowanceCharge: []
@@ -814,112 +816,57 @@ function guardarYGenerarInvoice(){
   }while(i<(15+cantidadProductos));
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = prefactura_sheet.getRange("A31").getValue(); // para verificar donde esta el TOTAL
-  let rangeFacturaTotal=""
+  const posicionOriginalTotalFactura = prefactura_sheet.getRange("A29").getValue(); // para verificar donde esta el TOTAL
   let rangeTotales=""
-  let rangeImpuestosValor=""
-  let cargoTotal=0
-  let descuentoTotal=0
-  let cargoFactura=0
-  let descuentoFactura=0
 
-  let startingRowTaxation=getTaxSectionStartRow(prefactura_sheet)
-  if (posicionOriginalTotalFactura==="Total factura"){
-    rangeImpuestosValor=prefactura_sheet.getRange(22,1,1,3);
-    rangeTotales=prefactura_sheet.getRange(29,1,1,4);//va a cambiar
-    rangeFacturaTotal=prefactura_sheet.getRange("K25")
-    cargoFactura=prefactura_sheet.getRange("D17").getValue()
-    descuentoFactura=prefactura_sheet.getRange("D18").getValue()
+
+  if (posicionOriginalTotalFactura==="Subtotal"){
+    rangeTotales=prefactura_sheet.getRange(29,1,1,12);//va a cambiar
     
   }else{
-    let rowImpuestosValor=startingRowTaxation+7//va a cambiar
-    let rowTotales=startingRowTaxation+10
-    let rowTotalFactura=startingRowTaxation+12
-    let rowCargoFactura=startingRowTaxation-2
-    let rowDescuentoFactura=startingRowTaxation-1
-    rangeImpuestosValor=prefactura_sheet.getRange(rowImpuestosValor,1,1,3); //va a cambiar
-    rangeTotales=prefactura_sheet.getRange(rowTotales,1,1,4);
-    rangeFacturaTotal=prefactura_sheet.getRange(rowTotalFactura,2);//(maxRows-1) porque no necesito el total
-    cargoFactura=prefactura_sheet.getRange("B"+String(rowCargoFactura)).getValue()
-    descuentoFactura=prefactura_sheet.getRange("B"+String(rowDescuentoFactura)).getValue()
-  }
-
-  if(cargoFactura==""){
-    cargoFactura=0
-  }
-
-  if(descuentoFactura==""){
-    descuentoFactura=0
+    let rowTotales = getTotalesLinea(prefactura_sheet)
+    rangeTotales=prefactura_sheet.getRange(rowTotales+1,1,1,12);
   }
   
   let totalesValores=String(rangeTotales.getValues())
   totalesValores=totalesValores.split(",")
-  Logger.log("totalesValores"+totalesValores)
-  cargoTotal=totalesValores[2]
-  descuentoTotal=totalesValores[3]
-  Logger.log("cargoTotal "+cargoTotal)
-  Logger.log("descuentoTotal "+descuentoTotal)
-  Logger.log("cargoFactura "+cargoFactura)
-  Logger.log("descuentoFactura "+descuentoFactura)
-  // aqui cambia con respecto al original, aqui deberia de cambiar el segundo parametro creo, seria con respecto a un j el cual seria la cantidad de ivas que hay
-  let facturaTotalesBaseImponilbe=String(rangeImpuestosValor.getValues());
-  facturaTotalesBaseImponilbe=facturaTotalesBaseImponilbe.split(",");
-  Logger.log("facturaTotales "+facturaTotalesBaseImponilbe)
-  let TotalFactura=rangeFacturaTotal.getValue()
+ 
+  //Definir los valores para el json
+  let pfSubTotal = parseFloat(totalesValores[0]);
+  let pfBaseGrabable = parseFloat(totalesValores[1]);
+  let pfSubTotalMasImpuestos = parseFloat(totalesValores[2]);
+  let pfRetenciones = parseFloat(totalesValores[4]);
+  let pfCargos = parseFloat(totalesValores[7]);
+  let pfTotal = parseFloat(totalesValores[8]);
+  let pfAnticipo = parseFloat(totalesValores[9]);
+  let pfNetoAPagar = parseFloat(totalesValores[10]);
+  if (pfAnticipo = null){
+    pfAnticipo=0;
+  }
 
-  /*Aqui cambia por completo, por ahora solo voy a dejar los parametros en numeros x 
-  ,  solo coinciden el base imponible he IVA */
-  let pfSubTotal = parseFloat(facturaTotalesBaseImponilbe[0]);//base imponible
-  let pfIVA = parseFloat(facturaTotalesBaseImponilbe[2]);//IVA
-  let pfImpoconsumo = 0;
-  let pfTotal = parseFloat(facturaTotalesBaseImponilbe[0]+facturaTotalesBaseImponilbe[2]);
-  let pfRefuente = 0;
-  let pfReteICA = 0;
-  let pfReteIVA = 0;
-  let pfTRetenciones = 0; 
-  let pfAnticipo = descuentoTotal;
-  let pfTPagar = 0;
-
-  //Aqui seguiria el texto, pero en el de carlos nunca lo llama 
-  let facturaTotales=String(rangeImpuestosValor.getValues());
   let invoice_total = {
-    "LineExtensionAmount": pfSubTotal,
+    "lineExtensionamount": pfBaseGrabable,
     "TaxExclusiveAmount": pfSubTotal,
-    "TaxInclusiveAmount": pfTotal,
-    "AllowanceTotalAmount": 0,
-    "GeneralChargeTotalAmount": cargoFactura,
-    "ChargeTotalAmount": cargoTotal,
-    "GeneralPrePaidAmount": descuentoFactura,
-    "PrePaidAmount": pfAnticipo,
-    "PayableAmount": TotalFactura ,// antes era (pfTotal - pfAnticipo) 
-    "totalRet":totalesValores[0],
-    "totalCargoEqui":totalesValores[1]
+    "TaxInclusiveAmount": pfSubTotalMasImpuestos,
+    "AllowanceTotalAmount": pfRetenciones,
+    "ChargeTotalAmount": pfCargos,
+    "PrePaidAmount": Number(pfAnticipo),
+    "PayableAmount": pfNetoAPagar , 
   }
 
 
   let cliente = prefactura_sheet.getRange("B2").getValue();
   let InvoiceGeneralInformation = getInvoiceGeneralInformation();
-  let CustomerInformation = getCustomerInformation(cliente);// tal ves que por ahora no llame al cliente
+  let CustomerInformation = getCustomerInformation(cliente);
   
   let sheetDatosEmisor=spreadsheet.getSheetByName('Datos de emisor');
   let userId = String(sheetDatosEmisor.getRange("B11").getValue());
   let companyId = String(sheetDatosEmisor.getRange("B3").getValue());
-  let PaymentSummary=getPaymentSummary(startingRowTaxation)
+  let PaymentSummary=getPaymentSummary(pfTotal, pfNetoAPagar);
 
   let fechParaNuevoInvoice=ConvertirFecha("vacio")
   let fechaVencdioParaNuevoInvoice=ConvertirFecha("pago")
 
-  let PercentSurchargeEquivalence;
-  let PercentageRetention;
-
-  if(totalesValores[0]==="" || totalesValores[0]===0||totalesValores[0]===null){
-//futuro para calcuclar bien estos valores
-  }else{
-
-  }
-
-  
-  calcularPorcentaje()
   let nuevoInvoiceResumido=JSON.stringify({
     "file": "base64",
     "Document": {
@@ -928,42 +875,43 @@ function guardarYGenerarInvoice(){
       "companyId": companyId,
       "invoice": {
         "invoiceType": false,
-        "contactName": String(cliente),
-        "numeroIdentificacion": String(CustomerInformation["Identification"]),
-        "invoiceDate": String(fechParaNuevoInvoice),
-        "numberInvoice": String(InvoiceGeneralInformation["InvoiceNumber"]),
-        "taxableAmount": String(parseFloat(facturaTotalesBaseImponilbe[0])),
+        "contactName": "",
+        "numeroIdentificacion": "",
+        "invoiceDate": "",
+        "numberInvoice": "",
+        "taxableAmount": "",
         "Percent": "0",
-        "taxAmount": String(parseFloat(facturaTotalesBaseImponilbe[2])),
+        "taxAmount": '',
         "surchargeAmount": "el valor no se debe de reportar",
         "surchargeValue": "el valor no se debe de reportar",
         "PercentSurchargeEquivalence": "0",
         "PercentageRetention": "0",
         "IRPFValue": "el valor no se debe de reportar",
-        "invoiceTotal": String(TotalFactura),
-        "payDate":String(fechaVencdioParaNuevoInvoice),
-        "PaymentType": String(PaymentSummary["PaymentType"]),
-        "Observations": String(InvoiceGeneralInformation["note"])
+        "invoiceTotal": '',
+        "payDate": "",
+        "PaymentType": "",
+        "Observations": ""
       }
     }
   }
   );
-  Logger.log(invoice_total)
+
   let invoice = JSON.stringify({
     CustomerInformation: CustomerInformation,
     InvoiceGeneralInformation: InvoiceGeneralInformation,
     Delivery: getDelivery(),
     AdditionalDocuments: getAdditionalDocuments(),
-    AdditionalProperty: getAdditionalProperty(),
     PaymentSummary: PaymentSummary, //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
-    //Invoice_Note: invoice_note,
     InvoiceTaxTotal: invoiceTaxTotal,
+    InvoiceTaxOthersTotal: null,
     InvoiceAllowanceCharge: [],
-    InvoiceTotal: invoice_total
+    InvoiceTotal: invoice_total,
+    Documents: []
   });
-  Logger.log(invoice)
-  Logger.log(nuevoInvoiceResumido)
+
+  Logger.log("JSON generado: " + invoice)
+
 
   let nameString = prefactura_sheet.getRange("B2").getValue();
   let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
@@ -975,10 +923,6 @@ function guardarYGenerarInvoice(){
   
 }
 
-function calcularPorcentaje(valor, total) {
-  return (valor / total) * 100;
-}
-
 function showCustomDialog() {
   var html = HtmlService.createHtmlOutputFromFile('postFactura')
       .setWidth(400)
@@ -987,39 +931,17 @@ function showCustomDialog() {
 }
 
 
-function ConvertirFecha(opcion) {
-  
-  // Llama a la función ObtenerFecha para obtener la fecha formateada
-  let fechaFormateada = ObtenerFecha(opcion);
-  
-  // Divide la fecha en día, mes y año
-  let [dia, mes, año] = fechaFormateada.split("/");
+function SumarDiasAFecha(dias, fecha) {
 
-  // Reorganiza la fecha en formato YYYY-MM-DD
-  let fechaConvertida = `${año}-${mes}-${dia}`;
+  // Convertir la fecha de string a objeto Date
+  var partes = fecha.split("-");
+  var fechaObj = new Date(partes[0], partes[1] - 1, partes[2]); // Año, Mes (0-indexado), Día
 
-  return fechaConvertida;
-}
+  // Sumar los días
+  fechaObj.setDate(fechaObj.getDate() + dias);
 
-function SumarDiasAFecha(dias) {
-  // Obtiene la fecha en formato yyyy-MM-dd
-  let fechaConvertida = ConvertirFecha();
-  
-  // Descompone la fecha en año, mes y día
-  let [año, mes, dia] = fechaConvertida.split("-").map(Number);
-
-  // Crea un objeto Date con los valores de año, mes y día
-  let fecha = new Date(año, mes - 1, dia); // mes - 1 porque los meses en Date son indexados desde 0
-
-  // Suma el número de días a la fecha
-  fecha.setDate(fecha.getDate() + dias);
-
-  // Formatea la nueva fecha en formato yyyy-MM-dd
-  let nuevoAño = fecha.getFullYear();
-  let nuevoMes = ("0" + (fecha.getMonth() + 1)).slice(-2); // Asegura dos dígitos para el mes
-  let nuevoDia = ("0" + fecha.getDate()).slice(-2); // Asegura dos dígitos para el día
-
-  let nuevaFecha = `${nuevoAño}-${nuevoMes}-${nuevoDia}`;
+  // Formatear la nueva fecha a yyyy-MM-dd
+  var nuevaFecha = Utilities.formatDate(fechaObj, "GMT", "yyyy-MM-dd");
 
   return nuevaFecha;
 }
@@ -1036,16 +958,10 @@ function obtenerDatosFactura(factura){
   
   var invoiceColIndex = 5; // Columna F (indexada desde 0)
   var jsonColIndex = 12; // Columna M (indexada desde 0)
-  Logger.log("factura "+factura)
-  Logger.log("data length "+data.length)
-  Logger.log(typeof(factura))
-  //Logger.log("data +"+data)
+
   for (var i = 1; i < data.length; i++) { // Comienza en 1 para saltar la fila de encabezado
-    Logger.log(data[i][invoiceColIndex])
-    Logger.log(typeof(data[i][invoiceColIndex]))
     if (data[i][invoiceColIndex] == factura) {
       var jsonData = data[i][jsonColIndex];
-      Logger.log("jsondata "+jsonData)
       if (jsonData) {
         try {
           var invoiceData = JSON.parse(jsonData);
@@ -1400,4 +1316,17 @@ function crearCarpeta() {
   var folder = DriveApp.createFolder("MisFacturas");
   var id = folder.getId();
   hojaDatosEmisor.getRange("B14").setValue(id);
+}
+function ConvertirFecha(opcion) {
+  
+  // Llama a la función ObtenerFecha para obtener la fecha formateada
+  let fechaFormateada = ObtenerFecha1(opcion);
+  
+  // Divide la fecha en día, mes y año
+  let [dia, mes, año] = fechaFormateada.split("/");
+
+  // Reorganiza la fecha en formato YYYY-MM-DD
+  let fechaConvertida = `${año}-${mes}-${dia}`;
+
+  return fechaConvertida;
 }
