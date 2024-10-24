@@ -315,7 +315,7 @@ function onEdit(e) {
       //celda de elegir cliente en hoja factura
       Logger.log("No se editó un cliente válido");
       verificarYCopiarCliente(e);
-      obtenerFechaYHoraActual()
+      obtenerFechaYHoraActual();
       //generarNumeroFactura()
       let hojaInfoUsuario= spreadsheet.getSheetByName('Datos de emisor');
 
@@ -359,8 +359,6 @@ function onEdit(e) {
     }else if(colEditada==8 && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
       //verificar descuentos
       let valorEditadoDescuneto = celdaEditada.getValue();
-      Logger.log(typeof(valorEditadoDescuneto))
-      Logger.log("valorEditadoDescuneto "+valorEditadoDescuneto)
 
       if(0.00 > valorEditadoDescuneto || valorEditadoDescuneto > 1.00){
         Logger.log("No se puede pasar de 100% el valor de descuento o menos de 0%")
@@ -394,7 +392,7 @@ function onEdit(e) {
       Logger.log("dentro de agg info para totoal")
       Logger.log("lastRowProducto "+lastRowProducto)
       Logger.log("productStartRow"+productStartRow)
-      calcularDescuentosCargosYTotales(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual)
+      calcularDescuentosCargosYTotales(lastRowProducto,taxSectionStartRow,hojaActual)
     }
 
     updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,taxSectionStartRow)
@@ -413,16 +411,16 @@ function onEdit(e) {
 
 
 
-function calcularDescuentosCargosYTotales(lastRowProducto,productStartRow,taxSectionStartRow,hojaActual) {
+function calcularDescuentosCargosYTotales(lastRowProducto,taxSectionStartRow,hojaActual) {
 
-  let rowSeccionCargosYDescuentos=taxSectionStartRow+2
-  let rowEspacioIvasAgrupacion=taxSectionStartRow+6
+
+  let rowEspacioIvasAgrupacion=getLastCargoDescuentoRow(hojaActual)+3;
 
 
   //IVA%
   hojaActual.getRange("B"+String(rowEspacioIvasAgrupacion)).setValue("=UNIQUE(G15:G"+String(lastRowProducto)+")")
 
-  let rowParaTotales=taxSectionStartRow+11
+  let rowParaTotales=getTotalesLinea(hojaActual)
 
   //total descuentos FACTURA
 
@@ -473,7 +471,7 @@ function getLastProductRow(sheet, productStartRow, taxSectionStartRow) {
   //aqui arrelgar error que se agrega una nueva linea cuando hay espacio arriba
   return lastProductRow;
 }
-function getLastCargoDescuentoRow(sheet, taxSectionStartRow) {
+function getLastCargoDescuentoRow(sheet) {
   //obtiene la row donde esta el final de la seccion de cargos y descuentos
   const lastRow = sheet.getLastRow();
   let row = 21
@@ -491,7 +489,7 @@ function getTotalesLinea(sheet) {
 
   for (row; row < lastRow; row++) { 
     if (sheet.getRange(row, 1).getValue() === 'Subtotal') {
-      return row;
+      return row+1;
     }
   }
 }

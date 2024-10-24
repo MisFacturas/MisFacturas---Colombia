@@ -73,21 +73,20 @@ function guardarFactura(){
 }
 function agregarFilaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
+  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
   const productStartRow = 15;
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
   hojaFactura.insertRowAfter(lastProductRow)
 }
 function agregarFilaCargoDescuento(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
-  const lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura, taxSectionStartRow);
+  const lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
   hojaFactura.insertRowAfter(lastCargoDescuentoRow)
 }
 
 function agregarProductoDesdeFactura(cantidad,producto){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);//recordar este devuelve el lugar en donde deberian estar base imponible, toca restar -1
+  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
   const productStartRow = 15;
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
 
@@ -224,15 +223,12 @@ function convertPdfToBase64() {
   let hojaListadoEstado=SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
   let dataRange=hojaListadoEstado.getDataRange()
   let data=dataRange.getValues()
-  Logger.log("data "+data)
 
   let jsonNuevoCol=13;
   let lastRow = hojaListadoEstado.getLastRow();
   let jsonData=data[lastRow-1][jsonNuevoCol]
-  Logger.log("json prueba de jason : "+jsonData)
   let invoiceData=JSON.parse(jsonData)
   let infoACambiar=invoiceData.file;
-  Logger.log("infoACambiar "+infoACambiar)
 
 
   let lastRowFacturasId=hoja.getLastRow()
@@ -262,6 +258,7 @@ function enviarFactura(){
 
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
+    Logger.log("aqui quiero borrar ese log re grande"    ); // Muestra la respuesta de la API en los logs
     Logger.log(respuesta.getContentText()); // Muestra la respuesta de la API en los logs
     SpreadsheetApp.getUi().alert("Factura enviada correctamente a MisFacturas. Si desea verla ingrese a https://facturasapp-qa.cenet.ws/Aplicacion/");
   } catch (error) {
@@ -489,7 +486,7 @@ function generarPdfUrl(pdfBlob) {
 function limpiarHojaFactura(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
 
-  //total productos
+  //Limpiar informacion general de la factura
   hojaFactura.getRange("B2").setValue("")//Cliente
   hojaFactura.getRange("B3").setValue("")//Codigo
 
@@ -503,25 +500,16 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("J5").setValue("")//tasa de cambio
   hojaFactura.getRange("J6").setValue("")//fecha tasa de cambio
 
-
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//Nota de pago 
   
-
-
-  //productos
+  //Limpiar informacion productos
   let productStartRow = 15;
   let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
   let lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
-  Logger.log("limpiarHojaFactura")
-  Logger.log("lastProductRow "+lastProductRow)
-  Logger.log("productStartRow+1 "+(Number(productStartRow)+1))
   for (let j = lastProductRow; j >= Number(productStartRow)+1; j--) {
     hojaFactura.deleteRow(j);
-    Logger.log("J" + j);
   }
-  Logger.log("Salta if")
-
   hojaFactura.getRange("A15").setValue("")//referncia
   hojaFactura.getRange("B15").setValue("")//producto
   hojaFactura.getRange("C15").setValue("")//cantidad
@@ -534,6 +522,17 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("J15").setValue("")//cargos
   hojaFactura.getRange("K15").setValue("")//retencion
   
+  //Limpiar informacion de los cargos y descuentos
+  let cargosStartRow = 20;
+  let lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
+  for (let i = lastCargoDescuentoRow; i >= Number(cargosStartRow)+1; i--) {
+    hojaFactura.deleteRow(i);
+  }
+  hojaFactura.getRange("A20").setValue("")//cargo/descuento
+  hojaFactura.getRange("B20").setValue("")//concepto
+  hojaFactura.getRange("C20").setValue("")//valor o porcentaje
+  hojaFactura.getRange("D20").setValue("")//base
+  hojaFactura.getRange("E20").setValue("")//total
 
   hojaFactura.getRange("B16").setValue("0")//total producto
   hojaFactura.getRange("J29").setValue("0")//anticipos
@@ -609,6 +608,8 @@ function obtenerFechaYHoraActual(){
   sheet.getRange("H6").setNumberFormat("@");
   sheet.getRange("H6").setValue(horaFormateada);
 
+  sheet.getRange("J6").setNumberFormat("@");
+  sheet.getRange("J6").setValue(fechaFormateada);
 }
 function ObtenerFecha(opcion){
   let fechaFormateada
@@ -744,53 +745,51 @@ function guardarYGenerarInvoice(){
     for (let j=0;j<12;j++){// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo
       LineaFactura[llavesFinales[j]]=productoFilaActual[j]
     }
+
     
     let ItemReference = String(LineaFactura['referencia']);
     let Name = String(LineaFactura['producto']);
     let Quantity = String(LineaFactura['cantidad']);
     let Price = Number(LineaFactura['preciounitario']);
-    let LineAllowanceTotal = 0.0;
-    let LineChargeTotal = parseFloat(LineaFactura['cargos']);
-    let LineTotalTaxes = parseFloat(LineaFactura['impuetos']);
+    let LineAllowanceTotal = parseFloat(LineaFactura['descuento%']);
+    let LineChargeTotal = Number(LineaFactura['cargos']);
+    let LineTotalTaxes = Number(LineaFactura['impuestos']);
     let LineTotal = parseFloat(LineaFactura['totaldelinea']);
     let LineExtensionAmount = parseFloat(LineaFactura['subtotal']);
     let MeasureUnitCode = "Sin unidad"
+    let ItemTaxesInformation = [];
 
-
-    //IVA
-    let ItemTaxesInformation = [];//taxes del producto en si
-    let percentIva = convertToPercentage(LineaFactura["iva%"]);
-    let ivaTaxInformation = {
-      Id: "01",//Id
-      TaxEvidenceIndicator: false,
-      TaxableAmount: LineExtensionAmount,
-      TaxAmount: LineExtensionAmount*LineaFactura["iva%"],
-      Percent: percentIva,
-      BaseUnitMeasure: 0,
-      PerUnitAmount: 0,
-    };
-    if (LineaFactura["iva%"]>0){
-      ItemTaxesInformation.push(ivaTaxInformation);
+    function agregarImpuestos(){
+    //taxes del producto en si
+      if (LineaFactura["iva%"]>0){
+        let percentIva = convertToPercentage(LineaFactura["iva%"]);
+        let ivaTaxInformation = {
+          Id: "01",//Id
+          TaxEvidenceIndicator: false,
+          TaxableAmount: LineExtensionAmount,
+          TaxAmount: LineExtensionAmount*LineaFactura["iva%"],
+          Percent: percentIva,
+          BaseUnitMeasure: 0,
+          PerUnitAmount: 0,
+        };
+        ItemTaxesInformation.push(ivaTaxInformation);
+      }
+      if  (LineaFactura["inc%"]>0){
+        let percentInc = convertToPercentage(LineaFactura["inc%"]);
+        let incTaxInformation = {
+          Id: "02",//Id
+          TaxEvidenceIndicator: false,
+          TaxableAmount: LineExtensionAmount,
+          TaxAmount: LineExtensionAmount*LineaFactura["inc%"],
+          Percent: percentInc,
+          BaseUnitMeasure: 0,
+          PerUnitAmount: 0,      
+        };
+        ItemTaxesInformation.push(incTaxInformation);
+      }
+      invoiceTaxTotal.push(ItemTaxesInformation);
+      return ItemTaxesInformation;
     }
-
-    let percentInc = convertToPercentage(LineaFactura["inc%"]);
-    let incTaxInformation = {
-      Id: "02",//Id
-      TaxEvidenceIndicator: false,
-      TaxableAmount: LineExtensionAmount,
-      TaxAmount: LineExtensionAmount*LineaFactura["inc%"],
-      Percent: percentInc,
-      BaseUnitMeasure: 0,
-      PerUnitAmount: 0,      
-    };
-
-    if  (LineaFactura["inc%"]>0){
-      ItemTaxesInformation.push(incTaxInformation);
-    }
-
-    invoiceTaxTotal.push(ivaTaxInformation);
-
-
 
     let productoI = {//aqui organizamos todos los parametros necesarios para 
       ItemReference: ItemReference,
@@ -808,7 +807,7 @@ function guardarYGenerarInvoice(){
       AdditionalReference: [],
       Nota: "",
       AdditionalProperty: [],
-      TaxesInformation: ItemTaxesInformation,
+      TaxesInformation: agregarImpuestos(),
       AllowanceCharge: []
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
