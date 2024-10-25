@@ -188,63 +188,6 @@ function processForm(data) {
   }
 }
 
-function generatePdfFromPlantilla() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Copia de Plantilla');
-  var celdaNumFactura = ss.getSheetByName('Factura').getRange('A9').getValue();
-  var numFactura = celdaNumFactura.substring(20);
-
-  if (!sheet) {
-    throw new Error('La hoja Plantilla no existe.');
-  }
-
-  var sheetId = sheet.getSheetId();
-  var url = ss.getUrl().replace(/edit$/, '') + 'export?exportFormat=pdf&format=pdf' +
-    '&gid=' + sheetId +
-    '&size=A4' +  // Tamaño del papel
-    '&portrait=true' +  // Orientación vertical
-    '&fitw=true' +  // Ajustar a ancho de la página
-    '&sheetnames=false&printtitle=false' +  // Opciones de impresión
-    '&pagenumbers=false&gridlines=false' +  // Más opciones de impresión
-    '&fzr=false' +  // Aislar filas congeladas
-    '&top_margin=0.8' +  // Margen superior
-    '&bottom_margin=0.00' +  // Margen inferior
-    '&left_margin=0.50' +  // Margen izquierdo
-    '&right_margin=0.50' +  // Margen derecho
-    '&horizontal_alignment=CENTER' +  // Alineación horizontal
-    '&vertical_alignment=TOP';  // Alineación vertical
-
-  var token = ScriptApp.getOAuthToken();
-
-  try {
-    var response = UrlFetchApp.fetch(url, {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      },
-      muteHttpExceptions: true
-    });
-
-    if (response.getResponseCode() === 200) {
-      var pdfBlob = response.getBlob().setName('Factura '&numFactura&'.pdf');
-      return pdfBlob;
-    } else {
-      Logger.log('Error ' + response.getResponseCode() + ': ' + response.getContentText());
-      throw new Error('Error ' + response.getResponseCode() + ': ' + response.getContentText());
-    }
-  } catch (e) {
-    Logger.log('Exception: ' + e.message);
-    throw new Error('Exception: ' + e.message);
-  }
-}
-
-function getPdfUrl() {
-  var pdfBlob = generatePdfFromPlantilla();
-  var base64Data = Utilities.base64Encode(pdfBlob.getBytes());
-  var contentType = pdfBlob.getContentType();
-  var name = pdfBlob.getName();
-  return `data:${contentType};base64,${base64Data}`;
-}
-
 
 function convertToPercentage(value) {
   return (value * 100).toFixed(2);
@@ -332,9 +275,9 @@ function onEdit(e) {
     let lastRowProducto = cargosDescuentosStartRow-3;
     if (lastRowProducto===productStartRow){
       // //ESTADO DEAFULT no se hace nada
-      hojaActual.getRange("K29").setValue("=L15")
-      hojaActual.getRange("L29").setValue("=K29-J29")
-
+      let rowParaTotales=getTotalesLinea(hojaActual);
+      hojaActual.getRange("K"+String(rowParaTotales)).setValue("=L15")
+      hojaActual.getRange("L"+String(rowParaTotales)).setValue("=K"+String(rowParaTotales)+"-J"+String(rowParaTotales))
 
 
     }else{
@@ -363,7 +306,7 @@ function calcularDescuentosCargosYTotales(lastRowProducto,cargosDescuentosStartR
   let lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaActual);
   //Seccion Cargos y Descuentos
   let rowSeccionCargosYDescuentos=cargosDescuentosStartRow+2;
-  let totalDescuentosSeccionCargosyDescuentos = calcularCargYDescu(hojaActual,rowSeccionCargosYDescuentos, lastCargoDescuentoRow, rowParaTotales);
+  let totalDescuentosSeccionCargosyDescuentos = calcularCargYDescu(hojaActual,rowSeccionCargosYDescuentos, lastCargoDescuentoRow);
   
   //Seccion Impuestos
   let rowImpuestos=lastCargoDescuentoRow+4;
@@ -439,7 +382,7 @@ function getcargosDescuentosStartRow(sheet) {
   }
   return row+1;// por si se borro todos los productos,creo que da igual 
 }
-function calcularCargYDescu(hojaActual,rowSeccionCargosYDescuentos, lastCargoDescuentoRow, rowParaTotales) {
+function calcularCargYDescu(hojaActual,rowSeccionCargosYDescuentos, lastCargoDescuentoRow) {
   let totalDescuentosSeccionCargosyDescuentos = {cargos:0,descuentos:0};
   for (let i = rowSeccionCargosYDescuentos; i < lastCargoDescuentoRow+1; i++) {
     let celdaValorPorcentaje = hojaActual.getRange("C"+String(i)).getValue()
