@@ -109,21 +109,6 @@ function showPostFactura() {
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
-function showEnviarEmailHistorial(data){
-  var html = HtmlService.createHtmlOutputFromFile('enviarEmailHistorial')
-    .setTitle('Enviar Email Historial');
-  SpreadsheetApp.getUi()
-    .showSidebar(html);
-}
-
-
-function showEnviarEmailPost() {
-  var html = HtmlService.createHtmlOutputFromFile('enviarEmailPost')
-    .setWidth(400)
-    .setHeight(300)
-  SpreadsheetApp.getUi()
-    .showModalDialog(html,"Digite el email a enviar");
-}
 
 
 function processForm(data) {
@@ -260,26 +245,6 @@ function getPdfUrl() {
   return `data:${contentType};base64,${base64Data}`;
 }
 
-/*
-function sendPdfByEmail(email) {
-  var pdfFile = generatePdfFromFactura();
-  var subject = 'Factura';
-  var body = 'Adjunto encontrará la factura en formato PDF.';
-
-  if (!email) {
-    return "Por favor ingrese una dirección de correo válida.";
-  }
-
-  MailApp.sendEmail({
-    to: email,
-    subject: subject,
-    body: body,
-    attachments: [pdfFile.getAs(MimeType.PDF)]
-  });
-
-  return "PDF generado y enviado por correo electrónico a " + email;
-}
-*/
 
 function convertToPercentage(value) {
   return (value * 100).toFixed(2);
@@ -305,7 +270,7 @@ function onEdit(e) {
       //celda de elegir cliente en hoja factura
       Logger.log("No se editó un cliente válido");
       verificarYCopiarCliente(e);
-      obtenerFechaYHoraActual();
+      ponerFechaYHoraActual();
 
     }
     else if(rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos)  {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)

@@ -627,8 +627,6 @@ function obtenerInformacionCliente(cliente) {
   let celdaCliente = datos_sheet.getRange("H2");
   celdaCliente.setValue(cliente);
 
-
-
   let codigoCliente = datos_sheet.getRange("I2").getValue();
   let direccion = datos_sheet.getRange("T2").getValue();
   let pais = datos_sheet.getRange("S2").getValue();

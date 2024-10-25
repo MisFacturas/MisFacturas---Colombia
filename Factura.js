@@ -129,33 +129,6 @@ function agregarProductoDesdeFactura(cantidad,producto){
   calcularDescuentosCargosYTotales(rowParaDatos,productStartRow,rowParaTotalTaxes,hojaFactura)
 }
 
-function onImageClick() {
-  // Obtén el rango activo (última celda seleccionada)
-  var range = SpreadsheetApp.getActiveSpreadsheet().getActiveRange();
-
-  // Obtén la dirección de la celda
-  var cellAddress = range.getA1Notation();
-
-  // Muestra la celda en un diálogo
-  SpreadsheetApp.getUi().alert('La celda activa es: ' + cellAddress);
-}
-function probarInsertarImagen(){
-  insertarImagenBorrarFila(15)
-}
-function insertarImagenBorrarFila(fila){
-  let hojaFcatura=spreadsheet.getSheetByName('Factura');
-  let imagenURL="https://i.postimg.cc/RFZ45sgp/basura3.png"
-  var cell = hojaFcatura.getRange('H'+fila);
-  cell.setHorizontalAlignment('center');
-  var imageBlob = UrlFetchApp.fetch(imagenURL).getBlob();
-  var image = hojaFcatura.insertImage(imageBlob, cell.getColumn(), cell.getRow());
-  var numFactura = hojaFcatura.getRange('A'+fila).getValue();
-  image.assignScript("onImageClick");
-  image.setHeight(20);
-  image.setWidth(20);
-  image.setAnchorCellXOffset(40);
-}
-
 function guardarFacturaHistorial() {
   var hojaFactura = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Factura');
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
@@ -193,20 +166,10 @@ function guardarFacturaHistorial() {
   celdaEstado.setHorizontalAlignment('center');
   celdaEstado.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaImagen = hojaListado.getRange("F" + newRow);
-  insertarImagen(newRow);
-  celdaImagen.setHorizontalAlignment('center');
-  celdaImagen.setBorder(true, true, true, true, null, null, null, null);
-
   var idArchivo = obtenerDatosFactura(numeroFactura);
   Logger.log("idarchivo"+idArchivo)
   guardarIdArchivo(idArchivo, numeroFactura);
 
-  // var html = HtmlService.createHtmlOutputFromFile('postFactura')
-  //   .setTitle('Menú');
-  // SpreadsheetApp.getUi()
-  //   .showSidebar(html);
-  
   showCustomDialog()
 }
 
@@ -227,9 +190,8 @@ function convertPdfToBase64() {
   let jsonNuevoCol=13;
   let lastRow = hojaListadoEstado.getLastRow();
   let jsonData=data[lastRow-1][jsonNuevoCol]
+  Logger.log("jsonData: " + jsonData)
   let invoiceData=JSON.parse(jsonData)
-  let infoACambiar=invoiceData.file;
-
 
   let lastRowFacturasId=hoja.getLastRow()
   var idArchivo = hoja.getRange("B" + lastRowFacturasId).getValue();
@@ -247,8 +209,8 @@ function convertPdfToBase64() {
 }
 function enviarFactura(){
   Logger.log("enviarFactura")
-  let url ="https://facturasapp-qa.cenet.ws/ApiGateway/InvoiceSync/LoadInvoice/LoadDocument"
-  let json =convertPdfToBase64()
+  let url ="" //url de la api
+  let json = convertPdfToBase64()
   let opciones={
     "method" : "post",
     "contentType": "application/json",
@@ -260,97 +222,12 @@ function enviarFactura(){
     var respuesta = UrlFetchApp.fetch(url, opciones);
     Logger.log("aqui quiero borrar ese log re grande"    ); // Muestra la respuesta de la API en los logs
     Logger.log(respuesta.getContentText()); // Muestra la respuesta de la API en los logs
-    SpreadsheetApp.getUi().alert("Factura enviada correctamente a MisFacturas. Si desea verla ingrese a https://facturasapp-qa.cenet.ws/Aplicacion/");
+    SpreadsheetApp.getUi().alert("Factura enviada correctamente a MisFacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
     SpreadsheetApp.getUi().alert("Error al enviar la factura a MisFacturas. Intente de nuevo si el error presiste comuniquese con soporte");
   }
 }
-
-function convertPdfToBase64Prueba() {
-  let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
-  let hojaListadoEstao = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
-  let dataRange = hojaListadoEstao.getDataRange();
-  let data = dataRange.getValues();
-
-  let jsonNuevoCol = 13;
-  let lastRow = hojaListadoEstao.getLastRow();
-  let jsonData = data[lastRow - 1][jsonNuevoCol];
-  Logger.log("json" + jsonData);
-
-  let invoiceData = JSON.parse(jsonData);
-  let infoACambiar = invoiceData.file;
-  Logger.log("infoACambiar " + infoACambiar);
-
-  let lastRowFacturasId = hoja.getLastRow();
-  let idArchivo = hoja.getRange("B" + lastRowFacturasId).getValue();
-  const file = DriveApp.getFileById(idArchivo);
-  const base64String = Utilities.base64Encode(file.getBlob().getBytes());
-
-  invoiceData.file = base64String;
-  Logger.log("Nuevo valor de invoiceData.file: " + invoiceData.file);
-  
-  let nuevoJsonData = JSON.stringify(invoiceData);
-  Logger.log("Nuevo JSON Data: " + nuevoJsonData);
-
-  // Crear o actualizar el archivo 'prueba.json' en Google Drive
-  let folder = DriveApp.getRootFolder(); // Aquí puedes especificar una carpeta en particular
-  let files = folder.getFilesByName('prueba.json');
-  let jsonFile = folder.createFile('prueba.json', nuevoJsonData, "application/json");
-
-  if (files.hasNext()) {
-    jsonFile = files.next();
-    jsonFile.setContent(nuevoJsonData);
-    Logger.log('Archivo "prueba.json" actualizado.');
-  } else {
-    jsonFile = folder.createFile('prueba.json', nuevoJsonData, MimeType.JSON);
-    Logger.log('Archivo "prueba.json" creado.');
-  }
-}
-
-
-
-function linkDescargaFactura() {
-  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
-  var lastRow = hoja.getLastRow();
-  var idArchivo = hoja.getRange("B" + lastRow).getValue();
-  var numFactura = hoja.getRange("A" + lastRow).getValue();
-  var pdf = DriveApp.getFileById(idArchivo);
-  var url = pdf.getDownloadUrl();
-  return {
-    numFactura: numFactura,
-    url: url
-  };
-}
-
-function getDownloadLink() {
-  var data = linkDescargaFactura();
-  return data;
-}
-
-function enviarEmailPostFactura(email) {
-  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
-  var lastRow = hoja.getLastRow();
-  var idArchivo = hoja.getRange("B" + lastRow).getValue();
-  var numFactura = hoja.getRange("A" + lastRow).getValue();
-  var pdfFile = DriveApp.getFileById(idArchivo).getBlob();
-  var subject = `Factura ${numFactura}`
-  var body = 'Adjunto encontrará la factura en formato PDF.';
-
-  if (!email) {
-    return "Por favor ingrese una dirección de correo válida.";
-  }
-
-  MailApp.sendEmail({
-    to: email,
-    subject: subject,
-    body: body,
-    attachments: [pdfFile.getAs(MimeType.PDF)]
-  });
-
-  return "PDF generado y enviado por correo electrónico a " + email;
-}
-
 
 function ProcesarFormularioFactura(data) {
   var numFactura = data.numFactura
@@ -372,117 +249,6 @@ function ProcesarFormularioFactura(data) {
   return link;
 }
 
-function insertarImagen(fila) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
-  var imageUrl = 'https://cdn.icon-icons.com/icons2/1674/PNG/512/download_111133.png'; // Reemplaza con la URL de tu imagen
-  var cell = sheet.getRange('F' + fila);
-  cell.setHorizontalAlignment('center');
-  var imageBlob = UrlFetchApp.fetch(imageUrl).getBlob();
-  var image = sheet.insertImage(imageBlob, cell.getColumn(), cell.getRow());
-  image.assignScript("descargarFactura");
-  image.setHeight(20);
-  image.setWidth(20);
-  image.setAnchorCellXOffset(40);
-}
-
-function descargarFactura() {
-  var html = HtmlService.createHtmlOutputFromFile('descargaFacturaHistorial')
-    .setTitle('Menú');
-  SpreadsheetApp.getUi()
-    .showSidebar(html);
-}
-
-function guardarFilaFactura() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
-  var cell = sheet.getActiveCell();
-  var fila = cell.getRow();
-  sheet.getRange('Z1').setValue(fila); // Guardar la fila en una celda oculta (Z1)
-  generarPDFfactura();
-}
-
-
-function generarPDFfactura() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
-  var fila = sheet.getRange('Z1').getValue(); // Leer el número de fila de la celda oculta
-  var numeroFactura = sheet.getRange('A' + fila).getValue(); // Obtener el número de factura
-
-  var resultado = obtenerDatosFactura(numeroFactura);
-  if (resultado) {
-    var pdfBlob = generarPDF();
-  } else {
-    Utilities.sleep(5000);
-    var pdfBlob = generarPDF();
-  }
-  var url = generarPdfUrl(pdfBlob);
-
-  // Crear un archivo temporal en el Drive para proporcionar un enlace de descarga
-  var tempFile = DriveApp.createFile(pdfBlob);
-  var tempFileUrl = tempFile.getDownloadUrl();
-
-  // Enviar un enlace de descarga al usuario
-  var html = '<html><body><a href="' + tempFileUrl + '">Descargar PDF de la Factura ' + numeroFactura + '</a></body></html>';
-  var ui = HtmlService.createHtmlOutput(html)
-    .setWidth(300)
-    .setHeight(100);
-  SpreadsheetApp.getUi().showModalDialog(ui, 'Descargar PDF');
-}
-
-
-function generarPDF() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName('Copia de Plantilla');
-
-  if (!sheet) {
-    throw new Error('La hoja Plantilla no existe.');
-  }
-
-  var sheetId = sheet.getSheetId();
-  var url = ss.getUrl().replace(/edit$/, '') + 'export?exportFormat=pdf&format=pdf' +
-    '&gid=' + sheetId +
-    '&size=A4' +  // Tamaño del papel
-    '&portrait=true' +  // Orientación vertical
-    '&fitw=true' +  // Ajustar a ancho de la página
-    '&sheetnames=false&printtitle=false' +  // Opciones de impresión
-    '&pagenumbers=false&gridlines=false' +  // Más opciones de impresión
-    '&fzr=false' +  // Aislar filas congeladas
-    '&top_margin=0.8' +  // Margen superior
-    '&bottom_margin=0.00' +  // Margen inferior
-    '&left_margin=0.50' +  // Margen izquierdo
-    '&right_margin=0.50' +  // Margen derecho
-    '&horizontal_alignment=CENTER' +  // Alineación horizontal
-    '&vertical_alignment=TOP';  // Alineación vertical
-
-  var token = ScriptApp.getOAuthToken();
-
-  try {
-    var response = UrlFetchApp.fetch(url, {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      },
-      muteHttpExceptions: true
-    });
-
-    if (response.getResponseCode() === 200) {
-      var pdfBlob = response.getBlob().setName('Factura.pdf');
-      return pdfBlob;
-    } else {
-      Logger.log('Error ' + response.getResponseCode() + ': ' + response.getContentText());
-      throw new Error('Error ' + response.getResponseCode() + ': ' + response.getContentText());
-    }
-  } catch (e) {
-    Logger.log('Exception: ' + e.message);
-    throw new Error('Exception: ' + e.message);
-  }
-}
-
-function generarPdfUrl(pdfBlob) {
-  var base64Data = Utilities.base64Encode(pdfBlob.getBytes());
-  var contentType = pdfBlob.getContentType();
-  var name = pdfBlob.getName();
-  return `data:${contentType};base64,${base64Data}`;
-}
-
-
 function limpiarHojaFactura(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
 
@@ -502,6 +268,7 @@ function limpiarHojaFactura(){
 
   hojaFactura.getRange("B10").setValue("")//Osbervaciones
   hojaFactura.getRange("B11").setValue("")//Nota de pago 
+  hojaFactura.getRange("L15").setValue("")//Total primer producto
   
   //Limpiar informacion productos
   let productStartRow = 15;
@@ -544,7 +311,7 @@ function limpiarHojaFactura(){
 
 function inicarFacturaNueva(){
   generarNumeroFactura(); 
-  obtenerFechaYHoraActual();
+  ponerFechaYHoraActual();
 }
 
 function limpiarYEliminarFila(numeroFila,hoja,hojaTax){
@@ -597,7 +364,7 @@ function generarNumeroFactura(){
   sheet.getRange("G2").setValue(numeroActual);
 }
 
-function obtenerFechaYHoraActual(){ 
+function ponerFechaYHoraActual(){ 
   let sheet = spreadsheet.getSheetByName('Factura');
 
   let fecha = new Date();
@@ -613,30 +380,13 @@ function obtenerFechaYHoraActual(){
   sheet.getRange("J6").setNumberFormat("@");
   sheet.getRange("J6").setValue(fechaFormateada);
 }
-function ObtenerFecha(opcion){
+function obtenerFecha(){
   let fechaFormateada
   let sheet = spreadsheet.getSheetByName('Factura');
   let valorFecha=sheet.getRange("H4").getValue();
   fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "yyyy-MM-dd");
   return fechaFormateada
 }
-
-function ObtenerFecha1(opcion){
-  let fechaFormateada
-  if(opcion=="pago"){
-    let sheet = spreadsheet.getSheetByName('Factura');
-    let valorFecha=sheet.getRange("G3").getValue();
-    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
-  }else{
-    let sheet = spreadsheet.getSheetByName('Factura');
-    let valorFecha=sheet.getRange("G4").getValue();
-    fechaFormateada = Utilities.formatDate(new Date(valorFecha), "UTC+1", "dd/MM/yyyy");
-  }
-
-
-  return fechaFormateada
-}
-
 
 function obtenerDatosProductos(sheet,range,e){
     if ( range.getA1Notation() === "A14" || range.getA1Notation()=== "A15" || range.getA1Notation() === "A16" || range.getA1Notation()=== "A17" || range.getA1Notation()=== "A18") {
@@ -662,15 +412,6 @@ function obtenerDatosProductos(sheet,range,e){
 
 }
 
-function getprefacturaValueA1(column, row) {
-  return getsheetValueA1(prefactura_sheet, column, row);
-}
-
-function updateprefacturaValue(column, row, value) {
-  updatesheetValue(prefactura_sheet, column, row, value);
-  return;
-}
-
 function getInvoiceGeneralInformation() {
 
   //Recuperar los datos de la factura del sheets
@@ -692,8 +433,8 @@ function getInvoiceGeneralInformation() {
     "Prefix": "SETT",
     "DaysOff": String(diasVencimiento),
     "Currency": "COP",
-    "ExchangeRate": "",
-    "ExchangeRateDate": "",
+    "ExchangeRate": exchangeRate,
+    "ExchangeRateDate": exchangeRateDate,
     "CustomizationID": "10",
     "SalesPerson": "",
     "Note": observaciones,
@@ -865,9 +606,6 @@ function guardarYGenerarInvoice(){
   let companyId = String(sheetDatosEmisor.getRange("B3").getValue());
   let PaymentSummary=getPaymentSummary(pfTotal, pfNetoAPagar);
 
-  let fechParaNuevoInvoice=ConvertirFecha("vacio")
-  let fechaVencdioParaNuevoInvoice=ConvertirFecha("pago")
-
   let nuevoInvoiceResumido=JSON.stringify({
     "file": "base64",
     "Document": {
@@ -911,14 +649,11 @@ function guardarYGenerarInvoice(){
     Documents: []
   });
 
-  Logger.log("JSON generado: " + invoice)
-
-
-  let nameString = prefactura_sheet.getRange("B2").getValue();
-  let numeroFactura = JSON.stringify(InvoiceGeneralInformation.InvoiceNumber);
-  let fecha =ObtenerFecha();
-  let codigoCliente=prefactura_sheet.getRange("B3").getValue();
-  listadoestado_sheet.appendRow(["vacio", "vacio","vacio" , fecha,"vacio" ,numeroFactura ,nameString ,codigoCliente,"vacio" ,"vacio" ,"representacion" ,"Vacio", String(invoice),String(nuevoInvoiceResumido)]);
+  let nombreCliente = prefactura_sheet.getRange("B2").getValue();
+  let numeroFactura = InvoiceGeneralInformation.InvoiceNumber;
+  let fecha = obtenerFecha();
+  let codigoCliente = prefactura_sheet.getRange("B3").getValue();
+  listadoestado_sheet.appendRow(["vacio", fecha,"vacio", numeroFactura, nombreCliente, codigoCliente,"vacio" ,"vacio","Vacio", invoice, nuevoInvoiceResumido]);
   
   SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente, aguarde unos segundos");
   
@@ -946,8 +681,6 @@ function SumarDiasAFecha(dias, fecha) {
 
   return nuevaFecha;
 }
-
-
 
 
 
@@ -1124,7 +857,6 @@ function obtenerDatosFactura(factura){
               celdaTotal.setHorizontalAlignment('normal');
 
               contador += 1;
-              Logger.log('IVA: ' + key + '%');
               
             }
           }
@@ -1226,108 +958,4 @@ function obtenerDatosFactura(factura){
     }
   }
   Logger.log('Invoice number ' + factura + ' not found.');
-}
-
-function testWriteNumeroIdentificacionToPlantilla() {
-  var invoiceNumber = '192'; // Reemplaza con el número de factura deseado
-  Logger.log(obtenerDatosFactura(invoiceNumber));
-}
-
-function resetPlantilla() {
-  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Copia de Plantilla');
-
-  // Borrar información de productos
-  var colProductos = "A";
-  var lineaProductos = 19;
-  limpiarTablas(colProductos, lineaProductos);
-
-  var colBases = "E";
-  var lineaBases = 30;
-  limpiarTablas(colBases, lineaBases);
-  
-  // Borrar información del cliente
-  targetSheet.getRange('B12').clearContent();
-  targetSheet.getRange('B13').clearContent();
-  targetSheet.getRange('B14').clearContent();
-  targetSheet.getRange('B15').clearContent();
-  targetSheet.getRange('B16').clearContent();
-  targetSheet.getRange('K12').clearContent();
-  targetSheet.getRange('K13').clearContent();
-  targetSheet.getRange('K14').clearContent();
-  targetSheet.getRange('J15').clearContent();
-  
-  // Borrar valor a pagar, nota de pago y observaciones
-  targetSheet.getRange('B41').clearContent();
-  targetSheet.getRange('A45').clearContent();
-  targetSheet.getRange('A50').clearContent();
-  
-  // Borrar total de items, descuentos y cargos
-  targetSheet.getRange('B21').clearContent();
-  targetSheet.getRange('A24').clearContent();
-  targetSheet.getRange('D24').clearContent();
-  
-  // Borrar totales
-  targetSheet.getRange('A32').clearContent();
-  targetSheet.getRange('F32').clearContent();
-  targetSheet.getRange('I32').clearContent();
-  targetSheet.getRange('A36').clearContent();
-  targetSheet.getRange('D36').clearContent();
-  targetSheet.getRange('G36').clearContent();
-  targetSheet.getRange('K36').clearContent();
-  
-}
-
-function limpiarTablas(columna, linea){
-  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Copia de Plantilla');
-  var primeraFila = targetSheet.getRange(linea+":"+linea);
-  primeraFila.clearContent();
-  linea++;
-  while (!targetSheet.getRange(columna+linea).isBlank()) {
-    targetSheet.deleteRow(linea);
-  }
-}
-
-function sacarColumnaFila(celda){
-  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Celdas Plantilla');
-  var celdaDestino = hoja.getRange(celda).getValue();
-  var match = celdaDestino.match(/([A-Z]+)(\d+)/);
-  if (match) {
-    var columna = match[1];  // 'B'
-    var fila = parseInt(match[2], 10);  // 21
-    
-    return [columna, fila];
-  } else {
-    Logger.log('No se pudo dividir la referencia de celda.');
-  }
-}
-
-function pruebaSacar(){
-  var lista = sacarColumnaFila("E18")
-  Logger.log(lista)
-}
-
-function subirFactura(nombre, pdfBlob) {
-  var folder = DriveApp.getFolderById(folderId);
-  var file = folder.createFile(pdfBlob.setName(`Factura ${nombre}.pdf`));
-  var id = file.getId();
-  return id;
-}
-
-function crearCarpeta() {
-  var folder = DriveApp.createFolder("MisFacturas");
-  var id = folder.getId();
-  hojaDatosEmisor.getRange("B14").setValue(id);
-}
-function ConvertirFecha(opcion) {
-  
-  // Llama a la función ObtenerFecha para obtener la fecha formateada
-  let fechaFormateada = ObtenerFecha1(opcion);
-  
-  // Divide la fecha en día, mes y año
-  let [dia, mes, año] = fechaFormateada.split("/");
-
-  // Reorganiza la fecha en formato YYYY-MM-DD
-  let fechaConvertida = `${año}-${mes}-${dia}`;
-
-  return fechaConvertida;
 }

@@ -108,24 +108,6 @@
           google.script.run.showSidebar();
         }
 
-        function downloadPdf() {
-            google.script.run.withSuccessHandler(function(data) {
-                var numFactura = data.numFactura;
-                var url = data.url;
-
-                var link = document.createElement('a');
-                link.href = url;
-                link.download = 'Factura ' + numFactura + '.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }).getDownloadLink();
-        }
-
-        function showEnviarEmailPost() {
-            google.script.run.showEnviarEmailPost();
-        }
-
         function enviarFactura(){
             google.script.run.enviarFactura();
         }
@@ -138,8 +120,6 @@
       <div class="container">
         <h1>Facturas</h1>
         <div class="btn-group">
-            <button onclick="downloadPdf()">Descargar PDF</button>
-            <button onclick="showEnviarEmailPost()">Enviar factura por correo</button>
             <button onclick="enviarFactura()">Enviar factura a MisFacturas</button>
         </div>
       </div>

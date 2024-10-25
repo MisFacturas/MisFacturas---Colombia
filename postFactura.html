@@ -19,24 +19,6 @@
           google.script.run.showSidebar();
         }
 
-        function downloadPdf() {
-            google.script.run.withSuccessHandler(function(data) {
-                var numFactura = data.numFactura;
-                var url = data.url;
-
-                var link = document.createElement('a');
-                link.href = url;
-                link.download = 'Factura ' + numFactura + '.pdf';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }).getDownloadLink();
-        }
-
-        function showEnviarEmailPost() {
-            google.script.run.showEnviarEmailPost();
-        }
-
         function enviarFactura(){
             google.script.run.enviarFactura();
         }
@@ -44,35 +26,13 @@
   </head>
 <body class="d-flex h-100">
 
-<!-- Modal Facturas -->
-<!--   
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-body pt-0">
-          <div class="row py-3 px-4 gx-0">
-            <div class="col-12 text-center py-4">
-              <h1>Facturas</h1>
-            <p>Elige una opción</p>
-            </div>
-
-            <a onclick="downloadPdf()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-download"></i><span>Descargar PDF</span></a>
-            <a onclick="showEnviarEmailPost()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-send"></i><span>Enviar factura por correo</span></a>
-            <a onclick="enviarFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-send"></i><span>Enviar factura a misFacturas</span></a>
-          </div>
-        </div>
-      </div>
-    </div> -->
- 
-    <main>
+<main>
 
       <div class="row py-3 px-4 gx-0">
         <div class="col-12 text-center py-4">
           <h1>Facturas!</h1>
         <p>Elige una opción</p>
         </div>
-  
-        <a onclick="downloadPdf()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-download"></i><span>Descargar PDF</span></a>
-        <a onclick="showEnviarEmailPost()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-send"></i><span>Enviar factura por correo</span></a>
         <a onclick="enviarFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-send"></i><span>Enviar factura a MisFacturas</span></a>
   
       </div>
