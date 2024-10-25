@@ -73,9 +73,9 @@ function guardarFactura(){
 }
 function agregarFilaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
+  let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
   const productStartRow = 15;
-  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
   hojaFactura.insertRowAfter(lastProductRow)
 }
 function agregarFilaCargoDescuento(){
@@ -86,9 +86,9 @@ function agregarFilaCargoDescuento(){
 
 function agregarProductoDesdeFactura(cantidad,producto){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
+  let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
   const productStartRow = 15;
-  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
 
   let dictInformacionProducto ={}
   if(producto==="" || cantidad==="" || cantidad===0){
@@ -98,7 +98,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
   }
 
   let rowParaDatos=lastProductRow
-  let rowParaTotalTaxes=taxSectionStartRow
+  let rowParaTotalTaxes=cargosDescuentosStartRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
     hojaFactura.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
@@ -113,7 +113,7 @@ function agregarProductoDesdeFactura(cantidad,producto){
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
-    rowParaTotalTaxes=taxSectionStartRow+1
+    rowParaTotalTaxes=cargosDescuentosStartRow+1
     rowParaDatos=lastProductRow+1
     hojaFactura.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     hojaFactura.getRange("B"+String(rowParaDatos)).setValue(producto)
@@ -505,8 +505,8 @@ function limpiarHojaFactura(){
   
   //Limpiar informacion productos
   let productStartRow = 15;
-  let taxSectionStartRow = getTaxSectionStartRow(hojaFactura);
-  let lastProductRow = getLastProductRow(hojaFactura, productStartRow, taxSectionStartRow);
+  let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
+  let lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
   for (let j = lastProductRow; j >= Number(productStartRow)+1; j--) {
     hojaFactura.deleteRow(j);
   }
@@ -536,6 +536,8 @@ function limpiarHojaFactura(){
 
   hojaFactura.getRange("B16").setValue("0")//total producto
   hojaFactura.getRange("J29").setValue("0")//anticipos
+  hojaFactura.getRange("F29").setValue("0")//total descuentos
+  hojaFactura.getRange("H29").setValue("0")//total cargos
 
 }
 
@@ -721,7 +723,7 @@ function guardarYGenerarInvoice(){
   if (posicionTotalProductos==="Total productos"){
     var cantidadProductos=prefactura_sheet.getRange("B16").getValue();// cantidad total de productos 
   }else{
-    let startingRowTax=getTaxSectionStartRow(prefactura_sheet)
+    let startingRowTax=getcargosDescuentosStartRow(prefactura_sheet)
     let posicionTotalProductos=startingRowTax-2
     var cantidadProductos=prefactura_sheet.getRange("B"+String(posicionTotalProductos)).getValue();// cantidad total de productos
   }

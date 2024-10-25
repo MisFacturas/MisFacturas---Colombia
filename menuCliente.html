@@ -10,10 +10,10 @@
 
 
     <!-- Bootstrap core CSS -->
-    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://misfacturas-qa.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
-    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
-    <link href="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+    <link href="https://misfacturas-qa.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+    <link href="https://misfacturas-qa.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
     
     <script>
     function addClient() {
@@ -39,18 +39,15 @@
 
    <header class="mb-auto">
     <div id="logo" class="d-flex justify-content-center bg-primary">
-      <img src="https://facturasapp-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+      <img src="https://misfacturas-qa.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
     </div>
 
     <div class="row mt-4 px-4 gx-0">
-        <div class="col-1 p-0">
+          <div class="col-1 p-0">
             <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
           </div>
           <div class="col-7 p-0 d-flex align-items-center">
             <h2 class="mb-0 ms-4"> Clientes</h2>
-          </div>
-          <div class="col-4 p-0 d-flex justify-content-end">
-            <a href=""><i class="icon-24-outlined-suggested-symbol-x nav-icon"></i></a>
           </div>
     </div>
   </header>
@@ -63,25 +60,22 @@
       <p>Crea, guarda y visualiza tus clientes en Google Sheets.</p>
     </div>
 
-
-    <div class="col-12 mt-4 px-0">
-        <div class="row">
-          <div class="col-6">
-            <a onclick="addClient()" class="btn btn-secondary btn-lg w-100">
-              <i class="icon-24-outlined-other-person-user-plus me-0"></i><span>Crear <br>cliente</span>
-            </a>
-        </div>
-        <div class="col-6 d-hide">
+    <div class="container">
+      <!-- Fila para el botón "Crear cliente" -->
+      <div class="row">
+        <div class="col-12">
+          <a onclick="addClient()" class="btn btn-secondary btn-lg w-100">
+            <i class="icon-24-outlined-other-person-user-plus me-0"></i><span>Crear <br>cliente</span>
+          </a>
         </div>
       </div>
-    </div>
-
-    <div class="col-12 mt-4 px-0 mt-fluid">
-        <div class="row">
-          <div class="col-6">
-            <a onclick="inactivateClient()" class="btn btn-secondary btn-lg w-100">
-              <i class="icon-user-x me-0"></i><span>Inactivar <br>cliente</span>
-            </a>
+    
+      <!-- Fila para los botones "Activar cliente" e "Inactivar cliente" -->
+      <div class="row mt-4">
+        <div class="col-6">
+          <a onclick="inactivateClient()" class="btn btn-secondary btn-lg w-100">
+            <i class="icon-user-x me-0"></i><span>Inactivar <br>cliente</span>
+          </a>
         </div>
         <div class="col-6">
           <a onclick="reactivateClient()" class="btn btn-secondary btn-lg w-100">
@@ -101,13 +95,6 @@
         <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100 btn-menu d-flex align-items-center justify-content-between">
           <span>Home</span>
           <i class="icon-24-outlined-other-location-home"></i>
-        </a>
-      </div>
-      <div class="col-6 ps-1">
-        <!-- Botón Salir ajustado -->
-        <a onclick="google.script.host.close()" class="btn btn-primary btn-lg w-100 btn-menu d-flex align-items-center justify-content-between">
-          <span>Salir</span>
-          <i class="icon-24-outlined-directions-log-log-in"></i>
         </a>
       </div>
     </div>
