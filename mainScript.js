@@ -309,9 +309,12 @@ function calcularDescuentosCargosYTotales(lastRowProducto,cargosDescuentosStartR
   let totalDescuentosSeccionCargosyDescuentos = calcularCargYDescu(hojaActual,rowSeccionCargosYDescuentos, lastCargoDescuentoRow);
   
   //Seccion Impuestos
-  let rowImpuestos=lastCargoDescuentoRow+4;
-  hojaActual.getRange("B"+String(rowImpuestos)).setValue("=UNIQUE(G15:G"+String(lastRowProducto)+")")
-
+  let rowIVA=lastCargoDescuentoRow+4;
+  hojaActual.getRange("B"+String(rowIVA)).setValue("=SORT(UNIQUE(G15:G"+String(lastRowProducto)+"))")
+  let rowINC=rowIVA+4;
+  hojaActual.getRange("B" + String(rowINC)).setValue("=SORT(FILTER(UNIQUE(H15:H" + String(lastRowProducto) + "), UNIQUE(H15:H" + String(lastRowProducto) + ") <> \"0\"))");
+  hojaActual.getRange("C"+String(rowIVA)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B"+String(rowIVA)+":B"+String(rowINC-1)+"; E15:E"+String(lastRowProducto)+"))")
+  hojaActual.getRange("C"+String(rowINC)).setValue("=ARRAYFORMULA(SUMIF(H15:H"+String(lastRowProducto)+"; B"+String(rowINC)+":B"+String(rowINC+3)+"; E15:E"+String(lastRowProducto)+"))") 
 
   //impuestos
   hojaActual.getRange("C"+String(rowParaTotales)).setValue("=SUM(F15:F"+String(lastRowProducto)+")")

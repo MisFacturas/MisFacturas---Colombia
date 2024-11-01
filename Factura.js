@@ -443,6 +443,17 @@ function guardarYGenerarInvoice(){
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
 
   let invoiceTaxTotal=[];
+  let agrupacionImpuestos ={
+    
+      "Id": "01",
+      "TaxEvidenceIndicator": false,
+      "TaxableAmount": 4000.0,
+      "TaxAmount": 760.0,
+      "Percent": 19.0,
+      "BaseUnitMeasure": 0,
+      "PerUnitAmount": 0.0
+  
+  }
   var productoInformation = [];
 
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
@@ -488,7 +499,7 @@ function guardarYGenerarInvoice(){
       if  (LineaFactura["inc%"]>0){
         let percentInc = convertToPercentage(LineaFactura["inc%"]);
         let incTaxInformation = {
-          Id: "02",//Id
+          Id: "04",//Id
           TaxEvidenceIndicator: false,
           TaxableAmount: LineExtensionAmount,
           TaxAmount: LineExtensionAmount*LineaFactura["inc%"],
@@ -498,7 +509,6 @@ function guardarYGenerarInvoice(){
         };
         ItemTaxesInformation.push(incTaxInformation);
       }
-      invoiceTaxTotal.push(ItemTaxesInformation);
       return ItemTaxesInformation;
     }
 
