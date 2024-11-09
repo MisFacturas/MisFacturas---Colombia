@@ -112,6 +112,11 @@ function showPostFactura() {
 
 
 function processForm(data) {
+  let existe=verificarCodigo(data.codigoReferencia,"Productos")
+  if(existe){
+    SpreadsheetApp.getUi().alert("El codigo de referencia ya existe, por favor poner un codigo de referencia unico");
+    throw new Error('por favor poner un Numero de Identificacion unico');
+  }
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Productos");
     const lastRow = sheet.getLastRow();
@@ -180,7 +185,10 @@ function processForm(data) {
     valorRetencion = precioUnitario * (parseFloat(tarifaRetencion) / 100);
     sheet.getRange(newRow, 15).setValue(valorRetencion);
 
-
+    let referenciaUnica =nombre+"-"+codigoReferencia
+    sheet.getRange(newRow,16).setValue(referenciaUnica);
+    sheet.getRange(newRow, 16).setHorizontalAlignment('normal');
+    
     
     return SpreadsheetApp.getUi().alert("Nuevo producto creado satisfactoriamente");
   } catch (error) {
@@ -288,9 +296,30 @@ function onEdit(e) {
     updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,cargosDescuentosStartRow)
     
   } else if (hojaActual.getName() === "Clientes") {
+
+    let celdaEditada = e.range;
+    let hojaCliente=e.source.getActiveSheet();
+    
+    let rowEditada = celdaEditada.getRow();
+    let colEditada = celdaEditada.getColumn();
+    let colTipoDePersona=2
     let tipoPersona= obtenerTipoDePersona(e);
+
+    if (colEditada ==6 && rowEditada>1){
+      Logger.log("entro a ver si el edit es en numero")
+      let numeroIdentificacion=hojaCliente.getRange(rowEditada,colEditada).getValue()
+      Logger.log("num i"+numeroIdentificacion )
+      let existe=verificarCodigo(numeroIdentificacion,"Clientes",true)
+      if(existe){
+        SpreadsheetApp.getUi().alert("El numero de identificacion ya existe, por favor elegir otro numero unico");
+        celdaEditada.setValue("");
+        verificarDatosObligatorios(e,tipoPersona)
+        throw new Error('por favor poner un Numero de Identificacion unico');
+      }
+    }
+
     verificarDatosObligatorios(e,tipoPersona)
-  
+    agregarCodigoIdentificador(e)
 
   }
 }
@@ -309,12 +338,12 @@ function calcularDescuentosCargosYTotales(lastRowProducto,cargosDescuentosStartR
   let totalDescuentosSeccionCargosyDescuentos = calcularCargYDescu(hojaActual,rowSeccionCargosYDescuentos, lastCargoDescuentoRow);
   
   //Seccion Impuestos
-  let rowIVA=lastCargoDescuentoRow+4;
-  hojaActual.getRange("B"+String(rowIVA)).setValue("=SORT(UNIQUE(G15:G"+String(lastRowProducto)+"))")
-  let rowINC=rowIVA+4;
-  hojaActual.getRange("B" + String(rowINC)).setValue("=SORT(FILTER(UNIQUE(H15:H" + String(lastRowProducto) + "), UNIQUE(H15:H" + String(lastRowProducto) + ") <> \"0\"))");
-  hojaActual.getRange("C"+String(rowIVA)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B"+String(rowIVA)+":B"+String(rowINC-1)+"; E15:E"+String(lastRowProducto)+"))")
-  hojaActual.getRange("C"+String(rowINC)).setValue("=ARRAYFORMULA(SUMIF(H15:H"+String(lastRowProducto)+"; B"+String(rowINC)+":B"+String(rowINC+3)+"; E15:E"+String(lastRowProducto)+"))") 
+  //let rowIVA=lastCargoDescuentoRow+4;
+  //hojaActual.getRange("B"+String(rowIVA)).setValue("=SORT(UNIQUE(G15:G"+String(lastRowProducto)+"))")
+  //let rowINC=rowIVA+4;
+  //hojaActual.getRange("B" + String(rowINC)).setValue("=SORT(FILTER(UNIQUE(H15:H" + String(lastRowProducto) + "), UNIQUE(H15:H" + String(lastRowProducto) + ") <> \"0\"))");
+  //hojaActual.getRange("C"+String(rowIVA)).setValue("=ARRAYFORMULA(SUMIF(G15:G"+String(lastRowProducto)+"; B"+String(rowIVA)+":B"+String(rowINC-1)+"; E15:E"+String(lastRowProducto)+"))")
+  //hojaActual.getRange("C"+String(rowINC)).setValue("=ARRAYFORMULA(SUMIF(H15:H"+String(lastRowProducto)+"; B"+String(rowINC)+":B"+String(rowINC+3)+"; E15:E"+String(lastRowProducto)+"))") 
 
   //impuestos
   hojaActual.getRange("C"+String(rowParaTotales)).setValue("=SUM(F15:F"+String(lastRowProducto)+")")
@@ -430,6 +459,21 @@ function updateTotalProductCounter(lastRowProducto,productStartRow,hojaActual,ca
 
 }
 
+function agregarCodigoIdentificador(e){
+  hojaCliente=e.source.getActiveSheet();
+  let range = e.range;
+  let rowEditada = range.getRow();
+  let colEditada = range.getColumn();
+  let estadoActual=hojaCliente.getRange(rowEditada,1).getValue()
+  Logger.log("entrado a codigo-identiicador")
+  Logger.log("estado actual "+estadoActual)
+  if (estadoActual=="Valido"){
+    let nombre=hojaCliente.getRange(rowEditada,2).getValue()
+    let numeroIdentificacion=hojaCliente.getRange(rowEditada,6).getValue()
+    let identificadorUnico=nombre+"-"+numeroIdentificacion
+    hojaCliente.getRange(rowEditada,24).setValue(identificadorUnico)
+  }
+}
 
 function limpiarDict() {
   Logger.log("Limpiar el dict")

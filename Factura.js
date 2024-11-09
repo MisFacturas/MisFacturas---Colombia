@@ -68,9 +68,8 @@ function guardarFactura(){
   }else{
     SpreadsheetApp.getUi().alert("La factura no es valida")
   }
-  
-
 }
+
 function agregarFilaNueva(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
@@ -78,6 +77,7 @@ function agregarFilaNueva(){
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
   hojaFactura.insertRowAfter(lastProductRow)
 }
+
 function agregarFilaCargoDescuento(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   const lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
@@ -197,26 +197,6 @@ function enviarFactura(){
   }
 }
 
-function ProcesarFormularioFactura(data) {
-  var numFactura = data.numFactura
-  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Facturas ID');
-
-  var range = hoja.getRange('A2:A'); // Rango desde A2 hasta el final de la columna A
-  var textFinder = range.createTextFinder(numFactura);
-  var cell = textFinder.findNext();
-
-  if (cell) {
-    var fila = cell.getRow();
-    var idAsociado = hoja.getRange('B' + fila).getValue();
-  } else {
-    return 'Factura no encontrada';
-  }
-
-  var pdf = DriveApp.getFileById(idAsociado);
-  var link = pdf.getDownloadUrl();
-  return link;
-}
-
 function limpiarHojaFactura(){
   let hojaFactura = spreadsheet.getSheetByName('Factura');
 
@@ -270,9 +250,6 @@ function limpiarHojaFactura(){
   hojaFactura.getRange("E20").setValue("")//total
 
   hojaFactura.getRange("B16").setValue("0")//total producto
-  hojaFactura.getRange("J29").setValue("0")//anticipos
-  hojaFactura.getRange("F29").setValue("0")//total descuentos
-  hojaFactura.getRange("H29").setValue("0")//total cargos
 
 }
 
@@ -441,19 +418,7 @@ function guardarYGenerarInvoice(){
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
   const llavesFinales =llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
-
-  let invoiceTaxTotal=[];
-  let agrupacionImpuestos ={
-    
-      "Id": "01",
-      "TaxEvidenceIndicator": false,
-      "TaxableAmount": 4000.0,
-      "TaxAmount": 760.0,
-      "Percent": 19.0,
-      "BaseUnitMeasure": 0,
-      "PerUnitAmount": 0.0
-  
-  }
+ 
   var productoInformation = [];
 
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
@@ -493,9 +458,11 @@ function guardarYGenerarInvoice(){
           Percent: percentIva,
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
-        };
+        }
         ItemTaxesInformation.push(ivaTaxInformation);
       }
+      
+      
       if  (LineaFactura["inc%"]>0){
         let percentInc = convertToPercentage(LineaFactura["inc%"]);
         let incTaxInformation = {
@@ -535,6 +502,54 @@ function guardarYGenerarInvoice(){
     i++;
   }while(i<(15+cantidadProductos));
 
+  
+let invoiceTaxTotal=[];
+// Función para obtener todos los impuestos de productoInformation
+function obtenerTodosLosImpuestos(productoInformation) {
+  let todosLosImpuestos = [];
+
+  for (let i = 0; i < productoInformation.length; i++) {
+    let impuestosProducto = productoInformation[i].TaxesInformation;
+    if (impuestosProducto && impuestosProducto.length > 0) {
+      for (let j = 0; j < impuestosProducto.length; j++) {
+        todosLosImpuestos.push(impuestosProducto[j]);
+      }
+    }
+  }
+
+  return todosLosImpuestos;
+}
+
+// Función para agrupar impuestos
+function agruparImpuestos(todosLosImpuestos) {
+  let impuestosAgrupados = [];
+
+  for (let i = 0; i < todosLosImpuestos.length; i++) {
+    let impuestoActual = todosLosImpuestos[i];
+    let encontrado = false;
+
+    for (let j = 0; j < impuestosAgrupados.length; j++) {
+      let impuestoAgrupado = impuestosAgrupados[j];
+
+      if (impuestoAgrupado.Id === impuestoActual.Id && impuestoAgrupado.Percent === impuestoActual.Percent) {
+        impuestoAgrupado.TaxableAmount += impuestoActual.TaxableAmount;
+        impuestoAgrupado.TaxAmount += impuestoActual.TaxAmount;
+        encontrado = true;
+        break;
+      }
+    }
+
+    if (!encontrado) {
+      impuestosAgrupados.push({ ...impuestoActual });
+    }
+  }
+
+  return impuestosAgrupados;
+}
+
+
+
+
   //estos es dinamico, verificar donde va el total cargo y descuento
   const posicionOriginalTotalFactura = prefactura_sheet.getRange("A29").getValue(); // para verificar donde esta el TOTAL
   let rangeTotales=""
@@ -545,11 +560,12 @@ function guardarYGenerarInvoice(){
     
   }else{
     let rowTotales = getTotalesLinea(prefactura_sheet)
-    rangeTotales=prefactura_sheet.getRange(rowTotales+1,1,1,12);
+    rangeTotales=prefactura_sheet.getRange(rowTotales,1,1,12);
   }
   
   let totalesValores=String(rangeTotales.getValues())
   totalesValores=totalesValores.split(",")
+
  
   //Definir los valores para el json
   let pfSubTotal = parseFloat(totalesValores[0]);
@@ -617,10 +633,10 @@ function guardarYGenerarInvoice(){
     CustomerInformation: CustomerInformation,
     InvoiceGeneralInformation: InvoiceGeneralInformation,
     Delivery: getDelivery(),
-    AdditionalDocuments: getAdditionalDocuments(),
+    AdditionalDocuments: [],
     PaymentSummary: PaymentSummary, //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
-    InvoiceTaxTotal: invoiceTaxTotal,
+    InvoiceTaxTotal: agruparImpuestos(obtenerTodosLosImpuestos(productoInformation)),
     InvoiceTaxOthersTotal: null,
     InvoiceAllowanceCharge: [],
     InvoiceTotal: invoice_total,
@@ -634,6 +650,7 @@ function guardarYGenerarInvoice(){
   listadoestado_sheet.appendRow(["vacio", fecha,"vacio", numeroFactura, nombreCliente, codigoCliente,"vacio" ,"vacio","Vacio", invoice, nuevoInvoiceResumido]);
   
   SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente, aguarde unos segundos");
+  Logger.log("Este es el json a revisar: "+invoice);
   
 }
 
@@ -660,3 +677,59 @@ function SumarDiasAFecha(dias, fecha) {
   return nuevaFecha;
 }
 
+
+function verificarCodigo(codigo, nombreHoja,inHoja) {
+  Logger.log("Verificar codigos");
+  // Clientes o Productos
+  let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(nombreHoja);
+  if (codigo==""){
+    return false
+  }else if (nombreHoja === "Clientes") {
+    try {
+      let columnaNumIdentificacionC = 6;
+      let lastActiveRow = sheet.getLastRow();
+      let rangeNumeroIdentificaciones;
+      if(inHoja){
+        rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow - 2);
+      }else{
+        rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow - 1);
+      }
+      let NumerosIdentificacion = String(rangeNumeroIdentificaciones.getValues()); 
+      NumerosIdentificacion=NumerosIdentificacion.split(",")
+      Logger.log("Numero identificacion");
+      Logger.log(NumerosIdentificacion);
+      Logger.log("codigo: " + codigo);
+
+      // Verificar si el código ya existe
+      if (NumerosIdentificacion.includes(String(codigo))) {
+        Logger.log("El Num identificion ya existe.");
+        return true
+      } else {
+        Logger.log("El Num identificion no existe.");
+        return false
+      }
+    } catch (error) {
+      Logger.log("Error al verificar el Num identificion: " + error.message);
+    }
+  } else if (nombreHoja === "Productos") {
+    try{
+      let columnaNumIdentificacionP = 2;
+      let lastActiveRow = sheet.getLastRow();
+      let rangeCodigoReferencia = sheet.getRange(2, columnaNumIdentificacionP, lastActiveRow - 1);
+      let codigosReferencia = String(rangeCodigoReferencia.getValues());
+      codigosReferencia=codigosReferencia.split(",")
+      if(codigosReferencia.includes(String(codigo))){
+        Logger.log("El código ya existe.");
+        return true
+      } else {
+        Logger.log("El código no existe.");
+        return false
+      }
+    }catch(error){
+      Logger.log("Error al verificar el codigo: " + error.message);
+    }
+    
+  }else{
+    Logger.log("No coindicden");
+  }
+}

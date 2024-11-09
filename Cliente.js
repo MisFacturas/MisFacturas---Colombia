@@ -419,7 +419,9 @@ function obtenerTipoDePersona(e){
   let colEditada = 4;
 
   let tipoPersona =sheet.getRange(rowEditada,colEditada).getValue()
+  Logger.log(tipoPersona)
   return tipoPersona
+  
 }
 
 function saveClientData(formData) {
@@ -487,17 +489,17 @@ function verificarDatosObligatorios(e, tipoPersona) {
   let colEditada = range.getColumn();
   let ultimaColumnaPermitida = 21; // Actualizado para reflejar el número de columnas
   let columnasObligatorias = [];
-  let todasLasColumnas = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,21];
+  let todasLasColumnas = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
 
   if (tipoPersona === "") {
     Logger.log("Vacio hizo edicion no en tipoPersona, cogemos el viejo");
     tipoPersona = sheet.getRange("D" + String(rowEditada)).getValue(); // Columna 4 para Tipo Persona
   }
 
-  if (tipoPersona === "Autonomo") {
-    columnasObligatorias = [2,3, 4, 5, 6,7, 8, 10, 12, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
-  } else if (tipoPersona === "Empresa") {
-    columnasObligatorias = [2,3, 4, 5, 6, 7,8,9, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
+  if (tipoPersona === "Natural") {
+    columnasObligatorias = [2, 3, 4, 5, 6,7, 8, 10, 12, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
+  } else if (tipoPersona === "Juridica") {
+    columnasObligatorias = [2, 3, 4, 5, 6, 7, 8, 9, 14, 17, 18,19, 21, 22, 23]; // Incluyendo "Nombre cliente" (columna 2)
   } else {
     Logger.log("Vacio tipo de persona");
   }
