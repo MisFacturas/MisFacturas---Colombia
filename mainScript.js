@@ -393,7 +393,7 @@ function getLastCargoDescuentoRow(sheet) {
 function getTotalesLinea(sheet) {
   //obtiene la row donde esta la linea de totales
   const lastRow = sheet.getLastRow();
-  let row = 28
+  let row = 25
 
   for (row; row < lastRow; row++) { 
     if (sheet.getRange(row, 1).getValue() === 'Subtotal') {

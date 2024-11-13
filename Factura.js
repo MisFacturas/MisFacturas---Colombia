@@ -177,13 +177,14 @@ function recuperarJson(){
 }
 function enviarFactura(){
   Logger.log("enviarFactura")
-  let url ="" //url de la api
+  let url ="https://www.misfacturas.com.co/integrationAPI_2/api/insertinvoice?SchemaID=31&IDNumber=900089681&TemplateID=73" //url de la api
   let json = recuperarJson()
   Logger.log(json)
   let opciones={
     "method" : "post",
     "contentType": "application/json",
     "payload" : json,
+    "headers": {"X-API-KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjkwMDA5MTQ5NiIsIm5iZiI6MTczMTQ2Njg1MiwiZXhwIjoxNzMxNTUzMjUyLCJpYXQiOjE3MzE0NjY4NTIsImlzcyI6Ik1pc0ZhY3R1cmFzIn0.Ptm5WWhhgWTZ1W2Ic8nBUqde5USmP9rNSXQGbXbqeYc"},
     'muteHttpExceptions': true
   };
 
