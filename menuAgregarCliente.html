@@ -53,22 +53,25 @@
       const form = document.getElementById('clienteForm');
       const tipoPersona = document.getElementById('tipoPersona').value;
       const columnasObligatorias = tipoPersona === 'Natural' ? 
-        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente','regimen', 'primerNombre', 'primerApellido', 'pais', 'direccion', 'codigoPostal','telefono',  'email'] :
+        ['tipoTercero', 'tipoPersona','tipoDocumento', 'numeroIdentificacion', 'codigoCliente','regimen', 'primerNombre', 'primerApellido', 'pais', 'direccion', 'codigoPostal','telefono',  'email', 'detallesTributarios', 'responsabilidadFiscal'] :
         tipoPersona === 'Juridica' ? 
-        ['nombreCliente','tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente','regimen', 'nombreComercial', 'pais', 'direccion', 'codigoPostal', 'telefono',  'email'] : 
+        ['tipoTercero','tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente','regimen', 'nombreComercial', 'pais', 'direccion', 'codigoPostal', 'telefono',  'email', 'detallesTributarios', 'responsabilidadFiscal'] : 
         [];
 
       let isValid = true;
 
       columnasObligatorias.forEach(id => {
-        const field = document.getElementById(id);
-        if (!field.value.trim()) {
-          field.style.backgroundColor = '#FFC7C7';
-          isValid = false;
-        } else {
-          field.style.backgroundColor = '';
-        }
-      });
+      const field = document.getElementById(id);
+      if (field.tagName === 'SELECT' && field.value === 'Seleccione') {
+        field.style.backgroundColor = '#FFC7C7';
+        isValid = false;
+      } else if (!field.value.trim()) {
+        field.style.backgroundColor = '#FFC7C7';
+        isValid = false;
+      } else {
+        field.style.backgroundColor = '';
+      }
+    });
 
       return isValid;
     }
@@ -76,18 +79,17 @@
     function saveData() {
       if (verificarDatosObligatorios()) {
         const formData = {
-          nombreCliente: document.getElementById('nombreCliente').value,
           tipoTercero: document.getElementById('tipoTercero').value,
           tipoPersona: document.getElementById('tipoPersona').value,
-          tipoDocumento: document.getElementById('tipoDocumento').value,
-          numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
-          codigoCliente: document.getElementById('codigoCliente').value,
-          regimen: document.getElementById('regimen').value,
           nombreComercial: document.getElementById('nombreComercial').value,
           primerNombre: document.getElementById('primerNombre').value,
           segundoNombre: document.getElementById('segundoNombre').value,
           primerApellido: document.getElementById('primerApellido').value,
           segundoApellido: document.getElementById('segundoApellido').value,
+          tipoDocumento: document.getElementById('tipoDocumento').value,
+          numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
+          codigoCliente: document.getElementById('codigoCliente').value,
+          regimen: document.getElementById('regimen').value,
           pais: document.getElementById('pais').value,
           departamento: document.getElementById('departamento').value,
           municipio: document.getElementById('municipio').value,
@@ -102,11 +104,70 @@
         };
 
         google.script.run.saveClientData(formData);
+        resetForm();
       } else {
         alert('Por favor complete todos los campos obligatorios.');
       }
+      function resetForm() {
+    const form = document.getElementById('clienteForm');
+    form.reset();
+
+    const fieldsToDisable = [
+      'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'numeroIdentificacion', 'sitioWeb'
+    ];
+
+    fieldsToDisable.forEach(id => {
+      const field = document.getElementById(id);
+      field.disabled = true;
+      field.style.backgroundColor = '';
+    });
+
+    const selects = form.querySelectorAll('select');
+    selects.forEach(select => {
+      select.value = 'Seleccione';
+      select.style.backgroundColor = '';
+    });
+
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.style.backgroundColor = '';
+    });
+  }s
     }
-  </script>
+    document.addEventListener('DOMContentLoaded', function() {
+            const tipoPersona = document.getElementById('tipoPersona');
+            const allFields = [
+                'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
+            ];
+            const naturalFields = [
+                'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal'
+            ];
+            const juridicaFields = [
+                'tipoDocumento', 'numeroIdentificacion', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
+            ];
+
+            // Bloquear todos los campos por defecto excepto tipoTercero y tipoPersona
+            allFields.forEach(id => {
+                document.getElementById(id).disabled = true;
+            });
+
+            tipoPersona.addEventListener('change', function() {
+                if (tipoPersona.value === 'Natural') {
+                    naturalFields.forEach(id => {
+                        document.getElementById(id).disabled = false;
+                    });
+                    document.getElementById('nombreComercial').disabled = true;
+                } else if (tipoPersona.value === 'Juridica') {
+                    juridicaFields.forEach(id => {
+                        document.getElementById(id).disabled = false;
+                    });
+                    ['primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido'].forEach(id => {
+                        document.getElementById(id).disabled = true;
+                    });
+                }
+            });
+        });
+   </script>
   <body class="d-flex h-100">
     
 <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
@@ -134,174 +195,151 @@
           <p>Ingresa la información de tu nuevo cliente.</p>
         </div>
 
-        <div class="col-12 px-0">
-            <form class="row g-3" id="clientForm">
-                <div class="col-12">
-                    <label for="nombreCliente" class="form-label">Nombre cliente</label>
-                    <input type="text" class="form-control form-control-lg" id="nombreCliente" placeholder="Nombre Cliente">
-                </div>
 
-                <div class="col-md-12">
-                    <label for="tipoTercero" class="form-label">Tipo de cliente</label>
-                    <select id="tipoTercero" class="form-select form-select-lg">
-                      <option selected>Cliente</option>
-                      <option>Proveedor</option>
-                    </select>
-                </div>
-
-                <div class="col-md-12">
-                    <label for="tipoPersona" class="form-label">Tipo de persona</label>
-                    <select id="tipoPersona" class="form-select form-select-lg">
-                      <option selected>Natural</option>
-                      <option>Juridica</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="tipoDocumento" class="form-label">Tipo de documento</label>
-                    <select id="tipoDocumento" class="form-select form-select-lg">
-                      <option selected>Seleccione</option>
-                      <option>Cédula de ciudadanía</option>
-                      <option>Tarjeta de extranjería</option>
-                      <option>Cédula de extranjería</option>
-                      <option>NIT</option>
-                      <option>Pasaporte</option>
-                      <option>Documento de identificación extranjero</option>
-                      <option>PEP (Permiso Especial de Permanencia)</option>
-                      <option>PPT (Permiso Protección Temporal)</option>
-                      <option>NIT de otro país</option>
-                      <option>NUIP</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="numeroIdentificacion" class="form-label">Núm. de documento</label>
-                    <input type="text" class="form-control form-control-lg" id="numeroIdentificacion" placeholder="Número de identificación">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="codigoCliente" class="form-label">Código cliente</label>
-                    <input type="text" class="form-control form-control-lg" id="codigoCliente" placeholder="Código cliente">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="regimen" class="form-label">Régimen</label>
-                    <select id="regimen" class="form-select form-select-lg">
-                      <option selected>Seleccione</option>
-                      <option>Impuesto sobre las ventas - IVA</option>
-                      <option>No responsable de IVA</option> 
-                    </select>
-                </div>
-
-                <div class="col-md-6">
-                    <label for="nombreComercial" class="form-label">Nombre comercial</label>
-                    <input type="text" class="form-control form-control-lg" id="nombreComercial" placeholder="Nombre comercial">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="primerNombre" class="form-label">Primer nombre</label>
-                    <input type="text" class="form-control form-control-lg" id="primerNombre" placeholder="Primer nombre">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="segundoNombre" class="form-label">Segundo nombre</label>
-                    <input type="text" class="form-control form-control-lg" id="segundoNombre" placeholder="Segundo nombre">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="primerApellido" class="form-label">Primer apellido</label>
-                    <input type="text" class="form-control form-control-lg" id="primerApellido" placeholder="Primer apellido">
-                </div>
-
-                <div class="col-md-6">
-                    <label for="segundoApellido" class="form-label">Segundo apellido</label>
-                    <input type="text" class="form-control form-control-lg" id="segundoApellido" placeholder="Segundo apellido">
-                </div>
-
-                <div class="col-md-12">
-                    <label for="pais" class="form-label">Buscar país</label>
-                    <input type="text" id="pais" class="form-control form-control-lg" placeholder="Buscar país" autocomplete="off" onkeyup="buscarPais()">
-                    <div class="result-box">
-                      <!-- Los resultados se mostrarán aquí -->
-                    </div>
-                </div>
-
-                <div class="col-md-12">
-                    <label for="departamento" class="form-label">Departamento</label>
-                    <input type="text" class="form-control form-control-lg" id="departamento" placeholder="Departamento">
-                </div>
-
-                <div class="col-md-12">
-                    <label for="municipio" class="form-label">Municipio</label>
-                    <input type="text" class="form-control form-control-lg" id="municipio" placeholder="Municipio">
-                </div>
-
-                <div class="col-md-12">
-                    <label for="direccion" class="form-label">Dirección</label>
-                    <input type="text" class="form-control form-control-lg" id="direccion" placeholder="Dirección">
-                </div>
-
-                <div class="col-md-12">
-                    <label for="codigoPostal" class="form-label">Código Postal</label>
-                    <input type="text" class="form-control form-control-lg" id="codigoPostal" placeholder="Código Postal">
-                </div>
-
-                <div class="col-md-12">
-                    <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="text" class="form-control form-control-lg" id="telefono" placeholder="Teléfono">
-                </div>
-
-                <div class="col-md-12">
-                    <label for="sitioWeb" class="form-label">Sitio web</label>
-                    <input type="text" class="form-control form-control-lg" id="sitioWeb" placeholder="Sitio web">
-                </div>
-
-                <div class="col-md-12">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control form-control-lg" id="email" placeholder="Email">
-                </div>
-
-                <div class="col-12">
-                  <label for="detallesTributarios" class="form-label">Detalles tributarios</label>
-                  <select id="detallesTributarios" class="form-select form-select-lg">
-                    <option selected>Seleccione</option>
-                    <option>IVA</option>
-                    <option>INC</option>
-                    <option>IVA e INC</option>
-                    <option>No aplica</option>
-                  </select>
-              </div>
-
-              <div class="col-12">
-                <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal</label>
-                <select id="responsabilidadFiscal" class="form-select form-select-lg">
-                  <option selected>Seleccione</option>
-                  <option>Gran contribuyente</option>
-                  <option>Autorretenedor</option>
-                  <option>Agente de retencion</option>
-                  <option>Regimen simple de tributacion</option>
-                  <option>No aplica – Otros</option>
-                </select>
-            </div>
-            </form>
+        <form class="row g-3" id="clientForm">
+          <div class="col-md-12">
+              <label for="tipoTercero" class="form-label">Tipo de cliente</label>
+              <select id="tipoTercero" class="form-select form-select-lg">
+                  <option selected>Cliente</option>
+                  <option>Proveedor</option>
+              </select>
+          </div>
+  
+          <div class="col-md-12">
+              <label for="tipoPersona" class="form-label">Tipo de persona</label>
+              <select id="tipoPersona" class="form-select form-select-lg">
+                <option class="placeholder" selected disabled hidden>Seleccione</option>
+                <option>Natural</option>
+                <option>Juridica</option>
+              </select>
+          </div>
+          <div class="col-md-6">
+            <label for="nombreComercial" class="form-label">Nombre comercial</label>
+            <input type="text" class="form-control form-control-lg" id="nombreComercial" disabled>
+          </div>
+          <div class="col-md-6">
+            <label for="primerNombre" class="form-label">Primer nombre</label>
+            <input type="text" class="form-control form-control-lg" id="primerNombre" disabled>
         </div>
+        <div class="col-md-6">
+            <label for="segundoNombre" class="form-label">Segundo nombre</label>
+            <input type="text" class="form-control form-control-lg" id="segundoNombre" disabled>
+        </div>
+        <div class="col-md-6">
+            <label for="primerApellido" class="form-label">Primer apellido</label>
+            <input type="text" class="form-control form-control-lg" id="primerApellido" disabled>
+        </div>
+        <div class="col-md-6">
+            <label for="segundoApellido" class="form-label">Segundo apellido</label>
+            <input type="text" class="form-control form-control-lg" id="segundoApellido" disabled>
+        </div>
+        <div class="col-md-6">
+            <label for="codigoCliente" class="form-label">Código cliente</label>
+            <input type="text" class="form-control form-control-lg" id="codigoCliente" disabled>
+        </div>
+          <div class="col-md-6">
+              <label for="tipoDocumento" class="form-label">Tipo de documento</label>
+              <select id="tipoDocumento" class="form-select form-select-lg" disabled>
+                  <option class="placeholder" selected disabled hidden>Seleccione</option>
+                  <option>Cédula de ciudadanía</option>
+                  <option>Tarjeta de extranjería</option>
+                  <option>Cédula de extranjería</option>
+                  <option>NIT</option>
+                  <option>Pasaporte</option>
+                  <option>Documento de identificación extranjero</option>
+                  <option>PEP (Permiso Especial de Permanencia)</option>
+                  <option>PPT (Permiso Protección Temporal)</option>
+                  <option>NIT de otro país</option>
+                  <option>NUIP</option>
+              </select>
+          </div>
+  
+          <div class="col-md-6">
+              <label for="numeroIdentificacion" class="form-label">Número de identificación</label>
+              <input type="text" class="form-control form-control-lg" id="numeroIdentificacion" disabled>
+          </div>
+          
+          <div class="col-md-6">
+            <label for="regimen" class="form-label">Régimen</label>
+            <select id="regimen" class="form-select form-select-lg" disabled>
+              <option class="placeholder" selected disabled hidden>Seleccione</option>
+              <option>Impuesto sobre las ventas - IVA</option>
+              <option>No responsable de IVA</option>
+            </select>
+        </div>
+
+          <div class="col-md-6">
+              <label for="pais" class="form-label">País</label>
+              <input type="text" class="form-control form-control-lg" id="pais" disabled>
+          </div>
+          <div class="col-md-6">
+              <label for="departamento" class="form-label">Departamento</label>
+              <input type="text" class="form-control form-control-lg" id="departamento" disabled>
+          </div>
+          <div class="col-md-6">
+              <label for="municipio" class="form-label">Municipio</label>
+              <input type="text" class="form-control form-control-lg" id="municipio" disabled>
+          </div>
+          <div class="col-md-6">
+              <label for="direccion" class="form-label">Dirección</label>
+              <input type="text" class="form-control form-control-lg" id="direccion" disabled>
+          </div>
+          <div class="col-md-6">
+              <label for="codigoPostal" class="form-label">Código postal</label>
+              <input type="text" class="form-control form-control-lg" id="codigoPostal" disabled>
+          </div>
+          <div class="col-md-6">
+              <label for="telefono" class="form-label">Teléfono</label>
+              <input type="text" class="form-control form-control-lg" id="telefono" disabled>
+          </div>
+          <div class="col-md-12">
+              <label for="sitioWeb" class="form-label">Sitio web</label>
+              <input type="text" class="form-control form-control-lg" id="sitioWeb" disabled>
+          </div>
+          <div class="col-md-12">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control form-control-lg" id="email" disabled>
+          </div>
+          <div class="col-12">
+              <label for="detallesTributarios" class="form-label">Detalles tributarios</label>
+              <select id="detallesTributarios" class="form-select form-select-lg" disabled>
+                <option class="placeholder" selected disabled hidden>Seleccione</option>
+                <option>IVA</option>
+                <option>INC</option>
+                <option>IVA e INC</option>
+                <option>No aplica</option>
+              </select>
+          </div>
+          <div class="col-12">
+              <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal</label>
+              <select id="responsabilidadFiscal" class="form-select form-select-lg" disabled>
+                <option class="placeholder" selected disabled hidden>Seleccione</option>
+                <option>Gran contribuyente</option>
+                <option>Autorretenedor</option>
+                <option>Agente de retencion</option>
+                <option>Regimen simple de tributacion</option>
+                <option>No aplica – Otros</option>
+              </select>
+          </div>
+
+        </form>
     </div>
 
   </main>
   <footer class="mt-auto">
     <div class="row p-4 gx-0">
       <div class="col-6 pe-1">
-        <a onclick="Back()" class="btn btn-outline-primary btn-lg w-100 btn-menu d-flex justify-content-between align-items-center">
-            <span class="text-container pe-4">Home</span>
-            
+        <a onclick="saveData()" class="btn btn-primary btn-lg w-100 btn-menu d-flex"><span class="text-container pe-4">Crear</span> 
+        </a>
+      </div>
+      <br />
+      <div class="col-6 ps-1">
+        <a onclick="Back()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
+            <span>Inicio</span>   
+            <i class="icon-24-outlined-other-location-home"></i>
         </a>
     </div>
-    <div class="col-6 ps-1">
-        <a onclick="saveData()" class="btn btn-primary btn-lg w-100 btn-menu d-flex justify-content-between align-items-center">
-            <span class="text-container pe-4">Agregar</span>
-            
-        </a>
-    </div>
+
     
     </div>
   </footer>

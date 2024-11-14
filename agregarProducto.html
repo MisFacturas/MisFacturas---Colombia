@@ -16,8 +16,12 @@
 
     <script>
          function submitForm() {
-            const form = document.getElementById('productForm');
-            form.dispatchEvent(new Event('submit'));  // Manually trigger form submission
+            if (verificarDatosObligatoriosProducto()) {
+              const form = document.getElementById('productForm');
+              form.dispatchEvent(new Event('submit'));
+            }  else {
+              alert('Por favor complete todos los campos obligatorios.');
+            }
           } 
 
           function handleSubmit(event) {
@@ -28,8 +32,27 @@
             formData.forEach((value, key) => {
                 data[key] = value;
             });
+
             google.script.run.processForm(data);
+            resetForm();
           }
+          function resetForm() {
+            const form = document.getElementById('productForm');
+            form.reset();
+                // Limpiar manualmente cada campo
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                switch (input.type) {
+                    case 'checkbox':
+                    case 'radio':
+                        input.checked = false;
+                        break;
+                    default:
+                        input.value = '';
+                        break;
+                }
+            });
+         }
 
           function showMenuPrincipal() {
             google.script.run.showSidebar();
@@ -37,9 +60,56 @@
           function showPreProducto(){
             google.script.run.showPreProductos();
           }
+
+          function verificarDatosObligatoriosProducto() {
+        const camposObligatorios = [
+          'tipo',
+          'precioUnitario',
+          'codigoReferencia',
+          'nombre'
+        ];
+
+        let isValid = true;
+
+        camposObligatorios.forEach(id => {
+          const campo = document.getElementById(id);
+          if (!campo.value.trim()) {
+            campo.style.backgroundColor = '#FFC7C7';  // Marca en rojo si está vacío
+            isValid = false;
+          } else {
+            campo.style.backgroundColor = '';  // Limpia el color si está lleno
+          }
+        });
+
+        return isValid;
+      }
+
    
+          document.getElementById('reteIvaCheckbox').addEventListener('change', function() {
+                  document.getElementById('reteRentaCheckbox').checked = false;
+                  document.getElementById('tarifaReteRenta').disabled = true;
+                  document.getElementById('tarifaReteRenta').value = ''; // Set value to empty
+                  document.getElementById('tarifaReteIva').disabled = !this.checked;
+                });
+              
+                document.getElementById('reteRentaCheckbox').addEventListener('change', function() {
+                  document.getElementById('reteIvaCheckbox').checked = false;
+                  document.getElementById('tarifaReteIva').disabled = true;
+                  document.getElementById('tarifaReteIva').value = ''; // Set value to empty
+                  document.getElementById('tarifaReteRenta').disabled = !this.checked;
+                });
 
-
+                function toggleSelect(checkboxId, selectId) {
+                  var checkbox = document.getElementById(checkboxId);
+                  var select = document.getElementById(selectId);
+              
+                  if (checkbox.checked) {
+                    select.disabled = false;
+                  } else {
+                    select.disabled = true;
+                    select.selectedIndex = 0; // Resetea la selección a la primera opción
+                  }
+                }
   
     </script>
   </head>
@@ -134,7 +204,7 @@
                   INC
                 </label>
                 <select id="tarifaInc" name="tarifaInc" class="form-select form-select-lg">
-                  <option value="0"></option>
+                  <option value="0">0%</option>
                   <option value="2">2%</option>
                   <option value="4">4%</option>
                   <option value="8">8%</option>
@@ -142,19 +212,6 @@
                 </select>
               </div>
 
-              <script>
-                function toggleSelect(checkboxId, selectId) {
-                  var checkbox = document.getElementById(checkboxId);
-                  var select = document.getElementById(selectId);
-              
-                  if (checkbox.checked) {
-                    select.disabled = false;
-                  } else {
-                    select.disabled = true;
-                    select.selectedIndex = 0; // Resetea la selección a la primera opción
-                  }
-                }
-              </script>
 
               <div class="col-12">
                 <label for="ReteIva">
@@ -219,22 +276,6 @@
                 </select>
               </div>
 
-              <script>
-                document.getElementById('reteIvaCheckbox').addEventListener('change', function() {
-                  document.getElementById('reteRentaCheckbox').checked = false;
-                  document.getElementById('tarifaReteRenta').disabled = true;
-                  document.getElementById('tarifaReteRenta').value = ''; // Set value to empty
-                  document.getElementById('tarifaReteIva').disabled = !this.checked;
-                });
-              
-                document.getElementById('reteRentaCheckbox').addEventListener('change', function() {
-                  document.getElementById('reteIvaCheckbox').checked = false;
-                  document.getElementById('tarifaReteIva').disabled = true;
-                  document.getElementById('tarifaReteIva').value = ''; // Set value to empty
-                  document.getElementById('tarifaReteRenta').disabled = !this.checked;
-                });
-              </script>
-
             </form>
           </div>
         </div>
@@ -242,17 +283,17 @@
       <footer class="mt-auto">
         <div class="row p-4 gx-0">
             <div class="col-6 pe-1">
-                <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100">
-                    <span class="text-container pe-4">Home</span>
-                    
-                </a>
-            </div>
-            <div class="col-6 ps-1">
               <a onclick="submitForm()" class="btn btn-primary btn-lg w-100">
                   <span class="pe-4">Guardar</span>
                   
               </a>
             </div>
+            <div class="col-6 ps-1">
+              <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100">
+                  <span>Inicio</span>
+                  <i class="icon-24-outlined-other-location-home"></i>
+              </a>
+          </div>
         </div>
       </footer>
     </div>

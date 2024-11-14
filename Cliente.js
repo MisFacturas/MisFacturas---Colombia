@@ -416,7 +416,7 @@ function obtenerTipoDePersona(e){
   let sheet = e.source.getActiveSheet();
   let range = e.range;
   let rowEditada = range.getRow();
-  let colEditada = 4;
+  let colEditada = 3;
 
   let tipoPersona =sheet.getRange(rowEditada,colEditada).getValue()
   Logger.log(tipoPersona)
@@ -429,9 +429,13 @@ function saveClientData(formData) {
   if (!sheet) {
     throw new Error('La hoja "Clientes" no existe.');
   }
-
+  let existe=verificarIdentificacionUnica(formData.numeroIdentificacion,"Clientes",false)
+  if(existe){
+    SpreadsheetApp.getUi().alert("El Numero de Identificacion ya existe, por favor poner un Numero de Identificacion unico");
+    throw new Error('por favor poner un Numero de Identificacion unico');
+  }
   const lastRow = sheet.getLastRow();
-  const dataRange = sheet.getRange(2, 2, lastRow, 19).getValues(); // Obtener desde la columna B hasta la S (19 columnas)
+  const dataRange = sheet.getRange(2, 2, lastRow, 22).getValues(); // Obtener desde la columna B hasta la S (19 columnas)
 
   let emptyRow = 0;
   for (let i = 0; i < dataRange.length; i++) {
@@ -449,18 +453,17 @@ function saveClientData(formData) {
   }
 
   const values = [
-    formData.nombreCliente,
     formData.tipoTercero,
     formData.tipoPersona,
-    formData.tipoDocumento,
-    formData.numeroIdentificacion,
-    formData.codigoCliente,
-    formData.regimen,
     formData.nombreComercial,
     formData.primerNombre,
     formData.segundoNombre,
     formData.primerApellido,
     formData.segundoApellido,
+    formData.tipoDocumento,
+    formData.numeroIdentificacion,
+    formData.codigoCliente,
+    formData.regimen,
     formData.pais,
     formData.departamento,
     formData.municipio,
@@ -487,19 +490,19 @@ function verificarDatosObligatorios(e, tipoPersona) {
   let range = e.range;
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
-  let ultimaColumnaPermitida = 21; // Actualizado para reflejar el número de columnas
+  let ultimaColumnaPermitida = 22; // Actualizado para reflejar el número de columnas
   let columnasObligatorias = [];
-  let todasLasColumnas = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
+  let todasLasColumnas = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
 
   if (tipoPersona === "") {
     Logger.log("Vacio hizo edicion no en tipoPersona, cogemos el viejo");
-    tipoPersona = sheet.getRange("D" + String(rowEditada)).getValue(); // Columna 4 para Tipo Persona
+    tipoPersona = sheet.getRange("C" + String(rowEditada)).getValue(); // Columna 4 para Tipo Persona
   }
 
   if (tipoPersona === "Natural") {
-    columnasObligatorias = [2, 3, 4, 5, 6,7, 8, 10, 12, 14, 17, 18,19, 21]; // Incluyendo "Nombre cliente" (columna 2)
+    columnasObligatorias = [5, 7, 9, 10, 11, 12, 13, 16, 17, 18, 20]; 
   } else if (tipoPersona === "Juridica") {
-    columnasObligatorias = [2, 3, 4, 5, 6, 7, 8, 9, 14, 17, 18,19, 21, 22, 23]; // Incluyendo "Nombre cliente" (columna 2)
+    columnasObligatorias = [4, 9, 10, 11, 12, 13, 16, 17, 18, 20]; 
   } else {
     Logger.log("Vacio tipo de persona");
   }

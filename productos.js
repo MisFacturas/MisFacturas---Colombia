@@ -61,6 +61,39 @@ function saveProductData(formData) {
 }
 
 
+function verificarDatosObligatoriosProductos(e){
+  let sheet = e.source.getActiveSheet();
+  let range = e.range;
+  let rowEditada = range.getRow();
+  let colEditada = range.getColumn();
+  let ultimaColumnaPermitida = 9;
+  let  columnasObligatorias= [1, 2, 3, 4, 6];
+  let estadosDefault = [""];
+  let todasLasColumnas=[1,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,15];
+
+  if (rowEditada > 1 && colEditada <= ultimaColumnaPermitida) {
+    let estaCompleto = true;
+    let estaVacioOPredeterminado = true;
+
+    // Borrar el color de fondo de todas las celdas obligatorias antes de la verificación
+    for (let i = 0; i < todasLasColumnas.length; i++) {
+      sheet.getRange(rowEditada, todasLasColumnas[i]).setBackground(null);
+    }
+
+    // Verificar celdas obligatorias
+    for (let i = 0; i < columnasObligatorias.length; i++) {
+      let valorDeCelda = sheet.getRange(rowEditada, columnasObligatorias[i]).getValue();
+      if (estadosDefault.includes(valorDeCelda)) {
+        estaCompleto = false;
+        sheet.getRange(rowEditada, columnasObligatorias[i]).setBackground('#FFC7C7'); // Resaltar en rojo claro
+      } else {
+        estaVacioOPredeterminado = false;
+      }
+    }
+    sheet.getRange(rowEditada, 5).setValue("=VLOOKUP(D"+String(rowEditada)+",Datos!$F$36:$G$43,2,0)");
+  }
+}
+
 // a cambiar cuando se pregunte y agg los otros porcinetos
 function obtenerInformacionProducto(producto) {
     let celdaProducto = datos_sheet.getRange("I11");
