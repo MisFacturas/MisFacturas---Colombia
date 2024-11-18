@@ -25,8 +25,6 @@ Producción: https://www.misfacturas.com.co/Publico/google-sheets-resources/js/b
       function openFactura() {
         google.script.run.openFacturaSheet();
         google.script.run.showNuevaFactura();
-        google.script.run.inicarFacturaNueva();
-        
       }
       function openClientes() {
         google.script.run.openClientesSheet();
@@ -35,6 +33,11 @@ Producción: https://www.misfacturas.com.co/Publico/google-sheets-resources/js/b
       function showPreProductos() {
         google.script.run.showPreProductos();
 
+      }
+      function openConfiguracion() {
+        google.script.run.openDatosEmisorSheet();
+        google.script.run.showConfiguracion();
+        
       }
     </script>
   </head>
@@ -46,6 +49,12 @@ Producción: https://www.misfacturas.com.co/Publico/google-sheets-resources/js/b
        <div id="logo" class="d-flex justify-content-center bg-primary">
          <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
        </div>
+       <div class="d-flex justify-content-center mt-2">
+        <a onclick="openConfiguracion()" class="btn btn-lg btn-outline-secondary mb-2">
+          <i class="icon-24-outlined-action-main-settings-1"></i>
+          <span>Configuración</span>
+        </a>
+      </div>
      </header>
    
      <main class="d-flex flex-column align-items-center justify-content-center vh-100"></mainclass>

@@ -7,18 +7,27 @@ var spreadsheet = SpreadsheetApp.getActive();
 // directorio carlos /home/cley/src/MisFacturasApp
 
 function onOpen() {
-
+  //showSidebar()
+  console.log("onOpenEntering");
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var ui = SpreadsheetApp.getUi();
   // https://developers.google.com/apps-script/guides/menus
 
-  ui.createMenu('misfacturas')
+  ui.createAddonMenu()
     .addItem('Inicio', 'showSidebar')
-    .addToUi()
+    .addToUi();
 
+  //showSidebar()
 
-  showSidebar();
+  console.log("setActiveSheet Inicio");
+  //var ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  var sheet = ss.getSheetByName("Inicio");
+  SpreadsheetApp.setActiveSheet(sheet);
+  
+  console.log("onOpenReturning");
   return;
+  
 }
 
 function pruebaLogo(){
@@ -41,6 +50,24 @@ function showPreProductos() {
     .showSidebar(html);
 }
 
+function openDatosEmisorSheet(){
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Datos de emisor");
+  SpreadsheetApp.setActiveSheet(sheet);
+}
+function showConfiguracion(){
+  var html = HtmlService.createHtmlOutputFromFile('menuConfiguracion')
+  .setTitle('Datos emisor');
+SpreadsheetApp.getUi()
+  .showSidebar(html);
+}
+
+function showDesvincular(){
+  var html = HtmlService.createHtmlOutputFromFile('menuDesvincular')
+  .setTitle('Desvincular cuenta');
+SpreadsheetApp.getUi()
+  .showSidebar(html);
+}
 function showAggProductos() {
   var html = HtmlService.createHtmlOutputFromFile('agregarProducto')
     .setTitle('Agregar Productos');
@@ -92,22 +119,83 @@ function showClientes() {
     .showSidebar(html);
 }
 
+function showVincularCuenta() {
+  var html = HtmlService.createHtmlOutputFromFile('menuVincular')
+    .setTitle('Vincular cuenta');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function showEliminarInfo(){
+  var html = HtmlService.createHtmlOutputFromFile('menuEliminarInfo')
+  .setTitle('Eliminar informacion');
+SpreadsheetApp.getUi()
+  .showSidebar(html);
+}
+
+
+function eliminarTotalidadInformacion(){
+  let hojaDatos = spreadsheet.getSheetByName('Datos');
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let hojaProductos = spreadsheet.getSheetByName('Productos');
+  let hojaClientes=spreadsheet.getSheetByName("Clientes");
+  let hojaListadoEstado=spreadsheet.getSheetByName('ListadoEstado');
+  let ClientesInvalidos=spreadsheet.getSheetByName('ClientesInvalidos');
+  
+  
+  borrarInfoHoja(hojaProductos)
+  borrarInfoHoja(hojaClientes)
+  borrarInfoHoja(hojaListadoEstado)
+  borrarInfoHoja(ClientesInvalidos)
+  borrarInfoHoja(hojaDatosEmisor)
+  hojaDatos.getRange("Q11").setValue("")
+  hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
+  hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
+  SpreadsheetApp.getUi().alert('Informacion eliminada correctamente');
+
+
+  //falta borrar carpeta esa con pdfs
+}
+function borrarInfoHoja(hoja){
+  let lastrow=Number(hoja.getLastRow())
+  let nombreHoja=hoja.getSheetName()
+  Logger.log("borrarInfoHoja")
+  Logger.log("nombreHoja "+nombreHoja)
+  Logger.log("lastrow "+lastrow)
+  if (nombreHoja==="Datos de emisor" ){
+    Logger.log("Hoja es datos emisor ")
+    hoja.getRange(1,2,12).setValue("")
+  }else{
+    Logger.log("else")
+    hoja.deleteRows(2,lastrow)
+    let maxRows=hoja.getMaxRows()
+    Logger.log("maxRows "+maxRows)
+    let dif = 1000-maxRows
+    Logger.log("dif "+dif)
+    hoja.insertRows(maxRows,dif)
+  }
+}
+function mensajeBorrarInfoError(){
+  Logger.log("Error borrar info")
+  SpreadsheetApp.getUi().alert('Si deseas eliminar toda la informacion de misfacturas asegurate de escribir ELIMINAR en el campo');
+}
+function DesvincularMisfacturas(){
+  Logger.log("Desvincular")
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
+  hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
+  SpreadsheetApp.getUi().alert('Haz desvinculado exitosamente misfacturas');
+}
+function mensajeErrorDesvincularMisfacturas(){
+  Logger.log("Error Desvincular")
+  SpreadsheetApp.getUi().alert('Si deseas desvincular misfacturas asegurate de escribir DESVINCULAR en el campo');
+  
+}
 
 function openProductosSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName("Productos");
   SpreadsheetApp.setActiveSheet(sheet);
-}
-
-function inicarFacturaNuevaMain() {
-  inicarFacturaNueva();
-}
-
-function showPostFactura() {
-  var html = HtmlService.createHtmlOutputFromFile('postFactura')
-    .setTitle('Post Factura');
-  SpreadsheetApp.getUi()
-    .showSidebar(html);
 }
 
 
@@ -253,9 +341,7 @@ function onEdit(e) {
           factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
           cargos = Number(factura_sheet.getRange("J"+String(i)).getValue())//Cargos
           factura_sheet.getRange("K"+String(i)).setValue(dictInformacionProducto["valor Retencion"])//Retencion
-          factura_sheet.getRange("L"+String(i)).setValue("=(E"+String(i)+"+F"+String(i)+"+"+cargos+")-(K"+String(i)+"*E"+String(i)+")")//total linea
-          totalLinea = factura_sheet.getRange("L"+String(i)).getValue()
-          factura_sheet.getRange("L"+String(i)).setValue("="+totalLinea+"-("+totalLinea+"*I"+String(i)+")")//total linea menos descuentos
+          factura_sheet.getRange("L"+String(i)).setValue("=(E"+String(i)+"+F"+String(i)+"+J"+String(i)+"+(K"+String(i)+"*E"+String(i)+"))-(E"+String(i)+"*I"+String(i)+")")//Total
         }
       }
 
@@ -278,7 +364,18 @@ function onEdit(e) {
     
         // Restablece el valor a 0
         celdaEditada.setValue(0);
-      }}
+    }} else if (colEditada == 10 && rowEditada == 4) {
+      //Verifica la moneda
+      let moneda = celdaEditada.getValue();
+      if (moneda != "Pesos Colombianos") {
+        hojaActual.getRange(rowEditada+1, colEditada).setBackground('#FFC7C7');
+        ponerFechaTasaDeCambio();
+      } else { 
+        hojaActual.getRange(rowEditada+1, colEditada).setBackground('#FFFFFF');
+        hojaActual.getRange(rowEditada+1, colEditada).setValue("");
+        hojaActual.getRange(rowEditada+2, colEditada).setValue("");
+      }
+    }
 
     let lastRowProducto = cargosDescuentosStartRow-3;
     if (lastRowProducto===productStartRow){
@@ -286,7 +383,6 @@ function onEdit(e) {
       let rowParaTotales=getTotalesLinea(hojaActual);
       hojaActual.getRange("K"+String(rowParaTotales)).setValue("=L15")
       hojaActual.getRange("L"+String(rowParaTotales)).setValue("=K"+String(rowParaTotales)+"-J"+String(rowParaTotales))
-
 
     }else{
 

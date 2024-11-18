@@ -102,38 +102,39 @@
           responsabilidadFiscal: document.getElementById('responsabilidadFiscal').value
 
         };
-
-        google.script.run.saveClientData(formData);
         resetForm();
+        google.script.run.saveClientData(formData);
+        
       } else {
         alert('Por favor complete todos los campos obligatorios.');
       }
-      function resetForm() {
-    const form = document.getElementById('clienteForm');
-    form.reset();
-
-    const fieldsToDisable = [
-      'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'numeroIdentificacion', 'sitioWeb'
-    ];
-
-    fieldsToDisable.forEach(id => {
-      const field = document.getElementById(id);
-      field.disabled = true;
-      field.style.backgroundColor = '';
-    });
-
-    const selects = form.querySelectorAll('select');
-    selects.forEach(select => {
-      select.value = 'Seleccione';
-      select.style.backgroundColor = '';
-    });
-
-    const inputs = form.querySelectorAll('input');
-    inputs.forEach(input => {
-      input.style.backgroundColor = '';
-    });
-  }s
     }
+      function resetForm() {
+        const form = document.getElementById('clienteForm');
+        form.reset();
+
+        const fieldsToDisable = [
+          'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'numeroIdentificacion', 'sitioWeb'
+        ];
+
+        fieldsToDisable.forEach(id => {
+          const field = document.getElementById(id);
+          field.disabled = true;
+          field.style.backgroundColor = '';
+        });
+
+        const selects = form.querySelectorAll('select');
+        selects.forEach(select => {
+          select.value = 'Seleccione';
+          select.style.backgroundColor = '';
+        });
+
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => {
+          input.style.backgroundColor = '';
+        });
+      }
+
     document.addEventListener('DOMContentLoaded', function() {
             const tipoPersona = document.getElementById('tipoPersona');
             const allFields = [

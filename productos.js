@@ -134,13 +134,14 @@ function obtenerInformacionProducto(producto) {
     var spreadsheet = SpreadsheetApp.getActive();
     var hojaProductos = spreadsheet.getSheetByName('Productos');
     var ultimaFila = hojaProductos.getLastRow();
-    var valores = hojaProductos.getRange(1, 2, ultimaFila - 1, 1).getValues();
+    var valores = hojaProductos.getRange(2, 16, ultimaFila - 1, 1).getValues();
   
     // Filtrar los productos que coincidan con el término de búsqueda
     var productosFiltrados = valores
       .map(function(row) { return row[0]; })
       .filter(function(producto) {
-        return producto.toLowerCase().includes(terminoBusqueda.toLowerCase());
+        // Verificar que 'producto' es una cadena antes de llamar a 'toLowerCase'
+        return typeof producto === 'string' && producto.toLowerCase().includes(terminoBusqueda.toLowerCase());
       });
   
     return productosFiltrados;
