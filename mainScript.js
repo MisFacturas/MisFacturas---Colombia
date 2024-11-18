@@ -341,7 +341,7 @@ function onEdit(e) {
           factura_sheet.getRange("H"+String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
           cargos = Number(factura_sheet.getRange("J"+String(i)).getValue())//Cargos
           factura_sheet.getRange("K"+String(i)).setValue(dictInformacionProducto["valor Retencion"])//Retencion
-          factura_sheet.getRange("L"+String(i)).setValue("=(E"+String(i)+"+F"+String(i)+"+J"+String(i)+"+(K"+String(i)+"*E"+String(i)+"))-(E"+String(i)+"*I"+String(i)+")")//Total
+          factura_sheet.getRange("L"+String(i)).setValue("=(E"+String(i)+"+F"+String(i)+"+J"+String(i)+"+(K"+String(i)+"*E"+String(i)+"))-((E"+String(i)+"+F"+String(i)+"+J"+String(i)+"+(K"+String(i)+"*E"+String(i)+"))*I"+String(i)+")")
         }
       }
 

@@ -14,6 +14,47 @@
       <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
 
   </head>
+      
+  <script>
+    function Back() {
+      google.script.run.showNuevaFactura();
+    }
+
+    function agregarProducto() {
+      var cantidad = document.getElementById('cantidad').value;
+      var producto = document.getElementById('buscarProducto').value;
+
+      console.log("Producto:", producto, "Cantidad:", cantidad);
+      google.script.run.agregarProductoDesdeFactura(cantidad, producto);
+
+      document.getElementById('cantidad').value = '';
+      document.getElementById('producto').value = '';
+    }
+
+    function buscarProductos() {
+      var input = document.getElementById('buscarProducto').value;
+      google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
+    }
+    
+    function mostrarResultados(productos) {
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = '';
+      productos.forEach(function(producto) {
+        var div = document.createElement('div');
+        div.textContent = producto;
+        div.onclick = function() {
+          seleccionarProducto(producto);
+        };
+        resultBox.appendChild(div);
+      });
+    }
+
+    function seleccionarProducto(producto) {
+      document.getElementById('buscarProducto').value = producto;
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = ''; // Limpiar los resultados
+    }
+</script>
   <body class="d-flex h-100">
 
     <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
@@ -32,9 +73,10 @@
     
 
       <main>
-        <div class="row py-3 px-5 mt-3 gx-0">
+
+        <div class="row py-3 px-4 gx-0">
           <div class="col-12 py-4">
-            <p>Ingresa la informacion de tu nuevo producto.</p>
+            <p>Ingresa cantidad y el nombre del tu producto para agregare en la factura.</p>
           </div> 
 
           <div class="col-12">
@@ -51,61 +93,29 @@
                   <!-- Los resultados se mostrarán aquí -->
                 </div>
               </div>
-              <button type="button" class="btn btn-primary" onclick="agregarProducto()">Agregar producto</button>
-              
-    
             </form>
           </div>
         </div>
       </main>
+
+
+
+      <footer class="mt-auto">
+        <div class="row p-4 gx-0">
+          <div class="col-6 pe-1">
+            <a onclick="agregarProducto()" class="btn btn-primary btn-lg w-100">
+                <span class="text-container pe-4">Agregar producto</span>
+            </a>
+          </div>
+          <div class="col-6 ps-1">
+            <a onclick="Back()" class="btn btn-outline-primary btn-lg w-100 d-flex align-items-center justify-content-center">
+              <i class="icon-left"></i>  
+              <span class="text-container pe-4">Atras</span>
+               
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
-
-    <footer class="mt-auto">
-      <div class="row p-4 gx-0">
-        <div class="col-6 pe-1">
-          <a onclick="Back()" class="btn btn-outline-primary btn-lg w-100 btn-menu d-flex justify-content-between align-items-center">
-              <span class="text-container pe-4">Inicio</span>
-              
-          </a>
-      </div>
-    </footer>
-    
-    <script>
-        function Back() {
-          google.script.run.showNuevaFactura();
-        }
-
-        function agregarProducto() {
-          var cantidad = document.getElementById('cantidad').value;
-          var producto = document.getElementById('buscarProducto').value;
-
-          console.log("Producto:", producto, "Cantidad:", cantidad);
-          google.script.run.agregarProductoDesdeFactura(cantidad, producto);
-        }
-
-        function buscarProductos() {
-          var input = document.getElementById('buscarProducto').value;
-          google.script.run.withSuccessHandler(mostrarResultados).buscarProductos(input);
-        }
-        
-        function mostrarResultados(productos) {
-          var resultBox = document.querySelector('.result-box');
-          resultBox.innerHTML = '';
-          productos.forEach(function(producto) {
-            var div = document.createElement('div');
-            div.textContent = producto;
-            div.onclick = function() {
-              seleccionarProducto(producto);
-            };
-            resultBox.appendChild(div);
-          });
-        }
-
-        function seleccionarProducto(producto) {
-          document.getElementById('buscarProducto').value = producto;
-          var resultBox = document.querySelector('.result-box');
-          resultBox.innerHTML = ''; // Limpiar los resultados
-        }
-    </script>
   </body>
 </html>

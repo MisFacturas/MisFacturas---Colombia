@@ -118,7 +118,6 @@ function agregarProductoDesdeFactura(cantidad,producto){
   }
 
   let rowParaDatos=lastProductRow
-  let rowParaTotalTaxes=cargosDescuentosStartRow
   let cantidadProductos=hojaFactura.getRange("B16").getValue()//estado defaul de total productos
   if(cantidadProductos===0 || cantidadProductos===""){
     hojaFactura.getRange("A15").setValue(dictInformacionProducto["codigo Producto"])
@@ -129,24 +128,25 @@ function agregarProductoDesdeFactura(cantidad,producto){
     hojaFactura.getRange("F15").setValue(dictInformacionProducto["precio Impuesto"])
     hojaFactura.getRange("G15").setValue(dictInformacionProducto["tarifa INC"])
     hojaFactura.getRange("H15").setValue(dictInformacionProducto["tarifa IVA"])
-    hojaFactura.getRange("K15").setValue("=D15*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")
+    hojaFactura.getRange("K15").setValue(dictInformacionProducto["valor Retencion"])
+    hojaFactura.getRange("L15").setValue("=(E15+F15+J15+(K15*E15))-((E15+F15+J15+(K15*E15))*I15)")//Total
 
   }else{
     hojaFactura.insertRowAfter(lastProductRow)
-    rowParaTotalTaxes=cargosDescuentosStartRow+1
     rowParaDatos=lastProductRow+1
     hojaFactura.getRange("A"+String(rowParaDatos)).setValue(dictInformacionProducto["codigo Producto"])
     hojaFactura.getRange("B"+String(rowParaDatos)).setValue(producto)
     hojaFactura.getRange("C"+String(rowParaDatos)).setValue(cantidad)
     hojaFactura.getRange("D"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
     hojaFactura.getRange("E"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*C"+String(rowParaDatos))//Subtotal
-    hojaFactura.getRange("F"+String(rowParaDatos)).setValue(dictInformacionProducto["precio Impuesto"])//precio de los Impuestos
+    hojaFactura.getRange("F"+String(rowParaDatos)).setValue("=E"+String(rowParaDatos)+"*"+dictInformacionProducto["tarifa IVA"]+"+E"+String(rowParaDatos)+"*"+String(dictInformacionProducto["tarifa INC"]))//Impuestos
     hojaFactura.getRange("G"+String(rowParaDatos)).setValue(dictInformacionProducto["tarifa INC"])//%INC
     hojaFactura.getRange("H"+String(rowParaDatos)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
-    hojaFactura.getRange("K"+String(rowParaDatos)).setValue("=D"+String(rowParaDatos)+"*("+dictInformacionProducto["tarifa Retencion"]+"*"+cantidad+")")//Valor de los Impuestos
+    hojaFactura.getRange("K"+String(rowParaDatos)).setValue(dictInformacionProducto["valor Retencion"])
+    hojaFactura.getRange("L"+String(rowParaDatos)).setValue("=(E"+String(rowParaDatos)+"+F"+String(rowParaDatos)+"+J"+String(rowParaDatos)+"+(K"+String(rowParaDatos)+"*E"+String(rowParaDatos)+"))-(E"+String(rowParaDatos)+"*I"+String(rowParaDatos)+")")//Total
   } 
-  updateTotalProductCounter(rowParaDatos, productStartRow,hojaFactura, rowParaTotalTaxes);
-  calcularDescuentosCargosYTotales(rowParaDatos,productStartRow,rowParaTotalTaxes,hojaFactura)
+  updateTotalProductCounter(cargosDescuentosStartRow-3, productStartRow, hojaFactura, cargosDescuentosStartRow);
+  calcularDescuentosCargosYTotales(cargosDescuentosStartRow-3, productStartRow, hojaFactura, cargosDescuentosStartRow);
 }
 
 function recuperarJson(){
