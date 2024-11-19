@@ -87,7 +87,7 @@ function agregarFilaNueva() {
     return; // Detener la ejecución si hay error
   }
 
-  let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura); // recordar este devuelve el lugar en donde deberían estar base imponible, toca restar -1
+  let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
   const productStartRow = 15;
   const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
 
@@ -164,30 +164,22 @@ function enviarFactura() {
   let APIkey = hojaDatos.getRange("F47").getValue();
   let opciones = {
     "method": "post",
-    "Authorization": "misfacturas " + APIkey,
     "contentType": "application/json",
     "payload": json,
+    "headers": {"Authorization": "misfacturas " + APIkey},
     'muteHttpExceptions': true
   };
-
+  Logger.log("Enviar factura antes del try");
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
-    let contenidoRespuesta = respuesta.getContentText();
-    let jsonRespuesta = JSON.parse(contenidoRespuesta);
-
-    if (jsonRespuesta.Message === "An error has occurred.") {
-      SpreadsheetApp.getUi().alert("Error: An error has occurred.");
-    } else {
-      Logger.log(respuesta); // Muestra la respuesta de la API en los logs
-      Logger.log(respuesta.status); // Muestra la respuesta de la API en los logs
-      SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
-      limpiarHojaFactura();
-    }
+    var contenidoRespuesta = respuesta.getContentText();
+    Logger.log(contenidoRespuesta); // Muestra la respuesta de la API en los logs
+    SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
     SpreadsheetApp.getUi().alert("Error al enviar la factura a misfacturas. Intente de nuevo si el error presiste comuniquese con soporte");
   }
-
+  limpiarHojaFactura();
 }
 
 function obtenerAPIkey(usuario, contra) {
