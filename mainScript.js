@@ -1,26 +1,16 @@
 var spreadsheet = SpreadsheetApp.getActive();
-//let unidades_sheet = spreadsheet.getSheetByName('Unidades');
-//let datos_sheet = spreadsheet.getSheetByName('Datos2');
-
-// directorio alejandro C:\\Users\\catan\\OneDrive\\Documents\\Work\\Appsheets\\MisFacturasApp
-// directorio sebastian C:\\Users\\elfue\\Documents\\MisFacturasApp
-// directorio carlos /home/cley/src/MisFacturasApp
 
 function onOpen() {
-  //showSidebar()
-  console.log("onOpenEntering");
+
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var ui = SpreadsheetApp.getUi();
-  // https://developers.google.com/apps-script/guides/menus
+
 
   ui.createAddonMenu()
     .addItem('Inicio', 'showSidebar')
     .addToUi();
 
-  //showSidebar()
-
   console.log("setActiveSheet Inicio");
-  //var ss = SpreadsheetApp.getActiveSpreadsheet();
   
   var sheet = ss.getSheetByName("Inicio");
   SpreadsheetApp.setActiveSheet(sheet);
@@ -345,7 +335,7 @@ function onEdit(e) {
         }
       }
 
-    }else if(colEditada==8 && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
+    }else if(colEditada==9 && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
       //verificar descuentos
       let valorEditadoDescuneto = celdaEditada.getValue();
       if(0.00 > valorEditadoDescuneto || valorEditadoDescuneto > 1.00){
@@ -383,6 +373,7 @@ function onEdit(e) {
       let rowParaTotales=getTotalesLinea(hojaActual);
       hojaActual.getRange("K"+String(rowParaTotales)).setValue("=L15")
       hojaActual.getRange("L"+String(rowParaTotales)).setValue("=K"+String(rowParaTotales)+"-J"+String(rowParaTotales))
+
 
     }else{
 
@@ -445,12 +436,14 @@ function calcularDescuentosCargosYTotales(lastRowProducto,cargosDescuentosStartR
   //base grabable
   hojaActual.getRange("B"+String(rowParaTotales)).setValue("=SUM(D15:D"+String(lastRowProducto)+")")
 
-  let lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaActual);
   //Seccion Cargos y Descuentos
+  let lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaActual);
   let rowSeccionCargosYDescuentos=cargosDescuentosStartRow+2;
   let totalDescuentosSeccionCargosyDescuentos = calcularCargYDescu(hojaActual,rowSeccionCargosYDescuentos, lastCargoDescuentoRow);
   
   //Seccion Impuestos
+  let rowSeccionImpuestos=lastCargoDescuentoRow+4;
+
 
   //impuestos
   hojaActual.getRange("C"+String(rowParaTotales)).setValue("=SUM(F15:F"+String(lastRowProducto)+")")

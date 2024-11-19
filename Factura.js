@@ -70,7 +70,6 @@ function verificarEstadoValidoFactura(estadoFactura) {
 function guardarFactura(){
   let estadoFactura = [];
   verificarEstadoValidoFactura(estadoFactura);
-  Logger.log(estadoFactura[0] === true);
   if(estadoFactura[0] === true){
     guardarYGenerarInvoice();
     enviarFactura();
@@ -172,10 +171,10 @@ function enviarFactura(){
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
     Logger.log(respuesta.status); // Muestra la respuesta de la API en los logs
-    SpreadsheetApp.getUi().alert("Factura enviada correctamente a FacturasApp. Si desea verla ingrese a https://facturasapp-qa.cenet.ws/Aplicacion/");
+    SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
-    SpreadsheetApp.getUi().alert("Error al enviar la factura a FacturasApp. Intente de nuevo si el error presiste comuniquese con soporte");
+    SpreadsheetApp.getUi().alert("Error al enviar la factura a misfacturas. Intente de nuevo si el error presiste comuniquese con soporte");
   }
 }
 function jsonAPIkey(usuario,contra){
@@ -405,6 +404,10 @@ function getPaymentSummary(pfTotal, pfNetoAPagar) {
 }
 
 function guardarYGenerarInvoice(){
+  let datosSheet = spreadsheet.getSheetByName('Datos');
+  let consecutivoFactura = datosSheet.getRange("Q11").getValue();
+  let consecutivoFacturaActualizado = consecutivoFactura + 1;
+  datosSheet.getRange("Q11").setValue(consecutivoFacturaActualizado); 
 
   //obtener el total de prodcutos
   let posicionTotalProductos = prefactura_sheet.getRange("A16").getValue(); // para verificar donde esta el TOTAL
