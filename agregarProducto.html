@@ -1,302 +1,274 @@
 <!doctype html>
 <html lang="es" class="h-100">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
-    <title>Crear producto</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom styles for this template -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>Crear producto</title>
 
-    <script>
-         function submitForm() {
-            if (verificarDatosObligatoriosProducto()) {
-              const form = document.getElementById('productForm');
-              form.dispatchEvent(new Event('submit'));
-            }  else {
-              alert('Por favor complete todos los campos obligatorios.');
-            }
-          } 
+  <!-- Bootstrap core CSS -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+</head>
 
-          function handleSubmit(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+<script>
+  function submitForm() {
+    if (verificarDatosObligatoriosProducto()) {
+      const form = document.getElementById('productForm');
+      form.dispatchEvent(new Event('submit'));
+    } else {
+      alert('Por favor complete todos los campos obligatorios.');
+    }
+  }
 
-            google.script.run.processForm(data);
-            resetForm();
-          }
-          function resetForm() {
-            const form = document.getElementById('productForm');
-            form.reset();
-                // Limpiar manualmente cada campo
-            const inputs = form.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                switch (input.type) {
-                    case 'checkbox':
-                    case 'radio':
-                        input.checked = false;
-                        break;
-                    default:
-                        input.value = '';
-                        break;
-                }
-            });
-         }
+  function handleSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => {
+      data[key] = value;
+    });
 
-          function showMenuPrincipal() {
-            google.script.run.showSidebar();
-          }
-          function showPreProducto(){
-            google.script.run.showPreProductos();
-          }
+    google.script.run.withSuccessHandler(function (response) {
 
-          function verificarDatosObligatoriosProducto() {
-        const camposObligatorios = [
-          'tipo',
-          'precioUnitario',
-          'codigoReferencia',
-          'nombre'
-        ];
+      resetForm();  // Restablece el formulario a su estado predeterminado
+    }).processForm(data);
+  }
 
-        let isValid = true;
+  function showMenuPrincipal() {
+    google.script.run.showSidebar();
+  }
+  function showPreProducto() {
+    google.script.run.showPreProductos();
+  }
 
-        camposObligatorios.forEach(id => {
-          const campo = document.getElementById(id);
-          if (!campo.value.trim()) {
-            campo.style.backgroundColor = '#FFC7C7';  // Marca en rojo si está vacío
-            isValid = false;
-          } else {
-            campo.style.backgroundColor = '';  // Limpia el color si está lleno
-          }
-        });
+  function verificarDatosObligatoriosProducto() {
+    const camposObligatorios = [
+      'tipo',
+      'precioUnitario',
+      'codigoReferencia',
+      'nombre'
+    ];
 
-        return isValid;
+    let isValid = true;
+
+    camposObligatorios.forEach(id => {
+      const campo = document.getElementById(id);
+      if (!campo.value.trim()) {
+        campo.style.backgroundColor = '#FFC7C7';  // Marca en rojo si está vacío
+        isValid = false;
+      } else {
+        campo.style.backgroundColor = '';  // Limpia el color si está lleno
       }
+    });
 
-   
-          document.getElementById('reteIvaCheckbox').addEventListener('change', function() {
-                  document.getElementById('reteRentaCheckbox').checked = false;
-                  document.getElementById('tarifaReteRenta').disabled = true;
-                  document.getElementById('tarifaReteRenta').value = ''; // Set value to empty
-                  document.getElementById('tarifaReteIva').disabled = !this.checked;
-                });
-              
-                document.getElementById('reteRentaCheckbox').addEventListener('change', function() {
-                  document.getElementById('reteIvaCheckbox').checked = false;
-                  document.getElementById('tarifaReteIva').disabled = true;
-                  document.getElementById('tarifaReteIva').value = ''; // Set value to empty
-                  document.getElementById('tarifaReteRenta').disabled = !this.checked;
-                });
+    return isValid;
+  }
 
-                function toggleSelect(checkboxId, selectId) {
-                  var checkbox = document.getElementById(checkboxId);
-                  var select = document.getElementById(selectId);
-              
-                  if (checkbox.checked) {
-                    select.disabled = false;
-                  } else {
-                    select.disabled = true;
-                    select.selectedIndex = 0; // Resetea la selección a la primera opción
-                  }
-                }
-  
-    </script>
-  </head>
+</script>
 
-  <body class="d-flex h-100">
-    <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
-      <header class="mb-auto">
-        <div id="logo" class="d-flex justify-content-center bg-primary">
-          <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+<body class="d-flex h-100">
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+      </div>
+
+      <div class="row mt-4 px-5 gx-0">
+        <div class="col-1 p-0">
+          <a onclick="showPreProducto()"><i class="icon-left nav-icon"></i></a>
+        </div>
+        <div class="col-7 p-0 d-flex align-items-center">
+          <h2 class="mb-0 ms-4">Crear producto</h2>
         </div>
 
-        <div class="row mt-4 px-5 gx-0">
-          <div class="col-1 p-0">
-              <a onclick="showPreProducto()"><i class="icon-left nav-icon"></i></a>
-          </div>
-          <div class="col-7 p-0 d-flex align-items-center">
-              <h2 class="mb-0 ms-4">Crear producto</h2>
-          </div>
+      </div>
+    </header>
 
+    <main>
+      <div class="row py-3 px-5 gx-0">
+        <div class="col-12 py-4">
+          <p>Ingresa la informacion de tu nuevo producto.</p>
         </div>
-      </header> 
 
-      <main>
-        <div class="row py-3 px-5 mt-3 gx-0">
-          <div class="col-12 py-4">
-            <p>Ingresa la informacion de tu nuevo producto.</p>
-          </div>
+        <div class="col-12 px-0">
+          <form class="row g-3" onsubmit="handleSubmit(event)" id="productForm">
 
-          <div class="col-12 px-0">
-            <form class="row g-3" onsubmit="handleSubmit(event)" id="productForm">
-
-              <div class="col-12">
-                <label for="productoCheckbox">
-                  <input type="checkbox" id="productoCheckbox" name="tipo" value="Producto" onclick="toggleCheckbox('productoCheckbox', 'servicioCheckbox')">
-                  Producto
-                </label>
-                <label for="servicioCheckbox">
-                  <input type="checkbox" id="servicioCheckbox" name="tipo" value="Servicio" onclick="toggleCheckbox('servicioCheckbox', 'productoCheckbox')">
-                  Servicio
-                </label>
-              </div>
-
-
-              <div class="col-12">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control form-control-lg" id="nombre" name="nombre" required>
-              </div>
-
-              <div class="col-12">
-                <label for="precioUnitario" class="form-label">Precio unitario</label>
-                <input type="number" class="form-control form-control-lg" id="precioUnitario" name="precioUnitario" required>
-              </div>
-
-              <div class="col-12">
-                <label for="unidadDeMedida" class="form-label">Unidad de medida</label>
-                <input type="text" id="unidadDeMedida" class="form-control form-control-lg" name="unidadDeMedida">
-              </div>
-
-              <div class="col-12">
-                <label for="codigoReferencia" class="form-label">Codigo referencia</label>
-                <input type="number" class="form-control form-control-lg" id="codigoReferencia" name="codigoReferencia" required>
-              </div>
-
-              <div class="col-12">
-                <label for="referenciaAdicional" class="form-label">Referencia adicional</label>
-                <select id="referenciaAdicional" name="referenciaAdicional" class="form-select form-select-lg">
-                  <option value="" selected>Seleccione</option>
-                  <option>UNSPSC</option>
-                  <option>GTIN</option>
-                  <option>Partida Arancelarias</option>
-                  <option>Estandar de adopcion del contribuyente</option>
-                  <option>No aplica</option>
-                </select>
-              </div>
-
-              <div class="col-12">
-                <label for="IVA">
-                  <input type="checkbox" id="IVA" name="IVA" value="IVA" >
-                  IVA
-                </label>
-                <select id="tarifaIva" name="tarifaIva" class="form-select form-select-lg">
-                  <option value="0">Extento</option>
-                  <option value="5">5%</option>
-                  <option value="16">16%</option>
-                  <option value="19">19%</option>
-                </select>
-              </div>
-              
-              <div class="col-12">
-                <label for="INC">
-                  <input type="checkbox" id="INC" name="INC" value="INC">
-                  INC
-                </label>
-                <select id="tarifaInc" name="tarifaInc" class="form-select form-select-lg">
-                  <option value="0">0%</option>
-                  <option value="2">2%</option>
-                  <option value="4">4%</option>
-                  <option value="8">8%</option>
-                  <option value="16">16%</option>
-                </select>
-              </div>
-
-
-              <div class="col-12">
-                <label for="ReteIva">
-                  <input type="checkbox" id="reteIvaCheckbox" name="retencion" value="ReteIva" onclick="toggleCheckbox('reteIvaCheckbox', 'reteRentaCheckbox')">
-                  Retencion sobre el IVA
-                </label>
-                <select id="tarifaReteIva" name="tarifaReteIva" class="form-select form-select-lg">
-                  <option selected>Seleccione</option>
-                  <option value="15">15%</option>
-                  <option value="100">100%</option>
-                </select>
-              </div>
-
-              <div class="col-12">
-                <label for="ReteRenta">
-                  <input type="checkbox" id="reteRentaCheckbox" name="retencion" value="ReteRenta" onclick="toggleCheckbox('reteRentaCheckbox', 'reteIvaCheckbox')">
-                  Retencion sobre renta
-                </label>
-                <select id="tarifaReteRenta" name="tarifaReteRenta" class="form-select form-select-lg">
-                  <option selected>Seleccione</option>
-                  <option>Compras generales (declarantes)</option>
-                  <option>Compras generales (no declarantes)</option>
-                  <option>Compras con tarjeta debito o credito</option>
-                  <option>Compras de bienes o productos agricolas o pecuarios sin procesamiento industrial</option>
-                  <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial (declarantes)</option>
-                  <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial declarantes (no declarantes)</option>
-                  <option>Compras de cafe pergamino o cereza</option>
-                  <option>Compras de combustibles derivados del petroleo</option>
-                  <option>Enajenacion de activos fijos de personas naturales (notarias y transito son agentes retenedores)</option>
-                  <option>Compras de vehiculos</option>
-                  <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (por las primeras 20.000 UVT, es decir hasta $637.780.000)</option>
-                  <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (exceso de las primeras 20.000 UVT, es decir superior a $637.780.000)</option>
-                  <option>Compras de bienes raices cuya destinacion y uso sea distinto a vivienda de habitacion</option>
-                  <option>Servicios generales (declarantes)</option>
-                  <option>Servicios generales (no declarantes)</option>
-                  <option>Por emolumentos eclesiasticos (declarantes)</option>
-                  <option>Por emolumentos eclesiasticos (no declarantes)</option>
-                  <option>Servicios de transporte de carga</option>
-                  <option>Servicios de transporte nacional de pasajeros por via terrestre (declarantes)</option>
-                  <option>Servicios de transporte nacional de pasajeros por via terrestre (no declarantes)</option>
-                  <option>Servicios de transporte nacional de pasajeros por via aerea o maritima</option>
-                  <option>Servicios prestados por empresas de servicios temporales (sobre AIU)</option>
-                  <option>Servicios prestados por empresas de vigilancia y aseo (sobre AIU)</option>
-                  <option>Servicios integrales de salud prestados por IPS</option>
-                  <option>Servicios de hoteles y restaurantes (declarantes)</option>
-                  <option>Servicios de hoteles y restaurantes (no declarantes)</option>
-                  <option>Arrendamiento de bienes muebles</option>
-                  <option>Arrendamiento de bienes inmuebles (declarantes)</option>
-                  <option>Arrendamiento de bienes inmuebles (no declarantes)</option>
-                  <option>Otros ingresos tributarios (declarantes)</option>
-                  <option>Otros ingresos tributarios (no declarantes)</option>
-                  <option>Honorarios y comisiones (personas juridicas)</option>
-                  <option>Honorarios y comisiones personas naturales que suscriban contrato o cuya sumatoria de los pagos o abonos en cuenta superen las 3.300 UVT ($105.135.000)</option>
-                  <option>Honorarios y comisiones (no declarantes)</option>
-                  <option>Servicios de licenciamiento o derecho de uso de software</option>
-                  <option>Intereses o rendimientos financieros</option>
-                  <option>Comisiones del Fondo Nacional de Garantias</option>
-                  <option>Rendimientos financieros provenientes de titulos de renta fija</option>
-                  <option>Loterias, rifas, apuestas y similares</option>
-                  <option>Retencion en colocacion independiente de juegos de suerte y azar</option>
-                  <option>Contratos de construccion y urbanizacion</option>
-                </select>
-              </div>
-
-            </form>
-          </div>
-        </div>
-      </main> 
-      <footer class="mt-auto">
-        <div class="row p-4 gx-0">
-            <div class="col-6 pe-1">
-              <a onclick="submitForm()" class="btn btn-primary btn-lg w-100">
-                  <span class="pe-4">Guardar</span>
-                  
-              </a>
+            <div class="col-12">
+              <label for="productoCheckbox">
+                <input type="checkbox" id="productoCheckbox" name="tipo" value="Producto"
+                  onclick="toggleCheckbox('', 'productoCheckbox')">
+                Producto
+              </label>
+              <label for="servicioCheckbox">
+                <input type="checkbox" id="servicioCheckbox" name="tipo" value="Servicio"
+                  onclick="toggleCheckbox('productoCheckbox', 'servicioCheckbox')">
+                Servicio
+              </label>
             </div>
-            <div class="col-6 ps-1">
-              <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100">
-                  <span>Inicio</span>
-                  <i class="icon-24-outlined-other-location-home"></i>
-              </a>
-          </div>
-        </div>
-      </footer>
-    </div>
-  </body>
-</html>
 
+
+            <div class="col-12">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control form-control-lg" id="nombre" name="nombre" required>
+            </div>
+
+            <div class="col-12">
+              <label for="precioUnitario" class="form-label">Precio unitario</label>
+              <input type="number" class="form-control form-control-lg" id="precioUnitario" name="precioUnitario"
+                required>
+            </div>
+
+            <div class="col-12">
+              <label for="unidadDeMedida" class="form-label">Unidad de medida</label>
+              <input type="text" id="unidadDeMedida" class="form-control form-control-lg" name="unidadDeMedida">
+            </div>
+
+            <div class="col-12">
+              <label for="codigoReferencia" class="form-label">Codigo referencia</label>
+              <input type="number" class="form-control form-control-lg" id="codigoReferencia" name="codigoReferencia"
+                required>
+            </div>
+
+            <div class="col-12">
+              <label for="referenciaAdicional" class="form-label">Referencia adicional</label>
+              <select id="referenciaAdicional" name="referenciaAdicional" class="form-select form-select-lg">
+                <option value="" selected>Seleccione</option>
+                <option>UNSPSC</option>
+                <option>GTIN</option>
+                <option>Partida Arancelarias</option>
+                <option>Estandar de adopcion del contribuyente</option>
+                <option>No aplica</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="IVA">
+                <input type="checkbox" id="IVA" name="IVA" value="IVA">
+                IVA
+              </label>
+              <select id="tarifaIva" name="tarifaIva" class="form-select form-select-lg">
+                <option value="0">Extento</option>
+                <option value="5">5%</option>
+                <option value="16">16%</option>
+                <option value="19">19%</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="INC">
+                <input type="checkbox" id="INC" name="INC" value="INC">
+                INC
+              </label>
+              <select id="tarifaInc" name="tarifaInc" class="form-select form-select-lg">
+                <option value="0">0%</option>
+                <option value="2">2%</option>
+                <option value="4">4%</option>
+                <option value="8">8%</option>
+                <option value="16">16%</option>
+              </select>
+            </div>
+
+
+            <div class="col-12">
+              <label for="ReteIva">
+                <input type="checkbox" id="reteIvaCheckbox" name="retencion" value="ReteIva"
+                  onclick="toggleCheckbox('reteIvaCheckbox', 'reteRentaCheckbox')">
+                Retencion sobre el IVA
+              </label>
+              <select id="tarifaReteIva" name="tarifaReteIva" class="form-select form-select-lg">
+                <option selected>Seleccione</option>
+                <option value="15">15%</option>
+                <option value="100">100%</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="ReteRenta">
+                <input type="checkbox" id="reteRentaCheckbox" name="retencion" value="ReteRenta"
+                  onclick="toggleCheckbox('reteRentaCheckbox', 'reteIvaCheckbox')">
+                Retencion sobre renta
+              </label>
+              <select id="tarifaReteRenta" name="tarifaReteRenta" class="form-select form-select-lg">
+                <option selected>Seleccione</option>
+                <option>Compras generales (declarantes)</option>
+                <option>Compras generales (no declarantes)</option>
+                <option>Compras con tarjeta debito o credito</option>
+                <option>Compras de bienes o productos agricolas o pecuarios sin procesamiento industrial</option>
+                <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial (declarantes)
+                </option>
+                <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial declarantes (no
+                  declarantes)</option>
+                <option>Compras de cafe pergamino o cereza</option>
+                <option>Compras de combustibles derivados del petroleo</option>
+                <option>Enajenacion de activos fijos de personas naturales (notarias y transito son agentes retenedores)
+                </option>
+                <option>Compras de vehiculos</option>
+                <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (por las primeras
+                  20.000 UVT, es decir hasta $637.780.000)</option>
+                <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (exceso de las
+                  primeras 20.000 UVT, es decir superior a $637.780.000)</option>
+                <option>Compras de bienes raices cuya destinacion y uso sea distinto a vivienda de habitacion</option>
+                <option>Servicios generales (declarantes)</option>
+                <option>Servicios generales (no declarantes)</option>
+                <option>Por emolumentos eclesiasticos (declarantes)</option>
+                <option>Por emolumentos eclesiasticos (no declarantes)</option>
+                <option>Servicios de transporte de carga</option>
+                <option>Servicios de transporte nacional de pasajeros por via terrestre (declarantes)</option>
+                <option>Servicios de transporte nacional de pasajeros por via terrestre (no declarantes)</option>
+                <option>Servicios de transporte nacional de pasajeros por via aerea o maritima</option>
+                <option>Servicios prestados por empresas de servicios temporales (sobre AIU)</option>
+                <option>Servicios prestados por empresas de vigilancia y aseo (sobre AIU)</option>
+                <option>Servicios integrales de salud prestados por IPS</option>
+                <option>Servicios de hoteles y restaurantes (declarantes)</option>
+                <option>Servicios de hoteles y restaurantes (no declarantes)</option>
+                <option>Arrendamiento de bienes muebles</option>
+                <option>Arrendamiento de bienes inmuebles (declarantes)</option>
+                <option>Arrendamiento de bienes inmuebles (no declarantes)</option>
+                <option>Otros ingresos tributarios (declarantes)</option>
+                <option>Otros ingresos tributarios (no declarantes)</option>
+                <option>Honorarios y comisiones (personas juridicas)</option>
+                <option>Honorarios y comisiones personas naturales que suscriban contrato o cuya sumatoria de los pagos
+                  o abonos en cuenta superen las 3.300 UVT ($105.135.000)</option>
+                <option>Honorarios y comisiones (no declarantes)</option>
+                <option>Servicios de licenciamiento o derecho de uso de software</option>
+                <option>Intereses o rendimientos financieros</option>
+                <option>Comisiones del Fondo Nacional de Garantias</option>
+                <option>Rendimientos financieros provenientes de titulos de renta fija</option>
+                <option>Loterias, rifas, apuestas y similares</option>
+                <option>Retencion en colocacion independiente de juegos de suerte y azar</option>
+                <option>Contratos de construccion y urbanizacion</option>
+              </select>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer class="mt-auto">
+      <div class="row p-4 gx-0">
+        <div class="col-6 pe-1">
+          <a onclick="submitForm()" class="btn btn-primary btn-lg w-100">
+            <span class="pe-4">Guardar</span>
+
+          </a>
+        </div>
+        <div class="col-6 ps-1">
+          <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100">
+            <span>Inicio</span>
+            <i class="icon-24-outlined-other-location-home"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+
+</html>

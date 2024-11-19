@@ -1,98 +1,105 @@
 <!doctype html>
 <html lang="en" class="h-100">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Formulario con Botones</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.css" rel="stylesheet">
-    
-    <!-- Custom styles for this template -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
-    
-    <script>
-      function toggleButton() {
-        const inputText = document.getElementById('confirmacionTexto').value;
-        const botonEliminar = document.getElementById('botonEliminar');
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formulario con Botones</title>
 
-        // Habilita el botón solo si el texto es exactamente "ELIMINAR"
-        if (inputText === "DESVINCULAR") {
-          botonEliminar.removeAttribute('disabled');
-          botonEliminar.classList.add('btn-danger');  // Cambia a color rojo
-          botonEliminar.classList.remove('btn-secondary'); // Remueve color deshabilitado
-        } else {
-          botonEliminar.setAttribute('disabled', 'disabled');
-          botonEliminar.classList.remove('btn-danger');
-          botonEliminar.classList.add('btn-secondary');  // Añade color deshabilitado
-        }
+  <!-- Bootstrap core CSS -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+
+  <script>
+    function toggleButton() {
+      const inputText = document.getElementById('confirmacionTexto').value;
+      const botonEliminar = document.getElementById('botonEliminar');
+
+      // Habilita el botón solo si el texto es exactamente "ELIMINAR"
+      if (inputText === "DESVINCULAR") {
+        botonEliminar.removeAttribute('disabled');
+        botonEliminar.classList.add('btn-danger');  // Cambia a color rojo
+        botonEliminar.classList.remove('btn-secondary'); // Remueve color deshabilitado
+      } else {
+        botonEliminar.setAttribute('disabled', 'disabled');
+        botonEliminar.classList.remove('btn-danger');
+        botonEliminar.classList.add('btn-secondary');  // Añade color deshabilitado
       }
+    }
 
-      function showMenuPrincipal() {
-        google.script.run.showSidebar();
+    function showMenuPrincipal() {
+      google.script.run.showSidebar();
+    }
+
+
+    function Desvincular() {
+      const inputText = document.getElementById('confirmacionTexto').value;
+      if (inputText === "DESVINCULAR") {
+        google.script.run.DesvincularMisfacturas();
+      } else {
+        google.script.run.MensajeErrorDesvincularMisfacturas();
       }
+    }
+  </script>
+</head>
 
-
-      function Desvincular(){
-        const inputText = document.getElementById('confirmacionTexto').value;
-        if(inputText==="DESVINCULAR"){
-            google.script.run.DesvincularMisfacturas();
-        }else{
-            google.script.run.MensajeErrorDesvincularMisfacturas();
-        }
-      }
-    </script>
-  </head>
-  
-  <body class="d-flex h-100">
-    <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
-      <header class="mb-auto">
-        <div id="logo" class="d-flex justify-content-center bg-primary">
-          <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+<body class="d-flex h-100">
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+      </div>
+      <div class="row mt-4 px-4 gx-0">
+        <div class="col-1 p-0">
+          <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
         </div>
-        <div class="row mt-4 px-4 gx-0">
-          <div class="col-1 p-0">
-              <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
-            </div>
-            <div class="col-7 p-0 d-flex align-items-center">
-              <h2 class="mb-0 ms-4"> Desvincular misfacturas</h2>
-            </div>
+        <div class="col-7 p-0 d-flex align-items-center">
+          <h2 class="mb-0 ms-4"> Desvincular misfacturas</h2>
         </div>
-      </header>
+      </div>
+    </header>
 
-      <main>
-        <div class="container py-5">
-          <div class="row justify-content-center">
-            <div class="col-12 col-md-6">
-              <p class="fs-6 text-center">Si estás seguro de desvincular tu cuenta de misfacturas porfavor escribe la palabra <strong>"DESVINCULAR"</strong> en el campo a continuación y luego haz clic en el botón.</p>
-            </div>
-          </div>
-          <!-- Campo de confirmación y botón de eliminación -->
-          <div class="row justify-content-center mt-3">
-            <div class="col-8 col-md-4 mb-3 text-center">
-              <label for="confirmacionTexto" class="form-label">Confirma:</label>
-              <input type="text" id="confirmacionTexto" class="form-control" placeholder="Escribe DESVINCULAR" oninput="toggleButton()">
-            </div>
-            <div class="col-8 col-md-4">
-              <a id="botonEliminar" class="btn btn-secondary btn-lg w-100 btn-menu d-flex align-items-center justify-content-center" onclick="Desvincular()" disabled="disabled">
-                <span>Desvincular</span>
-              </a>
-            </div>
+    <main>
+      <div class="container py-5">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-6">
+            <p class="fs-6 text-center">Si estás seguro de desvincular tu cuenta de misfacturas porfavor escribe la
+              palabra <strong>"DESVINCULAR"</strong> en el campo a continuación y luego haz clic en el botón.</p>
           </div>
         </div>
-      </main>
-
-      <footer class="mt-auto">
-        <div class="row p-4 gx-0">
-            <div class="col-12 text-center">
-                <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100 d-flex align-items-center justify-content-center">
-                    <span>Inicio</span>
-                    <i class="icon-24-outlined-other-location-home ms-2"></i>
-                </a>
-            </div>
+        <!-- Campo de confirmación y botón de eliminación -->
+        <div class="row justify-content-center mt-3">
+          <div class="col-8 col-md-4 mb-3 text-center">
+            <label for="confirmacionTexto" class="form-label">Confirma:</label>
+            <input type="text" id="confirmacionTexto" class="form-control" placeholder="Escribe DESVINCULAR"
+              oninput="toggleButton()">
+          </div>
+          <div class="col-8 col-md-4">
+            <a id="botonEliminar"
+              class="btn btn-secondary btn-lg w-100 btn-menu d-flex align-items-center justify-content-center"
+              onclick="Desvincular()" disabled="disabled">
+              <span>Desvincular</span>
+            </a>
+          </div>
         </div>
-      </footer>
-    </div>
-  </body>
+      </div>
+    </main>
+
+    <footer class="mt-auto">
+      <div class="row p-4 gx-0">
+        <div class="col-12 text-center">
+          <a onclick="showMenuPrincipal()"
+            class="btn btn-outline-primary btn-lg w-100 d-flex align-items-center justify-content-center">
+            <span>Inicio</span>
+            <i class="icon-24-outlined-other-location-home ms-2"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+
 </html>

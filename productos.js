@@ -1,21 +1,21 @@
 var spreadsheet = SpreadsheetApp.getActive();
 
-function buscarUnidadesDeMedida(terminoBusqueda){
-  let unidadesDeMedida=datos_sheet.getRange(35,3,365,1).getValues();
+function buscarUnidadesDeMedida(terminoBusqueda) {
+  let unidadesDeMedida = datos_sheet.getRange(35, 3, 365, 1).getValues();
   var resultados = [];
-  if(terminoBusqueda===""){
+  if (terminoBusqueda === "") {
     return resultados
   }
   // Recorre los valores obtenidos
   for (var i = 0; i < unidadesDeMedida.length; i++) {
     var valor = unidadesDeMedida[i][0]; // Accede al primer (y único) valor de cada fila
-    
+
     // Comprueba si el valor coincide con el término de búsqueda
     if (valor.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) {
       resultados.push(valor); // Añade el valor a la lista de resultados si coincide
     }
   }
-  
+
   // Devuelve los resultados
   return resultados;
 }
@@ -61,15 +61,15 @@ function saveProductData(formData) {
 }
 
 
-function verificarDatosObligatoriosProductos(e){
+function verificarDatosObligatoriosProductos(e) {
   let sheet = e.source.getActiveSheet();
   let range = e.range;
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
   let ultimaColumnaPermitida = 9;
-  let  columnasObligatorias= [1, 2, 3, 4, 6];
+  let columnasObligatorias = [1, 2, 3, 4, 6];
   let estadosDefault = [""];
-  let todasLasColumnas=[1,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,15];
+  let todasLasColumnas = [1, 2, 3, 4, 5, 6, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
   if (rowEditada > 1 && colEditada <= ultimaColumnaPermitida) {
     let estaCompleto = true;
@@ -90,106 +90,105 @@ function verificarDatosObligatoriosProductos(e){
         estaVacioOPredeterminado = false;
       }
     }
-    sheet.getRange(rowEditada, 5).setValue("=VLOOKUP(D"+String(rowEditada)+",Datos!$F$36:$G$43,2,0)");
+    sheet.getRange(rowEditada, 5).setValue("=VLOOKUP(D" + String(rowEditada) + ",Datos!$F$36:$G$43,2,0)");
   }
 }
 
 // a cambiar cuando se pregunte y agg los otros porcinetos
 function obtenerInformacionProducto(producto) {
-    let celdaProducto = datos_sheet.getRange("I11");
-    celdaProducto.setValue(producto);
-  
-    let codigoProducto = datos_sheet.getRange("H11").getValue();
-    let precioUnitario = datos_sheet.getRange("J11").getValue();
-    let tarifaIVA = datos_sheet.getRange("K11").getValue();
-    let tarifaINC = datos_sheet.getRange("L11").getValue();
-    let precioImpuesto = datos_sheet.getRange("L11").getValue();
-    let tarifaRetencion = datos_sheet.getRange("M11").getValue();
-    let valorRetencion=datos_sheet.getRange("N11").getValue();
+  let celdaProducto = datos_sheet.getRange("I11");
+  celdaProducto.setValue(producto);
 
-    
-    let informacionProducto = {
-      "codigo Producto": codigoProducto,
-      "precio Unitario": precioUnitario,
-      "tarifa IVA": tarifaIVA,
-      "tarifa INC": tarifaINC,
-      "precio Impuesto": precioImpuesto,
-      "tarifa Retencion": tarifaRetencion,
-      "valor Retencion": valorRetencion
-    };
-    if (informacionProducto["tarifa IVA"] == ""){
-      informacionProducto["tarifa IVA"] = 0;
-    }
-    if (informacionProducto["tarifa INC"] == ""){
-      informacionProducto["tarifa INC"] = 0;
-    }
+  let codigoProducto = datos_sheet.getRange("H11").getValue();
+  let precioUnitario = datos_sheet.getRange("J11").getValue();
+  let tarifaIVA = datos_sheet.getRange("K11").getValue();
+  let tarifaINC = datos_sheet.getRange("L11").getValue();
+  let precioImpuesto = datos_sheet.getRange("L11").getValue();
+  let tarifaRetencion = datos_sheet.getRange("M11").getValue();
+  let valorRetencion = datos_sheet.getRange("N11").getValue();
 
 
-
-  
-    return informacionProducto;
+  let informacionProducto = {
+    "codigo Producto": codigoProducto,
+    "precio Unitario": precioUnitario,
+    "tarifa IVA": tarifaIVA,
+    "tarifa INC": tarifaINC,
+    "precio Impuesto": precioImpuesto,
+    "tarifa Retencion": tarifaRetencion,
+    "valor Retencion": valorRetencion
+  };
+  if (informacionProducto["tarifa IVA"] == "") {
+    informacionProducto["tarifa IVA"] = 0;
+  }
+  if (informacionProducto["tarifa INC"] == "") {
+    informacionProducto["tarifa INC"] = 0;
   }
 
-  function buscarProductos(terminoBusqueda) {
-    var spreadsheet = SpreadsheetApp.getActive();
-    var hojaProductos = spreadsheet.getSheetByName('Productos');
-    var ultimaFila = hojaProductos.getLastRow();
-    var valores = hojaProductos.getRange(2, 16, ultimaFila - 1, 1).getValues();
-  
-    // Filtrar los productos que coincidan con el término de búsqueda
-    var productosFiltrados = valores
-      .map(function(row) { return row[0]; })
-      .filter(function(producto) {
-        // Verificar que 'producto' es una cadena antes de llamar a 'toLowerCase'
-        return typeof producto === 'string' && producto.toLowerCase().includes(terminoBusqueda.toLowerCase());
-      });
-  
-    return productosFiltrados;
-  }
 
-  function validarImpuestos(impuestos, tarifaIva, tarifaInc) {
-    let tarifaImpuestos = 0;
-    if (impuestos === "IVA") {
-      tarifaImpuestos = tarifaIva;
-    } else {
-      tarifaImpuestos = tarifaInc;
-    }
-    return tarifaImpuestos;
-  }
 
-  function validarTipoRetencion(retencion, tarifaReteRenta) {
-    let tipoRetencion = "";
-    if(retencion === "ReteIva"){
-      tipoRetencion = "Retencion sobre el IVA";
-    }else {
-      tipoRetencion = tarifaReteRenta;
-    }
-    return tipoRetencion;
-  }
 
-  function validarTarifaRetencion(retencion, tarifaReteIva, tarifaReteRenta) {
-    let tarifaRetencion = 0;
-    if (retencion === "ReteIva") {
-      tarifaRetencion = tarifaReteIva;
-    } else {
-      tarifaRetencion = reteRentaValores[tarifaReteRenta];
-    }
-    return tarifaRetencion;
-  }
+  return informacionProducto;
+}
 
-  function validarReferenciaAdicional(referenciaAdicional) {
-    let numeroReferenciaAdicional = 0;
-    if (referenciaAdicional === "UNSPSC") {
-      numeroReferenciaAdicional = 1;
-    } else if (referenciaAdicional === "GTIN") {
-      numeroReferenciaAdicional = 10;
-    } else if (referenciaAdicional === "Partida Arancelarias") {
-      numeroReferenciaAdicional = 20;
-    } else if (referenciaAdicional === "Estándar de adopción del contribuyente") {
-      numeroReferenciaAdicional = 999;
-    } else if (referenciaAdicional === "No Aplica") {
-      numeroReferenciaAdicional = 0;
-    }
-    return numeroReferenciaAdicional;
+function buscarProductos(terminoBusqueda) {
+  var spreadsheet = SpreadsheetApp.getActive();
+  var hojaProductos = spreadsheet.getSheetByName('Productos');
+  var ultimaFila = hojaProductos.getLastRow();
+  var valores = hojaProductos.getRange(2, 16, ultimaFila - 1, 1).getValues();
+
+  // Filtrar los productos que coincidan con el término de búsqueda
+  var productosFiltrados = valores
+    .map(function (row) { return row[0]; })
+    .filter(function (producto) {
+      // Verificar que 'producto' es una cadena antes de llamar a 'toLowerCase'
+      return typeof producto === 'string' && producto.toLowerCase().includes(terminoBusqueda.toLowerCase());
+    });
+
+  return productosFiltrados;
+}
+
+function validarImpuestos(impuestos, tarifaIva, tarifaInc) {
+  let tarifaImpuestos = 0;
+  if (impuestos === "IVA") {
+    tarifaImpuestos = tarifaIva;
+  } else {
+    tarifaImpuestos = tarifaInc;
   }
-  
+  return tarifaImpuestos;
+}
+
+function validarTipoRetencion(retencion, tarifaReteRenta) {
+  let tipoRetencion = "";
+  if (retencion === "ReteIva") {
+    tipoRetencion = "Retencion sobre el IVA";
+  } else {
+    tipoRetencion = tarifaReteRenta;
+  }
+  return tipoRetencion;
+}
+
+function validarTarifaRetencion(retencion, tarifaReteIva, tarifaReteRenta) {
+  let tarifaRetencion = 0;
+  if (retencion === "ReteIva") {
+    tarifaRetencion = tarifaReteIva;
+  } else {
+    tarifaRetencion = reteRentaValores[tarifaReteRenta];
+  }
+  return tarifaRetencion;
+}
+
+function validarReferenciaAdicional(referenciaAdicional) {
+  let numeroReferenciaAdicional = 0;
+  if (referenciaAdicional === "UNSPSC") {
+    numeroReferenciaAdicional = 1;
+  } else if (referenciaAdicional === "GTIN") {
+    numeroReferenciaAdicional = 10;
+  } else if (referenciaAdicional === "Partida Arancelarias") {
+    numeroReferenciaAdicional = 20;
+  } else if (referenciaAdicional === "Estándar de adopción del contribuyente") {
+    numeroReferenciaAdicional = 999;
+  } else if (referenciaAdicional === "No Aplica") {
+    numeroReferenciaAdicional = 0;
+  }
+  return numeroReferenciaAdicional;
+}

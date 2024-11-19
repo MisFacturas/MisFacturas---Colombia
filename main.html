@@ -1,12 +1,13 @@
 <!doctype html>
 <html lang="en" class="h-100">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
-    <title>Cover Template · Bootstrap v5.0</title>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>Cover Template · Bootstrap v5.0</title>
 
   <!-- 
   QA: https://misfacturas.cenet.ws/Publico/google-sheets-resources
@@ -14,65 +15,71 @@ Preproducción: https://misfacturas.cenet.ws/Publico/google-sheets-resources/
 Producción: https://www.misfacturas.com.co/Publico/google-sheets-resources/js/bootstrap.js  
   
   -->
-    <!-- Bootstrap core CSS -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.css" rel="stylesheet">
-    
-    <!-- Custom styles for this template -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
-    
-    <script>
-      function openFactura() {
-        google.script.run.openFacturaSheet();
-        google.script.run.showNuevaFactura();
-      }
-      function openClientes() {
-        google.script.run.openClientesSheet();
-        google.script.run.showClientes();
-      }
-      function showPreProductos() {
-        google.script.run.showPreProductos();
+  <!-- Bootstrap core CSS -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.css" rel="stylesheet">
 
-      }
-      function openConfiguracion() {
-        google.script.run.openDatosEmisorSheet();
-        google.script.run.showConfiguracion();
-        
-      }
-    </script>
-  </head>
-  <body class="d-flex h-100">
-    
-    <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+  <!-- Custom styles for this template -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
 
-      <header class="mb-auto">
-       <div id="logo" class="d-flex justify-content-center bg-primary">
-         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
-       </div>
-       <div class="d-flex justify-content-center mt-2">
+  <script>
+    function openFactura() {
+      google.script.run.openFacturaSheet();
+      google.script.run.showNuevaFactura();
+    }
+    function openClientes() {
+      google.script.run.openClientesSheet();
+      google.script.run.showClientes();
+    }
+    function showPreProductos() {
+      google.script.run.showPreProductos();
+
+    }
+    function openConfiguracion() {
+      google.script.run.openDatosEmisorSheet();
+      google.script.run.showConfiguracion();
+
+    }
+  </script>
+</head>
+
+<body class="d-flex h-100">
+
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+      </div>
+      <div class="d-flex justify-content-center mt-2">
         <a onclick="openConfiguracion()" class="btn btn-lg btn-outline-secondary mb-2">
           <i class="icon-24-outlined-action-main-settings-1"></i>
           <span>Configuración</span>
         </a>
       </div>
-     </header>
-   
-     <main class="d-flex flex-column align-items-center justify-content-center vh-100"></mainclass>
-        <div class="row py-3 px-4 gx-0 text-center">
-          <div class="col-12 py-4">
-            <h1>¡Hola!</h1>
-            <p>Bienvenido a misfacturas <span class="d-block">¿Qué deseas hacer hoy?</span></p>
-          </div>
-   
-         <a onclick="openFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-24-outlined-other-file-and-folder-file-text"></i><span>Facturación</span></a>
-         <a onclick="openClientes()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-24-outlined-other-person-user-plus"></i><span>Clientes</span></a>
-         <a onclick="showPreProductos()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-24-outlined-other-other-box-1"></i><span>Productos</span></a>
-   
-       </div>
-     </main>
-   </div>
-   
-   <script src="js/bootstrap.js"></script>
-   
-     </body>
-   </html>
+    </header>
+
+    <main class="d-flex flex-column align-items-center justify-content-center vh-100">
+      </mainclass>
+      <div class="row py-3 px-4 gx-0 text-center">
+        <div class="col-12 py-4">
+          <h1>¡Hola!</h1>
+          <p>Bienvenido a misfacturas <span class="d-block">¿Qué deseas hacer hoy?</span></p>
+        </div>
+
+        <a onclick="openFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i
+            class="icon-24-outlined-other-file-and-folder-file-text"></i><span>Facturación</span></a>
+        <a onclick="openClientes()" class="btn btn-lg btn-outline-secondary mb-2"><i
+            class="icon-24-outlined-other-person-user-plus"></i><span>Clientes</span></a>
+        <a onclick="showPreProductos()" class="btn btn-lg btn-outline-secondary mb-2"><i
+            class="icon-24-outlined-other-other-box-1"></i><span>Productos</span></a>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="js/bootstrap.js"></script>
+
+</body>
+
+</html>

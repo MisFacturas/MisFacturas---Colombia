@@ -1,68 +1,72 @@
 <!doctype html>
 <html lang="en" class="h-100">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
-    <title>Cover Template · Bootstrap v5.0</title>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>Cover Template · Bootstrap v5.0</title>
 
 
-    <!-- Bootstrap core CSS -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom styles for this template -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources//css/fontello-codes.css" rel="stylesheet">
-  </head>
-  <script>
-        function showMenuPrincipal() {
-          google.script.run.showSidebar();
-        }
+  <!-- Bootstrap core CSS -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources//css/fontello-codes.css" rel="stylesheet">
+</head>
+<script>
+  function showMenuPrincipal() {
+    google.script.run.showSidebar();
+  }
 
-        function showEnviarEmail() {
-          google.script.run.openHistorialSheet();
-        }
+  function showEnviarEmail() {
+    google.script.run.openHistorialSheet();
+  }
 
-        
-        function openNuevaFactura(){
-            google.script.run.openFacturaSheet();
-            google.script.run.showNuevaFactura();
-            google.script.run.inicarFacturaNueva();
-        }
-  </script>
-  <body class="d-flex h-100">
-    
-    <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
 
-      <header class="mb-auto">
-       <div id="logo" class="d-flex justify-content-center bg-primary">
-         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png"alt="">
-       </div>
-   
-       <div class="row mt-4 px-4 gx-0">
-             <div class="col-7 p-0 d-flex align-items-center">
-               <h2 class="mb-0 ms-4">Facturación</h2>
-             </div>
-       </div>
-     </header>
-   
-   
-   
-      <main>
-   
-       <div class="row py-3 px-4 gx-0">
-         <div class="col-12 py-4">
-         <p>Gestiona, genera y envía con facilidad. Revisa el historial de todas tus facturas, todo desde un solo lugar.</p>
-         </div>
-   
-         <a onclick="openNuevaFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-file-plus"></i><span>Nueva factura</span></a>
-   
-     </main>
-   
-   
-   
-     <footer class="mt-auto">
+  function openNuevaFactura() {
+    google.script.run.openFacturaSheet();
+    google.script.run.showNuevaFactura();
+    google.script.run.inicarFacturaNueva();
+  }
+</script>
+
+<body class="d-flex h-100">
+
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+      </div>
+
+      <div class="row mt-4 px-4 gx-0">
+        <div class="col-7 p-0 d-flex align-items-center">
+          <h2 class="mb-0 ms-4">Facturación</h2>
+        </div>
+      </div>
+    </header>
+
+
+
+    <main>
+
+      <div class="row py-3 px-4 gx-0">
+        <div class="col-12 py-4">
+          <p>Gestiona, genera y envía con facilidad. Revisa el historial de todas tus facturas, todo desde un solo
+            lugar.</p>
+        </div>
+
+        <a onclick="openNuevaFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i
+            class="icon-file-plus"></i><span>Nueva factura</span></a>
+
+    </main>
+
+
+
+    <footer class="mt-auto">
       <div class="row p-4 gx-0">
         <div class="col-6 pe-1">
           <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100 btn-menu d-flex">
@@ -72,14 +76,15 @@
         </div>
       </div>
     </footer>
-    
-   
-   
-   
-   
-   </div>
-   
 
-    
-  </body>
+
+
+
+
+  </div>
+
+
+
+</body>
+
 </html>

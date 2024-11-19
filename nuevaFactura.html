@@ -1,90 +1,93 @@
 <!doctype html>
 <html lang="en" class="h-100">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
-    <title>Cover Template · Bootstrap v5.0</title>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>Cover Template · Bootstrap v5.0</title>
 
 
-    <!-- Bootstrap core CSS -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom styles for this template -->
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
-    <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
-  </head>
-  <script>
-    function writeDocument(htmlOutput) {
-      document.open();
-      document.write(htmlOutput);
-      document.close();
-    }
+  <!-- Bootstrap core CSS -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+</head>
+<script>
+  function writeDocument(htmlOutput) {
+    document.open();
+    document.write(htmlOutput);
+    document.close();
+  }
 
-    function addNewProduct() {
-      // Función para agregar nuevo producto
-      google.script.run.withSuccessHandler(writeDocument).showAgregarProdcuto();
-    }
+  function addNewProduct() {
+    // Función para agregar nuevo producto
+    google.script.run.withSuccessHandler(writeDocument).showAgregarProdcuto();
+  }
 
-    function saveInvoice() {
-      google.script.run.guardarFactura();
-    }
+  function saveInvoice() {
+    google.script.run.guardarFactura();
+  }
 
-    function clearInvoice() {
-      google.script.run.limpiarHojaFactura();
-    }
-    function showMenuPrincipal() {
-          google.script.run.showSidebar();
-        }
-  </script>
-  <body class="d-flex h-100">
-    
-    <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+  function clearInvoice() {
+    google.script.run.limpiarHojaFactura();
+  }
+  function showMenuPrincipal() {
+    google.script.run.showSidebar();
+  }
+</script>
 
-      <header class="mb-auto">
-       <div id="logo" class="d-flex justify-content-center bg-primary">
-         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
-       </div>
-   
-       <div class="row mt-4 px-4 gx-0">
-             <div class="col-7 p-0 d-flex align-items-center">
-               <h2 class="mb-0 ms-4">Nueva factura</h2>
-             </div>
-       </div>
-     </header>
-   
-   
+<body class="d-flex h-100">
+
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+      </div>
+
+      <div class="row mt-4 px-4 gx-0">
+        <div class="col-7 p-0 d-flex align-items-center">
+          <h2 class="mb-0 ms-4">Nueva factura</h2>
+        </div>
+      </div>
+    </header>
+
+
     <main>
-   
-       <div class="row py-3 px-4 gx-0">
-         <div class="col-12 py-4">
-         <p>Crea, guarda y visualiza tus facturas en Google Sheets.</p>
-   
-         <p class="text-center">
-         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/nueva-factura.png" class="m-auto img-fluid my-3" alt="">
-         </p>
-         </div>
-         <div class="col-12 mt-4 px-0">
-           <div class="row">
-             <div class="col-6">
-               <a onclick="addNewProduct()" class="btn btn-secondary btn-lg w-100">
-                 <i class="icon-plus me-0"></i><span>Agregar <br>producto</span>
-               </a>
-           </div>
-           <div class="col-6">
-             <a onclick="clearInvoice()" class="btn btn-secondary btn-lg w-100">
-               <i class="icon-erase me-0"></i><span>Limpiar <br>factura</span>
-             </a>
-         </div>
-   
-         </div>
-   
-       </div>
-   
-   
-     </main>
-   
+
+      <div class="row py-3 px-4 gx-0">
+        <div class="col-12 py-4">
+          <p>Crea, guarda y visualiza tus facturas en Google Sheets.</p>
+
+          <p class="text-center">
+            <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/nueva-factura.png"
+              class="m-auto img-fluid my-3" alt="">
+          </p>
+        </div>
+        <div class="col-12 mt-4 px-0">
+          <div class="row">
+            <div class="col-6">
+              <a onclick="addNewProduct()" class="btn btn-secondary btn-lg w-100">
+                <i class="icon-plus me-0"></i><span>Agregar <br>producto</span>
+              </a>
+            </div>
+            <div class="col-6">
+              <a onclick="clearInvoice()" class="btn btn-secondary btn-lg w-100">
+                <i class="icon-erase me-0"></i><span>Limpiar <br>factura</span>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+
+
+    </main>
+
     <footer class="mt-auto">
       <div class="col-12 mt-4 px-0">
         <div class="row">
@@ -92,14 +95,15 @@
             <a onclick="saveInvoice()" class="btn btn-primary btn-lg w-100 btn-menu d-flex">
               <span>Guardar factura</span>
             </a>
-        </div>
-        <div class="col-6">
-          <a onclick="showMenuPrincipal()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
-            <span>Inicio</span>
-            <i class="icon-24-outlined-other-location-home"></i>
-          </a>
-      </div>
+          </div>
+          <div class="col-6">
+            <a onclick="showMenuPrincipal()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
+              <span>Inicio</span>
+              <i class="icon-24-outlined-other-location-home"></i>
+            </a>
+          </div>
     </footer>
-   </div>
-  </body>
+  </div>
+</body>
+
 </html>
