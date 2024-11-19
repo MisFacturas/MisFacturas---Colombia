@@ -1900,3 +1900,11 @@ var paymentMeansCode = {
   "Desembolso Débito (CCD)": "36",
   "Clearing entre partners": "97"
 };
+
+var referenciaAdicionalCodigos = {
+  "UNSPSC": 1,
+  "GTIN": 10,
+  "Partida Arancelarias": 20,
+  "Estándar de adopción del contribuyente": 999,
+  "No aplica": 0
+};

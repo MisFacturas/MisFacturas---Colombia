@@ -14,64 +14,114 @@
   <!-- Custom styles for this template -->
   <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
   <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
-</head>
 
-<script>
-  function submitForm() {
-    if (verificarDatosObligatoriosProducto()) {
-      const form = document.getElementById('productForm');
-      form.dispatchEvent(new Event('submit'));
-    } else {
-      alert('Por favor complete todos los campos obligatorios.');
+
+  <script>
+    function verificarDatosObligatoriosProducto() {
+      const camposObligatorios = [
+        'tipoProducto',
+        'precioUnitario',
+        'codigoReferencia',
+        'nombre',
+        'unidadDeMedida',
+        'referenciaAdicional',
+      ];
+
+      let isValid = true;
+
+      camposObligatorios.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo.value.trim()) {
+          campo.style.backgroundColor = '#FFC7C7';  // Marca en rojo si está vacío
+          isValid = false;
+        } else {
+          campo.style.backgroundColor = '';  // Limpia el color si está lleno
+        }
+      });
+
+      return isValid;
     }
-  }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => {
-      data[key] = value;
-    });
-
-    google.script.run.withSuccessHandler(function (response) {
-
-      resetForm();  // Restablece el formulario a su estado predeterminado
-    }).processForm(data);
-  }
-
-  function showMenuPrincipal() {
-    google.script.run.showSidebar();
-  }
-  function showPreProducto() {
-    google.script.run.showPreProductos();
-  }
-
-  function verificarDatosObligatoriosProducto() {
-    const camposObligatorios = [
-      'tipo',
-      'precioUnitario',
-      'codigoReferencia',
-      'nombre'
-    ];
-
-    let isValid = true;
-
-    camposObligatorios.forEach(id => {
-      const campo = document.getElementById(id);
-      if (!campo.value.trim()) {
-        campo.style.backgroundColor = '#FFC7C7';  // Marca en rojo si está vacío
-        isValid = false;
+    function submitForm() {
+      if (verificarDatosObligatoriosProducto()) {
+        const form = document.getElementById('productForm');
+        form.dispatchEvent(new Event('submit'));
+        google.script.run.openProductosSheet();
+        resetForm(); // Llama a la función para resetear el formulario
       } else {
-        campo.style.backgroundColor = '';  // Limpia el color si está lleno
+        alert('Por favor complete todos los campos obligatorios.');
       }
-    });
+    }
 
-    return isValid;
-  }
+    function handleSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
 
-</script>
+
+
+
+      google.script.run.withSuccessHandler(function (response) {
+
+      }).processForm(data);
+    }
+
+    function showMenuPrincipal() {
+      google.script.run.showSidebar();
+    }
+    function showPreProducto() {
+      google.script.run.showPreProductos();
+    }
+    function buscarUnidadMedida() {
+      var input = document.getElementById('unidadDeMedida').value;
+      google.script.run.withSuccessHandler(mostrarResultados).buscarUnidadesDeMedidaProducto(input);
+    }
+    function resetForm() {
+      const form = document.getElementById('productForm');
+      form.reset();
+      // Opcional: limpiar los estilos de los campos
+      const camposObligatorios = [
+        'tipoProducto',
+        'precioUnitario',
+        'codigoReferencia',
+        'nombre',
+        'unidadDeMedida',
+        'referenciaAdicional',
+      ];
+
+      camposObligatorios.forEach(id => {
+        const campo = document.getElementById(id);
+        campo.style.backgroundColor = '';  // Limpia el color
+      });
+    }
+
+    function mostrarResultados(unidadesDeMedida) {
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = '';
+      unidadesDeMedida.forEach(function (unidadSelecionada) {
+        var div = document.createElement('div');
+        div.textContent = unidadSelecionada;
+        div.onclick = function () {
+          seleccionarUnidad(unidadSelecionada);
+        };
+        resultBox.appendChild(div);
+      });
+    }
+    function seleccionarUnidad(unidadSelecionada) {
+      document.getElementById('unidadDeMedida').value = unidadSelecionada;
+      var resultBox = document.querySelector('.result-box');
+      resultBox.innerHTML = ''; // Limpiar los resultados
+    }
+
+    function toggleCheckbox(selectedId, otherId) {
+      document.getElementById(otherId).checked = false;
+    }
+  </script>
+</head>
 
 <body class="d-flex h-100">
   <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
@@ -101,18 +151,12 @@
           <form class="row g-3" onsubmit="handleSubmit(event)" id="productForm">
 
             <div class="col-12">
-              <label for="productoCheckbox">
-                <input type="checkbox" id="productoCheckbox" name="tipo" value="Producto"
-                  onclick="toggleCheckbox('', 'productoCheckbox')">
-                Producto
-              </label>
-              <label for="servicioCheckbox">
-                <input type="checkbox" id="servicioCheckbox" name="tipo" value="Servicio"
-                  onclick="toggleCheckbox('productoCheckbox', 'servicioCheckbox')">
-                Servicio
-              </label>
+              <label for="tipoProducto" class="form-label">Tipo</label>
+              <select id="tipoProducto" name="tipoProducto" class="form-select form-select-lg">
+                <option selected>Producto</option>
+                <option>Servicio</option>
+              </select>
             </div>
-
 
             <div class="col-12">
               <label for="nombre" class="form-label">Nombre</label>
@@ -127,7 +171,11 @@
 
             <div class="col-12">
               <label for="unidadDeMedida" class="form-label">Unidad de medida</label>
-              <input type="text" id="unidadDeMedida" class="form-control form-control-lg" name="unidadDeMedida">
+              <input type="text" id="unidadDeMedida" class="form-control" placeholder="Buscar" name="unidadDeMedida"
+                autocomplete="off" onkeyup="buscarUnidadMedida()">>
+              <div class="result-box">
+                <!-- Los resultados se mostrarán aquí -->
+              </div>
             </div>
 
             <div class="col-12">
@@ -149,8 +197,7 @@
             </div>
 
             <div class="col-12">
-              <label for="IVA">
-                <input type="checkbox" id="IVA" name="IVA" value="IVA">
+              <label for="IVA" class="form-label">
                 IVA
               </label>
               <select id="tarifaIva" name="tarifaIva" class="form-select form-select-lg">
@@ -162,8 +209,7 @@
             </div>
 
             <div class="col-12">
-              <label for="INC">
-                <input type="checkbox" id="INC" name="INC" value="INC">
+              <label for="INC" class="form-label">
                 INC
               </label>
               <select id="tarifaInc" name="tarifaInc" class="form-select form-select-lg">
@@ -177,26 +223,24 @@
 
 
             <div class="col-12">
-              <label for="ReteIva">
-                <input type="checkbox" id="reteIvaCheckbox" name="retencion" value="ReteIva"
-                  onclick="toggleCheckbox('reteIvaCheckbox', 'reteRentaCheckbox')">
+              <label for="ReteIva" class="form-label">
                 Retencion sobre el IVA
               </label>
               <select id="tarifaReteIva" name="tarifaReteIva" class="form-select form-select-lg">
-                <option selected>Seleccione</option>
+                <option selected value="">Seleccione</option>
+                <option value="">No alpica</option>
                 <option value="15">15%</option>
                 <option value="100">100%</option>
               </select>
             </div>
 
             <div class="col-12">
-              <label for="ReteRenta">
-                <input type="checkbox" id="reteRentaCheckbox" name="retencion" value="ReteRenta"
-                  onclick="toggleCheckbox('reteRentaCheckbox', 'reteIvaCheckbox')">
+              <label for="ReteRenta" class="form-label">
                 Retencion sobre renta
               </label>
               <select id="tarifaReteRenta" name="tarifaReteRenta" class="form-select form-select-lg">
-                <option selected>Seleccione</option>
+                <option selected value="">Seleccione</option>
+                <option value="">No alpica</option>
                 <option>Compras generales (declarantes)</option>
                 <option>Compras generales (no declarantes)</option>
                 <option>Compras con tarjeta debito o credito</option>
@@ -262,7 +306,7 @@
         </div>
         <div class="col-6 ps-1">
           <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100">
-            <span>Inicio</span>
+            <span class="pe-4">Inicio</span>
             <i class="icon-24-outlined-other-location-home"></i>
           </a>
         </div>

@@ -480,6 +480,7 @@ function saveClientData(formData) {
   sheet.getRange(emptyRow, 2, 1, values.length).setValues([values]);
 
   sheet.getRange(emptyRow, 1,).setValue("Valido");
+  agregarCodigoIdentificador(sheet.getName, formData.tipoPersona);
 
   SpreadsheetApp.getUi().alert("Nuevo cliente generado satisfactoriamente");
 }

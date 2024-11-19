@@ -212,20 +212,34 @@ function processForm(data) {
     const lastRow = sheet.getLastRow();
     const newRow = lastRow + 1;
     //Crea las variables para guardar los datos del producto
-    const tipo = data.tipo;
+    const tipo = data.tipoProducto;
     const codigoReferencia = data.codigoReferencia;
     const nombre = data.nombre;
     const precioUnitario = parseFloat(data.precioUnitario);
     const unidadDeMedida = data.unidadDeMedida;
     const referenciaAdicional = data.referenciaAdicional;
-    const numeroReferenciaAdicional = validarReferenciaAdicional(referenciaAdicional);
-    const iva = data.IVA;
-    const tarifaIva = String(data.tarifaIva) + "%";
-    const inc = data.INC;
-    const tarifaInc = String(data.tarifaInc) + "%";
-    const retencionConcepto = validarTipoRetencion(data.retencion, data.tarifaReteRenta);
-    const tarifaRetencion = String(validarTarifaRetencion(data.retencion, data.tarifaReteIva, data.tarifaReteRenta) + "%");
-
+    const numeroReferenciaAdicional = referenciaAdicionalCodigos[referenciaAdicional];
+    let iva = "";
+    let tarifaIva = String(data.tarifaIva) + "%";
+    if (data.tarifaIva !== "0") {
+      iva = "IVA";
+    }
+    if (data.tarifaIva === "0") {
+      tarifaIva = "";
+    }
+    let inc = "";
+    let tarifaInc = String(data.tarifaInc) + "%";
+    if (data.tarifaInc !== "0") {
+      inc = "INC";
+    }
+    if (data.tarifaInc === "0") {
+      tarifaInc = "";
+    }
+    const retencionConcepto = validarTipoRetencion(data.tarifaReteIva, data.tarifaReteRenta);
+    let tarifaRetencion = String(validarTarifaRetencion(data.tarifaReteIva, data.tarifaReteRenta) + "%");
+    if (tarifaRetencion === "0%") {
+      tarifaRetencion = "";
+    }
 
 
     //Asigna los valores a los campos en el sheet
@@ -242,12 +256,12 @@ function processForm(data) {
     sheet.getRange(newRow, 4).setValue(referenciaAdicional);
     //Codigo Referencia Adicional
     sheet.getRange(newRow, 5).setValue(numeroReferenciaAdicional);
+
     //Precio Unitario
     sheet.getRange(newRow, 6).setValue(precioUnitario);
     sheet.getRange(newRow, 6).setHorizontalAlignment('normal');
     sheet.getRange(newRow, 6).setNumberFormat('$#,##0');
     //Unidad de Medida
-    Logger.log("Unidad de medida: " + unidadDeMedida);
     sheet.getRange(newRow, 7).setValue(unidadDeMedida);
     //Columna IVA
     sheet.getRange(newRow, 8).setValue(iva);
@@ -257,7 +271,7 @@ function processForm(data) {
     tarifaIVA.setValue(tarifaIva); // Establece el valor del IVA como decimal
     //Columna INC
     sheet.getRange(newRow, 10).setValue(inc);
-    //Tarifa INC (formatea la celda como porcentaje)
+    //Tarifa INC (formatea la celda como porcentaje)  
     const tarifaINC = sheet.getRange(newRow, 11);
     tarifaINC.setHorizontalAlignment('center');
     tarifaINC.setValue(tarifaInc); // Establece el valor del IVA como decimal
@@ -267,12 +281,16 @@ function processForm(data) {
     //Retencion concepto
     sheet.getRange(newRow, 13).setValue(retencionConcepto);
     //Tarifa Retencion (formatea la celda como porcentaje)
+    Logger.log("tarifaRetencion " + tarifaRetencion)
     const tarifaRetencionCell = sheet.getRange(newRow, 14);
     tarifaRetencionCell.setHorizontalAlignment('center');
     tarifaRetencionCell.setValue(tarifaRetencion); // Establece el valor del IVA como decimal
     tarifaRetencionCell.setNumberFormat('0%'); // Formatea la celda como porcentaje con dos decimales
     //Valor Retencion
     valorRetencion = precioUnitario * (parseFloat(tarifaRetencion) / 100);
+    if (tarifaRetencion === "") {
+      valorRetencion = 0;
+    }
     sheet.getRange(newRow, 15).setValue(valorRetencion);
 
     let referenciaUnica = nombre + "-" + codigoReferencia
@@ -624,9 +642,10 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja) {
 }
 
 function agregarCodigoIdentificador(e, tipoPersona) {
-  hoja = e.source.getActiveSheet();
+  let hoja = e.source.getActiveSheet();
   let range = e.range;
   let rowEditada = range.getRow();
+
 
   if (hoja.getName() == "Clientes") {
     let estadoActual = hoja.getRange(rowEditada, 1).getValue()
