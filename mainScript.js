@@ -654,7 +654,7 @@ function agregarCodigoIdentificador(e, tipoPersona) {
         let nombre = hoja.getRange(rowEditada, 5).getValue()
         let apellido = hoja.getRange(rowEditada, 7).getValue()
         let numeroIdentificacion = hoja.getRange(rowEditada, 10).getValue()
-        let identificadorUnico = nombre + "-" + apellido + "-" + numeroIdentificacion
+        let identificadorUnico = nombre + " " + apellido + "-" + numeroIdentificacion
         hoja.getRange(rowEditada, 23).setValue(identificadorUnico)
 
       } else if (tipoPersona === "Juridica") {

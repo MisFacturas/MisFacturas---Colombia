@@ -103,7 +103,12 @@
         responsabilidadFiscal: document.getElementById('responsabilidadFiscal').value
 
       };
-      google.script.run.saveClientData(formData);
+
+      google.script.run.withSuccessHandler(function (response) {
+
+        resetForm();  // Llamar a resetForm para limpiar el formulario
+      }).saveClientData(formData);
+
 
     } else {
       alert('Por favor complete todos los campos obligatorios.');

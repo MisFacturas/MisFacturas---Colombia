@@ -480,7 +480,12 @@ function saveClientData(formData) {
   sheet.getRange(emptyRow, 2, 1, values.length).setValues([values]);
 
   sheet.getRange(emptyRow, 1,).setValue("Valido");
-  agregarCodigoIdentificador(sheet.getName, formData.tipoPersona);
+  let identificadorUnico = "";
+  if (formData.tipoPersona === "Natural") {
+    identificadorUnico = formData.primerNombre + " " + formData.primerApellido + "-" + formData.numeroIdentificacion;
+  } else {
+    identificadorUnico = formData.nombreComercial + "-" + formData.numeroIdentificacion;
+  }
 
   SpreadsheetApp.getUi().alert("Nuevo cliente generado satisfactoriamente");
 }
