@@ -47,7 +47,7 @@
         const form = document.getElementById('productForm');
         form.dispatchEvent(new Event('submit'));
         google.script.run.openProductosSheet();
-        resetForm(); // Llama a la función para resetear el formulario
+
       } else {
         alert('Por favor complete todos los campos obligatorios.');
       }
@@ -66,7 +66,7 @@
 
 
       google.script.run.withSuccessHandler(function (response) {
-
+        resetForm(); // Llama a la función para resetear el formulario
       }).processForm(data);
     }
 

@@ -138,7 +138,7 @@ function eliminarTotalidadInformacion() {
   borrarInfoHoja(hojaListadoEstado)
   borrarInfoHoja(ClientesInvalidos)
   borrarInfoHoja(hojaDatosEmisor)
-  hojaDatos.getRange("Q11").setValue("")
+  hojaDatos.getRange("Q11").setValue(0)
   hojaDatos.getRange("F47").setValue("")
   hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
   hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
@@ -625,18 +625,20 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja) {
     try {
       let columnaNumIdentificacionP = 2;
       let lastActiveRow = sheet.getLastRow();
+      let codigoNumero = Number(codigo);
       let rangeCodigoReferencia = sheet.getRange(2, columnaNumIdentificacionP, lastActiveRow - 2);
-      let codigosReferencia = String(rangeCodigoReferencia.getValues());
-      codigosReferencia = codigosReferencia.split(",")
-      if (codigosReferencia.includes(String(codigo))) {
-        Logger.log("El código ya existe.");
-        return true
-      } else {
-        Logger.log("El código no existe.");
-        return false
+      let datos = rangeCodigoReferencia.getValues().flat().map(Number);
+      for (let i = 0; i < datos.length; i++) {
+        Logger.log("Datos i" + datos[i])
+        if (datos[i] === codigoNumero) {
+          Logger.log(`El código "${codigoNumero}" ya existe en la hoja "${nombreHoja}".`);
+          return true;
+        }
       }
+      return false;
     } catch (error) {
       Logger.log("Error al verificar el codigo: " + error.message);
+      return false;
     }
   }
 }

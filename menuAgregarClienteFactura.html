@@ -114,6 +114,19 @@
       alert('Por favor complete todos los campos obligatorios.');
     }
   }
+  function resetForm() {
+    const form = document.getElementById('clientForm');
+    form.reset();
+    // Opcional: limpiar los estilos de los campos
+    const camposObligatorios = [
+      'primerApellido', 'segundoApellido', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal'
+    ];
+
+    camposObligatorios.forEach(id => {
+      const campo = document.getElementById(id);
+      campo.style.backgroundColor = '';  // Limpia el color
+    });
+  }
   document.addEventListener('DOMContentLoaded', function () {
     const tipoPersona = document.getElementById('tipoPersona');
     const allFields = [
@@ -251,7 +264,10 @@
 
           <div class="col-md-6">
             <label for="pais" class="form-label">País</label>
-            <input type="text" class="form-control form-control-lg" id="pais" disabled>
+            <input type="text" id="pais" class="form-control form-control-lg" placeholder="Buscar país" autocomplete="off" onkeyup="buscarPais()" disabled>
+            <div class="result-box">
+              <!-- Los resultados se mostrarán aquí -->
+            </div>
           </div>
           <div class="col-md-6">
             <label for="departamento" class="form-label">Departamento</label>
@@ -317,8 +333,9 @@
         <br />
         <div class="col-6 ps-1">
           <a onclick="Back()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
-            <span>Regresar</span>
-            <i class="icon-24-outlined-other-location-home"></i>
+            <i class="icon-left"></i>
+            <span>Atras</span>
+            
           </a>
         </div>
 

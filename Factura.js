@@ -35,6 +35,10 @@ function verificarEstadoValidoFactura(estadoFactura) {
       estadoFactura.push(informacionFactura1[i][0]);
     }
   }
+  if (moneda === "") {
+    estaValido = false;
+    estadoFactura.push("Moneda");
+  }
   if (moneda === "Pesos Colombianos") {
     for (let j = 0; j < 3; j++) {
       if (informacionFactura2[j][1] === "") {
@@ -143,7 +147,7 @@ function agregarProductoDesdeFactura(cantidad, producto) {
     hojaFactura.getRange("L" + String(rowParaDatos)).setValue("=(E" + String(rowParaDatos) + "+F" + String(rowParaDatos) + "+J" + String(rowParaDatos) + "+(K" + String(rowParaDatos) + "*E" + String(rowParaDatos) + "))-(E" + String(rowParaDatos) + "*I" + String(rowParaDatos) + ")")//Total
   }
   updateTotalProductCounter(cargosDescuentosStartRow - 3, productStartRow, hojaFactura, cargosDescuentosStartRow);
-  calcularDescuentosCargosYTotales(cargosDescuentosStartRow - 3, productStartRow, hojaFactura, cargosDescuentosStartRow);
+  calcularDescuentosCargosYTotales(cargosDescuentosStartRow - 3, cargosDescuentosStartRow, hojaFactura);
 }
 
 function recuperarJson() {

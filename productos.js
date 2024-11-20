@@ -49,7 +49,9 @@ function verificarDatosObligatoriosProductos(e) {
         estaVacioOPredeterminado = false;
       }
     }
-    sheet.getRange(rowEditada, 5).setValue(referenciaAdicional[getRange("D" + String(rowEditada)).getValue()]);
+    let referenciaAdicional = sheet.getRange("D" + String(rowEditada)).getValue()
+    let codigoRefAdicional = referenciaAdicionalCodigos[referenciaAdicional]
+    sheet.getRange(rowEditada, 5).setValue(codigoRefAdicional);
   }
 }
 

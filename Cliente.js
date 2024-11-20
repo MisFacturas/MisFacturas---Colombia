@@ -188,7 +188,7 @@ function buscarClientes(terminoBusqueda, hojaA) {
   return resultados;
 }
 function buscarPaises(terminoBusqueda) {
-  let paises = datos_sheet.getRange(25, 1, 170, 1).getValues();
+  let paises = datos_sheet.getRange(25, 1, 195, 1).getValues();
   var resultados = [];
   if (terminoBusqueda === "") {
     return resultados
@@ -481,11 +481,13 @@ function saveClientData(formData) {
 
   sheet.getRange(emptyRow, 1,).setValue("Valido");
   let identificadorUnico = "";
+  Logger.log(formData.tipoPersona)
   if (formData.tipoPersona === "Natural") {
     identificadorUnico = formData.primerNombre + " " + formData.primerApellido + "-" + formData.numeroIdentificacion;
   } else {
     identificadorUnico = formData.nombreComercial + "-" + formData.numeroIdentificacion;
   }
+  sheet.getRange(emptyRow, 23).setValue(identificadorUnico);
 
   SpreadsheetApp.getUi().alert("Nuevo cliente generado satisfactoriamente");
 }
@@ -548,10 +550,14 @@ function verificarDatosObligatorios(e, tipoPersona) {
 
 
 function crearCliente() {
-  showNuevaCliente()
+  showNuevaClienteV2()
 
 }
-
+function showNuevaClienteV2() {
+  var html = HtmlService.createHtmlOutputFromFile('menuAgregarClienteFactura').setTitle("Nuevo Cliente")
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
 function getCustomerInformation(cliente) {
   let celdaCliente = datos_sheet.getRange("H2");
   celdaCliente.setValue(cliente);
