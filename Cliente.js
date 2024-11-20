@@ -22,14 +22,14 @@ function showActivarCliente() {
 
 function inactivarCliente(cliente) {
   let hojaClientesInactivos = spreadsheet.getSheetByName('ClientesInvalidos');
-  let hojaClietnes = spreadsheet.getSheetByName("Clientes")
+  let hojaClientes = spreadsheet.getSheetByName("Clientes")
   Logger.log(cliente)
   datos_sheet.getRange("H2").setValue(cliente)
 
 
   let rowDelCliente = datos_sheet.getRange("G2").getValue();
   let rowMaximaClientesInactivos = hojaClientesInactivos.getLastRow() + 1;
-  let rowMaximaClientes = hojaClietnes.getLastRow() + 1;
+  let rowMaximaClientes = hojaClientes.getLastRow() + 1;
 
   let codigoCliente = datos_sheet.getRange("I2").getValue();
   let tipoDoc = datos_sheet.getRange("J2").getValue();
@@ -84,19 +84,20 @@ function inactivarCliente(cliente) {
 
   //eliminar cliente de la hoja clientes
 
-  hojaClietnes.deleteRow(rowDelCliente)
-  hojaClietnes.insertRowAfter(rowMaximaClientes)
+  hojaClientes.deleteRow(rowDelCliente)
+  hojaClientes.insertRowAfter(rowMaximaClientes)
+  SpreadsheetApp.getUi().alert("El cliente se ha inactivado satisfactoriamente");
 }
 
 function activarCliente(cliente) {
   let hojaClientesInactivos = spreadsheet.getSheetByName('ClientesInvalidos');
-  let hojaClietnes = spreadsheet.getSheetByName("Clientes")
+  let hojaClientes = spreadsheet.getSheetByName("Clientes")
   Logger.log(cliente)
   datos_sheet.getRange("I6").setValue(cliente)
 
   let rowDelCliente = datos_sheet.getRange("G6").getValue();
   let rowMaximaClientesInactivos = hojaClientesInactivos.getLastRow() + 1;
-  let rowMaximaClientes = hojaClietnes.getLastRow() + 1;
+  let rowMaximaClientes = hojaClientes.getLastRow() + 1;
 
   let estado = datos_sheet.getRange('H6').getValue();
   let tipoTercero = datos_sheet.getRange('J6').getValue();
@@ -121,29 +122,29 @@ function activarCliente(cliente) {
   let detallesTributarios = datos_sheet.getRange('AC6').getValue();
   let responsabilidadFiscal = datos_sheet.getRange('AD6').getValue();
 
-  hojaClietnes.getRange(rowMaximaClientes, 1).setValue(estado);
-  hojaClietnes.getRange(rowMaximaClientes, 2).setValue(cliente);
-  hojaClietnes.getRange(rowMaximaClientes, 3).setValue(tipoTercero);
-  hojaClietnes.getRange(rowMaximaClientes, 4).setValue(tipoPersona);
-  hojaClietnes.getRange(rowMaximaClientes, 5).setValue(tipoDoc);
-  hojaClietnes.getRange(rowMaximaClientes, 6).setValue(numIdentificacion);
-  hojaClietnes.getRange(rowMaximaClientes, 7).setValue(codigoCliente);
-  hojaClietnes.getRange(rowMaximaClientes, 8).setValue(regimen);
-  hojaClietnes.getRange(rowMaximaClientes, 9).setValue(nombreComercial);
-  hojaClietnes.getRange(rowMaximaClientes, 10).setValue(primerNombre);
-  hojaClietnes.getRange(rowMaximaClientes, 11).setValue(segundoNombre);
-  hojaClietnes.getRange(rowMaximaClientes, 12).setValue(primerApellido);
-  hojaClietnes.getRange(rowMaximaClientes, 13).setValue(segundoApellido);
-  hojaClietnes.getRange(rowMaximaClientes, 14).setValue(pais);
-  hojaClietnes.getRange(rowMaximaClientes, 15).setValue(departamento);
-  hojaClietnes.getRange(rowMaximaClientes, 16).setValue(municipio);
-  hojaClietnes.getRange(rowMaximaClientes, 17).setValue(direccion);
-  hojaClietnes.getRange(rowMaximaClientes, 18).setValue(codigoPostal);
-  hojaClietnes.getRange(rowMaximaClientes, 19).setValue(telefono);
-  hojaClietnes.getRange(rowMaximaClientes, 20).setValue(sitioWeb);
-  hojaClietnes.getRange(rowMaximaClientes, 21).setValue(email);
-  hojaClietnes.getRange(rowMaximaClientes, 22).setValue(detallesTributarios);
-  hojaClietnes.getRange(rowMaximaClientes, 23).setValue(responsabilidadFiscal);
+  hojaClientes.getRange(rowMaximaClientes, 1).setValue(estado);
+  hojaClientes.getRange(rowMaximaClientes, 2).setValue(cliente);
+  hojaClientes.getRange(rowMaximaClientes, 3).setValue(tipoTercero);
+  hojaClientes.getRange(rowMaximaClientes, 4).setValue(tipoPersona);
+  hojaClientes.getRange(rowMaximaClientes, 5).setValue(tipoDoc);
+  hojaClientes.getRange(rowMaximaClientes, 6).setValue(numIdentificacion);
+  hojaClientes.getRange(rowMaximaClientes, 7).setValue(codigoCliente);
+  hojaClientes.getRange(rowMaximaClientes, 8).setValue(regimen);
+  hojaClientes.getRange(rowMaximaClientes, 9).setValue(nombreComercial);
+  hojaClientes.getRange(rowMaximaClientes, 10).setValue(primerNombre);
+  hojaClientes.getRange(rowMaximaClientes, 11).setValue(segundoNombre);
+  hojaClientes.getRange(rowMaximaClientes, 12).setValue(primerApellido);
+  hojaClientes.getRange(rowMaximaClientes, 13).setValue(segundoApellido);
+  hojaClientes.getRange(rowMaximaClientes, 14).setValue(pais);
+  hojaClientes.getRange(rowMaximaClientes, 15).setValue(departamento);
+  hojaClientes.getRange(rowMaximaClientes, 16).setValue(municipio);
+  hojaClientes.getRange(rowMaximaClientes, 17).setValue(direccion);
+  hojaClientes.getRange(rowMaximaClientes, 18).setValue(codigoPostal);
+  hojaClientes.getRange(rowMaximaClientes, 19).setValue(telefono);
+  hojaClientes.getRange(rowMaximaClientes, 20).setValue(sitioWeb);
+  hojaClientes.getRange(rowMaximaClientes, 21).setValue(email);
+  hojaClientes.getRange(rowMaximaClientes, 22).setValue(detallesTributarios);
+  hojaClientes.getRange(rowMaximaClientes, 23).setValue(responsabilidadFiscal);
 
   hojaClientesInactivos.deleteRow(rowDelCliente)
   hojaClientesInactivos.insertRowAfter(rowMaximaClientesInactivos)
@@ -157,7 +158,7 @@ function buscarClientes(terminoBusqueda, hojaA) {
 
     var sheet = spreadsheet.getSheetByName('ClientesInvalidos');
     var ultimaFila = sheet.getLastRow();
-    var valores = sheet.getRange(2, 2, ultimaFila - 1, 1).getValues();
+    var valores = sheet.getRange(2, 23, ultimaFila - 1, 1).getValues();
 
     for (var i = 0; i < valores.length; i++) {
       var valor = valores[i][0]; // Accede al primer (y único) valor de cada fila
@@ -168,7 +169,7 @@ function buscarClientes(terminoBusqueda, hojaA) {
   }
 
   var ultimaFila = sheet.getLastRow();
-  var valores = sheet.getRange(2, 2, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
+  var valores = sheet.getRange(2, 23, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
 
 
   if (terminoBusqueda === "") {
