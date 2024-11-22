@@ -58,7 +58,7 @@ function verificarEstadoValidoFactura(estadoFactura) {
   // Verificar si se agregaron productos
   let totalProductos = hojaFactura.getRange("A16").getValue();
 
-  if (totalProductos === "Total productos") {
+  if (totalProductos === "Total filas") {
     // no hay necesidad de encontrar TOTAL PRODUCTOS si no esta, porque eso implica que si anadio asi sea 1 prodcuto
     let valorTotalProductos = hojaFactura.getRange("B16").getValue();
     if (valorTotalProductos === 0 || valorTotalProductos === "") {
@@ -159,8 +159,9 @@ function recuperarJson() {
   return json;
 }
 function enviarFactura() {
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let schemaID = 31;
-  let idNumber = 900091496;
+  let idNumber = hojaDatosEmisor.getRange("B3").getValue();
   let templateID = 73;
   let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/insertinvoice?SchemaID=${schemaID}&IDNumber=${idNumber}&TemplateID=${templateID}`;
   let json = recuperarJson();
@@ -416,7 +417,7 @@ function guardarYGenerarInvoice() {
 
   //obtener el total de prodcutos
   let posicionTotalProductos = prefactura_sheet.getRange("A16").getValue(); // para verificar donde esta el TOTAL
-  if (posicionTotalProductos === "Total productos") {
+  if (posicionTotalProductos === "Total filas") {
     var cantidadProductos = prefactura_sheet.getRange("B16").getValue();// cantidad total de productos 
   } else {
     let startingRowTax = getcargosDescuentosStartRow(prefactura_sheet)

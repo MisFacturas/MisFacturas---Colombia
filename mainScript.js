@@ -504,7 +504,7 @@ function getLastProductRow(sheet, productStartRow, cargosDescuentosStartRow) {
   for (let row = productStartRow; row < cargosDescuentosStartRow; row++) {
 
     let valorCeldaActual = sheet.getRange(row, 1).getValue()
-    if (valorCeldaActual === "Total productos") {
+    if (valorCeldaActual === "Total filas") {
       return lastProductRow
     } else {
       lastProductRow = row;
