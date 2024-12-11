@@ -1358,6 +1358,8 @@ var departamentosCodigos = {
 };
 
 var reteRentaValores = {
+  "Retencion sobre el IVA 15%": 15.00,
+  "Retencion sobre el IVA 100%": 100.00,
   "Compras generales (declarantes)": 2.50,
   "Compras generales (no declarantes)": 3.50,
   "Compras con tarjeta debito o credito": 1.50,

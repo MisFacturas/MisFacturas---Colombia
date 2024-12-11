@@ -166,30 +166,45 @@ function enviarFactura() {
   let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/insertinvoice?SchemaID=${schemaID}&IDNumber=${idNumber}&TemplateID=${templateID}`;
   let json = recuperarJson();
   let hojaDatos = spreadsheet.getSheetByName('Datos');
-  let APIkey = hojaDatos.getRange("F47").getValue();
+  let token = hojaDatos.getRange("F47").getValue();
   let opciones = {
     "method": "post",
     "contentType": "application/json",
     "payload": json,
-    "headers": {"Authorization": "misfacturas " + APIkey},
+    "headers": { "Authorization": "misfacturas " + token },
     'muteHttpExceptions': true
   };
   Logger.log("Enviar factura antes del try");
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
+    var estatusRespuesta = respuesta.getResponseCode();
+    Logger.log("Estatus de la respuesta: " + estatusRespuesta);
+
     var contenidoRespuesta = respuesta.getContentText();
-    Logger.log(contenidoRespuesta); // Muestra la respuesta de la API en los logs
-    SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
+    contenidoRespuesta = JSON.parse(contenidoRespuesta);
+    Logger.log(contenidoRespuesta);
+
+    if (contenidoRespuesta["DocumentId"] && contenidoRespuesta["MessageValidation"] === "Factura insertada existosamente") {
+      Logger.log(contenidoRespuesta["DocumentId"], contenidoRespuesta["MessageValidation"]);
+      SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
+      limpiarHojaFactura(); 
+    } else {
+      SpreadsheetApp.getUi().alert(
+        "Error al enviar la factura: " +
+        (contenidoRespuesta["Message"] || "Respuesta desconocida")
+      );
+    }
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
     SpreadsheetApp.getUi().alert("Error al enviar la factura a misfacturas. Intente de nuevo si el error presiste comuniquese con soporte");
   }
-  limpiarHojaFactura();
+
 }
 
-function obtenerAPIkey(usuario, contra) {
+function obtenerTokenMF(usuario, contra) {
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaDatos = spreadsheet.getSheetByName("Datos")
+
   let url = `https://misfacturas.cenet.ws/IntegrationAPI_2/api/login?username=${usuario}&password=${contra}`;
   let opciones = {
     "method": "post",
@@ -210,14 +225,17 @@ function obtenerAPIkey(usuario, contra) {
       throw new Error("Respuesta inesperada de la API. No es JSON válido.");
     }
 
-    // Verificar si la respuesta contiene un API Key en el formato esperado
+    // Verificar si la respuesta contiene un token en el formato esperado
     if (respuestaJson.length > 0 && typeof respuestaJson === 'string') {
-      let apiKey = respuestaJson; // Extrae el API Key
-      Logger.log("API Key obtenida: " + apiKey);
+      let token = respuestaJson; // Extrae el API Key
+      Logger.log("API Key obtenida: " + token);
       SpreadsheetApp.getUi().alert("Se ha vinculado tu cuenta exitosamente");
+      hojaDatos.getRange("F49").setValue(usuario)
+      hojaDatos.getRange("F50").setValue(contra)
       hojaDatosEmisor.getRange("B13").setBackground('#ccffc7')  // Almacena el API Key en la celda
       hojaDatosEmisor.getRange("B13").setValue("Vinculado")
-      hojaDatos.getRange("F47").setValue(apiKey)
+      hojaDatos.getRange("F47").setValue(token)
+      obtenerResolucionesDian(token, usuario);
     } else {
       hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
       hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
@@ -234,6 +252,73 @@ function obtenerAPIkey(usuario, contra) {
   }
 }
 
+function obtenerResolucionesDian(token, usuario) {
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let hojaDatos = spreadsheet.getSheetByName("Datos")
+  if (!token || !usuario) {
+    usuario = hojaDatos.getRange("F49").getValue();
+    token = hojaDatos.getRange("F47").getValue();
+  }
+
+  let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${usuario}`;
+  let opciones = {
+    "method": "get",
+    "headers": { "Authorization": "misfacturas " + token },
+    "contentType": "application/json",
+    'muteHttpExceptions': true
+  };
+
+  try {
+    const respuesta = UrlFetchApp.fetch(url, opciones);
+    const contenidoTexto = respuesta.getContentText(); // Obtiene el cuerpo de la respuesta como texto
+    const datos = JSON.parse(contenidoTexto); // Convierte el texto a un objeto JSON
+
+    if (datos.InvoiceAuthorizationList && datos.InvoiceAuthorizationList.length > 0) {
+      const encabezados = [
+        "InvoiceAuthorizationNumber",
+        //"ResolutionDateTime",
+        //"StartDate",
+        //"EndDate",
+        "Prefix",
+        "From",
+        "To",
+        //"TechnicalKey",
+        "CurrentSecuence",
+        "Estado",
+        //"Observaciones"
+      ];
+
+
+      //hojaDatosEmisor.getRange(17, 1, 1, encabezados.length).setValues([encabezados]);
+
+      // Preparar los datos para escribirlos en el sheet
+      const filas = datos.InvoiceAuthorizationList.map(item => [
+        item.InvoiceAuthorizationNumber,
+        //item.ResolutionDateTime,
+        //item.StartDate,
+        //item.EndDate,
+        item.Prefix,
+        item.From,
+        item.To,
+        //item.TechnicalKey,
+        item.CurrentSecuence,
+        item.Estado,
+        //item.Observaciones
+      ]);
+
+      // Escribir los datos en la hoja, debajo de los encabezados
+      hojaDatosEmisor.getRange(18, 1, filas.length, encabezados.length).setValues(filas);
+
+    } else {
+      throw new Error("Error de la API: " + contenidoRespuesta); // Muestra el error de la API
+
+    }
+  } catch (error) {
+
+    SpreadsheetApp.getUi().alert("Error al obtener las resoluciones dian. Verifica que el usuario y la contraseña estén correctos e intenta de nuevo. Si el error persiste, comunícate con soporte.");
+  }
+
+}
 
 function limpiarHojaFactura() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -257,6 +342,7 @@ function limpiarHojaFactura() {
   const hojaFacturaPost = spreadsheet.getSheetByName('Factura');
   spreadsheet.setActiveSheet(hojaFacturaPost)
   Logger.log("La hoja 'Factura' ha sido reemplazada correctamente.");
+  grabarRangoResolucionesDian(hojaFacturaPost);
 }
 
 
@@ -363,6 +449,37 @@ function obtenerDatosProductos(sheet, range, e) {
 
 }
 
+function grabarRangoResolucionesDian(hojaFactura) {
+  var hojaDatosEmisor = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
+
+  var columnaBase = hojaDatosEmisor.getRange("A18:A").getValues(); // Ajustar la columna según tu necesidad
+  var valoresValidos = [];
+
+  // Filtrar valores no vacíos
+  for (var i = 0; i < columnaBase.length; i++) {
+    if (columnaBase[i][0] !== "") {
+      valoresValidos.push(columnaBase[i][0]);
+    }
+  }
+
+  if (valoresValidos.length === 0) {
+    Logger.log("No hay valores válidos en el rango.");
+    return;
+  }
+
+  // Crear el rango de validación dinámico
+  var reglaDeValidacion = SpreadsheetApp.newDataValidation()
+    .requireValueInList(valoresValidos, true) // Lista desplegable basada en los valores encontrados
+    .setAllowInvalid(false) // No permitir valores fuera de la lista
+    .build();
+
+  // Aplicar la validación al rango donde quieres el dropdown
+  var rangoDropdown = hojaFactura.getRange("H3"); // Ajusta el rango donde irá el dropdown
+  rangoDropdown.setDataValidation(reglaDeValidacion);
+  Logger.log("Dropdown creado exitosamente.");
+
+}
+
 function getInvoiceGeneralInformation() {
 
   //Recuperar los datos de la factura del sheets
@@ -411,21 +528,29 @@ function getPaymentSummary() {
 function guardarYGenerarInvoice() {
   let datosSheet = spreadsheet.getSheetByName('Datos');
   let hojaProductos = spreadsheet.getSheetByName('Productos');
-  let consecutivoFactura = datosSheet.getRange("Q11").getValue();
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let consecutivoFactura = hojaFactura.getRange("H2").getValue();
   let consecutivoFacturaActualizado = consecutivoFactura + 1;
-  datosSheet.getRange("Q11").setValue(consecutivoFacturaActualizado);
-
-  //obtener el total de prodcutos
-  let posicionTotalProductos = prefactura_sheet.getRange("A16").getValue(); // para verificar donde esta el TOTAL
-  if (posicionTotalProductos === "Total filas") {
-    var cantidadProductos = prefactura_sheet.getRange("B16").getValue();// cantidad total de productos 
-  } else {
-    let startingRowTax = getcargosDescuentosStartRow(prefactura_sheet)
-    let posicionTotalProductos = startingRowTax - 2
-    var cantidadProductos = prefactura_sheet.getRange("B" + String(posicionTotalProductos)).getValue();// cantidad total de productos
+  let numeroAutorizacion = hojaFactura.getRange("H3").getValue();
+  for (let i = 18; i <= 20; i++) {
+    if (hojaDatosEmisor.getRange(i, 1).getValue() == numeroAutorizacion) {
+      consecutivoFactura = hojaDatosEmisor.getRange(i, 5).setValue(consecutivoFacturaActualizado);
+      break;
+    }
   }
 
-  let llavesParaLinea = prefactura_sheet.getRange("A14:L14");//llamo los headers 
+  //obtener el total de prodcutos
+  let posicionTotalProductos = hojaFactura.getRange("A16").getValue(); // para verificar donde esta el TOTAL
+  if (posicionTotalProductos === "Total filas") {
+    var cantidadProductos = hojaFactura.getRange("B16").getValue();// cantidad total de productos 
+  } else {
+    let startingRowTax = getcargosDescuentosStartRow(hojaFactura)
+    let posicionTotalProductos = startingRowTax - 2
+    var cantidadProductos = hojaFactura.getRange("B" + String(posicionTotalProductos)).getValue();// cantidad total de productos
+  }
+
+  let llavesParaLinea = hojaFactura.getRange("A14:L14");//llamo los headers 
   llavesParaLinea = slugifyF(llavesParaLinea.getValues()).replace(/\s/g, ''); // Todo en una sola linea
   const llavesFinales = llavesParaLinea.split(",");
   /* Creo que esto se puede cambiar a una manera mas simple, ya que los headers de la fila H7 hatsa N7 nunca van a cambiar */
@@ -435,7 +560,7 @@ function guardarYGenerarInvoice() {
   let i = 15 // es 15 debido a que aqui empieza los productos elegidos por el cliente
   do {
     let filaActual = "A" + String(i) + ":L" + String(i);
-    let rangoProductoActual = prefactura_sheet.getRange(filaActual);
+    let rangoProductoActual = hojaFactura.getRange(filaActual);
     let productoFilaActual = String(rangoProductoActual.getValues());
     productoFilaActual = productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
     let LineaFactura = {};
@@ -576,16 +701,16 @@ function guardarYGenerarInvoice() {
 
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = prefactura_sheet.getRange("A29").getValue(); // para verificar donde esta el TOTAL
+  const posicionOriginalTotalFactura = hojaFactura.getRange("A29").getValue(); // para verificar donde esta el TOTAL
   let rangeTotales = ""
 
 
   if (posicionOriginalTotalFactura === "Subtotal") {
-    rangeTotales = prefactura_sheet.getRange(29, 1, 1, 12);//va a cambiar
+    rangeTotales = hojaFactura.getRange(29, 1, 1, 12);//va a cambiar
 
   } else {
-    let rowTotales = getTotalesLinea(prefactura_sheet)
-    rangeTotales = prefactura_sheet.getRange(rowTotales, 1, 1, 12);
+    let rowTotales = getTotalesLinea(hojaFactura)
+    rangeTotales = hojaFactura.getRange(rowTotales, 1, 1, 12);
   }
 
   let totalesValores = String(rangeTotales.getValues())
@@ -595,10 +720,9 @@ function guardarYGenerarInvoice() {
   //Definir los valores para el json
   let pfSubTotal = parseFloat(totalesValores[0]);
   let pfBaseGrabable = parseFloat(totalesValores[1]);
-  let pfSubTotalMasImpuestos = parseFloat(totalesValores[2]);
+  let pfSubTotalMasImpuestos = parseFloat(totalesValores[3]);
   let pfRetenciones = parseFloat(totalesValores[4]);
   let pfCargos = parseFloat(totalesValores[7]);
-  let pfTotal = parseFloat(totalesValores[8]);
   let pfAnticipo = parseFloat(totalesValores[9]);
   let pfNetoAPagar = parseFloat(totalesValores[10]);
   if (pfAnticipo = null) {
@@ -606,8 +730,8 @@ function guardarYGenerarInvoice() {
   }
 
   let invoice_total = {
-    "lineExtensionamount": pfBaseGrabable,
-    "TaxExclusiveAmount": pfSubTotal,
+    "lineExtensionamount": pfSubTotal,
+    "TaxExclusiveAmount": pfBaseGrabable,
     "TaxInclusiveAmount": pfSubTotalMasImpuestos,
     "AllowanceTotalAmount": pfRetenciones,
     "ChargeTotalAmount": pfCargos,
@@ -616,7 +740,7 @@ function guardarYGenerarInvoice() {
   }
 
 
-  let cliente = prefactura_sheet.getRange("B2").getValue();
+  let cliente = hojaFactura.getRange("B2").getValue();
   let InvoiceGeneralInformation = getInvoiceGeneralInformation();
   let CustomerInformation = getCustomerInformation(cliente);
 
@@ -668,10 +792,10 @@ function guardarYGenerarInvoice() {
     Documents: []
   });
 
-  let nombreCliente = prefactura_sheet.getRange("B2").getValue();
+  let nombreCliente = hojaFactura.getRange("B2").getValue();
   let numeroFactura = InvoiceGeneralInformation.InvoiceNumber;
   let fecha = obtenerFecha();
-  let codigoCliente = prefactura_sheet.getRange("B3").getValue();
+  let codigoCliente = hojaFactura.getRange("B3").getValue();
   listadoestado_sheet.appendRow(["vacio", fecha, "vacio", numeroFactura, nombreCliente, codigoCliente, "vacio", "vacio", "Vacio", invoice, nuevoInvoiceResumido]);
 
   SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente, aguarde unos segundos");

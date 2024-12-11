@@ -21,7 +21,8 @@
     function obtenerToken() {
       let contra = document.getElementById('Contra').value;
       let usuario = document.getElementById("Usuario").value;
-      google.script.run.obtenerAPIkey(usuario, contra);
+      google.script.run.obtenerTokenMF(usuario, contra);
+      showMenuPrincipal();
     }
 
     function generarToken() {
