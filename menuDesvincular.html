@@ -34,6 +34,10 @@
       google.script.run.showSidebar();
     }
 
+    function showConfiguracion() {
+      google.script.run.showConfiguracion();
+    }
+
 
     function Desvincular() {
       const inputText = document.getElementById('confirmacionTexto').value;
@@ -52,13 +56,13 @@
       <div id="logo" class="d-flex justify-content-center bg-primary">
         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
       </div>
-      <div class="row mt-4 px-4 gx-0">
-        <div class="col-1 p-0">
-          <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
-        </div>
-        <div class="col-7 p-0 d-flex align-items-center">
-          <h2 class="mb-0 ms-4"> Desvincular misfacturas</h2>
-        </div>
+      <div class="mt-4 px-4 gx-0 d-flex flex-column">
+        <a onclick="showConfiguracion()" class="btn btn-dark btn-fluid"><i class="icon-left"></i>
+          <span>Regresar</span></a>
+      </div>
+      <div class="col-12 text-center py-4"></div>
+      <div class="px-4 gx-0 d-flex flex-column">
+        <h2 class="text-center">Desvincular Cuenta</h1>
       </div>
     </header>
 

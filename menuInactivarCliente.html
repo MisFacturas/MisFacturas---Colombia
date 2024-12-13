@@ -25,15 +25,13 @@
       <div id="logo" class="d-flex justify-content-center bg-primary">
         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
       </div>
-
-      <div class="row mt-4 px-5 gx-0">
-        <div class="col-1 p-0">
-          <a onclick="Back()"><i class="icon-left nav-icon"></i></a>
-        </div>
-        <div class="col-7 p-0 d-flex align-items-center">
-          <h2 class="mb-0 ms-4">Inactivar Cliente</h2>
-        </div>
-
+      <div class="mt-4 px-4 gx-0 d-flex flex-column">
+        <a onclick="Back()" class="btn btn-dark btn-fluid"><i class="icon-left"></i>
+          <span>Regresar</span></a>
+      </div>
+      <div class="col-12 text-center py-4"></div>
+      <div class="px-4 gx-0 d-flex flex-column">
+        <h2 class="text-center">Inactivar Cliente</h1>
       </div>
     </header>
 
@@ -74,13 +72,6 @@
           </a>
         </div>
         <br />
-        <div class="col-6 ps-1">
-          <a onclick="Back()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
-            <i class="icon-left"></i>
-            <span>Atras</span>
-
-          </a>
-        </div>
       </div>
     </footer>
   </div>
@@ -94,6 +85,7 @@
       var cliente = document.getElementById('buscarCliente').value;
       console.log("cliente:", cliente);
       google.script.run.inactivarCliente(cliente);
+      document.getElementById('buscarCliente').value = '';
     }
 
     function buscarClientes() {

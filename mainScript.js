@@ -340,7 +340,7 @@ function onEdit(e) {
       hojaActual.getRange("H2").setValue(consecutivoFactura);
     }
 
-    else if (rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
+    else if (rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3 || colEditada == 9 || colEditada == 10) && rowEditada < posRowTotalProductos) {//asegurar que si sea dentro del espacio permititdo(donde empieza el taxinfo)
 
       let i = rowEditada;
       let productoFilaI = factura_sheet.getRange("B" + String(i)).getValue()
@@ -522,12 +522,14 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
   hojaActual.getRange("C" + String(rowParaTotales)).setValue("=SUM(F15:F" + String(lastRowProducto) + ")")
   //subtotal mas impuestos
   hojaActual.getRange("D" + String(rowParaTotales)).setValue("=A" + String(rowParaTotales) + "+C" + String(rowParaTotales))
+  
   //retenciones
   hojaActual.getRange("E" + String(rowParaTotales)).setValue("=SUM(K15:K" + String(lastRowProducto) + ")")
 
   //descuentos
   let descuentosPorProductos = calcularDescuentos(hojaActual, lastRowProducto)
-  hojaActual.getRange("F" + String(rowParaTotales)).setValue(descuentosPorProductos + totalDescuentosSeccionCargosyDescuentos.descuentos)
+  Logger.log("descuentosPorProductos " + totalDescuentosSeccionCargosyDescuentos.descuentos)
+  hojaActual.getRange("F" + String(rowParaTotales)).setValue(descuentosPorProductos + Number(totalDescuentosSeccionCargosyDescuentos.descuentos))
 
   //cargos
   hojaActual.getRange("H" + String(rowParaTotales)).setValue("=SUM(J15:J" + String(lastRowProducto) + ")+" + totalDescuentosSeccionCargosyDescuentos.cargos)
@@ -538,19 +540,19 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
 }
 
 function calcularDescuentos(hojaActual, lastRowProducto) {
-  const rangoDatos = hojaActual.getRange("E15:K" + String(lastRowProducto)).getValues();
+  let rangoDatos = hojaActual.getRange("E15:K" + String(lastRowProducto)).getValues();
   let resultado = 0;
 
-  // Iterar sobre las filas del rango
   rangoDatos.forEach(fila => {
-    Logger.log(fila)
-    const suma = Number(fila[0]) + Number(fila[1]) + Number(fila[5]) + Number(fila[6]);
-
-    const producto = suma * Number(fila[4]);
+    //suma = subtotal + impuestos + cargos + retencion
+    let suma = Number(fila[0]) + Number(fila[1]) + Number(fila[5]) + Number(fila[6]);
+    //producto = suma * descuento
+    let producto = suma * Number(fila[4]);
     resultado += producto;
+    
   });
 
-
+  Logger.log("resultado " + resultado)
   return resultado;
 
 }

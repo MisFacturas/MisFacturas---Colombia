@@ -37,15 +37,13 @@
       <div id="logo" class="d-flex justify-content-center bg-primary">
         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
       </div>
-
-      <div class="row mt-4 px-4 gx-0">
-        <div class="col-1 p-0">
-          <a onclick="showMenuPrincipal()"><i class="icon-left nav-icon"></i></a>
-        </div>
-        <div class="col-7 p-0 d-flex align-items-center">
-          <h2 class="mb-0 ms-4">Productos</h2>
-        </div>
-
+      <div class="mt-4 px-4 gx-0 d-flex flex-column">
+        <a onclick="showMenuPrincipal()" class="btn btn-dark btn-fluid"><i class="icon-left"></i>
+          <span>Regresar</span></a>
+      </div>
+      <div class="col-12 text-center py-4"></div>
+      <div class="px-4 gx-0 d-flex flex-column">
+        <h2 class="text-center">Productos</h1>
       </div>
     </header>
 
@@ -60,7 +58,7 @@
 
         <a onclick="openProductos()" class="btn btn-lg btn-outline-secondary mb-2"><i class="icon-list"></i><span>Lista
             de productos</span></a>
-        <a onclick="openAgregarProducto()" class="btn btn-lg btn-outline-secondary mb-2"><i
+        <a onclick="openAgregarProducto()" class="btn btn-lg btn-primary mb-2"><i
             class="icon-box-plus"></i><span>Crear producto</span></a>
 
 

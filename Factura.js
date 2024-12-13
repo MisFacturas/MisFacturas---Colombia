@@ -1,9 +1,4 @@
-PREFACTURA_ROW = 3;
-PREFACTURA_COLUMN = 2;
-COL_TOTALES_PREFACTURA = 11;// K
-FILA_INICIAL_PREFACTURA = 8;
-COLUMNA_FINAL = 50;
-ADDITIONAL_ROWS = 3 + 3; //(Personalizacion)
+
 
 var spreadsheet = SpreadsheetApp.getActive();
 var prefactura_sheet = spreadsheet.getSheetByName('Factura');
@@ -75,6 +70,7 @@ function guardarFactura() {
   verificarEstadoValidoFactura(estadoFactura);
   if (estadoFactura[0] === true) {
     guardarYGenerarInvoice();
+    logearUsuario();
     enviarFactura();
   } else {
     let mensajeError = "La factura no es válida. Por favor rellene los campos obligatorios:\n" + estadoFactura.join("\n- ");
@@ -158,6 +154,25 @@ function recuperarJson() {
   Logger.log(json);
   return json;
 }
+
+function logearUsuario() {
+  let hojaDatos = spreadsheet.getSheetByName('Datos');
+  let usuario = hojaDatos.getRange("F49").getValue();
+  let contrasena = hojaDatos.getRange("F50").getValue();
+
+  let url = `https://misfacturas.cenet.ws/IntegrationAPI_2/api/login?username=${usuario}&password=${contrasena}`;
+  let opciones = {
+    "method": "post",
+    "contentType": "application/json",
+    'muteHttpExceptions': true
+  };
+  let respuesta = UrlFetchApp.fetch(url, opciones);
+  let contenidoRespuesta = respuesta.getContentText();
+  let token = JSON.parse(contenidoRespuesta);
+  hojaDatos.getRange("F47").setValue(token);
+  Logger.log("Usuario loggeado para generar resoluciones o mandar la factura");
+}
+
 function enviarFactura() {
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let schemaID = 31;
@@ -187,7 +202,7 @@ function enviarFactura() {
     if (contenidoRespuesta["DocumentId"] && contenidoRespuesta["MessageValidation"] === "Factura insertada existosamente") {
       Logger.log(contenidoRespuesta["DocumentId"], contenidoRespuesta["MessageValidation"]);
       SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
-      limpiarHojaFactura(); 
+      limpiarHojaFactura();
     } else {
       SpreadsheetApp.getUi().alert(
         "Error al enviar la factura: " +
@@ -200,6 +215,7 @@ function enviarFactura() {
   }
 
 }
+
 
 function obtenerTokenMF(usuario, contra) {
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
@@ -257,6 +273,7 @@ function obtenerResolucionesDian(token, usuario) {
   let hojaDatos = spreadsheet.getSheetByName("Datos")
   if (!token || !usuario) {
     usuario = hojaDatos.getRange("F49").getValue();
+    logearUsuario();
     token = hojaDatos.getRange("F47").getValue();
   }
 
@@ -565,7 +582,7 @@ function guardarYGenerarInvoice() {
     productoFilaActual = productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
     let LineaFactura = {};
 
-    for (let j = 0; j < 12; j++) {// original dice que son 11=COL_TOTALES_PREFACTURA deberian ser 10 creo
+    for (let j = 0; j < 12; j++) {
       LineaFactura[llavesFinales[j]] = productoFilaActual[j]
     }
     let filaProducto = obtenerFilaPorReferencia(Number(LineaFactura['referencia']));
@@ -574,14 +591,22 @@ function guardarYGenerarInvoice() {
     let ItemReference = String(LineaFactura['referencia']);
     let Name = String(LineaFactura['producto']);
     let Quantity = String(LineaFactura['cantidad']);
-    let Price = Number(LineaFactura['preciounitario']);
-    let LineAllowanceTotal = parseFloat(LineaFactura['descuento%']);
-    let LineChargeTotal = Number(LineaFactura['cargos']);
+    let Price = Number(LineaFactura['preciounitario']); 
+    let LineChargeTotal = Number(LineaFactura['cargos']) + Number(LineaFactura['retencion']);
+    let chargeIndicator = false;
+    if (LineChargeTotal !== 0) {
+      chargeIndicator = true;
+    }
     let LineTotalTaxes = Number(LineaFactura['impuestos']);
     let LineTotal = parseFloat(LineaFactura['totaldelinea']);
     let LineExtensionAmount = parseFloat(LineaFactura['subtotal']);
+    Logger.log(LineaFactura['descuento%'])
+    let LineAllowanceTotal = (LineExtensionAmount + LineTotalTaxes + LineChargeTotal) * Number(LineaFactura['descuento%']);
     let MeasureUnitCode = String(codigosUnidadDeMedida[unidadDeMedida]);
+    
     let ItemTaxesInformation = [];
+    
+
 
     function obtenerFilaPorReferencia(referencia) {
       const hojaProductos = spreadsheet.getSheetByName('Productos');
@@ -630,6 +655,7 @@ function guardarYGenerarInvoice() {
       return ItemTaxesInformation;
     }
 
+
     let productoI = {//aqui organizamos todos los parametros necesarios para 
       ItemReference: ItemReference,
       Name: Name,
@@ -642,7 +668,7 @@ function guardarYGenerarInvoice() {
       LineTotal: LineTotal,
       LineExtensionAmount: LineExtensionAmount,
       MeasureUnitCode: MeasureUnitCode,
-      FreeOFChargeIndicator: false,
+      FreeOFChargeIndicator: chargeIndicator,
       AdditionalReference: [],
       Nota: "",
       AdditionalProperty: [],
@@ -722,6 +748,7 @@ function guardarYGenerarInvoice() {
   let pfBaseGrabable = parseFloat(totalesValores[1]);
   let pfSubTotalMasImpuestos = parseFloat(totalesValores[3]);
   let pfRetenciones = parseFloat(totalesValores[4]);
+  let pfDescuentos = parseFloat(totalesValores[5]);
   let pfCargos = parseFloat(totalesValores[7]);
   let pfAnticipo = parseFloat(totalesValores[9]);
   let pfNetoAPagar = parseFloat(totalesValores[10]);
@@ -733,8 +760,8 @@ function guardarYGenerarInvoice() {
     "lineExtensionamount": pfSubTotal,
     "TaxExclusiveAmount": pfBaseGrabable,
     "TaxInclusiveAmount": pfSubTotalMasImpuestos,
-    "AllowanceTotalAmount": pfRetenciones,
-    "ChargeTotalAmount": pfCargos,
+    "AllowanceTotalAmount": pfDescuentos,
+    "ChargeTotalAmount": pfCargos + pfRetenciones,
     "PrePaidAmount": Number(pfAnticipo),
     "PayableAmount": pfNetoAPagar,
   }
