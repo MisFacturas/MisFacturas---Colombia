@@ -173,4 +173,16 @@ function buscarUnidadesDeMedida(terminoBusqueda) {
   return productosFiltrados;
 }
 
+function buscarRetencion(idProducto) {
+  let respuesta = [];
+  var spreadsheet = SpreadsheetApp.getActive();
+  var hojaDatos = spreadsheet.getSheetByName('Datos');
+  hojaDatos.getRange("H14").setValue(idProducto);
+  var nombreRetencion = hojaDatos.getRange("I14").getValue();
+  respuesta.push(nombreRetencion);
+  var porcentajeRetencion = hojaDatos.getRange("J14").getValue();
+  respuesta.push(porcentajeRetencion);
+  return respuesta;
+}
+
  

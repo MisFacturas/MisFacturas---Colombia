@@ -66,6 +66,7 @@ function verificarEstadoValidoFactura(estadoFactura) {
 }
 
 function guardarFactura() {
+  SpreadsheetApp.getUi().alert("Revisando validez de la factura. Aguarde unos segundos");
   let estadoFactura = [];
   verificarEstadoValidoFactura(estadoFactura);
   if (estadoFactura[0] === true) {
@@ -543,7 +544,6 @@ function getPaymentSummary() {
 }
 
 function guardarYGenerarInvoice() {
-  let datosSheet = spreadsheet.getSheetByName('Datos');
   let hojaProductos = spreadsheet.getSheetByName('Productos');
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
@@ -591,21 +591,17 @@ function guardarYGenerarInvoice() {
     let ItemReference = String(LineaFactura['referencia']);
     let Name = String(LineaFactura['producto']);
     let Quantity = String(LineaFactura['cantidad']);
-    let Price = Number(LineaFactura['preciounitario']); 
-    let LineChargeTotal = Number(LineaFactura['cargos']) + Number(LineaFactura['retencion']);
+    let Price = Number(LineaFactura['preciounitario']);
+    let LineChargeTotal = Number(LineaFactura['cargos']);
     let chargeIndicator = false;
-    if (LineChargeTotal !== 0) {
-      chargeIndicator = true;
-    }
     let LineTotalTaxes = Number(LineaFactura['impuestos']);
     let LineTotal = parseFloat(LineaFactura['totaldelinea']);
     let LineExtensionAmount = parseFloat(LineaFactura['subtotal']);
-    Logger.log(LineaFactura['descuento%'])
-    let LineAllowanceTotal = (LineExtensionAmount + LineTotalTaxes + LineChargeTotal) * Number(LineaFactura['descuento%']);
+    let LineAllowanceTotal = Number(LineaFactura['descuento%']) * 100;
     let MeasureUnitCode = String(codigosUnidadDeMedida[unidadDeMedida]);
-    
+
     let ItemTaxesInformation = [];
-    
+
 
 
     function obtenerFilaPorReferencia(referencia) {
@@ -622,6 +618,32 @@ function guardarYGenerarInvoice() {
       return -1; // Retorna -1 si no se encuentra la referencia
     }
 
+    function agregarCargosDescuentos() {
+      let AllowanceCharge = [];
+      if (LineAllowanceTotal > 0) {
+        let Allowance = {
+          "Id": 9,
+          "ChargeIndicator": chargeIndicator,
+          "AllowanceChargeReason": "",
+          "MultiplierFactorNumeric": Number(LineAllowanceTotal),
+          "Amount": Number(Price) * Number(Quantity) * (LineAllowanceTotal / 100),
+          "BaseAmount": Number(Price) * Number(Quantity)
+        }
+        AllowanceCharge.push(Allowance);
+      }
+      if (LineChargeTotal > 0) {
+        let Charge = {
+          "Id": 20,
+          "ChargeIndicator": !chargeIndicator,
+          "AllowanceChargeReason": "",
+          "Amount": LineChargeTotal,
+          "BaseAmount": Number(Price) * Number(Quantity)
+        }
+        AllowanceCharge.push(Charge);
+      }
+      return AllowanceCharge;
+    }
+
     function agregarImpuestos() {
       //taxes del producto en si
       if (LineaFactura["iva%"] > 0) {
@@ -631,7 +653,7 @@ function guardarYGenerarInvoice() {
           TaxEvidenceIndicator: false,
           TaxableAmount: LineExtensionAmount,
           TaxAmount: LineExtensionAmount * LineaFactura["iva%"],
-          Percent: percentIva,
+          Percent: Number(percentIva),
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         }
@@ -646,12 +668,33 @@ function guardarYGenerarInvoice() {
           TaxEvidenceIndicator: false,
           TaxableAmount: LineExtensionAmount,
           TaxAmount: LineExtensionAmount * LineaFactura["inc%"],
-          Percent: percentInc,
+          Percent: Number(percentInc),
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         };
         ItemTaxesInformation.push(incTaxInformation);
       }
+
+      if (LineaFactura["retencion"] > 0) {
+        let retencionTaxInformation = {
+          Id: "05",
+          TaxEvidenceIndicator: true,
+          TaxableAmount: Number(LineExtensionAmount),
+          TaxAmount: Number(LineaFactura["retencion"]),
+          Percent: 0,
+          BaseUnitMeasure: 0,
+          PerUnitAmount: 0,
+        };
+        let nombreYporcentajeRetencion = buscarRetencion(LineaFactura["producto"]);
+        let nombreRetencion = nombreYporcentajeRetencion[0];
+        let porcentajeRetencion = Number(nombreYporcentajeRetencion[1]) * 100;
+        retencionTaxInformation.Percent = porcentajeRetencion;
+        if (nombreRetencion !== "Retencion sobre el IVA 100%" && nombreRetencion !== "Retencion sobre el IVA 15%") {
+          retencionTaxInformation.Id = "06";
+        }
+        ItemTaxesInformation.push(retencionTaxInformation);
+      }
+
       return ItemTaxesInformation;
     }
 
@@ -662,8 +705,8 @@ function guardarYGenerarInvoice() {
       Quatity: new Number(Quantity),
       Price: new Number(Price),
 
-      LineAllowanceTotal: LineAllowanceTotal,
-      LineChargeTotal: LineChargeTotal,
+      LineAllowanceTotal: 0,
+      LineChargeTotal: 0,
       LineTotalTaxes: LineTotalTaxes,
       LineTotal: LineTotal,
       LineExtensionAmount: LineExtensionAmount,
@@ -673,7 +716,7 @@ function guardarYGenerarInvoice() {
       Nota: "",
       AdditionalProperty: [],
       TaxesInformation: agregarImpuestos(),
-      AllowanceCharge: []
+      AllowanceCharge: agregarCargosDescuentos()
     };
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
@@ -722,6 +765,48 @@ function guardarYGenerarInvoice() {
 
     return impuestosAgrupados;
   }
+  function agregarCargosDescuentosTotales(subtotal) {
+    let hojaFactura = spreadsheet.getSheetByName('Factura');
+
+    let rowSeccionCargosyDescuentos = getcargosDescuentosStartRow(hojaFactura)+2;
+    let lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
+    let CargosyDescuentos = [];
+    let chargeIndicator = false;
+    for (let i = rowSeccionCargosyDescuentos; i <= lastCargoDescuentoRow+1; i++) {
+      let celdaValorPorcentaje = hojaFactura.getRange("C" + String(i)).getValue()
+      if (hojaFactura.getRange("A" + String(i)).getValue() === "Cargo") {
+        let Charge = {
+          "Id": 20,
+          "ChargeIndicator": !chargeIndicator,
+          "AllowanceChargeReason": hojaFactura.getRange("B" + String(i)).getValue(),
+          "MultiplierFactorNumeric": 0,
+          "Amount": hojaFactura.getRange("E" + String(i)).getValue(),
+          "BaseAmount": subtotal
+        }
+        if (String(celdaValorPorcentaje).includes("%")) {
+          Charge.MultiplierFactorNumeric = Number(celdaValorPorcentaje.replace("%", ""))
+        }
+        CargosyDescuentos.push(Charge);
+      }
+      else {
+        let Allowance = {
+          "Id": 9,
+          "ChargeIndicator": chargeIndicator,
+          "AllowanceChargeReason": hojaFactura.getRange("B" + String(i)).getValue(),
+          "MultiplierFactorNumeric": 0,
+          "Amount": hojaFactura.getRange("E" + String(i)).getValue(),
+          "BaseAmount": subtotal
+        }
+        if (String(celdaValorPorcentaje).includes("%")) {
+          Allowance.MultiplierFactorNumeric = Number(celdaValorPorcentaje.replace("%", ""))
+        }
+        CargosyDescuentos.push(Allowance);
+      }
+    }
+      
+    return CargosyDescuentos;
+  }
+
 
 
 
@@ -761,9 +846,9 @@ function guardarYGenerarInvoice() {
     "TaxExclusiveAmount": pfBaseGrabable,
     "TaxInclusiveAmount": pfSubTotalMasImpuestos,
     "AllowanceTotalAmount": pfDescuentos,
-    "ChargeTotalAmount": pfCargos + pfRetenciones,
+    "ChargeTotalAmount": pfCargos,
     "PrePaidAmount": Number(pfAnticipo),
-    "PayableAmount": pfNetoAPagar,
+    "PayableAmount": pfNetoAPagar
   }
 
 
@@ -814,7 +899,7 @@ function guardarYGenerarInvoice() {
     ItemInformation: productoInformation,
     InvoiceTaxTotal: agruparImpuestos(obtenerTodosLosImpuestos(productoInformation)),
     InvoiceTaxOthersTotal: null,
-    InvoiceAllowanceCharge: [],
+    InvoiceAllowanceCharge: agregarCargosDescuentosTotales(pfSubTotal),
     InvoiceTotal: invoice_total,
     Documents: []
   });
