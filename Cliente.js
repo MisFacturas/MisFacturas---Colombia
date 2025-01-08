@@ -149,6 +149,8 @@ function activarCliente(cliente) {
   hojaClientesInactivos.deleteRow(rowDelCliente)
   hojaClientesInactivos.insertRowAfter(rowMaximaClientesInactivos)
 }
+
+
 function buscarClientes(terminoBusqueda, hojaA) {
   var resultados = [];
 
@@ -208,211 +210,6 @@ function buscarPaises(terminoBusqueda) {
   return resultados;
 }
 
-
-function agregarPaises() {
-  const paises = [
-    "Afganistán",
-    "Albania",
-    "Alemania",
-    "Andorra",
-    "Angola",
-    "Antigua y Barbuda",
-    "Arabia Saudita",
-    "Argelia",
-    "Argentina",
-    "Armenia",
-    "Australia",
-    "Austria",
-    "Azerbaiyán",
-    "Bahamas",
-    "Bangladés",
-    "Barbados",
-    "Baréin",
-    "Bélgica",
-    "Belice",
-    "Benín",
-    "Bielorrusia",
-    "Birmania",
-    "Bolivia",
-    "Bosnia y Herzegovina",
-    "Botsuana",
-    "Brasil",
-    "Brunéi",
-    "Bulgaria",
-    "Burkina Faso",
-    "Burundi",
-    "Bután",
-    "Cabo Verde",
-    "Camboya",
-    "Camerún",
-    "Canadá",
-    "Catar",
-    "Chad",
-    "Chile",
-    "China",
-    "Chipre",
-    "Ciudad del Vaticano",
-    "Colombia",
-    "Comoras",
-    "Corea del Norte",
-    "Corea del Sur",
-    "Costa de Marfil",
-    "Costa Rica",
-    "Croacia",
-    "Cuba",
-    "Dinamarca",
-    "Dominica",
-    "Ecuador",
-    "Egipto",
-    "El Salvador",
-    "Emiratos Árabes Unidos",
-    "Eritrea",
-    "Eslovaquia",
-    "Eslovenia",
-    "España",
-    "Estados Unidos",
-    "Estonia",
-    "Etiopía",
-    "Filipinas",
-    "Finlandia",
-    "Fiyi",
-    "Francia",
-    "Gabón",
-    "Gambia",
-    "Georgia",
-    "Ghana",
-    "Granada",
-    "Grecia",
-    "Guatemala",
-    "Guyana",
-    "Guinea",
-    "Guinea ecuatorial",
-    "Guinea-Bisáu",
-    "Haití",
-    "Honduras",
-    "Hungría",
-    "India",
-    "Indonesia",
-    "Irak",
-    "Irán",
-    "Irlanda",
-    "Islandia",
-    "Islas Marshall",
-    "Islas Salomón",
-    "Israel",
-    "Italia",
-    "Jamaica",
-    "Japón",
-    "Jordania",
-    "Kazajistán",
-    "Kenia",
-    "Kirguistán",
-    "Kiribati",
-    "Kosovo",
-    "Kuwait",
-    "Laos",
-    "Lesoto",
-    "Letonia",
-    "Líbano",
-    "Liberia",
-    "Libia",
-    "Liechtenstein",
-    "Lituania",
-    "Luxemburgo",
-    "Macedonia del Norte",
-    "Madagascar",
-    "Malasia",
-    "Malaui",
-    "Maldivas",
-    "Malí",
-    "Malta",
-    "Marruecos",
-    "Mauricio",
-    "Mauritania",
-    "México",
-    "Micronesia",
-    "Moldavia",
-    "Mónaco",
-    "Mongolia",
-    "Montenegro",
-    "Mozambique",
-    "Namibia",
-    "Nauru",
-    "Nepal",
-    "Nicaragua",
-    "Níger",
-    "Nigeria",
-    "Noruega",
-    "Nueva Zelanda",
-    "Omán",
-    "Países Bajos",
-    "Pakistán",
-    "Palaos",
-    "Panamá",
-    "Papúa Nueva Guinea",
-    "Paraguay",
-    "Perú",
-    "Polonia",
-    "Portugal",
-    "Reino Unido",
-    "República Centroafricana",
-    "República Checa",
-    "República del Congo",
-    "República Democrática del Congo",
-    "República Dominicana",
-    "Ruanda",
-    "Rumania",
-    "Rusia",
-    "Samoa",
-    "San Cristóbal y Nieves",
-    "San Marino",
-    "San Vicente y las Granadinas",
-    "Santa Lucía",
-    "Santo Tomé y Príncipe",
-    "Senegal",
-    "Serbia",
-    "Seychelles",
-    "Sierra Leona",
-    "Singapur",
-    "Siria",
-    "Somalia",
-    "Sri Lanka",
-    "Suazilandia",
-    "Sudáfrica",
-    "Sudán",
-    "Sudán del Sur",
-    "Suecia",
-    "Suiza",
-    "Surinam",
-    "Tailandia",
-    "Tanzania",
-    "Tayikistán",
-    "Timor Oriental",
-    "Togo",
-    "Tonga",
-    "Trinidad y Tobago",
-    "Túnez",
-    "Turkmenistán",
-    "Turquía",
-    "Tuvalu",
-    "Ucrania",
-    "Uganda",
-    "Uruguay",
-    "Uzbekistán",
-    "Vanuatu",
-    "Venezuela",
-    "Vietnam",
-    "Yemen",
-    "Yibuti",
-    "Zambia",
-    "Zimbabue"
-  ];
-  let Paragg = 0
-  for (let i = 25; i < paises.length; i++) {
-    datos_sheet.getRange("A" + String(i)).setValue(paises[Paragg])
-    Paragg++
-  }
-}
 
 function obtenerTipoDePersona(e) {
   let sheet = e.source.getActiveSheet();
@@ -559,6 +356,80 @@ function showNuevaClienteV2() {
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
+
+function getCityCode(departamentoCliente, ciudadCliente) {
+  switch (departamentoCliente) {
+    case "Amazonas":
+      return municipiosAmazonas[ciudadCliente];
+    case "Antioquia":
+      return municipiosAntioquia[ciudadCliente];
+    case "Arauca":
+      return municipiosArauca[ciudadCliente];
+    case "Atlantico":
+      return municipiosAtlantico[ciudadCliente];
+    case "Bogota":
+      return municipiosBogota[ciudadCliente];
+    case "Bolivar":
+      return municipiosBolivar[ciudadCliente];
+    case "Boyaca":
+      return municipiosBoyaca[ciudadCliente];
+    case "Caldas":
+      return municipiosCaldas[ciudadCliente];
+    case "Caqueta":
+      return municipiosCaqueta[ciudadCliente];
+    case "Casanare":
+      return municipiosCasanare[ciudadCliente];
+    case "Cauca":
+      return municipiosCauca[ciudadCliente];
+    case "Cesar":
+      return municipiosCesar[ciudadCliente];
+    case "Choco":
+      return municipiosChoco[ciudadCliente];
+    case "Cordoba":
+      return municipiosCordoba[ciudadCliente];
+    case "Cundinamarca":
+      return municipiosCundinamarca[ciudadCliente];
+    case "Guainia":
+      return municipiosGuainia[ciudadCliente];
+    case "Guaviare":
+      return municipiosGuaviare[ciudadCliente];
+    case "Huila":
+      return municipiosHuila[ciudadCliente];
+    case "La Guajira":
+      return municipiosLaGuajira[ciudadCliente];
+    case "Magdalena":
+      return municipiosMagdalena[ciudadCliente];
+    case "Meta":
+      return municipiosMeta[ciudadCliente];
+    case "Narino":
+      return municipiosNarino[ciudadCliente];
+    case "Norte de Santander":
+      return municipiosNorteDeSantander[ciudadCliente];
+    case "Putumayo":
+      return municipiosPutumayo[ciudadCliente];
+    case "Quindio":
+      return municipiosQuindio[ciudadCliente];
+    case "Risaralda":
+      return municipiosRisaralda[ciudadCliente];
+    case "San Andres y Providencia":
+      return municipiosSanAndresYProvidencia[ciudadCliente];
+    case "Santander":
+      return municipiosSantander[ciudadCliente];
+    case "Sucre":
+      return municipiosSucre[ciudadCliente];
+    case "Tolima":
+      return municipiosTolima[ciudadCliente];
+    case "Valle del Cauca":
+      return municipiosValleDelCauca[ciudadCliente];
+    case "Vaupes":
+      return municipiosVaupes[ciudadCliente];
+    case "Vichada":
+      return municipiosVichada[ciudadCliente];
+    default:
+      return null;
+  }
+}
+
 function getCustomerInformation(cliente) {
   let celdaCliente = datos_sheet.getRange("H2");
   celdaCliente.setValue(cliente);
@@ -596,6 +467,9 @@ function getCustomerInformation(cliente) {
   //Municipio
   var municipioCliente = (datos_sheet.getRange("Z2").getValue()).toUpperCase();
 
+  // Get city code using the new function
+  var cityCode = getCityCode(departamentoCliente, municipioCliente);
+
   //Codigo tipo persona
   var tipoPersona = datos_sheet.getRange("L2").getValue();
 
@@ -624,7 +498,7 @@ function getCustomerInformation(cliente) {
     "CountryName": paisCliente,
     "SubdivisionCode": String(departamentosCodigos[departamentoCliente]),
     "SubdivisionName": departamentoCliente,
-    "CityCode": String(municipiosCodigos[municipioCliente]),
+    "CityCode": String(cityCode),
     "CityName": municipioCliente,
     "AddressLine": String(direccion),
     "Telephone": String(telefono),

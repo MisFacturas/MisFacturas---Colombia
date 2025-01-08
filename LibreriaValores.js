@@ -196,9 +196,21 @@ var paisesCodigos = {
   "Zimbabue": "ZW"
 };
 
-var municipiosCodigos = {
+var municipiosAmazonas = {
+  "LETICIA": "91001",
+  "EL ENCANTO": "91263",
+  "LA CHORRERA": "91405",
+  "LA PEDRERA": "91407",
+  "LA VICTORIA": "91430",
+  "MIRITI ? PARANA": "91460",
+  "PUERTO ALEGRIA": "91530",
+  "PUERTO ARICA": "91536",
+  "PUERTO NARINO": "91540",
+  "PUERTO SANTANDER": "91669",
+  "TARAPACA": "91798"
+}
+var municipiosAntioquia = {
   "MEDELLIN": "05001",
-  "MEDELLíN": "05001",
   "ABEJORRAL": "05002",
   "ABRIAQUI": "05004",
   "ALEJANDRIA": "05021",
@@ -322,7 +334,19 @@ var municipiosCodigos = {
   "YARUMAL": "05887",
   "YOLOMBO": "05890",
   "YONDO": "05893",
-  "ZARAGOZA": "05895",
+  "ZARAGOZA": "05895"
+
+}
+var municipiosArauca = {
+  "ARAUCA": "81001",
+  "ARAUQUITA": "81065",
+  "CRAVO NORTE": "81220",
+  "FORTUL": "81300",
+  "PUERTO RONDON": "81591",
+  "SARAVENA": "81736",
+  "TAME": "81794"
+}
+var municipiosAtlantico = {
   "BARRANQUILLA": "08001",
   "BARANOA": "08078",
   "CAMPO DE LA CRUZ": "08137",
@@ -345,8 +369,12 @@ var municipiosCodigos = {
   "SOLEDAD": "08758",
   "SUAN": "08770",
   "TUBARA": "08832",
-  "USIACURI": "08849",
-  "BOGOTA, D.C.": "11001",
+  "USIACURI": "08849"
+}
+var municipiosBogota = {
+  "BOGOTA, D.C.": "11001"
+}
+var municipiosBolivar = { 
   "CARTAGENA DE INDIAS": "13001",
   "ACHI": "13006",
   "ALTOS DEL ROSARIO": "13030",
@@ -392,7 +420,10 @@ var municipiosCodigos = {
   "TURBACO": "13836",
   "TURBANA": "13838",
   "VILLANUEVA": "13873",
-  "ZAMBRANO": "13894",
+  "ZAMBRANO": "13894"
+}
+var municipiosBoyaca = {
+
   "TUNJA": "15001",
   "ALMEIDA": "15022",
   "AQUITANIA": "15047",
@@ -515,7 +546,10 @@ var municipiosCodigos = {
   "UMBITA": "15842",
   "VENTAQUEMADA": "15861",
   "VIRACACHA": "15879",
-  "ZETAQUIRA": "15897",
+  "ZETAQUIRA": "15897"
+}
+var municipiosCaldas = {
+
   "MANIZALES": "17001",
   "AGUADAS": "17013",
   "ANSERMA": "17042",
@@ -542,7 +576,9 @@ var municipiosCodigos = {
   "SUPIA": "17777",
   "VICTORIA": "17867",
   "VILLAMARIA": "17873",
-  "VITERBO": "17877",
+  "VITERBO": "17877"
+}
+var municipiosCaqueta = {
   "FLORENCIA": "18001",
   "ALBANIA": "18029",
   "BELEN DE LOS ANDAQUIES": "18094",
@@ -559,6 +595,29 @@ var municipiosCodigos = {
   "SOLANO": "18756",
   "SOLITA": "18785",
   "VALPARAISO": "18860",
+}
+var municipiosCasanare = {
+  "YOPAL": "85001",
+  "AGUAZUL": "85010",
+  "CHAMEZA": "85015",
+  "HATO COROZAL": "85125",
+  "LA SALINA": "85136",
+  "MANI": "85139",
+  "MONTERREY": "85162",
+  "NUNCHIA": "85225",
+  "OROCUE": "85230",
+  "PAZ DE ARIPORO": "85250",
+  "PORE": "85263",
+  "RECETOR": "85279",
+  "SABANALARGA": "85300",
+  "SACAMA": "85315",
+  "SAN LUIS DE PALENQUE": "85325",
+  "TAMARA": "85400",
+  "TAURAMENA": "85410",
+  "TRINIDAD": "85430",
+  "VILLANUEVA": "85440"
+}
+var municipiosCauca = {
   "POPAYAN": "19001",
   "ALMAGUER": "19022",
   "ARGELIA": "19050",
@@ -600,7 +659,9 @@ var municipiosCodigos = {
   "TIMBIQUI": "19809",
   "TORIBIO": "19821",
   "TOTORO": "19824",
-  "VILLA RICA": "19845",
+  "VILLA RICA": "19845"
+}
+var municipiosCesar = {
   "VALLEDUPAR": "20001",
   "AGUACHICA": "20011",
   "AGUSTIN CODAZZI": "20013",
@@ -625,7 +686,41 @@ var municipiosCodigos = {
   "SAN ALBERTO": "20710",
   "SAN DIEGO": "20750",
   "SAN MARTIN": "20770",
-  "TAMALAMEQUE": "20787",
+  "TAMALAMEQUE": "20787"
+}
+var municipiosChoco = {
+"QUIBDO": "27001",
+  "ACANDI": "27006",
+  "ALTO BAUDO (PIE DE PATO)": "27025",
+  "ATRATO (YUTO)": "27050",
+  "BAGADO": "27073",
+  "BAHIA SOLANO (MUTIS)": "27075",
+  "BAJO BAUDO (PIZARRO)": "27077",
+  "BOJAYA (BELLA VISTA)": "27099",
+  "EL CANTON DEL SAN PABLO": "27135",
+  "CARMEN DEL DARIEN": "27150",
+  "CERTEGUI": "27160",
+  "CONDOTO": "27205",
+  "EL CARMEN DE ATRATO": "27245",
+  "EL LITORAL DEL SAN JUAN": "27250",
+  "ISTMINA": "27361",
+  "JURADO": "27372",
+  "LLORO": "27413",
+  "MEDIO ATRATO (BETE)": "27425",
+  "MEDIO BAUDO": "27430",
+  "MEDIO SAN JUAN (ANDAGOYA)": "27450",
+  "NOVITA": "27491",
+  "NUQUI": "27495",
+  "RIO IRO (SANTA RITA)": "27580",
+  "RIO QUITO (PAIMADO)": "27600",
+  "RIOSUCIO": "27615",
+  "SAN JOSE DEL PALMAR": "27660",
+  "SIPI": "27745",
+  "TADO": "27787",
+  "UNGUIA": "27800",
+  "UNION PANAMERICANA (LAS ANIMAS)": "27810"
+}
+var municipiosCordoba = {
   "MONTERIA": "23001",
   "AYAPEL": "23068",
   "BUENAVISTA": "23079",
@@ -655,7 +750,9 @@ var municipiosCodigos = {
   "SAN PELAYO": "23686",
   "TIERRALTA": "23807",
   "TUCHIN": "23815",
-  "VALENCIA": "23855",
+  "VALENCIA": "23855"
+}
+var municipiosCundinamarca = {
   "AGUA DE DIOS": "25001",
   "ALBAN": "25019",
   "ANAPOIMA": "25035",
@@ -771,38 +868,27 @@ var municipiosCodigos = {
   "VIOTA": "25878",
   "YACOPI": "25885",
   "ZIPACON": "25898",
-  "ZIPAQUIRA": "25899",
-  "QUIBDO": "27001",
-  "ACANDI": "27006",
-  "ALTO BAUDO (PIE DE PATO)": "27025",
-  "ATRATO (YUTO)": "27050",
-  "BAGADO": "27073",
-  "BAHIA SOLANO (MUTIS)": "27075",
-  "BAJO BAUDO (PIZARRO)": "27077",
-  "BOJAYA (BELLA VISTA)": "27099",
-  "EL CANTON DEL SAN PABLO": "27135",
-  "CARMEN DEL DARIEN": "27150",
-  "CERTEGUI": "27160",
-  "CONDOTO": "27205",
-  "EL CARMEN DE ATRATO": "27245",
-  "EL LITORAL DEL SAN JUAN": "27250",
-  "ISTMINA": "27361",
-  "JURADO": "27372",
-  "LLORO": "27413",
-  "MEDIO ATRATO (BETE)": "27425",
-  "MEDIO BAUDO": "27430",
-  "MEDIO SAN JUAN (ANDAGOYA)": "27450",
-  "NOVITA": "27491",
-  "NUQUI": "27495",
-  "RIO IRO (SANTA RITA)": "27580",
-  "RIO QUITO (PAIMADO)": "27600",
-  "RIOSUCIO": "27615",
-  "SAN JOSE DEL PALMAR": "27660",
-  "SIPI": "27745",
-  "TADO": "27787",
-  "UNGUIA": "27800",
-  "UNION PANAMERICANA (LAS ANIMAS)": "27810",
-  "NEIVA": "41001",
+  "ZIPAQUIRA": "25899"
+}
+var municipiosGuainia = {
+"INIRIDA": "94001",
+  "BARRANCOMINAS": "94343",
+  "MAPIRIPANA": "94663",
+  "SAN FELIPE": "94883",
+  "PUERTO COLOMBIA": "94884",
+  "LA GUADALUPE": "94885",
+  "CACAHUAL": "94886",
+  "PANA PANA": "94887",
+  "MORICHAL NUEVO": "94888"
+}
+var municipiosGuaviare = {
+  "SAN JOSE DEL GUAVIARE": "95001",
+  "CALAMAR": "95015",
+  "EL RETORNO": "95025",
+  "MIRAFLORES": "95200"
+}
+var municipiosHuila = {
+"NEIVA": "41001",
   "ACEVEDO": "41006",
   "AGRADO": "41013",
   "AIPE": "41016",
@@ -838,8 +924,10 @@ var municipiosCodigos = {
   "TERUEL": "41801",
   "TIMANA": "41807",
   "VILLAVIEJA": "41872",
-  "YAGUARA": "41885",
-  "RIOHACHA": "44001",
+  "YAGUARA": "41885"
+}
+var municipiosLaGuajira = {
+"RIOHACHA": "44001",
   "ALBANIA": "44035",
   "BARRANCAS": "44078",
   "DIBULLA": "44090",
@@ -853,7 +941,9 @@ var municipiosCodigos = {
   "SAN JUAN DEL CESAR": "44650",
   "URIBIA": "44847",
   "URUMITA": "44855",
-  "VILLANUEVA": "44874",
+  "VILLANUEVA": "44874"
+}
+var municipiosMagdalena = {
   "SANTA MARTA": "47001",
   "ALGARROBO": "47030",
   "ARACATACA": "47053",
@@ -883,7 +973,9 @@ var municipiosCodigos = {
   "SITIONUEVO": "47745",
   "TENERIFE": "47798",
   "ZAPAYAN": "47960",
-  "ZONA BANANERA": "47980",
+  "ZONA BANANERA": "47980"
+}
+var municipiosMeta = {
   "VILLAVICENCIO": "50001",
   "ACACIAS": "50006",
   "BARRANCA DE UPIA": "50110",
@@ -912,7 +1004,9 @@ var municipiosCodigos = {
   "SAN JUAN DE ARAMA": "50683",
   "SAN JUANITO": "50686",
   "SAN MARTIN DE LOS LLANOS": "50689",
-  "VISTAHERMOSA": "50711",
+  "VISTAHERMOSA": "50711"
+}
+var municipiosNarino = {
   "PASTO": "52001",
   "ALBAN (SAN JOSE)": "52019",
   "ALDANA": "52022",
@@ -976,8 +1070,10 @@ var municipiosCodigos = {
   "TANGUA": "52788",
   "SAN ANDRES DE TUMACO": "52835",
   "TUQUERRES": "52838",
-  "YACUANQUER": "52885",
-  "CUCUTA": "54001",
+  "YACUANQUER": "52885"
+}
+var municipiosNorteDeSantander = {
+"CUCUTA": "54001",
   "ABREGO": "54003",
   "ARBOLEDAS": "54051",
   "BOCHALEMA": "54099",
@@ -1016,7 +1112,24 @@ var municipiosCodigos = {
   "TIBU": "54810",
   "TOLEDO": "54820",
   "VILLA CARO": "54871",
-  "VILLA DEL ROSARIO": "54874",
+  "VILLA DEL ROSARIO": "54874"
+}
+var municipiosPutumayo = {
+"MOCOA": "86001",
+  "COLON": "86219",
+  "ORITO": "86320",
+  "PUERTO ASIS": "86568",
+  "PUERTO CAICEDO": "86569",
+  "PUERTO GUZMAN": "86571",
+  "PUERTO LEGUIZAMO": "86573",
+  "SIBUNDOY": "86749",
+  "SAN FRANCISCO": "86755",
+  "SAN MIGUEL": "86757",
+  "SANTIAGO": "86760",
+  "VALLE DEL GUAMUEZ": "86865",
+  "VILLAGARZON": "86885"
+}
+var municipiosQuindio = {
   "ARMENIA": "63001",
   "BUENAVISTA": "63111",
   "CALARCA": "63130",
@@ -1028,8 +1141,10 @@ var municipiosCodigos = {
   "MONTENEGRO": "63470",
   "PIJAO": "63548",
   "QUIMBAYA": "63594",
-  "SALENTO": "63690",
-  "PEREIRA": "66001",
+  "SALENTO": "63690"
+}
+var municipiosRisaralda = {
+"PEREIRA": "66001",
   "APIA": "66045",
   "BALBOA": "66075",
   "BELEN DE UMBRIA": "66088",
@@ -1042,7 +1157,13 @@ var municipiosCodigos = {
   "PUEBLO RICO": "66572",
   "QUINCHIA": "66594",
   "SANTA ROSA DE CABAL": "66682",
-  "SANTUARIO": "66687",
+  "SANTUARIO": "66687"
+}
+var municipiosSanAndresYProvidencia = {
+  "SAN ANDRES": "88001",
+  "PROVIDENCIA": "88564"
+}
+var municipiosSantander = {
   "BUCARAMANGA": "68001",
   "AGUADA": "68013",
   "ALBANIA": "68020",
@@ -1129,7 +1250,9 @@ var municipiosCodigos = {
   "VELEZ": "68861",
   "VETAS": "68867",
   "VILLANUEVA": "68872",
-  "ZAPATOCA": "68895",
+  "ZAPATOCA": "68895"
+}
+var municipiosSucre = {
   "SINCELEJO": "70001",
   "BUENAVISTA": "70110",
   "CAIMITO": "70124",
@@ -1155,8 +1278,10 @@ var municipiosCodigos = {
   "SAN LUIS DE SINCE": "70742",
   "SUCRE": "70771",
   "SANTIAGO DE TOLU": "70820",
-  "TOLU VIEJO": "70823",
-  "IBAGUE": "73001",
+  "TOLU VIEJO": "70823"
+}
+var municipiosTolima = {
+"IBAGUE": "73001",
   "ALPUJARRA": "73024",
   "ALVARADO": "73026",
   "AMBALEMA": "73030",
@@ -1202,7 +1327,9 @@ var municipiosCodigos = {
   "VALLE DE SAN JUAN": "73854",
   "VENADILLO": "73861",
   "VILLAHERMOSA": "73870",
-  "VILLARRICA": "73873",
+  "VILLARRICA": "73873"
+}
+var municipiosValleDelCauca = {
   "CALI": "76001",
   "ALCALA": "76020",
   "ANDALUCIA": "76036",
@@ -1244,81 +1371,34 @@ var municipiosCodigos = {
   "VIJES": "76869",
   "YOTOCO": "76890",
   "YUMBO": "76892",
-  "ZARZAL": "76895",
-  "ARAUCA": "81001",
-  "ARAUQUITA": "81065",
-  "CRAVO NORTE": "81220",
-  "FORTUL": "81300",
-  "PUERTO RONDON": "81591",
-  "SARAVENA": "81736",
-  "TAME": "81794",
-  "YOPAL": "85001",
-  "AGUAZUL": "85010",
-  "CHAMEZA": "85015",
-  "HATO COROZAL": "85125",
-  "LA SALINA": "85136",
-  "MANI": "85139",
-  "MONTERREY": "85162",
-  "NUNCHIA": "85225",
-  "OROCUE": "85230",
-  "PAZ DE ARIPORO": "85250",
-  "PORE": "85263",
-  "RECETOR": "85279",
-  "SABANALARGA": "85300",
-  "SACAMA": "85315",
-  "SAN LUIS DE PALENQUE": "85325",
-  "TAMARA": "85400",
-  "TAURAMENA": "85410",
-  "TRINIDAD": "85430",
-  "VILLANUEVA": "85440",
-  "MOCOA": "86001",
-  "COLON": "86219",
-  "ORITO": "86320",
-  "PUERTO ASIS": "86568",
-  "PUERTO CAICEDO": "86569",
-  "PUERTO GUZMAN": "86571",
-  "PUERTO LEGUIZAMO": "86573",
-  "SIBUNDOY": "86749",
-  "SAN FRANCISCO": "86755",
-  "SAN MIGUEL": "86757",
-  "SANTIAGO": "86760",
-  "VALLE DEL GUAMUEZ": "86865",
-  "VILLAGARZON": "86885",
-  "SAN ANDRES": "88001",
-  "PROVIDENCIA": "88564",
-  "LETICIA": "91001",
-  "EL ENCANTO": "91263",
-  "LA CHORRERA": "91405",
-  "LA PEDRERA": "91407",
-  "LA VICTORIA": "91430",
-  "MIRITI ? PARANA": "91460",
-  "PUERTO ALEGRIA": "91530",
-  "PUERTO ARICA": "91536",
-  "PUERTO NARINO": "91540",
-  "PUERTO SANTANDER": "91669",
-  "TARAPACA": "91798",
-  "INIRIDA": "94001",
-  "BARRANCOMINAS": "94343",
-  "MAPIRIPANA": "94663",
-  "SAN FELIPE": "94883",
-  "PUERTO COLOMBIA": "94884",
-  "LA GUADALUPE": "94885",
-  "CACAHUAL": "94886",
-  "PANA PANA": "94887",
-  "MORICHAL NUEVO": "94888",
-  "SAN JOSE DEL GUAVIARE": "95001",
-  "CALAMAR": "95015",
-  "EL RETORNO": "95025",
-  "MIRAFLORES": "95200",
+  "ZARZAL": "76895"
+} 
+var municipiosVaupes = {
   "MITU": "97001",
   "CARURU": "97161",
   "PACOA": "97511",
   "TARAIRA": "97666",
   "PAPUNAHUA": "97777",
-  "YAVARATE": "97889",
+  "YAVARATE": "97889"
+}
+var municipiosVichada = {
   "PUERTO CARRENO": "99001",
   "LA PRIMAVERA": "99524",
   "SANTA ROSALIA": "99624"
+}
+var municipiosCodigos = {
+  
+  
+  
+  
+ 
+ 
+
+
+  
+
+
+
 };
 
 var departamentosCodigos = {
@@ -1910,3 +1990,146 @@ var referenciaAdicionalCodigos = {
   "Estándar de adopción del contribuyente": 999,
   "No aplica": 0
 };
+
+var municipiosPorDepartamento = {
+  "Amazonas": municipiosAmazonas,
+  "Antioquia": municipiosAntioquia,
+  "Arauca": municipiosArauca,
+  "Atlantico": municipiosAtlantico,
+  "Bogota": municipiosBogota,
+  "Bolivar": municipiosBolivar,
+  "Boyaca": municipiosBoyaca,
+  "Caldas": municipiosCaldas,
+  "Caqueta": municipiosCaqueta,
+  "Casanare": municipiosCasanare,
+  "Cauca": municipiosCauca,
+  "Cesar": municipiosCesar,
+  "Choco": municipiosChoco,
+  "Cordoba": municipiosCordoba,
+  "Cundinamarca": municipiosCundinamarca,
+  "Guainia": municipiosGuainia,
+  "Guaviare": municipiosGuaviare,
+  "Huila": municipiosHuila,
+  "La Guajira": municipiosLaGuajira,
+  "Magdalena": municipiosMagdalena,
+  "Meta": municipiosMeta,
+  "Narino": municipiosNarino,
+  "Norte de Santander": municipiosNorteDeSantander,
+  "Putumayo": municipiosPutumayo,
+  "Quindio": municipiosQuindio,
+  "Risaralda": municipiosRisaralda,
+  "San Andres y Providencia": municipiosSanAndresYProvidencia,
+  "Santander": municipiosSantander,
+  "Sucre": municipiosSucre,
+  "Tolima": municipiosTolima,
+  "Valle del Cauca": municipiosValleDelCauca,
+  "Vaupes": municipiosVaupes,
+  "Vichada": municipiosVichada
+};
+
+function buscarMunicipios(departamento) {
+  var municipios = [];
+
+  switch (departamento) {
+    case 'Amazonas':
+      municipios = Object.keys(municipiosAmazonas);
+      break;
+    case 'Antioquia':
+      municipios = Object.keys(municipiosAntioquia);
+      break;
+    case 'Arauca':
+      municipios = Object.keys(municipiosArauca);
+      break;
+    case 'Atlantico':
+      municipios = Object.keys(municipiosAtlantico);
+      break;
+    case 'Bogota':
+      municipios = Object.keys(municipiosBogota);
+      break;
+    case 'Bolivar':
+      municipios = Object.keys(municipiosBolivar);
+      break;
+    case 'Boyaca':
+      municipios = Object.keys(municipiosBoyaca);
+      break;
+    case 'Caldas':
+      municipios = Object.keys(municipiosCaldas);
+      break;
+    case 'Caqueta':
+      municipios = Object.keys(municipiosCaqueta);
+      break;
+    case 'Casanare':
+      municipios = Object.keys(municipiosCasanare);
+      break;
+    case 'Cauca':
+      municipios = Object.keys(municipiosCauca);
+      break;
+    case 'Cesar':
+      municipios = Object.keys(municipiosCesar);
+      break;
+    case 'Choco':
+      municipios = Object.keys(municipiosChoco);
+      break;
+    case 'Cordoba':
+      municipios = Object.keys(municipiosCordoba);
+      break;
+    case 'Cundinamarca':
+      municipios = Object.keys(municipiosCundinamarca);
+      break;
+    case 'Guainia':
+      municipios = Object.keys(municipiosGuainia);
+      break;
+    case 'Guaviare':
+      municipios = Object.keys(municipiosGuaviare);
+      break;
+    case 'Huila':
+      municipios = Object.keys(municipiosHuila);
+      break;
+    case 'La Guajira':
+      municipios = Object.keys(municipiosLaGuajira);
+      break;
+    case 'Magdalena':
+      municipios = Object.keys(municipiosMagdalena);
+      break;
+    case 'Meta':
+      municipios = Object.keys(municipiosMeta);
+      break;
+    case 'Narino':
+      municipios = Object.keys(municipiosNarino);
+      break;
+    case 'Norte de Santander':
+      municipios = Object.keys(municipiosNorteDeSantander);
+      break;
+    case 'Putumayo':
+      municipios = Object.keys(municipiosPutumayo);
+      break;
+    case 'Quindio':
+      municipios = Object.keys(municipiosQuindio);
+      break;
+    case 'Risaralda':
+      municipios = Object.keys(municipiosRisaralda);
+      break;
+    case 'San Andres y Providencia':
+      municipios = Object.keys(municipiosSanAndresYProvidencia);
+      break;
+    case 'Santander':
+      municipios = Object.keys(municipiosSantander);
+      break;
+    case 'Sucre':
+      municipios = Object.keys(municipiosSucre);
+      break;
+    case 'Tolima':
+      municipios = Object.keys(municipiosTolima);
+      break;
+    case 'Valle del Cauca':
+      municipios = Object.keys(municipiosValleDelCauca);
+      break;
+    case 'Vaupes':
+      municipios = Object.keys(municipiosVaupes);
+      break;
+    case 'Vichada':
+      municipios = Object.keys(municipiosVichada);
+      break;
+  }
+  return municipios;
+}

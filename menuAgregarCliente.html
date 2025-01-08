@@ -14,7 +14,7 @@
   <!-- Custom styles for this template -->
   <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
   <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
-
+  <script src="LibreriaValores.js"></script>
 </head>
 <script>
   function writeDocument(htmlOutput) {
@@ -24,6 +24,11 @@
   }
 
   function Back() {
+    google.script.run.openClientesSheet();
+    google.script.run.showClientes();
+  }
+
+  function Inicio() {
     google.script.run.showSidebar();
   }
 
@@ -127,6 +132,42 @@
       campo.style.backgroundColor = '';  // Limpia el color
     });
   }
+  const departamentos = {
+    "Amazonas": "91",
+    "Antioquia": "05",
+    "Arauca": "81",
+    "Atlantico": "08",
+    "Bogota": "11",
+    "Bolivar": "13",
+    "Boyaca": "15",
+    "Caldas": "17",
+    "Caqueta": "18",
+    "Casanare": "85",
+    "Cauca": "19",
+    "Cesar": "20",
+    "Choco": "27",
+    "Cordoba": "23",
+    "Cundinamarca": "25",
+    "Guainia": "94",
+    "Guaviare": "95",
+    "Huila": "41",
+    "La Guajira": "44",
+    "Magdalena": "47",
+    "Meta": "50",
+    "Narino": "52",
+    "Norte de Santander": "54",
+    "Putumayo": "86",
+    "Quindio": "63",
+    "Risaralda": "66",
+    "San Andres y Providencia": "88",
+    "Santander": "68",
+    "Sucre": "70",
+    "Tolima": "73",
+    "Valle del Cauca": "76",
+    "Vaupes": "97",
+    "Vichada": "99"
+  };
+
 
   document.addEventListener('DOMContentLoaded', function () {
     const tipoPersona = document.getElementById('tipoPersona');
@@ -134,19 +175,10 @@
       'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
     ];
     const naturalFields = [
-      'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal'
-    ];
-  });
-  document.addEventListener('DOMContentLoaded', function () {
-    const tipoPersona = document.getElementById('tipoPersona');
-    const allFields = [
-      'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
-    ];
-    const naturalFields = [
-      'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal'
+      'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal'
     ];
     const juridicaFields = [
-      'tipoDocumento', 'numeroIdentificacion', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
+      'tipoDocumento', 'numeroIdentificacion', 'codigoCliente', 'regimen', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
     ];
 
     // Bloquear todos los campos por defecto excepto tipoTercero y tipoPersona
@@ -154,7 +186,31 @@
       document.getElementById(id).disabled = true;
     });
 
+    // Bloquear el campo de país por defecto
+    document.getElementById('pais').value = 'Colombia';
+    document.getElementById('pais').disabled = true;
+    document.getElementById('departamento').disabled = true;
+    document.getElementById('municipio').disabled = true;
+
+    // Deshabilitar el checkbox de cambiar país por defecto
+    document.getElementById('cambiarPaisCheckbox').disabled = true;
+
+    // Agregar opciones de departamentos al select
+    const departamentoSelect = document.getElementById('departamento');
+    for (const [nombre, codigo] of Object.entries(departamentos)) {
+      const option = document.createElement('option');
+      option.value = nombre;
+      option.textContent = nombre;
+      departamentoSelect.appendChild(option);
+    }
+
     tipoPersona.addEventListener('change', function () {
+      // Bloquear todos los campos primero
+      allFields.forEach(id => {
+        document.getElementById(id).disabled = true;
+      });
+
+      // Desbloquear los campos correspondientes al tipo de persona seleccionado
       if (tipoPersona.value === 'Natural') {
         naturalFields.forEach(id => {
           document.getElementById(id).disabled = false;
@@ -164,12 +220,65 @@
         juridicaFields.forEach(id => {
           document.getElementById(id).disabled = false;
         });
-        ['primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido'].forEach(id => {
-          document.getElementById(id).disabled = true;
-        });
       }
+
+      // Mantener el campo de país bloqueado
+      document.getElementById('pais').disabled = true;
+      // Mantener el campo de municipio bloqueado
+      document.getElementById('municipio').disabled = true;
     });
+
+    document.getElementById('cambiarPaisCheckbox').addEventListener('change', togglePais);
+    document.getElementById('departamento').addEventListener('change', verificarDepartamento);
   });
+
+  function togglePais() {
+    const pais = document.getElementById('pais');
+    const departamento = document.getElementById('departamento');
+    const municipio = document.getElementById('municipio');
+    const checkbox = document.getElementById('cambiarPaisCheckbox');
+
+    if (checkbox.checked) {
+      pais.disabled = false;
+      departamento.disabled = true;
+      municipio.disabled = true;
+    } else {
+      pais.disabled = true;
+      pais.value = 'Colombia';
+      departamento.disabled = true;
+      municipio.disabled = true;
+    }
+  }
+
+  function verificarDepartamento() {
+    const departamento = document.getElementById('departamento');
+    const municipio = document.getElementById('municipio');
+
+    if (departamento.value !== 'Seleccione') {
+      municipio.disabled = false;
+      cargarMunicipios(departamento.value);
+    } else {
+      municipio.disabled = true;
+      municipio.innerHTML = '<option class="placeholder" selected disabled hidden>Seleccione</option>';
+    }
+  }
+
+  function cargarMunicipios() {
+      var departamento = document.getElementById('departamento').value;
+      var municipioSelect = document.getElementById('municipio');
+      municipioSelect.innerHTML = '<option value="">Seleccione</option>'; // Limpiar municipios anteriores
+
+      if (departamento) {
+        google.script.run.withSuccessHandler(function(municipios) {
+          municipios.forEach(function(municipio) {
+            var option = document.createElement('option');
+            option.value = municipio;
+            option.textContent = municipio;
+            municipioSelect.appendChild(option);
+          });
+        }).buscarMunicipios(departamento);
+      }
+    }
 </script>
 
 <body class="d-flex h-100">
@@ -273,18 +382,60 @@
 
           <div class="col-md-6">
             <label for="pais" class="form-label">País</label>
-            <input type="text" id="pais" class="form-control form-control-lg" placeholder="Buscar país" autocomplete="off" onkeyup="buscarPais()" disabled>
+            <input type="text" id="pais" class="form-control form-control-lg" placeholder="Buscar país"
+              autocomplete="off" onkeyup="buscarPais()" disabled>
             <div class="result-box">
               <!-- Los resultados se mostrarán aquí -->
+            </div>
+            <div>
+              <input type="checkbox" id="cambiarPaisCheckbox" disabled>
+              <label for="cambiarPaisCheckbox">Cambiar País</label>
             </div>
           </div>
           <div class="col-md-6">
             <label for="departamento" class="form-label">Departamento</label>
-            <input type="text" class="form-control form-control-lg" id="departamento" disabled>
+            <select id="departamento" class="form-select form-select-lg" onchange="cargarMunicipios()" disabled>
+              <option class="placeholder" selected disabled hidden>Seleccione</option>
+              <option value="Amazonas">Amazonas</option>
+              <option value="Antioquia">Antioquia</option>
+              <option value="Arauca">Arauca</option>
+              <option value="Atlantico">Atlantico</option>
+              <option value="Bogota">Bogota</option>
+              <option value="Bolivar">Bolivar</option>
+              <option value="Boyaca">Boyaca</option>
+              <option value="Caldas">Caldas</option>
+              <option value="Caqueta">Caqueta</option>
+              <option value="Casanare">Casanare</option>
+              <option value="Cauca">Cauca</option>
+              <option value="Cesar">Cesar</option>
+              <option value="Choco">Choco</option>
+              <option value="Cordoba">Cordoba</option>
+              <option value="Cundinamarca">Cundinamarca</option>
+              <option value="Guainia">Guainia</option>
+              <option value="Guaviare">Guaviare</option>
+              <option value="Huila">Huila</option>
+              <option value="La Guajira">La Guajira</option>
+              <option value="Magdalena">Magdalena</option>
+              <option value="Meta">Meta</option>
+              <option value="Narino">Narino</option>
+              <option value="Norte de Santander">Norte de Santander</option>
+              <option value="Putumayo">Putumayo</option>
+              <option value="Quindio">Quindio</option>
+              <option value="Risaralda">Risaralda</option>
+              <option value="San Andres y Providencia">San Andres y Providencia</option>
+              <option value="Santander">Santander</option>
+              <option value="Sucre">Sucre</option>
+              <option value="Tolima">Tolima</option>
+              <option value="Valle del Cauca">Valle del Cauca</option>
+              <option value="Vaupes">Vaupes</option>
+              <option value="Vichada">Vichada</option>
+            </select>
           </div>
           <div class="col-md-6">
             <label for="municipio" class="form-label">Municipio</label>
-            <input type="text" class="form-control form-control-lg" id="municipio" disabled>
+            <select id="municipio" class="form-select form-select-lg" disabled>
+              <option class="placeholder" selected disabled hidden>Seleccione</option>
+            </select>
           </div>
           <div class="col-md-6">
             <label for="direccion" class="form-label">Dirección</label>
@@ -341,7 +492,7 @@
         </div>
         <br />
         <div class="col-6 ps-1">
-          <a onclick="Back()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
+          <a onclick="Inicio()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
             <span>Inicio</span>
             <i class="icon-24-outlined-other-location-home"></i>
           </a>
