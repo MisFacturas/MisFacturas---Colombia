@@ -145,7 +145,6 @@ function eliminarTotalidadInformacion() {
   SpreadsheetApp.getUi().alert('Informacion eliminada correctamente');
 
 
-  //falta borrar carpeta esa con pdfs
 }
 function borrarInfoHoja(hoja) {
   let lastrow = Number(hoja.getLastRow())
@@ -156,6 +155,9 @@ function borrarInfoHoja(hoja) {
   if (nombreHoja === "Datos de emisor") {
     Logger.log("Hoja es datos emisor ")
     hoja.getRange(1, 2, 12).setValue("")
+    for (let i = 18; i < 50; i++) {
+      hoja.getRange(i, 1, 1, 6).setValue("")
+    }
   } else if (nombreHoja === "Clientes") {
     Logger.log("Hoja es clientes")
     hoja.deleteRows(3, lastrow)
@@ -187,6 +189,9 @@ function DesvincularMisfacturas() {
   hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
   hojaDatos.getRange("F47").setValue("")
   SpreadsheetApp.getUi().alert('Haz desvinculado exitosamente misfacturas');
+  for (let i = 18; i < 50; i++) {
+    hojaDatosEmisor.getRange(i, 1, 1, 6).setValue("")
+  }
 }
 function mensajeErrorDesvincularMisfacturas() {
   Logger.log("Error Desvincular")
@@ -406,7 +411,7 @@ function onEdit(e) {
       }
 
       updateTotalProductCounter(lastRowProducto, productStartRow, hojaActual, cargosDescuentosStartRow)
-    
+
     } else if ((colEditada == 9 || colEditada == 10) && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
       //verificar descuentos
       let valorEditadoDescuneto = celdaEditada.getValue();
@@ -472,6 +477,15 @@ function onEdit(e) {
         throw new Error('por favor poner un Numero de Identificacion unico');
       }
     }
+    var hojaDatos = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Datos');
+    hojaDatos.getRange("L101").setValue("=Clientes!N" + rowEditada);
+    // Agregar regla de validación de datos
+    let rangoValidacion = hojaCliente.getRange("O" + rowEditada);
+    let regla = SpreadsheetApp.newDataValidation()
+      .requireValueInRange(SpreadsheetApp.getActiveSpreadsheet().getRange("Datos!$M$101:$M$367"))
+      .setAllowInvalid(false)
+      .build();
+    rangoValidacion.setDataValidation(regla);
 
     verificarDatosObligatorios(e, tipoPersona)
     agregarCodigoIdentificador(e, tipoPersona)
@@ -528,7 +542,7 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
   //Seccion Impuestos
   let firstRowImpuestos = lastCargoDescuentoRow + 4;
   let lastRowImpuestos = getTotalesLinea(hojaActual) + 3;
-  
+
 
   //impuestos
   hojaActual.getRange("C" + String(rowParaTotales)).setValue("=SUM(F15:F" + String(lastRowProducto) + ")")
@@ -547,8 +561,8 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
   //cargos
   //hojaActual.getRange("H" + String(rowParaTotales)).setValue("=SUM(J15:J" + String(lastRowProducto) + ")+" + totalDescuentosSeccionCargosyDescuentos.cargos)
   hojaActual.getRange("H" + String(rowParaTotales)).setValue(totalDescuentosSeccionCargosyDescuentos.cargos)
-  
-  
+
+
   //total
   hojaActual.getRange("K" + String(rowParaTotales)).setValue("=D" + String(rowParaTotales) + "-F" + String(rowParaTotales) + "+H" + String(rowParaTotales))
   //neto a pagar
@@ -617,7 +631,7 @@ function getcargosDescuentosStartRow(sheet) {
   const lastRow = sheet.getLastRow();
   let row = 14
 
-  for (row; row < lastRow; row++) { 
+  for (row; row < lastRow; row++) {
     if (sheet.getRange(row, 1).getValue() === 'Cargos y/o Descuentos') {
       return row;
     }
@@ -627,7 +641,7 @@ function getcargosDescuentosStartRow(sheet) {
 function calcularCargYDescu(hojaActual, rowSeccionCargosYDescuentos, lastCargoDescuentoRow) {
   let totalDescuentosSeccionCargosyDescuentos = { cargos: 0, descuentos: 0 };
   let totalesRow = getTotalesLinea(hojaActual);
-  for (let i = rowSeccionCargosYDescuentos+2; i < lastCargoDescuentoRow + 1; i++) {
+  for (let i = rowSeccionCargosYDescuentos + 2; i < lastCargoDescuentoRow + 1; i++) {
     let celdaValorPorcentaje = hojaActual.getRange("C" + String(i)).getValue()
     if (hojaActual.getRange("A" + String(i)).getValue() === "Cargo") {
       if (String(celdaValorPorcentaje).includes("%")) {
@@ -655,8 +669,8 @@ function calcularCargYDescu(hojaActual, rowSeccionCargosYDescuentos, lastCargoDe
       }
       totalDescuentosSeccionCargosyDescuentos.descuentos += hojaActual.getRange("E" + String(i)).getValue();
     }
-    
-  } 
+
+  }
   return totalDescuentosSeccionCargosyDescuentos;
 }
 
@@ -740,12 +754,16 @@ function agregarCodigoIdentificador(e, tipoPersona) {
         let numeroIdentificacion = hoja.getRange(rowEditada, 10).getValue()
         let identificadorUnico = nombre + " " + apellido + "-" + numeroIdentificacion
         hoja.getRange(rowEditada, 23).setValue(identificadorUnico)
+        let rangoValidacion = hoja.getRange("O" + rowEditada);
+        rangoValidacion.clearDataValidations();
 
       } else if (tipoPersona === "Juridica") {
         let nombre = hoja.getRange(rowEditada, 4).getValue()
         let numeroIdentificacion = hoja.getRange(rowEditada, 10).getValue()
         let identificadorUnico = nombre + "-" + numeroIdentificacion
         hoja.getRange(rowEditada, 23).setValue(identificadorUnico)
+        let rangoValidacion = hoja.getRange("O" + rowEditada);
+        rangoValidacion.clearDataValidations();
       }
     }
   } else if (hoja.getName() == "Productos") {

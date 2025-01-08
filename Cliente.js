@@ -307,9 +307,9 @@ function verificarDatosObligatorios(e, tipoPersona) {
   }
 
   if (tipoPersona === "Natural") {
-    columnasObligatorias = [5, 7, 9, 10, 11, 12, 13, 16, 17, 18, 20];
+    columnasObligatorias = [5, 7, 9, 10, 11, 12, 13, 16, 17, 18, 20, 21, 22];
   } else if (tipoPersona === "Juridica") {
-    columnasObligatorias = [4, 9, 10, 11, 12, 13, 16, 17, 18, 20];
+    columnasObligatorias = [4, 9, 10, 11, 12, 13, 16, 17, 18, 20, 21, 22];
   } else {
     Logger.log("Vacio tipo de persona");
   }
@@ -344,6 +344,8 @@ function verificarDatosObligatorios(e, tipoPersona) {
       sheet.getRange(rowEditada, 1).setValue(status); // Establecer valor en "Estado"
     }
   }
+   
+
 }
 
 

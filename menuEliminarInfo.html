@@ -42,6 +42,7 @@
       const inputText = document.getElementById('confirmacionTexto').value;
       if (inputText === "ELIMINAR") {
         google.script.run.eliminarTotalidadInformacion();
+        google.script.run.showSidebar();
       } else {
         google.script.run.mensajeBorrarInfoError();
       }

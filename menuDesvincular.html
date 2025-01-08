@@ -43,6 +43,7 @@
       const inputText = document.getElementById('confirmacionTexto').value;
       if (inputText === "DESVINCULAR") {
         google.script.run.DesvincularMisfacturas();
+        google.script.run.showConfiguracion();
       } else {
         google.script.run.MensajeErrorDesvincularMisfacturas();
       }

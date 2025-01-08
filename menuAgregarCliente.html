@@ -105,8 +105,7 @@
         sitioWeb: document.getElementById('sitioWeb').value,
         email: document.getElementById('email').value,
         detallesTributarios: document.getElementById('detallesTributarios').value,
-        responsabilidadFiscal: document.getElementById('responsabilidadFiscal').value
-
+        responsabilidadFiscal: Array.from(document.getElementById('responsabilidadFiscal').selectedOptions).map(option => option.value).join(', ')
       };
 
       google.script.run.withSuccessHandler(function (response) {
@@ -400,7 +399,7 @@
               <option value="Antioquia">Antioquia</option>
               <option value="Arauca">Arauca</option>
               <option value="Atlantico">Atlantico</option>
-              <option value="Bogota">Bogota</option>
+              <option value="Bogota">BogotaDC</option>
               <option value="Bolivar">Bolivar</option>
               <option value="Boyaca">Boyaca</option>
               <option value="Caldas">Caldas</option>
@@ -414,19 +413,19 @@
               <option value="Guainia">Guainia</option>
               <option value="Guaviare">Guaviare</option>
               <option value="Huila">Huila</option>
-              <option value="La Guajira">La Guajira</option>
+              <option value="La Guajira">LaGuajira</option>
               <option value="Magdalena">Magdalena</option>
               <option value="Meta">Meta</option>
               <option value="Narino">Narino</option>
-              <option value="Norte de Santander">Norte de Santander</option>
+              <option value="Norte de Santander">NteSantander</option>
               <option value="Putumayo">Putumayo</option>
               <option value="Quindio">Quindio</option>
               <option value="Risaralda">Risaralda</option>
-              <option value="San Andres y Providencia">San Andres y Providencia</option>
+              <option value="San Andres y Providencia">SanAndresProvidencia</option>
               <option value="Santander">Santander</option>
               <option value="Sucre">Sucre</option>
               <option value="Tolima">Tolima</option>
-              <option value="Valle del Cauca">Valle del Cauca</option>
+              <option value="Valle del Cauca">ValleDelCauca</option>
               <option value="Vaupes">Vaupes</option>
               <option value="Vichada">Vichada</option>
             </select>
@@ -469,7 +468,7 @@
           </div>
           <div class="col-12">
             <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal</label>
-            <select id="responsabilidadFiscal" class="form-select form-select-lg" disabled>
+            <select id="responsabilidadFiscal" class="form-select form-select-lg" multiple disabled>
               <option class="placeholder" selected disabled hidden>Seleccione</option>
               <option>Gran contribuyente</option>
               <option>Autorretenedor</option>
