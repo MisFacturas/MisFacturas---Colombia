@@ -64,7 +64,6 @@
 
 
 
-
       google.script.run.withSuccessHandler(function (response) {
         resetForm(); // Llama a la función para resetear el formulario
       }).processForm(data);
@@ -119,6 +118,18 @@
 
     function toggleCheckbox(selectedId, otherId) {
       document.getElementById(otherId).checked = false;
+    }
+
+    function toggleUnidadDeMedida() {
+      const checkbox = document.getElementById('unidadMedidaCheckbox');
+      const unidadInput = document.getElementById('unidadDeMedida');
+      if (checkbox.checked) {
+        unidadInput.value = 'Unidad';
+        unidadInput.disabled = true;
+      } else {
+        unidadInput.value = '';
+        unidadInput.disabled = false;
+      }
     }
   </script>
 </head>
@@ -175,6 +186,13 @@
               <div class="result-box">
                 <!-- Los resultados se mostrarán aquí -->
               </div>
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="unidadMedidaCheckbox"
+                  onclick="toggleUnidadDeMedida()">
+                <label class="form-check-label" for="unidadCheckbox">
+                  Unidad
+                </label>
+              </div>
             </div>
 
             <div class="col-12">
@@ -222,24 +240,12 @@
 
 
             <div class="col-12">
-              <label for="ReteIva" class="form-label">
-                Retencion sobre el IVA
-              </label>
-              <select id="tarifaReteIva" name="tarifaReteIva" class="form-select form-select-lg">
-                <option selected value="">Seleccione</option>
-                <option value="">No alpica</option>
-                <option value="15">15%</option>
-                <option value="100">100%</option>
-              </select>
-            </div>
-
-            <div class="col-12">
               <label for="ReteRenta" class="form-label">
                 Retencion sobre renta
               </label>
               <select id="tarifaReteRenta" name="tarifaReteRenta" class="form-select form-select-lg">
-                <option selected value="">Seleccione</option>
-                <option value="">No alpica</option>
+                <option selected value="No Aplica">Seleccione</option>
+                <option>No Aplica</option>
                 <option>Compras generales (declarantes)</option>
                 <option>Compras generales (no declarantes)</option>
                 <option>Compras con tarjeta debito o credito</option>

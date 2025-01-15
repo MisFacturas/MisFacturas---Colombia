@@ -1438,6 +1438,7 @@ var departamentosCodigos = {
 };
 
 var reteRentaValores = {
+  "No Aplica": 0.00,
   "Retencion sobre el IVA 15%": 15.00,
   "Retencion sobre el IVA 100%": 100.00,
   "Compras generales (declarantes)": 2.50,

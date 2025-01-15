@@ -677,7 +677,7 @@ function guardarYGenerarInvoice() {
 
       if (LineaFactura["retencion"] > 0) {
         let retencionTaxInformation = {
-          Id: "05",
+          Id: "06",
           TaxEvidenceIndicator: true,
           TaxableAmount: Number(LineExtensionAmount),
           TaxAmount: Number(LineaFactura["retencion"]),
@@ -686,12 +686,8 @@ function guardarYGenerarInvoice() {
           PerUnitAmount: 0,
         };
         let nombreYporcentajeRetencion = buscarRetencion(LineaFactura["producto"]);
-        let nombreRetencion = nombreYporcentajeRetencion[0];
         let porcentajeRetencion = Number(nombreYporcentajeRetencion[1]) * 100;
         retencionTaxInformation.Percent = porcentajeRetencion;
-        if (nombreRetencion !== "Retencion sobre el IVA 100%" && nombreRetencion !== "Retencion sobre el IVA 15%") {
-          retencionTaxInformation.Id = "06";
-        }
         ItemTaxesInformation.push(retencionTaxInformation);
       }
 

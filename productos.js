@@ -137,23 +137,8 @@ function validarImpuestos(impuestos, tarifaIva, tarifaInc) {
   return tarifaImpuestos;
 }
 
-function validarTipoRetencion(tarifaReteIva, tarifaReteRenta) {
-  let tipoRetencion = "";
-  if (tarifaReteIva !== "") {
-    tipoRetencion = "Retencion sobre el IVA";
-  } else if (tarifaReteRenta !== "") {
-    tipoRetencion = tarifaReteRenta;
-  }
-  return tipoRetencion;
-}
-
-function validarTarifaRetencion(tarifaReteIva, tarifaReteRenta) {
-  let tarifaRetencion = 0;
-  if (tarifaReteIva !== "") {
-    tarifaRetencion = tarifaReteIva;
-  } else if (tarifaReteRenta !== "") {
-    tarifaRetencion = reteRentaValores[tarifaReteRenta];
-  }
+function validarTarifaRetencion(tarifaReteRenta) {
+  let tarifaRetencion = reteRentaValores[tarifaReteRenta];
   return tarifaRetencion;
 }
 

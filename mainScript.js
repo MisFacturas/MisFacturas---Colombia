@@ -222,6 +222,7 @@ function processForm(data) {
     const nombre = data.nombre;
     const precioUnitario = parseFloat(data.precioUnitario);
     const unidadDeMedida = data.unidadDeMedida;
+    const unidadMedidaCheckbox = data.unidadMedidaCheckbox;
     const referenciaAdicional = data.referenciaAdicional;
     const numeroReferenciaAdicional = referenciaAdicionalCodigos[referenciaAdicional];
     let iva = "";
@@ -229,23 +230,14 @@ function processForm(data) {
     if (data.tarifaIva !== "0") {
       iva = "IVA";
     }
-    if (data.tarifaIva === "0") {
-      tarifaIva = "";
-    }
     let inc = "";
     let tarifaInc = String(data.tarifaInc) + "%";
     if (data.tarifaInc !== "0") {
       inc = "INC";
     }
-    if (data.tarifaInc === "0") {
-      tarifaInc = "";
-    }
-    const retencionConcepto = validarTipoRetencion(data.tarifaReteIva, data.tarifaReteRenta);
-    let tarifaRetencion = String(validarTarifaRetencion(data.tarifaReteIva, data.tarifaReteRenta) + "%");
-    if (tarifaRetencion === "0%") {
-      tarifaRetencion = "";
-    }
-
+    const retencionConcepto = data.tarifaReteRenta;
+    Logger.log("retencionConcepto " + retencionConcepto)
+    let tarifaRetencion = String(validarTarifaRetencion(retencionConcepto) + "%");
 
     //Asigna los valores a los campos en el sheet
     //Tipo
@@ -267,7 +259,13 @@ function processForm(data) {
     sheet.getRange(newRow, 6).setHorizontalAlignment('normal');
     sheet.getRange(newRow, 6).setNumberFormat('$#,##0');
     //Unidad de Medida
+    Logger.log("unidadMedidaCheckbox " + unidadMedidaCheckbox)
+    Logger.log("unidadDeMedida " + unidadDeMedida)
+    if (unidadMedidaCheckbox) {
+      sheet.getRange(newRow, 7).setValue("Unidad");
+    } else {
     sheet.getRange(newRow, 7).setValue(unidadDeMedida);
+    }
     //Columna IVA
     sheet.getRange(newRow, 8).setValue(iva);
     //Tarifa IVA (formatea la celda como porcentaje)
@@ -286,15 +284,11 @@ function processForm(data) {
     //Retencion concepto
     sheet.getRange(newRow, 13).setValue(retencionConcepto);
     //Tarifa Retencion (formatea la celda como porcentaje)
-    Logger.log("tarifaRetencion " + tarifaRetencion)
     const tarifaRetencionCell = sheet.getRange(newRow, 14);
     tarifaRetencionCell.setValue(tarifaRetencion); // Establece el valor del IVA como decimal
     tarifaRetencionCell.setNumberFormat('0%'); // Formatea la celda como porcentaje con dos decimales
     //Valor Retencion
     valorRetencion = precioUnitario * (parseFloat(tarifaRetencion) / 100);
-    if (tarifaRetencion === "") {
-      valorRetencion = 0;
-    }
     sheet.getRange(newRow, 15).setValue(valorRetencion);
 
     let referenciaUnica = nombre + "-" + codigoReferencia
@@ -315,9 +309,9 @@ function convertToPercentage(value) {
 
 function onEdit(e) {
   let hojaActual = e.source.getActiveSheet();
+  let nombreHoja = hojaActual.getName();
 
-  if (hojaActual.getName() === "Factura") {
-
+  if (nombreHoja === "Factura") {
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
@@ -414,12 +408,6 @@ function onEdit(e) {
 
     } else if ((colEditada == 9 || colEditada == 10) && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
       //verificar descuentos
-      let valorEditadoDescuneto = celdaEditada.getValue();
-      if (colEditada == 9 && (0.00 > valorEditadoDescuneto || valorEditadoDescuneto > 1.00)) {
-        Logger.log("No se puede pasar de 100% el valor de descuento o menos de 0%")
-        SpreadsheetApp.getUi().alert("No es valido un descuento mayor a 100% ni menor a 0%")
-        celdaEditada.setValue("")
-      }
       let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaActual);
       let lastRowProducto = cargosDescuentosStartRow - 3;
       calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual)
@@ -455,7 +443,7 @@ function onEdit(e) {
 
 
 
-  } else if (hojaActual.getName() === "Clientes") {
+  } else if (nombreHoja === "Clientes") {
 
     let celdaEditada = e.range;
     let hojaCliente = e.source.getActiveSheet();
@@ -490,7 +478,8 @@ function onEdit(e) {
     verificarDatosObligatorios(e, tipoPersona)
     agregarCodigoIdentificador(e, tipoPersona)
 
-  } else if (hojaActual.getName() === "Productos") {
+  } else if (nombreHoja === "Productos") {
+
     let celdaEditada = e.range;
     let hojaProductos = e.source.getActiveSheet();
 
@@ -499,10 +488,9 @@ function onEdit(e) {
     let codigoReferencia = hojaProductos.getRange(rowEditada, colEditada).getValue()
     let existe = verificarIdentificacionUnica(codigoReferencia, "Productos", true)
     if (existe) {
-      SpreadsheetApp.getUi().alert("El numero de identificacion ya existe, por favor elegir otro numero unico");
-      celdaEditada.setValue("");
-      verificarDatosObligatoriosProductos(e);
-      throw new Error('por favor poner un Numero de Identificacion unico');
+      SpreadsheetApp.getUi().alert("El codigo de referencia ya existe, por favor elegir otro numero unico");
+      hojaProductos.getRange(rowEditada, 2).setValue("");
+      throw new Error('por favor poner un codigo de referencia unico');
     }
     let tipoPersona = '';
     verificarDatosObligatoriosProductos(e);
@@ -725,7 +713,6 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja) {
       let rangeCodigoReferencia = sheet.getRange(2, columnaNumIdentificacionP, lastActiveRow - 2);
       let datos = rangeCodigoReferencia.getValues().flat().map(Number);
       for (let i = 0; i < datos.length; i++) {
-        Logger.log("Datos i" + datos[i])
         if (datos[i] === codigoNumero) {
           Logger.log(`El código "${codigoNumero}" ya existe en la hoja "${nombreHoja}".`);
           return true;
