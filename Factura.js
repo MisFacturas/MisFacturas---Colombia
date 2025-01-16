@@ -680,14 +680,14 @@ function guardarYGenerarInvoice() {
           Id: "06",
           TaxEvidenceIndicator: true,
           TaxableAmount: Number(LineExtensionAmount),
-          TaxAmount: Number(LineaFactura["retencion"]).toFixed(2),
+          TaxAmount: Number(Number(LineaFactura["retencion"]).toFixed(2)),
           Percent: 0,
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         };
         let nombreYporcentajeRetencion = buscarRetencion(LineaFactura["producto"]);
         let porcentajeRetencion = Number(nombreYporcentajeRetencion[1]) * 100;
-        retencionTaxInformation.Percent = porcentajeRetencion.toFixed(2);
+        retencionTaxInformation.Percent = Number(porcentajeRetencion.toFixed(2));
         ItemTaxesInformation.push(retencionTaxInformation);
       }
 
