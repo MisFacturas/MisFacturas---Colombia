@@ -25,7 +25,7 @@ function verificarDatosObligatoriosProductos(e) {
   let range = e.range;
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
-  let ultimaColumnaPermitida = 9;
+  let ultimaColumnaPermitida = 15;
   let columnasObligatorias = [1, 2, 3, 4, 6, 7, 13];
   let estadosDefault = [""];
   let todasLasColumnas = [1, 2, 3, 4, 5, 6, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -56,6 +56,8 @@ function verificarDatosObligatoriosProductos(e) {
     if (tarifaINC !== "" || tarifaIVA !== "") {
       let precioImpuesto = sheet.getRange("F" + String(rowEditada)).getValue()*tarifaIVA + sheet.getRange("F" + String(rowEditada)).getValue()*tarifaINC;
       sheet.getRange("L"  + String(rowEditada)).setValue(precioImpuesto);
+      sheet.getRange("L"  + String(rowEditada)).setBackground('#d9d9d9');
+
     }
     let referenciaAdicional = sheet.getRange("D" + String(rowEditada)).getValue()
     let codigoRefAdicional = referenciaAdicionalCodigos[referenciaAdicional]
@@ -66,6 +68,7 @@ function verificarDatosObligatoriosProductos(e) {
       sheet.getRange(rowEditada, 14).setValue(tarifaRetencion+"%");
       let valorRetencion = sheet.getRange("F" + String(rowEditada)).getValue()*(tarifaRetencion/100);
       sheet.getRange(rowEditada, 15).setValue(valorRetencion);
+      sheet.getRange(rowEditada, 14).setBackground('#d9d9d9');
     } else {
       sheet.getRange(rowEditada, 14).setValue("");
       sheet.getRange(rowEditada, 15).setValue("");

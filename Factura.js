@@ -127,7 +127,7 @@ function agregarProductoDesdeFactura(cantidad, producto) {
     hojaFactura.getRange("G15").setValue(dictInformacionProducto["tarifa INC"])
     hojaFactura.getRange("H15").setValue(dictInformacionProducto["tarifa IVA"])
     hojaFactura.getRange("K15").setValue(dictInformacionProducto["valor Retencion"])
-    hojaFactura.getRange("L15").setValue("=(E15+F15+J15+(K15*E15))-((E15+F15+J15+(K15*E15))*I15)")//Total
+    hojaFactura.getRange("L15").setValue("=(E15+F15+J15)-((E15+F15+J15)*I15)")//Total
 
   } else {
     hojaFactura.insertRowAfter(lastProductRow)
@@ -141,7 +141,7 @@ function agregarProductoDesdeFactura(cantidad, producto) {
     hojaFactura.getRange("G" + String(rowParaDatos)).setValue(dictInformacionProducto["tarifa INC"])//%INC
     hojaFactura.getRange("H" + String(rowParaDatos)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
     hojaFactura.getRange("K" + String(rowParaDatos)).setValue(dictInformacionProducto["valor Retencion"])
-    hojaFactura.getRange("L" + String(rowParaDatos)).setValue("=(E" + String(rowParaDatos) + "+F" + String(rowParaDatos) + "+J" + String(rowParaDatos) + "+(K" + String(rowParaDatos) + "*E" + String(rowParaDatos) + "))-(E" + String(rowParaDatos) + "*I" + String(rowParaDatos) + ")")//Total
+    hojaFactura.getRange("L" + String(rowParaDatos)).setValue("=(E" + String(rowParaDatos) + "+F" + String(rowParaDatos) + "+J" + String(rowParaDatos) + "-(E" + String(rowParaDatos) + "*I" + String(rowParaDatos) + ")")//Total
   }
   updateTotalProductCounter(cargosDescuentosStartRow - 3, productStartRow, hojaFactura, cargosDescuentosStartRow);
   calcularDescuentosCargosYTotales(cargosDescuentosStartRow - 3, cargosDescuentosStartRow, hojaFactura);
@@ -680,14 +680,14 @@ function guardarYGenerarInvoice() {
           Id: "06",
           TaxEvidenceIndicator: true,
           TaxableAmount: Number(LineExtensionAmount),
-          TaxAmount: Number(LineaFactura["retencion"]),
+          TaxAmount: Number(LineaFactura["retencion"]).toFixed(2),
           Percent: 0,
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         };
         let nombreYporcentajeRetencion = buscarRetencion(LineaFactura["producto"]);
         let porcentajeRetencion = Number(nombreYporcentajeRetencion[1]) * 100;
-        retencionTaxInformation.Percent = porcentajeRetencion;
+        retencionTaxInformation.Percent = porcentajeRetencion.toFixed(2);
         ItemTaxesInformation.push(retencionTaxInformation);
       }
 
@@ -695,7 +695,7 @@ function guardarYGenerarInvoice() {
     }
 
 
-    let productoI = {//aqui organizamos todos los parametros necesarios para 
+    let productoI = {//aqui organizamos todos los parametros necesarios para los productos
       ItemReference: ItemReference,
       Name: Name,
       Quatity: new Number(Quantity),
@@ -784,7 +784,7 @@ function guardarYGenerarInvoice() {
         }
         CargosyDescuentos.push(Charge);
       }
-      else {
+      else if (hojaFactura.getRange("A" + String(i)).getValue() === "Descuento") {
         let Allowance = {
           "Id": 9,
           "ChargeIndicator": chargeIndicator,

@@ -361,7 +361,7 @@ function onEdit(e) {
         factura_sheet.getRange("H" + String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
         cargos = Number(factura_sheet.getRange("J" + String(i)).getValue())//Cargos
         factura_sheet.getRange("K" + String(i)).setValue(dictInformacionProducto["valor Retencion"] * factura_sheet.getRange("E" + String(i)).getValue())//Retencion
-        factura_sheet.getRange("L" + String(i)).setValue("=E" + String(i) + "+F" + String(i) + "+K" + String(i))
+        factura_sheet.getRange("L" + String(i)).setValue("=E" + String(i) + "+F" + String(i))
       }
 
       let lastRowProducto = cargosDescuentosStartRow - 3;
@@ -457,7 +457,7 @@ function onEdit(e) {
       Logger.log("entro a ver si el edit es en numero")
       let numeroIdentificacion = hojaCliente.getRange(rowEditada, colEditada).getValue()
       Logger.log("num i" + numeroIdentificacion)
-      let existe = verificarIdentificacionUnica(numeroIdentificacion, "Clientes", true)
+      let existe = verificarIdentificacionUnica(numeroIdentificacion, "Clientes", true, rowEditada)
       if (existe) {
         SpreadsheetApp.getUi().alert("El numero de identificacion ya existe, por favor elegir otro numero unico");
         celdaEditada.setValue("");
@@ -486,7 +486,7 @@ function onEdit(e) {
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
     let codigoReferencia = hojaProductos.getRange(rowEditada, colEditada).getValue()
-    let existe = verificarIdentificacionUnica(codigoReferencia, "Productos", true)
+    let existe = verificarIdentificacionUnica(codigoReferencia, "Productos", true, rowEditada)
     if (existe) {
       SpreadsheetApp.getUi().alert("El codigo de referencia ya existe, por favor elegir otro numero unico");
       hojaProductos.getRange(rowEditada, 2).setValue("");
@@ -554,7 +554,7 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
   //total
   hojaActual.getRange("K" + String(rowParaTotales)).setValue("=D" + String(rowParaTotales) + "-F" + String(rowParaTotales) + "+H" + String(rowParaTotales))
   //neto a pagar
-  hojaActual.getRange("L" + String(rowParaTotales)).setValue("=K" + String(rowParaTotales) + "-E" + String(rowParaTotales) + "-J" + String(rowParaTotales))
+  hojaActual.getRange("L" + String(rowParaTotales)).setValue("=K" + String(rowParaTotales) + "-J" + String(rowParaTotales))
 }
 
 function calcularDescuentos(hojaActual, lastRowProducto) {
@@ -676,7 +676,7 @@ function updateTotalProductCounter(lastRowProducto, productStartRow, hojaActual,
 
 }
 
-function verificarIdentificacionUnica(codigo, nombreHoja, inHoja) {
+function verificarIdentificacionUnica(codigo, nombreHoja, inHoja, numRow) {
   // Clientes o Productos
   let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(nombreHoja);
   if (codigo == "") {
@@ -687,17 +687,21 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja) {
       let lastActiveRow = sheet.getLastRow();
       let rangeNumeroIdentificaciones;
       if (inHoja) {
-        rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow - 2);
+        rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow);
       } else {
-        rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow - 1);
+        rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow);
       }
       let NumerosIdentificacion = String(rangeNumeroIdentificaciones.getValues());
       NumerosIdentificacion = NumerosIdentificacion.split(",")
 
       // Verificar si el código ya existe
       if (NumerosIdentificacion.includes(String(codigo))) {
-        Logger.log("El Num identificion ya existe.");
-        return true
+        var posicionArreglo = NumerosIdentificacion.indexOf(String(codigo)) + 2;
+        if (posicionArreglo !== numRow){
+          Logger.log(`posicion en el arreglo ${NumerosIdentificacion.indexOf(String(codigo))} y en numero de fila ${numRow}`)
+          Logger.log("El Num identificion ya existe.");
+          return true
+        }
       } else {
         Logger.log("El Num identificion no existe.");
         return false
@@ -710,10 +714,10 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja) {
       let columnaNumIdentificacionP = 2;
       let lastActiveRow = sheet.getLastRow();
       let codigoNumero = Number(codigo);
-      let rangeCodigoReferencia = sheet.getRange(2, columnaNumIdentificacionP, lastActiveRow - 2);
+      let rangeCodigoReferencia = sheet.getRange(2, columnaNumIdentificacionP, lastActiveRow);
       let datos = rangeCodigoReferencia.getValues().flat().map(Number);
       for (let i = 0; i < datos.length; i++) {
-        if (datos[i] === codigoNumero) {
+        if (datos[i] === codigoNumero && i + 2 !== numRow) {
           Logger.log(`El código "${codigoNumero}" ya existe en la hoja "${nombreHoja}".`);
           return true;
         }
