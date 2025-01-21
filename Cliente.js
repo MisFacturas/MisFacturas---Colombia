@@ -344,7 +344,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
       sheet.getRange(rowEditada, 1).setValue(status); // Establecer valor en "Estado"
     }
   }
-   
+
 
 }
 
@@ -446,7 +446,14 @@ function getCustomerInformation(cliente) {
   var numeroIdentificacion = datos_sheet.getRange("K2").getValue();//numero de identificacion
 
   //Digito de verificacion
-  var DV = 0;
+  function calcularDV(tipoIdentificacion) {
+    var DV = 0;
+    if (tipoIdentificacion === "NIT") {
+      DV = Number(datos_sheet.getRange("H50").getValue());
+    }
+    return DV;
+  }
+
 
   //Direccion
   var direccion = datos_sheet.getRange("T2").getValue();
@@ -494,7 +501,7 @@ function getCustomerInformation(cliente) {
   var CustomerInformation = {
     "IdentificationType": Number(tiposDocumento[tipoIdentificacion]),
     "Identification": Number(numeroIdentificacion),
-    "DV": DV,
+    "DV": calcularDV(tipoIdentificacion),
     "RegistrationName": cliente,
     "CountryCode": paisesCodigos[paisCliente],
     "CountryName": paisCliente,
