@@ -264,7 +264,7 @@ function processForm(data) {
     if (unidadMedidaCheckbox) {
       sheet.getRange(newRow, 7).setValue("Unidad");
     } else {
-    sheet.getRange(newRow, 7).setValue(unidadDeMedida);
+      sheet.getRange(newRow, 7).setValue(unidadDeMedida);
     }
     //Columna IVA
     sheet.getRange(newRow, 8).setValue(iva);
@@ -611,8 +611,10 @@ function getTotalesLinea(sheet) {
   for (row; row < lastRow; row++) {
     if (sheet.getRange(row, 1).getValue() === 'Subtotal') {
       return row + 1;
+      
     }
   }
+  Logger.log(" last row row " + row)
 }
 
 function getcargosDescuentosStartRow(sheet) {
@@ -697,7 +699,7 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja, numRow) {
       // Verificar si el código ya existe
       if (NumerosIdentificacion.includes(String(codigo))) {
         var posicionArreglo = NumerosIdentificacion.indexOf(String(codigo)) + 2;
-        if (posicionArreglo !== numRow){
+        if (posicionArreglo !== numRow) {
           Logger.log(`posicion en el arreglo ${NumerosIdentificacion.indexOf(String(codigo))} y en numero de fila ${numRow}`)
           Logger.log("El Num identificion ya existe.");
           return true

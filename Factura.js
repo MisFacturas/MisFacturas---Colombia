@@ -66,6 +66,7 @@ function verificarEstadoValidoFactura(estadoFactura) {
 }
 
 function guardarFactura() {
+  SpreadsheetApp.flush();
   SpreadsheetApp.getUi().alert("Revisando validez de la factura. Aguarde unos segundos");
   let estadoFactura = [];
   verificarEstadoValidoFactura(estadoFactura);
@@ -680,14 +681,15 @@ function guardarYGenerarInvoice() {
           Id: "06",
           TaxEvidenceIndicator: true,
           TaxableAmount: Number(LineExtensionAmount),
-          TaxAmount: Number(Number(LineaFactura["retencion"]).toFixed(2)),
+          TaxAmount: 0,
           Percent: 0,
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         };
         let nombreYporcentajeRetencion = buscarRetencion(LineaFactura["producto"]);
         let porcentajeRetencion = Number(nombreYporcentajeRetencion[1]) * 100;
-        retencionTaxInformation.Percent = Number(porcentajeRetencion.toFixed(2));
+        retencionTaxInformation.Percent = Number(porcentajeRetencion.toFixed(3));
+        retencionTaxInformation.TaxAmount = Number(LineExtensionAmount) * Number(porcentajeRetencion)/100;
         ItemTaxesInformation.push(retencionTaxInformation);
       }
 
@@ -808,12 +810,12 @@ function guardarYGenerarInvoice() {
 
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = hojaFactura.getRange("A29").getValue(); // para verificar donde esta el TOTAL
+  const posicionOriginalTotalFactura = hojaFactura.getRange("A26").getValue(); // para verificar donde esta el TOTAL
   let rangeTotales = ""
 
 
   if (posicionOriginalTotalFactura === "Subtotal") {
-    rangeTotales = hojaFactura.getRange(29, 1, 1, 12);//va a cambiar
+    rangeTotales = hojaFactura.getRange(posicionOriginalTotalFactura+1, 1, 1, 12);//va a cambiar
 
   } else {
     let rowTotales = getTotalesLinea(hojaFactura)
@@ -832,7 +834,7 @@ function guardarYGenerarInvoice() {
   let pfDescuentos = parseFloat(totalesValores[5]);
   let pfCargos = parseFloat(totalesValores[7]);
   let pfAnticipo = parseFloat(totalesValores[9]);
-  let pfNetoAPagar = parseFloat(totalesValores[10]);
+  let pfNetoAPagar = Number(totalesValores[10]);
   if (pfAnticipo = null) {
     pfAnticipo = 0;
   }
