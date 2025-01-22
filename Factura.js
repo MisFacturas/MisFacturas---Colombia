@@ -253,7 +253,10 @@ function obtenerTokenMF(usuario, contra) {
       hojaDatosEmisor.getRange("B13").setBackground('#ccffc7')  // Almacena el API Key en la celda
       hojaDatosEmisor.getRange("B13").setValue("Vinculado")
       hojaDatos.getRange("F47").setValue(token)
-      obtenerResolucionesDian(token, usuario);
+      var resdian = obtenerResolucionesDian(token, usuario);
+      if (!resdian) {
+        return;
+      }
     } else {
       hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
       hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
@@ -273,69 +276,81 @@ function obtenerTokenMF(usuario, contra) {
 function obtenerResolucionesDian(token, usuario) {
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaDatos = spreadsheet.getSheetByName("Datos")
-  if (!token || !usuario) {
-    usuario = hojaDatos.getRange("F49").getValue();
-    logearUsuario();
-    token = hojaDatos.getRange("F47").getValue();
+  let nit = hojaDatosEmisor.getRange("B3").getValue();
+  if (nit === "") {
+    hojaDatosEmisor.getRange("B3").setBackground("#FFC7C7");
+    SpreadsheetApp.getUi().alert("Por favor ingrese el NIT del emisor en la hoja 'Datos de emisor' y vuelva a intentar obtener las resoluciones.");
+    return;
   }
-
-  let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${usuario}`;
-  let opciones = {
-    "method": "get",
-    "headers": { "Authorization": "misfacturas " + token },
-    "contentType": "application/json",
-    'muteHttpExceptions': true
-  };
-
-  try {
-    const respuesta = UrlFetchApp.fetch(url, opciones);
-    const contenidoTexto = respuesta.getContentText(); // Obtiene el cuerpo de la respuesta como texto
-    const datos = JSON.parse(contenidoTexto); // Convierte el texto a un objeto JSON
-
-    if (datos.InvoiceAuthorizationList && datos.InvoiceAuthorizationList.length > 0) {
-      const encabezados = [
-        "InvoiceAuthorizationNumber",
-        //"ResolutionDateTime",
-        //"StartDate",
-        //"EndDate",
-        "Prefix",
-        "From",
-        "To",
-        //"TechnicalKey",
-        "CurrentSecuence",
-        "Estado",
-        //"Observaciones"
-      ];
-
-
-      //hojaDatosEmisor.getRange(17, 1, 1, encabezados.length).setValues([encabezados]);
-
-      // Preparar los datos para escribirlos en el sheet
-      const filas = datos.InvoiceAuthorizationList.map(item => [
-        item.InvoiceAuthorizationNumber,
-        //item.ResolutionDateTime,
-        //item.StartDate,
-        //item.EndDate,
-        item.Prefix,
-        item.From,
-        item.To,
-        //item.TechnicalKey,
-        item.CurrentSecuence,
-        item.Estado,
-        //item.Observaciones
-      ]);
-
-      // Escribir los datos en la hoja, debajo de los encabezados
-      hojaDatosEmisor.getRange(18, 1, filas.length, encabezados.length).setValues(filas);
-
-    } else {
-      throw new Error("Error de la API: " + contenidoRespuesta); // Muestra el error de la API
-
+  else {
+    hojaDatosEmisor.getRange("B3").setBackground(null);
+    if (!token || !usuario) {
+      usuario = hojaDatos.getRange("F49").getValue();
+      logearUsuario();
+      token = hojaDatos.getRange("F47").getValue();
     }
-  } catch (error) {
-
-    SpreadsheetApp.getUi().alert("Error al obtener las resoluciones dian. Verifica que el usuario y la contraseña estén correctos e intenta de nuevo. Si el error persiste, comunícate con soporte.");
+  
+    let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${nit}`;
+    let opciones = {
+      "method": "get",
+      "headers": { "Authorization": "misfacturas " + token },
+      "contentType": "application/json",
+      'muteHttpExceptions': true
+    };
+  
+    try {
+      const respuesta = UrlFetchApp.fetch(url, opciones);
+      const contenidoTexto = respuesta.getContentText(); // Obtiene el cuerpo de la respuesta como texto
+      const datos = JSON.parse(contenidoTexto); // Convierte el texto a un objeto JSON
+  
+      if (datos.InvoiceAuthorizationList && datos.InvoiceAuthorizationList.length > 0) {
+        const encabezados = [
+          "InvoiceAuthorizationNumber",
+          //"ResolutionDateTime",
+          //"StartDate",
+          //"EndDate",
+          "Prefix",
+          "From",
+          "To",
+          //"TechnicalKey",
+          "CurrentSecuence",
+          "Estado",
+          //"Observaciones"
+        ];
+  
+  
+        //hojaDatosEmisor.getRange(17, 1, 1, encabezados.length).setValues([encabezados]);
+  
+        // Preparar los datos para escribirlos en el sheet
+        const filas = datos.InvoiceAuthorizationList.map(item => [
+          item.InvoiceAuthorizationNumber,
+          //item.ResolutionDateTime,
+          //item.StartDate,
+          //item.EndDate,
+          item.Prefix,
+          item.From,
+          item.To,
+          //item.TechnicalKey,
+          item.CurrentSecuence,
+          item.Estado,
+          //item.Observaciones
+        ]);
+  
+        // Escribir los datos en la hoja, debajo de los encabezados
+        hojaDatosEmisor.getRange(18, 1, filas.length, encabezados.length).setValues(filas);
+        return true;
+      } else {
+        throw new Error("Error de la API: " + contenidoRespuesta); // Muestra el error de la API
+        return false;
+      }
+    } catch (error) {
+  
+      SpreadsheetApp.getUi().alert("Error al obtener las resoluciones dian. Verifica que el NIT sea correcto e intenta de nuevo. Si el error persiste, comunícate con soporte.");
+      return false;
+    }
   }
+
+ 
 
 }
 
@@ -689,7 +704,7 @@ function guardarYGenerarInvoice() {
         let nombreYporcentajeRetencion = buscarRetencion(LineaFactura["producto"]);
         let porcentajeRetencion = Number(nombreYporcentajeRetencion[1]) * 100;
         retencionTaxInformation.Percent = Number(porcentajeRetencion.toFixed(3));
-        retencionTaxInformation.TaxAmount = Number(LineExtensionAmount) * Number(porcentajeRetencion)/100;
+        retencionTaxInformation.TaxAmount = Number(LineExtensionAmount) * Number(porcentajeRetencion) / 100;
         ItemTaxesInformation.push(retencionTaxInformation);
       }
 
@@ -766,11 +781,11 @@ function guardarYGenerarInvoice() {
   function agregarCargosDescuentosTotales(subtotal) {
     let hojaFactura = spreadsheet.getSheetByName('Factura');
 
-    let rowSeccionCargosyDescuentos = getcargosDescuentosStartRow(hojaFactura)+2;
+    let rowSeccionCargosyDescuentos = getcargosDescuentosStartRow(hojaFactura) + 2;
     let lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
     let CargosyDescuentos = [];
     let chargeIndicator = false;
-    for (let i = rowSeccionCargosyDescuentos; i <= lastCargoDescuentoRow+1; i++) {
+    for (let i = rowSeccionCargosyDescuentos; i <= lastCargoDescuentoRow + 1; i++) {
       let celdaValorPorcentaje = hojaFactura.getRange("C" + String(i)).getValue()
       if (hojaFactura.getRange("A" + String(i)).getValue() === "Cargo") {
         let Charge = {
@@ -801,7 +816,7 @@ function guardarYGenerarInvoice() {
         CargosyDescuentos.push(Allowance);
       }
     }
-      
+
     return CargosyDescuentos;
   }
 
@@ -815,7 +830,7 @@ function guardarYGenerarInvoice() {
 
 
   if (posicionOriginalTotalFactura === "Subtotal") {
-    rangeTotales = hojaFactura.getRange(posicionOriginalTotalFactura+1, 1, 1, 12);//va a cambiar
+    rangeTotales = hojaFactura.getRange(posicionOriginalTotalFactura + 1, 1, 1, 12);//va a cambiar
 
   } else {
     let rowTotales = getTotalesLinea(hojaFactura)
