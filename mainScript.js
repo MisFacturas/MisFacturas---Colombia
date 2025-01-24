@@ -70,7 +70,7 @@ function iniciarHojasFactura() {
   Logger.log("Inicio instalación de hojas");
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const plantillaID = "1qxbXlhH4RpCOsObk91wsuu4k8jarVK34XXRUlKaKS1U";
+  const plantillaID = "1szeKZtkx62En3aHDnLuWeehKzpdLL_ewpITXOVdhqHo";
   const plantilla = SpreadsheetApp.openById(plantillaID);
 
   const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
@@ -209,7 +209,7 @@ function agregarDataValidations() {
   SpreadsheetApp.getUi().alert("Validaciones de datos aplicadas correctamente.");
 }
 
-function IniciarFacturasApp() {
+function IniciarMisfacturas() {
   let ui = SpreadsheetApp.getUi();
 
   let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
