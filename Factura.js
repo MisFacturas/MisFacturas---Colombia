@@ -176,6 +176,7 @@ function logearUsuario() {
 }
 
 function enviarFactura() {
+  let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let schemaID = 31;
   let idNumber = hojaDatosEmisor.getRange("B3").getValue();
@@ -205,12 +206,17 @@ function enviarFactura() {
       Logger.log(contenidoRespuesta["DocumentId"], contenidoRespuesta["MessageValidation"]);
       SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
       limpiarHojaFactura();
-    } else {
+    } else if (contenidoRespuesta["Message"] === "E002: El documento que intenta ingresar ya existe en el sistema") {
+      SpreadsheetApp.getUi().alert("Error: La factura ya existe en el sistema de misfacturas. Por favor, verifique que el número de factura sea único.");
+      hojaFactura.getRange("H2").setBackground("#FFC7C7");
+    }
+    else {
       SpreadsheetApp.getUi().alert(
         "Error al enviar la factura: " +
         (contenidoRespuesta["Message"] || "Respuesta desconocida")
       );
     }
+
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
     SpreadsheetApp.getUi().alert("Error al enviar la factura a misfacturas. Intente de nuevo si el error presiste comuniquese con soporte");
@@ -289,20 +295,20 @@ function obtenerResolucionesDian(token, usuario) {
       logearUsuario();
       token = hojaDatos.getRange("F47").getValue();
     }
-  
-    let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${nit}`;
+
+    let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=13&IDNumber=${nit}`;
     let opciones = {
       "method": "get",
       "headers": { "Authorization": "misfacturas " + token },
       "contentType": "application/json",
       'muteHttpExceptions': true
     };
-  
+
     try {
       const respuesta = UrlFetchApp.fetch(url, opciones);
       const contenidoTexto = respuesta.getContentText(); // Obtiene el cuerpo de la respuesta como texto
       const datos = JSON.parse(contenidoTexto); // Convierte el texto a un objeto JSON
-  
+
       if (datos.InvoiceAuthorizationList && datos.InvoiceAuthorizationList.length > 0) {
         const encabezados = [
           "InvoiceAuthorizationNumber",
@@ -317,10 +323,10 @@ function obtenerResolucionesDian(token, usuario) {
           "Estado",
           //"Observaciones"
         ];
-  
-  
+
+
         //hojaDatosEmisor.getRange(17, 1, 1, encabezados.length).setValues([encabezados]);
-  
+
         // Preparar los datos para escribirlos en el sheet
         const filas = datos.InvoiceAuthorizationList.map(item => [
           item.InvoiceAuthorizationNumber,
@@ -335,7 +341,7 @@ function obtenerResolucionesDian(token, usuario) {
           item.Estado,
           //item.Observaciones
         ]);
-  
+
         // Escribir los datos en la hoja, debajo de los encabezados
         hojaDatosEmisor.getRange(18, 1, filas.length, encabezados.length).setValues(filas);
         return true;
@@ -344,13 +350,13 @@ function obtenerResolucionesDian(token, usuario) {
         return false;
       }
     } catch (error) {
-  
+
       SpreadsheetApp.getUi().alert("Error al obtener las resoluciones dian. Verifica que el NIT sea correcto e intenta de nuevo. Si el error persiste, comunícate con soporte.");
       return false;
     }
   }
 
- 
+
 
 }
 
@@ -608,12 +614,12 @@ function guardarYGenerarInvoice() {
     let Name = String(LineaFactura['producto']);
     let Quantity = String(LineaFactura['cantidad']);
     let Price = Number(LineaFactura['preciounitario']);
-    let LineChargeTotal = Number(LineaFactura['cargos']);
     let chargeIndicator = false;
     let LineTotalTaxes = Number(LineaFactura['impuestos']);
     let LineTotal = parseFloat(LineaFactura['totaldelinea']);
     let LineExtensionAmount = parseFloat(LineaFactura['subtotal']);
-    let LineAllowanceTotal = Number(LineaFactura['descuento%']) * 100;
+    let TotalCargosLinea = Number(LineaFactura['cargos']);
+    let TotalDescuentoLinea = Number(LineaFactura['descuento%']) * 100;
     let MeasureUnitCode = String(codigosUnidadDeMedida[unidadDeMedida]);
 
     let ItemTaxesInformation = [];
@@ -636,27 +642,30 @@ function guardarYGenerarInvoice() {
 
     function agregarCargosDescuentos() {
       let AllowanceCharge = [];
-      if (LineAllowanceTotal > 0) {
+      if (TotalDescuentoLinea > 0) {
         let Allowance = {
           "Id": 9,
           "ChargeIndicator": chargeIndicator,
           "AllowanceChargeReason": "",
-          "MultiplierFactorNumeric": Number(LineAllowanceTotal),
-          "Amount": Number(Price) * Number(Quantity) * (LineAllowanceTotal / 100),
+          "MultiplierFactorNumeric": Number(TotalDescuentoLinea),
+          "Amount": Number(Price) * Number(Quantity) * (TotalDescuentoLinea / 100),
           "BaseAmount": Number(Price) * Number(Quantity)
         }
         AllowanceCharge.push(Allowance);
+
       }
-      if (LineChargeTotal > 0) {
+      if (TotalCargosLinea > 0) {
         let Charge = {
           "Id": 20,
           "ChargeIndicator": !chargeIndicator,
           "AllowanceChargeReason": "",
-          "Amount": LineChargeTotal,
+          "Amount": TotalCargosLinea,
           "BaseAmount": Number(Price) * Number(Quantity)
         }
         AllowanceCharge.push(Charge);
+
       }
+
       return AllowanceCharge;
     }
 
@@ -718,8 +727,8 @@ function guardarYGenerarInvoice() {
       Quatity: new Number(Quantity),
       Price: new Number(Price),
 
-      LineAllowanceTotal: 0,
-      LineChargeTotal: 0,
+      LineAllowanceTotal: TotalDescuentoLinea,
+      LineChargeTotal: TotalCargosLinea,
       LineTotalTaxes: LineTotalTaxes,
       LineTotal: LineTotal,
       LineExtensionAmount: LineExtensionAmount,
@@ -731,6 +740,8 @@ function guardarYGenerarInvoice() {
       TaxesInformation: agregarImpuestos(),
       AllowanceCharge: agregarCargosDescuentos()
     };
+
+
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
   } while (i < (15 + cantidadProductos));
@@ -825,7 +836,7 @@ function guardarYGenerarInvoice() {
 
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = hojaFactura.getRange("A26").getValue(); // para verificar donde esta el TOTAL
+  const posicionOriginalTotalFactura = hojaFactura.getRange("A25").getValue(); // para verificar donde esta el TOTAL
   let rangeTotales = ""
 
 

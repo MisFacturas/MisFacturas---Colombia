@@ -26,11 +26,14 @@ function verificarDatosObligatoriosProductos(e) {
   let rowEditada = range.getRow();
   let colEditada = range.getColumn();
   let ultimaColumnaPermitida = 15;
-  let columnasObligatorias = [1, 2, 3, 4, 6, 7, 13];
-  let estadosDefault = [""];
+  let columnasObligatorias = [1, 2, 3, 4, 6, 7];
   let todasLasColumnas = [1, 2, 3, 4, 5, 6, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  let valido = false;
+  var contadorFaltantes = 6;
 
-  if (rowEditada > 1 && colEditada <= ultimaColumnaPermitida) {
+
+
+  if (rowEditada >= 2 && colEditada <= ultimaColumnaPermitida) {
     let estaCompleto = true;
     let estaVacioOPredeterminado = true;
 
@@ -41,11 +44,13 @@ function verificarDatosObligatoriosProductos(e) {
 
     // Verificar celdas obligatorias
     for (let i = 0; i < columnasObligatorias.length; i++) {
+
       let valorDeCelda = sheet.getRange(rowEditada, columnasObligatorias[i]).getValue();
-      if (estadosDefault.includes(valorDeCelda)) {
+      if (valorDeCelda === "") {
         estaCompleto = false;
         sheet.getRange(rowEditada, columnasObligatorias[i]).setBackground('#FFC7C7'); // Resaltar en rojo claro
       } else {
+        contadorFaltantes--;
         estaVacioOPredeterminado = false;
       }
     }
@@ -54,9 +59,9 @@ function verificarDatosObligatoriosProductos(e) {
     Logger.log(tarifaIVA);
     Logger.log(tarifaINC);
     if (tarifaINC !== "" || tarifaIVA !== "") {
-      let precioImpuesto = sheet.getRange("F" + String(rowEditada)).getValue()*tarifaIVA + sheet.getRange("F" + String(rowEditada)).getValue()*tarifaINC;
-      sheet.getRange("L"  + String(rowEditada)).setValue(precioImpuesto);
-      sheet.getRange("L"  + String(rowEditada)).setBackground('#d9d9d9');
+      let precioImpuesto = sheet.getRange("F" + String(rowEditada)).getValue() * tarifaIVA + sheet.getRange("F" + String(rowEditada)).getValue() * tarifaINC;
+      sheet.getRange("L" + String(rowEditada)).setValue(precioImpuesto);
+      sheet.getRange("L" + String(rowEditada)).setBackground('#d9d9d9');
 
     }
     let referenciaAdicional = sheet.getRange("D" + String(rowEditada)).getValue()
@@ -65,8 +70,8 @@ function verificarDatosObligatoriosProductos(e) {
     let tipoRetencion = sheet.getRange("M" + String(rowEditada)).getValue();
     if (tipoRetencion !== "" || tipoRetencion !== "No Aplica") {
       let tarifaRetencion = reteRentaValores[tipoRetencion];
-      sheet.getRange(rowEditada, 14).setValue(tarifaRetencion+"%");
-      let valorRetencion = sheet.getRange("F" + String(rowEditada)).getValue()*(tarifaRetencion/100);
+      sheet.getRange(rowEditada, 14).setValue(tarifaRetencion + "%");
+      let valorRetencion = sheet.getRange("F" + String(rowEditada)).getValue() * (tarifaRetencion / 100);
       sheet.getRange(rowEditada, 15).setValue(valorRetencion);
       sheet.getRange(rowEditada, 14).setBackground('#d9d9d9');
     } else {
@@ -75,6 +80,11 @@ function verificarDatosObligatoriosProductos(e) {
       sheet.getRange(rowEditada, 13).setBackground(null);
     }
   }
+  Logger.log("contador faltantes :" + contadorFaltantes);
+  if (contadorFaltantes === 0) {
+    valido = true;
+  }
+  return valido;
 }
 
 // a cambiar cuando se pregunte y agg los otros porcinetos
@@ -152,8 +162,8 @@ function buscarUnidadesDeMedida(terminoBusqueda) {
 
   // Filtrar los productos que coincidan con el término de búsqueda
   var productosFiltrados = valores
-    .map(function(row) { return row[0]; })
-    .filter(function(producto) {
+    .map(function (row) { return row[0]; })
+    .filter(function (producto) {
       // Verificar que 'producto' es una cadena antes de llamar a 'toLowerCase'
       return typeof producto === 'string' && producto.toLowerCase().includes(terminoBusqueda.toLowerCase());
     });
@@ -173,4 +183,3 @@ function buscarRetencion(idProducto) {
   return respuesta;
 }
 
- 

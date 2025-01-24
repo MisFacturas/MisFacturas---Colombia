@@ -1438,6 +1438,7 @@ var departamentosCodigos = {
 };
 
 var reteRentaValores = {
+  "" : 0.00,
   "No Aplica": 0.00,
   "Retencion sobre el IVA 15%": 15.00,
   "Retencion sobre el IVA 100%": 100.00,

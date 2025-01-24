@@ -485,16 +485,24 @@ function onEdit(e) {
 
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
-    let codigoReferencia = hojaProductos.getRange(rowEditada, colEditada).getValue()
-    let existe = verificarIdentificacionUnica(codigoReferencia, "Productos", true, rowEditada)
-    if (existe) {
-      SpreadsheetApp.getUi().alert("El codigo de referencia ya existe, por favor elegir otro numero unico");
-      hojaProductos.getRange(rowEditada, 2).setValue("");
-      throw new Error('por favor poner un codigo de referencia unico');
+
+    if (rowEditada !== 1) {
+      let codigoReferencia = hojaProductos.getRange(rowEditada, colEditada).getValue()
+      let existe = verificarIdentificacionUnica(codigoReferencia, "Productos", true, rowEditada)
+      if (existe) {
+        SpreadsheetApp.getUi().alert("El codigo de referencia ya existe, por favor elegir otro numero unico");
+        hojaProductos.getRange(rowEditada, 2).setValue("");
+        throw new Error('por favor poner un codigo de referencia unico');
+      }
+      let tipoPersona = '';
+      let valido = verificarDatosObligatoriosProductos(e);
+      Logger.log("valido " + valido)
+      if (valido === true) {
+        agregarCodigoIdentificador(e, tipoPersona);
+      } else {
+        hojaProductos.getRange(rowEditada, 16).setValue("");
+      }
     }
-    let tipoPersona = '';
-    verificarDatosObligatoriosProductos(e);
-    agregarCodigoIdentificador(e, tipoPersona);
   }
 }
 
@@ -611,7 +619,7 @@ function getTotalesLinea(sheet) {
   for (row; row < lastRow; row++) {
     if (sheet.getRange(row, 1).getValue() === 'Subtotal') {
       return row + 1;
-      
+
     }
   }
   Logger.log(" last row row " + row)
