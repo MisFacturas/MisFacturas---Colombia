@@ -1,13 +1,14 @@
 
 
-var spreadsheet = SpreadsheetApp.getActive();
-var prefactura_sheet = spreadsheet.getSheetByName('Factura');
-var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
-var hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
-var folderId = hojaDatosEmisor.getRange("B13").getValue();
+//var spreadsheet = SpreadsheetApp.getActive();
+//var prefactura_sheet = spreadsheet.getSheetByName('Factura');
+//var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
+//var hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+//var folderId = hojaDatosEmisor.getRange("B13").getValue();
 
 
 function verificarEstadoValidoFactura(estadoFactura) {
+  var spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
 
   // Verificar datos de la factura 
@@ -66,6 +67,7 @@ function verificarEstadoValidoFactura(estadoFactura) {
 }
 
 function guardarFactura() {
+  
   SpreadsheetApp.flush();
   SpreadsheetApp.getUi().alert("Revisando validez de la factura. Aguarde unos segundos");
   let estadoFactura = [];
@@ -79,7 +81,10 @@ function guardarFactura() {
     SpreadsheetApp.getUi().alert(mensajeError);
   }
 }
+
 function agregarFilaNueva() {
+  var spreadsheet = SpreadsheetApp.getActive();
+
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let numeroFilasParaAgregar = hojaFactura.getRange("B13").getValue();
 
@@ -98,12 +103,14 @@ function agregarFilaNueva() {
 }
 
 function agregarFilaCargoDescuento() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   const lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
   hojaFactura.insertRowAfter(lastCargoDescuentoRow)
 }
 
 function agregarProductoDesdeFactura(cantidad, producto) {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
   const productStartRow = 15;
@@ -149,6 +156,7 @@ function agregarProductoDesdeFactura(cantidad, producto) {
 }
 
 function recuperarJson() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('ListadoEstado');
   let lastRow = hojaFactura.getLastRow();
   let infoFactura = hojaFactura.getRange(lastRow, 1, 1, 20).getValues();
@@ -158,6 +166,7 @@ function recuperarJson() {
 }
 
 function logearUsuario() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   let usuario = hojaDatos.getRange("F49").getValue();
   let contrasena = hojaDatos.getRange("F50").getValue();
@@ -176,6 +185,7 @@ function logearUsuario() {
 }
 
 function enviarFactura() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let schemaID = 31;
@@ -224,8 +234,8 @@ function enviarFactura() {
 
 }
 
-
 function obtenerTokenMF(usuario, contra) {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaDatos = spreadsheet.getSheetByName("Datos")
 
@@ -280,6 +290,7 @@ function obtenerTokenMF(usuario, contra) {
 }
 
 function obtenerResolucionesDian(token, usuario) {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaDatos = spreadsheet.getSheetByName("Datos")
   let nit = hojaDatosEmisor.getRange("B3").getValue();
@@ -385,8 +396,8 @@ function limpiarHojaFactura() {
   grabarRangoResolucionesDian(hojaFacturaPost);
 }
 
-
 function inicarFacturaNueva() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   let consecutivoFactura = hojaDatos.getRange("Q11").getValue();
@@ -394,25 +405,10 @@ function inicarFacturaNueva() {
   ponerFechaYHoraActual();
 }
 
-function limpiarYEliminarFila(numeroFila, hoja, hojaTax) {
-  //funcion para el boton que se va a agregar al final del producto
-  if (numeroFila > 20 && numeroFila < hojaTax) {
-    hoja.deleteRow(numeroFila)
-  } else {
-    hoja.getRange("A" + String(numeroFila)).setValue("");//referencia
-    hoja.getRange("B" + String(numeroFila)).setValue("");//producto
-    hoja.getRange("C" + String(numeroFila)).setValue("");//cantidad
-    hoja.getRange("D" + String(numeroFila)).setValue(0);//precio unitario
-
-  }
-}
-
 function verificarYCopiarCliente(e) {
   let hojaFacturas = e.source.getSheetByName('Factura');
   let hojaClientes = e.source.getSheetByName('Clientes');
   let celdaEditada = e.range;
-
-
 
   let nombreCliente = celdaEditada.getValue();
   let ultimaColumnaPermitida = 20; // Columna del estado en la hoja de clientes
@@ -435,6 +431,7 @@ function verificarYCopiarCliente(e) {
 }
 
 function ponerFechaYHoraActual() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let sheet = spreadsheet.getSheetByName('Factura');
 
   let fecha = new Date();
@@ -449,6 +446,7 @@ function ponerFechaYHoraActual() {
 }
 
 function ponerFechaTasaDeCambio() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let sheet = spreadsheet.getSheetByName('Factura');
   let fecha = new Date();
   let fechaFormateada = Utilities.formatDate(fecha, "America/Bogota", "yyyy-MM-dd");
@@ -458,12 +456,12 @@ function ponerFechaTasaDeCambio() {
 
 function obtenerFecha() {
   let fechaFormateada
+  let spreadsheet = SpreadsheetApp.getActive();
   let sheet = spreadsheet.getSheetByName('Factura');
   let valorFecha = sheet.getRange("H4").getValue();
   fechaFormateada = Utilities.formatDate(new Date(valorFecha), "America/Bogota", "yyyy-MM-dd");
   return fechaFormateada
 }
-
 
 function obtenerDatosProductos(sheet, range, e) {
   if (range.getA1Notation() === "A14" || range.getA1Notation() === "A15" || range.getA1Notation() === "A16" || range.getA1Notation() === "A17" || range.getA1Notation() === "A18") {
@@ -521,6 +519,8 @@ function grabarRangoResolucionesDian(hojaFactura) {
 }
 
 function getInvoiceGeneralInformation() {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let prefactura_sheet = spreadsheet.getSheetByName('Factura');
 
   //Recuperar los datos de la factura del sheets
   var numeroAutorizacion = prefactura_sheet.getRange("H3").getValue();//Resolución DIAN
@@ -538,7 +538,7 @@ function getInvoiceGeneralInformation() {
     "PreinvoiceNumber": String(numeroFactura),
     "InvoiceNumber": String(numeroFactura),
     "IssueDate": fechaEmision,
-    "Prefix": "SETT",
+    "Prefix": buscarPrefijo(numeroAutorizacion),
     "DaysOff": String(diasVencimiento),
     "Currency": "COP",
     "ExchangeRate": exchangeRate,
@@ -554,7 +554,27 @@ function getInvoiceGeneralInformation() {
   return InvoiceGeneralInformation;
 }
 
+function buscarPrefijo(numeroAutorizacion) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let fila = 18;
+  let valorCelda;
+
+  while (true) {
+    valorCelda = hojaDatosEmisor.getRange(fila, 1).getValue();
+    if (valorCelda === "") {
+      return null; // No existe el número de autorización
+    }
+    if (valorCelda == numeroAutorizacion) {
+      return hojaDatosEmisor.getRange(fila, 2).getValue(); // Retorna el valor de la columna 2
+    }
+    fila++;
+  }
+}
+
 function getPaymentSummary() {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let prefactura_sheet = spreadsheet.getSheetByName('Factura');
   var PaymentTypeTxt = prefactura_sheet.getRange("J2").getValue();
   var PaymentMeansTxt = prefactura_sheet.getRange("J3").getValue();
   var PaymentSummary = {
@@ -566,6 +586,7 @@ function getPaymentSummary() {
 }
 
 function guardarYGenerarInvoice() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaProductos = spreadsheet.getSheetByName('Productos');
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');

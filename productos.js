@@ -1,6 +1,8 @@
-var spreadsheet = SpreadsheetApp.getActive();
+//var spreadsheet = SpreadsheetApp.getActive();
 
 function buscarUnidadesDeMedidaProducto(terminoBusqueda) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let datos_sheet = spreadsheet.getSheetByName('Datos');
   let unidadesDeMedida = datos_sheet.getRange(35, 3, 365, 1).getValues();
   var resultados = [];
   if (terminoBusqueda === "") {
@@ -87,8 +89,9 @@ function verificarDatosObligatoriosProductos(e) {
   return valido;
 }
 
-// a cambiar cuando se pregunte y agg los otros porcinetos
 function obtenerInformacionProducto(producto) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let datos_sheet = spreadsheet.getSheetByName('Datos');
   let celdaProducto = datos_sheet.getRange("I11");
   celdaProducto.setValue(producto);
 
@@ -116,9 +119,6 @@ function obtenerInformacionProducto(producto) {
   if (informacionProducto["tarifa INC"] == "") {
     informacionProducto["tarifa INC"] = 0;
   }
-
-
-
 
   return informacionProducto;
 }

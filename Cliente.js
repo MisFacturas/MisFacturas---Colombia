@@ -1,6 +1,6 @@
-var spreadsheet = SpreadsheetApp.getActive();
-var datos_sheet = spreadsheet.getSheetByName('Datos');
-var factura_sheet = spreadsheet.getSheetByName("Factura")
+//var spreadsheet = SpreadsheetApp.getActive();
+//var datos_sheet = spreadsheet.getSheetByName('Datos');
+//var factura_sheet = spreadsheet.getSheetByName("Factura")
 
 function showNuevaCliente() {
   var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Nuevo Cliente")
@@ -14,6 +14,11 @@ function showInactivarCliente() {
     .showSidebar(html);
 }
 
+//Esta funcion se llama desde el sheets
+function crearCliente() {
+  showNuevaClienteV2()
+}
+
 function showActivarCliente() {
   var html = HtmlService.createHtmlOutputFromFile('menuActivarCliente').setTitle("Activar Cliente")
   SpreadsheetApp.getUi()
@@ -21,6 +26,8 @@ function showActivarCliente() {
 }
 
 function inactivarCliente(cliente) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let datos_sheet = spreadsheet.getSheetByName('Datos');
   let hojaClientesInactivos = spreadsheet.getSheetByName('ClientesInvalidos');
   let hojaClientes = spreadsheet.getSheetByName("Clientes")
   Logger.log(cliente)
@@ -90,6 +97,8 @@ function inactivarCliente(cliente) {
 }
 
 function activarCliente(cliente) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let datos_sheet = spreadsheet.getSheetByName('Datos');
   let hojaClientesInactivos = spreadsheet.getSheetByName('ClientesInvalidos');
   let hojaClientes = spreadsheet.getSheetByName("Clientes")
   Logger.log(cliente)
@@ -150,8 +159,8 @@ function activarCliente(cliente) {
   hojaClientesInactivos.insertRowAfter(rowMaximaClientesInactivos)
 }
 
-
 function buscarClientes(terminoBusqueda, hojaA) {
+  let spreadsheet = SpreadsheetApp.getActive();
   var resultados = [];
 
   if (hojaA === "Inactivar") {
@@ -190,7 +199,10 @@ function buscarClientes(terminoBusqueda, hojaA) {
   // Devuelve los resultados
   return resultados;
 }
+
 function buscarPaises(terminoBusqueda) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let datos_sheet = spreadsheet.getSheetByName('Datos');
   let paises = datos_sheet.getRange(25, 1, 195, 1).getValues();
   var resultados = [];
   if (terminoBusqueda === "") {
@@ -209,7 +221,6 @@ function buscarPaises(terminoBusqueda) {
   // Devuelve los resultados
   return resultados;
 }
-
 
 function obtenerTipoDePersona(e) {
   let sheet = e.source.getActiveSheet();
@@ -290,8 +301,6 @@ function saveClientData(formData) {
   SpreadsheetApp.getUi().alert("Nuevo cliente generado satisfactoriamente");
 }
 
-
-
 function verificarDatosObligatorios(e, tipoPersona) {
   let sheet = e.source.getActiveSheet();
   let range = e.range;
@@ -348,11 +357,6 @@ function verificarDatosObligatorios(e, tipoPersona) {
 
 }
 
-
-function crearCliente() {
-  showNuevaClienteV2()
-
-}
 function showNuevaClienteV2() {
   var html = HtmlService.createHtmlOutputFromFile('menuAgregarClienteFactura').setTitle("Nuevo Cliente")
   SpreadsheetApp.getUi()
@@ -433,6 +437,8 @@ function getCityCode(departamentoCliente, ciudadCliente) {
 }
 
 function getCustomerInformation(cliente) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let datos_sheet = spreadsheet.getSheetByName('Datos');
   let celdaCliente = datos_sheet.getRange("H2");
   celdaCliente.setValue(cliente);
 
@@ -526,6 +532,8 @@ function getCustomerInformation(cliente) {
 }
 
 function obtenerInformacionCliente(cliente) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let datos_sheet = spreadsheet.getSheetByName('Datos');
   let celdaCliente = datos_sheet.getRange("H2");
   celdaCliente.setValue(cliente);
 

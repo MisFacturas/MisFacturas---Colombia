@@ -1,4 +1,4 @@
-var spreadsheet = SpreadsheetApp.getActive();
+//var spreadsheet = SpreadsheetApp.getActive();
 
 function onOpen() {
 
@@ -18,6 +18,246 @@ function onOpen() {
   console.log("onOpenReturning");
   return;
 
+}
+
+function onOpen(e) {
+
+  let ui = SpreadsheetApp.getUi();
+
+  Logger.log("ScriptApp.AuthMode.NONE")
+  ui.createAddonMenu()
+    .addItem('Inicio', 'showSidebar2')
+    .addItem('Instalar', 'IniciarMisfacturas')
+    .addItem("Desinstalar", "eliminarHojasFactura").addToUi();
+
+  return;
+}
+
+function OnOpenSheetInicio() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Inicio");
+  SpreadsheetApp.setActiveSheet(sheet);
+}
+
+function showSidebar2() {
+  console.log("showSidebar2 Enters");
+  let ui = SpreadsheetApp.getUi();
+  console.log("setActiveSheet2 Inicio");
+  let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
+  Logger.log("hoja " + hoja)
+  Logger.log(typeof (hoja))
+  if (hoja == null) {
+    let respuesta = ui.alert('Primero debes de instalar las hojas necesarias ¿Deseas instalarlas ya?', ui.ButtonSet.YES_NO);
+    if (respuesta == ui.Button.YES) {
+      iniciarHojasFactura()
+      OnOpenSheetInicio()
+      agregarDataValidations()
+    } else {
+      return
+    }
+  } else {
+    var html = HtmlService.createHtmlOutputFromFile('main')
+      .setTitle('Menú');
+    SpreadsheetApp.getUi()
+      .showSidebar(html);
+
+
+    console.log("showSidebar Exits");
+  }
+}
+
+function iniciarHojasFactura() {
+  Logger.log("Inicio instalación de hojas");
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const plantillaID = "1qxbXlhH4RpCOsObk91wsuu4k8jarVK34XXRUlKaKS1U";
+  const plantilla = SpreadsheetApp.openById(plantillaID);
+
+  const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
+  const hojasBloqueadasEInvisibles = ["ListadoEstado", "Datos", "ClientesInvalidos", "Copia de Factura"];
+
+
+
+  // Instalar hojas desde la plantilla si no existen
+  nombresHojas.forEach(nombreHoja => {
+    if (nombreHoja === "Datos") return; // Saltar "Datos" para instalarla al final
+
+    let hoja = ss.getSheetByName(nombreHoja);
+    if (!hoja) {
+      const hojaPlantilla = plantilla.getSheetByName(nombreHoja);
+      if (hojaPlantilla) {
+        // Copiar hoja y replicar protecciones
+        const hojaCopia = hojaPlantilla.copyTo(ss).setName(nombreHoja);
+
+        // Obtener las protecciones de la hoja original
+        const protecciones = hojaPlantilla.getProtections(SpreadsheetApp.ProtectionType.RANGE);
+
+        // Replicar las protecciones en la copia
+        protecciones.forEach(proteccion => {
+          const rango = proteccion.getRange();
+          const rangoEnCopia = hojaCopia.getRange(rango.getA1Notation());
+
+          const nuevaProteccion = rangoEnCopia.protect();
+          nuevaProteccion.setDescription(proteccion.getDescription());
+          nuevaProteccion.setWarningOnly(proteccion.isWarningOnly());
+
+          // Transferir permisos de edición
+          if (!proteccion.isWarningOnly()) {
+            nuevaProteccion.addEditors(proteccion.getEditors());
+            if (proteccion.canDomainEdit()) {
+              nuevaProteccion.setDomainEdit(true);
+            }
+          }
+        });
+
+        // Bloquear la hoja completa si está en la lista de bloqueadas e invisibles
+        if (hojasBloqueadasEInvisibles.includes(nombreHoja)) {
+          hojaCopia.hideSheet(); // Hacer la hoja invisible
+          const protection = hojaCopia.protect();
+          protection.removeEditors(protection.getEditors()); // Bloquear completamente
+          protection.addEditor(Session.getEffectiveUser()); // Solo el propietario tiene acceso
+        }
+
+      } else {
+        SpreadsheetApp.getUi().alert('La hoja "' + nombreHoja + '" no existe en la plantilla.');
+      }
+    }
+  });
+
+  // Siempre instalar o reinstalar la hoja "Datos" al final
+  reinstalarHojaDatos(ss, plantilla);
+
+  // Eliminar hojas que no pertenezcan a la lista de hojas instaladas
+  ss.getSheets().forEach(hoja => {
+    const nombreHoja = hoja.getName();
+    if (!nombresHojas.includes(nombreHoja)) {
+      Logger.log(hoja.getName())
+      Logger.log("hojaname")
+      ss.deleteSheet(hoja);
+    }
+  });
+
+  SpreadsheetApp.getUi().alert("Hojas instaladas satisfactoriamente.");
+  //SpreadsheetApp.getUi().alert("Recuerda que antes de utilizar misfacturas debes de crear la carpeta donde se guardarán las facturas. Dirígete a la hoja Datos de emisor y dale clic en el botón crear carpeta.");
+}
+
+function agregarDataValidations() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hojaDatos = ss.getSheetByName("Datos");
+  const hojaFacturas = ss.getSheetByName("Factura");
+  const hojaValoresC = ss.getSheetByName("Clientes");
+  const hojaValoresP = ss.getSheetByName("Productos");
+  const hojaValoresCInvalidos = ss.getSheetByName("ClientesInvalidos");
+  const HojaValorescopiaFactura = ss.getSheetByName("Copia de Factura");
+
+  // Rango donde aplicar los dropdowns
+  const rangoDropdownCliente = hojaDatos.getRange("H2");
+  const rangoDropdownClienteInvalido = hojaDatos.getRange("I6");
+  const rangoDropdownProductos = hojaDatos.getRange("I11");
+  const rangoDropdownClienteF = hojaFacturas.getRange("B2:C2");
+  const rangoDropdownProductoF = hojaFacturas.getRange("B15");
+  const rangoDropdownCopiaFacturaCliente = HojaValorescopiaFactura.getRange("B2:C2")
+  const rangoDropdownCopiaFacturaProducto = HojaValorescopiaFactura.getRange("B15")
+
+  // Rango de valores para los dropdowns
+  const rangoValoresClienteInvalido = hojaValoresCInvalidos.getRange("B2:B1000");
+  const rangoValoresClienteDatos = hojaValoresC.getRange("W2:W1000");
+  const rangoValoresProductosDatos = hojaValoresP.getRange("P2:P1000");
+  const rangoValoresClienteFactura = hojaValoresC.getRange("$W$2:$W$1000");
+  const rangoValoresProductosFactura = hojaValoresP.getRange("$P$2:$P$1000");
+
+  // Crear y aplicar validaciones
+  const reglas = [
+    {
+      rango: rangoDropdownCliente,
+      valores: rangoValoresClienteDatos
+    },
+    {
+      rango: rangoDropdownClienteInvalido,
+      valores: rangoValoresClienteInvalido
+    },
+    {
+      rango: rangoDropdownProductos,
+      valores: rangoValoresProductosDatos
+    },
+    {
+      rango: rangoDropdownClienteF,
+      valores: rangoValoresClienteFactura
+    },
+    {
+      rango: rangoDropdownProductoF,
+      valores: rangoValoresProductosFactura
+    },
+    {
+      rango: rangoDropdownCopiaFacturaCliente,
+      valores: rangoValoresClienteFactura
+    },
+    {
+      rango: rangoDropdownCopiaFacturaProducto,
+      valores: rangoValoresProductosFactura
+    }
+  ];
+
+  reglas.forEach(({ rango, valores }) => {
+    const regla = SpreadsheetApp.newDataValidation()
+      .requireValueInRange(valores, true) // Usar valores del rango especificado
+      .setAllowInvalid(false) // No permitir valores fuera del rango
+      .build();
+    rango.setDataValidation(regla); // Aplicar la regla
+  });
+
+  SpreadsheetApp.getUi().alert("Validaciones de datos aplicadas correctamente.");
+}
+
+function IniciarFacturasApp() {
+  let ui = SpreadsheetApp.getUi();
+
+  let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
+  if (hoja == null) {
+    iniciarHojasFactura()
+    OnOpenSheetInicio()
+    agregarDataValidations()
+  } else {
+    let respuesta = ui.alert('Si vuelves a instalar, solo se instalaran las hojas no existan o que hayan sido eliminadas?', ui.ButtonSet.YES_NO);
+    if (respuesta == ui.Button.YES) {
+      iniciarHojasFactura()
+      OnOpenSheetInicio()
+      agregarDataValidations()
+    } else {
+      return
+    }
+  }
+
+}
+
+function eliminarHojasFactura() {
+  let ui = SpreadsheetApp.getUi();
+  Logger.log("Inicio de eliminación de hojas");
+  let respuesta = ui.alert('Recuerda que al desinstalar las hojas se eliminará toda la información de las mismas. Esta función solo debe ejecutarse si tienes un problema irreparable con las hojas. ¿Estás seguro de continuar?', ui.ButtonSet.YES_NO);
+  if (respuesta == ui.Button.YES) {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
+    
+    // Crear una hoja nueva en blanco
+    let nuevaHoja = ss.getSheetByName("Hoja en blanco");
+    if (!nuevaHoja) {
+      nuevaHoja = ss.insertSheet("Hoja en blanco");
+      Logger.log("Se creó una nueva hoja en blanco");
+    }
+
+    // Recorrer todas las hojas del archivo
+    ss.getSheets().forEach(hoja => {
+      const nombreHoja = hoja.getName();
+      if (nombresHojas.includes(nombreHoja)) {
+        ss.deleteSheet(hoja);
+        Logger.log(`Hoja eliminada: ${nombreHoja}`);
+      }
+    });
+
+    SpreadsheetApp.getUi().alert("Hojas eliminadas satisfactoriamente.");
+  } else {
+    return;
+  }
 }
 
 function pruebaLogo() {
@@ -45,6 +285,7 @@ function openDatosEmisorSheet() {
   var sheet = ss.getSheetByName("Datos de emisor");
   SpreadsheetApp.setActiveSheet(sheet);
 }
+
 function showConfiguracion() {
   var html = HtmlService.createHtmlOutputFromFile('menuConfiguracion')
     .setTitle('Datos emisor');
@@ -58,6 +299,7 @@ function showDesvincular() {
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
+
 function showAggProductos() {
   var html = HtmlService.createHtmlOutputFromFile('agregarProducto')
     .setTitle('Agregar Productos');
@@ -125,6 +367,7 @@ function showEliminarInfo() {
 
 
 function eliminarTotalidadInformacion() {
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaProductos = spreadsheet.getSheetByName('Productos');
@@ -146,6 +389,7 @@ function eliminarTotalidadInformacion() {
 
 
 }
+
 function borrarInfoHoja(hoja) {
   let lastrow = Number(hoja.getLastRow())
   let nombreHoja = hoja.getSheetName()
@@ -177,12 +421,15 @@ function borrarInfoHoja(hoja) {
     hoja.insertRows(maxRows, dif)
   }
 }
+
 function mensajeBorrarInfoError() {
   Logger.log("Error borrar info")
   SpreadsheetApp.getUi().alert('Si deseas eliminar toda la informacion de misfacturas asegurate de escribir ELIMINAR en el campo');
 }
+
 function DesvincularMisfacturas() {
   Logger.log("Desvincular")
+  let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
@@ -193,10 +440,10 @@ function DesvincularMisfacturas() {
     hojaDatosEmisor.getRange(i, 1, 1, 6).setValue("")
   }
 }
+
 function mensajeErrorDesvincularMisfacturas() {
   Logger.log("Error Desvincular")
   SpreadsheetApp.getUi().alert('Si deseas desvincular misfacturas asegurate de escribir DESVINCULAR en el campo');
-
 }
 
 function openProductosSheet() {
@@ -204,7 +451,6 @@ function openProductosSheet() {
   var sheet = ss.getSheetByName("Productos");
   SpreadsheetApp.setActiveSheet(sheet);
 }
-
 
 function processForm(data) {
   let existe = verificarIdentificacionUnica(data.codigoReferencia, "Productos")
@@ -301,7 +547,6 @@ function processForm(data) {
     return SpreadsheetApp.getUi().alert("Error al guardar los datos: " + error.message);
   }
 }
-
 
 function convertToPercentage(value) {
   return (value * 100).toFixed(2);
@@ -513,7 +758,6 @@ function calcularImpuestos(hojaActual, lastRowProducto, cargosDescuentosStartRow
 
 function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual) {
 
-
   let rowParaTotales = getTotalesLinea(hojaActual);
 
   //subtotal 
@@ -600,6 +844,7 @@ function getLastProductRow(sheet, productStartRow, cargosDescuentosStartRow) {
   }
   return lastProductRow;
 }
+
 function getLastCargoDescuentoRow(sheet) {
   //obtiene la row donde esta el final de la seccion de cargos y descuentos
   const lastRow = sheet.getLastRow();
@@ -611,6 +856,7 @@ function getLastCargoDescuentoRow(sheet) {
     }
   }
 }
+
 function getTotalesLinea(sheet) {
   //obtiene la row donde esta la linea de totales
   const lastRow = sheet.getLastRow();
@@ -775,17 +1021,6 @@ function agregarCodigoIdentificador(e, tipoPersona) {
   }
 }
 
-function limpiarDict() {
-  Logger.log("Limpiar el dict")
-  diccionarioCaluclarIva = {
-    "0.21": 0,
-    "0.1": 0,
-    "0.05": 0,
-    "0.04": 0,
-    "0": 0
-  }
-}
-
 function slugifyF(str) {
   var map = {
     '-': ' ',
@@ -808,6 +1043,7 @@ function slugifyF(str) {
 
   return str;
 };
+
 function getAdditionalDocuments() {
   var AdditionalDocuments = {
     "OrderReference": "",
@@ -817,7 +1053,6 @@ function getAdditionalDocuments() {
   }
   return AdditionalDocuments;
 }
-
 
 function getAdditionalProperty() {
   var AdditionalProperty = [];
