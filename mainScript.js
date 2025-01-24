@@ -156,15 +156,36 @@ function agregarDataValidations() {
   const rangoDropdownProductos = hojaDatos.getRange("I11");
   const rangoDropdownClienteF = hojaFacturas.getRange("B2:C2");
   const rangoDropdownProductoF = hojaFacturas.getRange("B15");
-  const rangoDropdownCopiaFacturaCliente = HojaValorescopiaFactura.getRange("B2:C2")
-  const rangoDropdownCopiaFacturaProducto = HojaValorescopiaFactura.getRange("B15")
+  const rangoDropdownCopiaFacturaCliente = HojaValorescopiaFactura.getRange("B2:C2");
+  const rangoDropdownCopiaFacturaProducto = HojaValorescopiaFactura.getRange("B15");
+  const rangoDropdownProductosColumnaD = hojaValoresP.getRange("D2:D");
+  const rangoDropdownProductosColumnaG = hojaValoresP.getRange("G2:G");
+  const rangoDropdownProductosColumnaI = hojaValoresP.getRange("I2:I");
+  const rangoDropdownProductosColumnaK = hojaValoresP.getRange("K2:K");
+  const rangoDropdownProductosColumnaM = hojaValoresP.getRange("M2:M");
+  const rangoDropdownClientesColumnaI = hojaValoresC.getRange("I2:I");
+  const rangoDropdownClientesColumnaM = hojaValoresC.getRange("M2:M");
+  const rangoDropdownClientesColumnaN = hojaValoresC.getRange("N2:N");
+  const rangoDropdownClientesColumnaU = hojaValoresC.getRange("U2:U");
+
+
 
   // Rango de valores para los dropdowns
-  const rangoValoresClienteInvalido = hojaValoresCInvalidos.getRange("B2:B1000");
-  const rangoValoresClienteDatos = hojaValoresC.getRange("W2:W1000");
-  const rangoValoresProductosDatos = hojaValoresP.getRange("P2:P1000");
-  const rangoValoresClienteFactura = hojaValoresC.getRange("$W$2:$W$1000");
-  const rangoValoresProductosFactura = hojaValoresP.getRange("$P$2:$P$1000");
+  const rangoValoresClienteInvalido = hojaValoresCInvalidos.getRange("B2:B");
+  const rangoValoresClienteDatos = hojaValoresC.getRange("W2:W");
+  const rangoValoresProductosDatos = hojaValoresP.getRange("P2:P");
+  const rangoValoresClienteFactura = hojaValoresC.getRange("$W$2:$W");
+  const rangoValoresProductosFactura = hojaValoresP.getRange("$P$2:$P");
+  const rangoValoresProductosColumnaD = hojaDatos.getRange("F36:F43");
+  const rangoValoresProductosColumnaG = hojaDatos.getRange("C35:C399");
+  const rangoValoresProductosColumnaI = hojaDatos.getRange("K26:K29");
+  const rangoValoresProductosColumnaK = hojaDatos.getRange("K31:K35");
+  const rangoValoresProductosColumnaM = hojaDatos.getRange("M26:M68");
+  const rangoValoresClientesColumnaI = hojaDatos.getRange("D3:D14");
+  const rangoValoresClientesColumnaM = hojaDatos.getRange("A24:A195");
+  const rangoValoresClientesColumnaN = hojaDatos.getRange("F57:F90");
+  const rangoValoresClientesColumnaU = hojaDatos.getRange("D18:D21");
+
 
   // Crear y aplicar validaciones
   const reglas = [
@@ -195,6 +216,42 @@ function agregarDataValidations() {
     {
       rango: rangoDropdownCopiaFacturaProducto,
       valores: rangoValoresProductosFactura
+    },
+    {
+      rango: rangoDropdownProductosColumnaD,
+      valores: rangoValoresProductosColumnaD
+    },
+    {
+      rango: rangoDropdownProductosColumnaG,
+      valores: rangoValoresProductosColumnaG
+    },
+    {
+      rango: rangoDropdownProductosColumnaI,
+      valores: rangoValoresProductosColumnaI
+    },
+    {
+      rango: rangoDropdownProductosColumnaK,
+      valores: rangoValoresProductosColumnaK
+    },
+    {
+      rango: rangoDropdownProductosColumnaM,
+      valores: rangoValoresProductosColumnaM
+    },
+    {
+      rango: rangoDropdownClientesColumnaI,
+      valores: rangoValoresClientesColumnaI
+    },
+    {
+      rango: rangoDropdownClientesColumnaM,
+      valores: rangoValoresClientesColumnaM
+    },
+    {
+      rango: rangoDropdownClientesColumnaN,
+      valores: rangoValoresClientesColumnaN
+    },
+    {
+      rango: rangoDropdownClientesColumnaU,
+      valores: rangoValoresClientesColumnaU
     }
   ];
 
@@ -237,7 +294,7 @@ function eliminarHojasFactura() {
   if (respuesta == ui.Button.YES) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
-    
+
     // Crear una hoja nueva en blanco
     let nuevaHoja = ss.getSheetByName("Hoja en blanco");
     if (!nuevaHoja) {
@@ -259,6 +316,36 @@ function eliminarHojasFactura() {
     return;
   }
 }
+
+
+function reinstalarHojaDatos(ss, plantilla) {
+  Logger.log("Reinstalando hoja Datos...");
+
+  const nombreHoja = "Datos";
+  let hojaDatos = ss.getSheetByName(nombreHoja);
+  Logger.log("After getting hojadatos")
+  // Eliminar la hoja "Datos" si ya existe
+  if (hojaDatos) {
+    ss.deleteSheet(hojaDatos);
+    Logger.log("AIFF ")
+  }
+
+  // Copiar la hoja "Datos" desde la plantilla
+  const hojaPlantilla = plantilla.getSheetByName(nombreHoja);
+  if (hojaPlantilla) {
+    const hojaCopia = hojaPlantilla.copyTo(ss).setName(nombreHoja);
+    Logger.log("dentro if")
+    // Bloquear la hoja "Datos"
+    const protection = hojaCopia.protect();
+    protection.removeEditors(protection.getEditors());
+    protection.addEditor(Session.getEffectiveUser());
+    hojaCopia.hideSheet(); // Hacer la hoja invisible
+    Logger.log("hoja aca")
+  } else {
+    SpreadsheetApp.getUi().alert('La hoja "Datos" no existe en la plantilla.');
+  }
+}
+
 
 function pruebaLogo() {
   var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
