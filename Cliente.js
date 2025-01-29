@@ -1,7 +1,3 @@
-//var spreadsheet = SpreadsheetApp.getActive();
-//var datos_sheet = spreadsheet.getSheetByName('Datos');
-//var factura_sheet = spreadsheet.getSheetByName("Factura")
-
 function showNuevaCliente() {
   var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Nuevo Cliente")
   SpreadsheetApp.getUi()
@@ -60,33 +56,34 @@ function inactivarCliente(cliente) {
   let detallesTributarios = datos_sheet.getRange("AB2").getValue();
   let responsabilidadFiscal = datos_sheet.getRange("AC2").getValue();
   let tipoTercero = datos_sheet.getRange("AD2").getValue();
+  let identificadorUnico = datos_sheet.getRange("AE2").getValue();
 
 
 
   // Proceso para agregar a la hoja de clientes inactivos
   hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 1).setValue(estado);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 2).setValue(cliente);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 3).setValue(tipoTercero);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 4).setValue(tipoPersona);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 5).setValue(tipoDoc);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 6).setValue(numIdentificacion);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 7).setValue(codigoCliente);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 8).setValue(regimen);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 9).setValue(nombreComercial);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 10).setValue(primerNombre);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 11).setValue(segundoNombre);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 12).setValue(primerApellido);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 13).setValue(segundoApellido);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 14).setValue(pais);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 15).setValue(departamento);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 16).setValue(municipio);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 17).setValue(direccion);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 18).setValue(codigoPostal);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 19).setValue(telefono);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 20).setValue(sitioWeb);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 21).setValue(email);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 22).setValue(detallesTributarios);
-  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 23).setValue(responsabilidadFiscal);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 2).setValue(tipoTercero);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 3).setValue(tipoPersona);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 4).setValue(nombreComercial);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 5).setValue(primerNombre);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 6).setValue(segundoNombre);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 7).setValue(primerApellido);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 8).setValue(segundoApellido);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 9).setValue(tipoDoc);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 10).setValue(numIdentificacion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 11).setValue(codigoCliente);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 12).setValue(regimen);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 13).setValue(pais);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 14).setValue(departamento);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 15).setValue(municipio);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 16).setValue(direccion);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 17).setValue(codigoPostal);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 18).setValue(telefono);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 19).setValue(sitioWeb);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 20).setValue(email);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 21).setValue(detallesTributarios);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 22).setValue(responsabilidadFiscal);
+  hojaClientesInactivos.getRange(rowMaximaClientesInactivos, 23).setValue(identificadorUnico);
 
 
   //eliminar cliente de la hoja clientes
@@ -102,24 +99,24 @@ function activarCliente(cliente) {
   let hojaClientesInactivos = spreadsheet.getSheetByName('ClientesInvalidos');
   let hojaClientes = spreadsheet.getSheetByName("Clientes")
   Logger.log(cliente)
-  datos_sheet.getRange("I6").setValue(cliente)
+  datos_sheet.getRange("H6").setValue(cliente)
 
   let rowDelCliente = datos_sheet.getRange("G6").getValue();
   let rowMaximaClientesInactivos = hojaClientesInactivos.getLastRow() + 1;
   let rowMaximaClientes = hojaClientes.getLastRow() + 1;
 
-  let estado = datos_sheet.getRange('H6').getValue();
+  let estado = datos_sheet.getRange('I6').getValue();
   let tipoTercero = datos_sheet.getRange('J6').getValue();
   let tipoPersona = datos_sheet.getRange('K6').getValue();
-  let tipoDoc = datos_sheet.getRange('L6').getValue();
-  let numIdentificacion = datos_sheet.getRange('M6').getValue();
-  let codigoCliente = datos_sheet.getRange('N6').getValue();
-  let regimen = datos_sheet.getRange('O6').getValue();
-  let nombreComercial = datos_sheet.getRange('P6').getValue();
-  let primerNombre = datos_sheet.getRange('Q6').getValue();
-  let segundoNombre = datos_sheet.getRange('R6').getValue();
-  let primerApellido = datos_sheet.getRange('S6').getValue();
-  let segundoApellido = datos_sheet.getRange('T6').getValue();
+  let nombreComercial = datos_sheet.getRange('L6').getValue();
+  let primerNombre = datos_sheet.getRange('M6').getValue();
+  let segundoNombre = datos_sheet.getRange('N6').getValue();
+  let primerApellido = datos_sheet.getRange('O6').getValue();
+  let segundoApellido = datos_sheet.getRange('P6').getValue();
+  let tipoDoc = datos_sheet.getRange('Q6').getValue();
+  let numIdentificacion = datos_sheet.getRange('R6').getValue();
+  let codigoCliente = datos_sheet.getRange('S6').getValue();
+  let regimen = datos_sheet.getRange('T6').getValue();
   let pais = datos_sheet.getRange('U6').getValue();
   let departamento = datos_sheet.getRange('V6').getValue();
   let municipio = datos_sheet.getRange('W6').getValue();
@@ -130,30 +127,31 @@ function activarCliente(cliente) {
   let email = datos_sheet.getRange('AB6').getValue();
   let detallesTributarios = datos_sheet.getRange('AC6').getValue();
   let responsabilidadFiscal = datos_sheet.getRange('AD6').getValue();
+  let identificadorUnico = datos_sheet.getRange('AE6').getValue();
 
   hojaClientes.getRange(rowMaximaClientes, 1).setValue(estado);
-  hojaClientes.getRange(rowMaximaClientes, 2).setValue(cliente);
-  hojaClientes.getRange(rowMaximaClientes, 3).setValue(tipoTercero);
-  hojaClientes.getRange(rowMaximaClientes, 4).setValue(tipoPersona);
-  hojaClientes.getRange(rowMaximaClientes, 5).setValue(tipoDoc);
-  hojaClientes.getRange(rowMaximaClientes, 6).setValue(numIdentificacion);
-  hojaClientes.getRange(rowMaximaClientes, 7).setValue(codigoCliente);
-  hojaClientes.getRange(rowMaximaClientes, 8).setValue(regimen);
-  hojaClientes.getRange(rowMaximaClientes, 9).setValue(nombreComercial);
-  hojaClientes.getRange(rowMaximaClientes, 10).setValue(primerNombre);
-  hojaClientes.getRange(rowMaximaClientes, 11).setValue(segundoNombre);
-  hojaClientes.getRange(rowMaximaClientes, 12).setValue(primerApellido);
-  hojaClientes.getRange(rowMaximaClientes, 13).setValue(segundoApellido);
-  hojaClientes.getRange(rowMaximaClientes, 14).setValue(pais);
-  hojaClientes.getRange(rowMaximaClientes, 15).setValue(departamento);
-  hojaClientes.getRange(rowMaximaClientes, 16).setValue(municipio);
-  hojaClientes.getRange(rowMaximaClientes, 17).setValue(direccion);
-  hojaClientes.getRange(rowMaximaClientes, 18).setValue(codigoPostal);
-  hojaClientes.getRange(rowMaximaClientes, 19).setValue(telefono);
-  hojaClientes.getRange(rowMaximaClientes, 20).setValue(sitioWeb);
-  hojaClientes.getRange(rowMaximaClientes, 21).setValue(email);
-  hojaClientes.getRange(rowMaximaClientes, 22).setValue(detallesTributarios);
-  hojaClientes.getRange(rowMaximaClientes, 23).setValue(responsabilidadFiscal);
+  hojaClientes.getRange(rowMaximaClientes, 2).setValue(tipoTercero);
+  hojaClientes.getRange(rowMaximaClientes, 3).setValue(tipoPersona);
+  hojaClientes.getRange(rowMaximaClientes, 4).setValue(nombreComercial);
+  hojaClientes.getRange(rowMaximaClientes, 5).setValue(primerNombre);
+  hojaClientes.getRange(rowMaximaClientes, 6).setValue(segundoNombre);
+  hojaClientes.getRange(rowMaximaClientes, 7).setValue(primerApellido);
+  hojaClientes.getRange(rowMaximaClientes, 8).setValue(segundoApellido);
+  hojaClientes.getRange(rowMaximaClientes, 9).setValue(tipoDoc);
+  hojaClientes.getRange(rowMaximaClientes, 10).setValue(numIdentificacion);
+  hojaClientes.getRange(rowMaximaClientes, 11).setValue(codigoCliente);
+  hojaClientes.getRange(rowMaximaClientes, 12).setValue(regimen);
+  hojaClientes.getRange(rowMaximaClientes, 13).setValue(pais);
+  hojaClientes.getRange(rowMaximaClientes, 14).setValue(departamento);
+  hojaClientes.getRange(rowMaximaClientes, 15).setValue(municipio);
+  hojaClientes.getRange(rowMaximaClientes, 16).setValue(direccion);
+  hojaClientes.getRange(rowMaximaClientes, 17).setValue(codigoPostal);
+  hojaClientes.getRange(rowMaximaClientes, 18).setValue(telefono);
+  hojaClientes.getRange(rowMaximaClientes, 19).setValue(sitioWeb);
+  hojaClientes.getRange(rowMaximaClientes, 20).setValue(email);
+  hojaClientes.getRange(rowMaximaClientes, 21).setValue(detallesTributarios);
+  hojaClientes.getRange(rowMaximaClientes, 22).setValue(responsabilidadFiscal);
+  hojaClientes.getRange(rowMaximaClientes, 23).setValue(identificadorUnico);
 
   hojaClientesInactivos.deleteRow(rowDelCliente)
   hojaClientesInactivos.insertRowAfter(rowMaximaClientesInactivos)
@@ -165,37 +163,65 @@ function buscarClientes(terminoBusqueda, hojaA) {
 
   if (hojaA === "Inactivar") {
     var sheet = spreadsheet.getSheetByName('Clientes');
-  } else {
+    var ultimaFila = sheet.getLastRow();
+    var valores = sheet.getRange(2, 1, ultimaFila - 1, 23).getValues(); // Obtener todas las columnas desde la fila 2
 
+    if (terminoBusqueda === "") {
+      return resultados;
+    }
+
+    // Recorre los valores obtenidos
+    for (var i = 0; i < valores.length; i++) {
+      var codigoCliente = valores[i][10]; // Columna K
+      var nombreComercial = valores[i][3]; // Columna D
+      var primerNombre = valores[i][4]; // Columna E
+      var tipoDocumento = String(valores[i][8]); // Columna I
+      var numeroIdentificacion = String(valores[i][9]); // Columna J
+      var identificadorUnico = valores[i][22]; // Columna W
+
+      // Comprueba si el valor coincide con el término de búsqueda
+      if (
+        (codigoCliente && String(codigoCliente).toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (nombreComercial && nombreComercial.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (primerNombre && primerNombre.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (tipoDocumento && tipoDocumento.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (numeroIdentificacion && numeroIdentificacion.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1)
+      ) {
+        resultados.push(identificadorUnico); // Añade el valor de la columna W a la lista de resultados si coincide
+      }
+    }
+  } else {
     var sheet = spreadsheet.getSheetByName('ClientesInvalidos');
     var ultimaFila = sheet.getLastRow();
-    var valores = sheet.getRange(2, 23, ultimaFila - 1, 1).getValues();
+    var valores = sheet.getRange(2, 1, ultimaFila - 1, 23).getValues(); // Obtener todas las columnas desde la fila 2
 
+    if (terminoBusqueda === "") {
+      return resultados;
+    }
+
+    // Recorre los valores obtenidos
     for (var i = 0; i < valores.length; i++) {
-      var valor = valores[i][0]; // Accede al primer (y único) valor de cada fila
-      resultados.push(valor);
-    }
+      var codigoCliente = valores[i][10]; // Columna K
+      var nombreComercial = valores[i][3]; // Columna D
+      var primerNombre = valores[i][4]; // Columna E
+      var tipoDocumento = String(valores[i][9]); // Columna J
+      var numeroIdentificacion = String(valores[i][10]); // Columna K
+      var identificadorUnico = valores[i][22]; // Columna W
 
-    return resultados
-  }
-
-  var ultimaFila = sheet.getLastRow();
-  var valores = sheet.getRange(2, 23, ultimaFila - 1, 1).getValues(); // `ultimaFila - 1` porque empieza en la fila 2
-
-
-  if (terminoBusqueda === "") {
-    return resultados
-  }
-  // Recorre los valores obtenidos
-  for (var i = 0; i < valores.length; i++) {
-    var valor = valores[i][0]; // Accede al primer (y único) valor de cada fila
-
-    // Comprueba si el valor coincide con el término de búsqueda
-    if (valor.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) {
-      resultados.push(valor); // Añade el valor a la lista de resultados si coincide
+      // Comprueba si el valor coincide con el término de búsqueda
+      if (
+        (codigoCliente && String(codigoCliente).toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (nombreComercial && nombreComercial.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (primerNombre && primerNombre.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (tipoDocumento && tipoDocumento.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1) ||
+        (numeroIdentificacion && numeroIdentificacion.toLowerCase().indexOf(terminoBusqueda.toLowerCase()) !== -1)
+      ) {
+        resultados.push(identificadorUnico); // Añade el valor de la columna W a la lista de resultados si coincide
+      }
     }
   }
 
+  Logger.log(resultados);
   // Devuelve los resultados
   return resultados;
 }
@@ -239,10 +265,15 @@ function saveClientData(formData) {
   if (!sheet) {
     throw new Error('La hoja "Clientes" no existe.');
   }
-  let existe = verificarIdentificacionUnica(formData.numeroIdentificacion, "Clientes", false)
-  if (existe) {
-    SpreadsheetApp.getUi().alert("El Numero de Identificacion ya existe, por favor poner un Numero de Identificacion unico");
+  let codigosIdetificadores = formData.numeroIdentificacion + "-" + formData.codigoCliente;
+  
+  let existe = verificarIdentificacionUnica(codigosIdetificadores,"Clientes", false)
+  if (existe === 1) {
+    SpreadsheetApp.getUi().alert("El Numero de Identificacion del cliente ya existe, por favor poner un Numero de Identificacion unico");
     throw new Error('por favor poner un Numero de Identificacion unico');
+  } else if (existe === 2) {
+    SpreadsheetApp.getUi().alert("El Codigo del cliente ya existe, por favor poner un Codigo de cliente unico");
+    throw new Error('por favor poner un Codigo de cliente unico');
   }
   const lastRow = sheet.getLastRow();
   const dataRange = sheet.getRange(2, 2, lastRow, 22).getValues(); // Obtener desde la columna B hasta la S (19 columnas)

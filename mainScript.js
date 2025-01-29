@@ -1,4 +1,3 @@
-//var spreadsheet = SpreadsheetApp.getActive();
 
 function onOpen() {
 
@@ -177,7 +176,7 @@ function agregarDataValidations() {
   const rangoValoresClienteFactura = hojaValoresC.getRange("$W$2:$W");
   const rangoValoresProductosFactura = hojaValoresP.getRange("$P$2:$P");
   const rangoValoresProductosColumnaD = hojaDatos.getRange("F36:F43");
-  const rangoValoresProductosColumnaG = hojaDatos.getRange("C35:C399");
+  const rangoValoresProductosColumnaG = hojaDatos.getRange("B35:B399");
   const rangoValoresProductosColumnaI = hojaDatos.getRange("K26:K29");
   const rangoValoresProductosColumnaK = hojaDatos.getRange("K31:K35");
   const rangoValoresProductosColumnaM = hojaDatos.getRange("M26:M68");
@@ -488,6 +487,7 @@ function borrarInfoHoja(hoja) {
     hoja.getRange(1, 2, 12).setValue("")
     for (let i = 18; i < 50; i++) {
       hoja.getRange(i, 1, 1, 6).setValue("")
+      hoja.getRange(i, 1, 1, 6).setBackground(null)
     }
   } else if (nombreHoja === "Clientes") {
     Logger.log("Hoja es clientes")
@@ -525,6 +525,7 @@ function DesvincularMisfacturas() {
   SpreadsheetApp.getUi().alert('Haz desvinculado exitosamente misfacturas');
   for (let i = 18; i < 50; i++) {
     hojaDatosEmisor.getRange(i, 1, 1, 6).setValue("")
+    hojaDatosEmisor.getRange(i, 1, 1, 6).setBackground(null)
   }
 }
 
@@ -555,7 +556,6 @@ function processForm(data) {
     const nombre = data.nombre;
     const precioUnitario = parseFloat(data.precioUnitario);
     const unidadDeMedida = data.unidadDeMedida;
-    const unidadMedidaCheckbox = data.unidadMedidaCheckbox;
     const referenciaAdicional = data.referenciaAdicional;
     const numeroReferenciaAdicional = referenciaAdicionalCodigos[referenciaAdicional];
     let iva = "";
@@ -569,7 +569,6 @@ function processForm(data) {
       inc = "INC";
     }
     const retencionConcepto = data.tarifaReteRenta;
-    Logger.log("retencionConcepto " + retencionConcepto)
     let tarifaRetencion = String(validarTarifaRetencion(retencionConcepto) + "%");
 
     //Asigna los valores a los campos en el sheet
@@ -592,13 +591,7 @@ function processForm(data) {
     sheet.getRange(newRow, 6).setHorizontalAlignment('normal');
     sheet.getRange(newRow, 6).setNumberFormat('$#,##0');
     //Unidad de Medida
-    Logger.log("unidadMedidaCheckbox " + unidadMedidaCheckbox)
-    Logger.log("unidadDeMedida " + unidadDeMedida)
-    if (unidadMedidaCheckbox) {
-      sheet.getRange(newRow, 7).setValue("Unidad");
-    } else {
-      sheet.getRange(newRow, 7).setValue(unidadDeMedida);
-    }
+    sheet.getRange(newRow, 7).setValue(unidadDeMedida);
     //Columna IVA
     sheet.getRange(newRow, 8).setValue(iva);
     //Tarifa IVA (formatea la celda como porcentaje)
@@ -644,6 +637,7 @@ function onEdit(e) {
   let nombreHoja = hojaActual.getName();
 
   if (nombreHoja === "Factura") {
+    let factura_sheet = hojaActual;
     let celdaEditada = e.range;
     let rowEditada = celdaEditada.getRow();
     let colEditada = celdaEditada.getColumn();
@@ -773,9 +767,11 @@ function onEdit(e) {
       }
     }
 
+    SpreadsheetApp.flush();
 
 
   } else if (nombreHoja === "Clientes") {
+
 
     let celdaEditada = e.range;
     let hojaCliente = e.source.getActiveSheet();
@@ -785,18 +781,28 @@ function onEdit(e) {
     let colTipoDePersona = 2
     let tipoPersona = obtenerTipoDePersona(e);
 
-    if (colEditada == 10 && rowEditada > 1) {
-      Logger.log("entro a ver si el edit es en numero")
+    if (colEditada == 10 || colEditada == 11 && rowEditada > 1) {
       let numeroIdentificacion = hojaCliente.getRange(rowEditada, colEditada).getValue()
-      Logger.log("num i" + numeroIdentificacion)
-      let existe = verificarIdentificacionUnica(numeroIdentificacion, "Clientes", true, rowEditada)
-      if (existe) {
+      let numeroIngresadoyColumna = numeroIdentificacion + "-" + colEditada
+      Logger.log("num i" + numeroIngresadoyColumna)
+      let existe = verificarIdentificacionUnica(numeroIngresadoyColumna, "Clientes", true, rowEditada)
+      if (existe === 1) {
         SpreadsheetApp.getUi().alert("El numero de identificacion ya existe, por favor elegir otro numero unico");
-        celdaEditada.setValue("");
+        hojaCliente.getRange(rowEditada, 10).setValue("")
+
+        verificarDatosObligatorios(e, tipoPersona)
+        throw new Error('por favor poner un Numero de Identificacion unico');
+
+      } else if (existe === 2) {
+        SpreadsheetApp.getUi().alert("El codigo del cliente ya existe, por favor elegir otro numero unico");
+        hojaCliente.getRange(rowEditada, 11).setValue("")
+
         verificarDatosObligatorios(e, tipoPersona)
         throw new Error('por favor poner un Numero de Identificacion unico');
       }
+
     }
+
     var hojaDatos = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Datos');
     hojaDatos.getRange("L101").setValue("=Clientes!N" + rowEditada);
     // Agregar regla de validación de datos
@@ -809,6 +815,8 @@ function onEdit(e) {
 
     verificarDatosObligatorios(e, tipoPersona)
     agregarCodigoIdentificador(e, tipoPersona)
+    SpreadsheetApp.flush();
+
 
   } else if (nombreHoja === "Productos") {
 
@@ -835,6 +843,7 @@ function onEdit(e) {
         hojaProductos.getRange(rowEditada, 16).setValue("");
       }
     }
+    SpreadsheetApp.flush();
   }
 }
 
@@ -1027,27 +1036,89 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja, numRow) {
   } else if (nombreHoja === "Clientes") {
     try {
       let columnaNumIdentificacionC = 10;
+      let columnaCodigoCliente = 11;
       let lastActiveRow = sheet.getLastRow();
       let rangeNumeroIdentificaciones;
+      let rangeCodigosCliente;
+      let numidentificacion;
+      let codigoCliente;
+      let codigos = codigo.split("-")
       if (inHoja) {
-        rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow);
+        if (codigos[1] === "10") {
+          Logger.log("entro a verificar si el numero es un de identificacion")
+          rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow);
+          let NumerosIdentificacion = String(rangeNumeroIdentificaciones.getValues());
+          NumerosIdentificacion = NumerosIdentificacion.split(",")
+          numidentificacion = codigos[0]
+
+          if (NumerosIdentificacion.includes(String(numidentificacion))) {
+            var posicionArreglo = NumerosIdentificacion.indexOf(String(numidentificacion)) + 2;
+            Logger.log("posicionArreglo " + posicionArreglo + " numRow " + numRow)
+            if (posicionArreglo !== numRow) {
+              Logger.log(`posicion en el arreglo ${NumerosIdentificacion.indexOf(String(numidentificacion))} y en numero de fila ${numRow}`)
+              Logger.log("El Num identificion ya existe.");
+              return 1
+            }
+          } else {
+            Logger.log("El Num identificion no existe.");
+            return false;
+          }
+        } else if (codigos[1] === "11"){
+          Logger.log("entro a verificar si el numero es un codigo")
+          rangeCodigosCliente = sheet.getRange(2, columnaCodigoCliente, lastActiveRow);
+          let CodigosCliente = String(rangeCodigosCliente.getValues());
+          CodigosCliente = CodigosCliente.split(",")
+          codigoCliente = codigos[0]
+          if (CodigosCliente.includes(String(codigoCliente))) {
+            var posicionArreglo = CodigosCliente.indexOf(String(codigoCliente)) + 2;
+            Logger.log("posicionArreglo " + posicionArreglo + " numRow " + numRow)
+            if (posicionArreglo !== numRow) {
+              Logger.log(`posicion en el arreglo ${CodigosCliente.indexOf(String(codigoCliente))} y en numero de fila ${numRow}`)
+              Logger.log("El Num identificion ya existe.");
+              return 2
+            }
+          } else {
+            Logger.log("El Num identificion no existe.");
+            return false;
+          }
+
+        }
+
       } else {
+
         rangeNumeroIdentificaciones = sheet.getRange(2, columnaNumIdentificacionC, lastActiveRow);
+        rangeCodigosCliente = sheet.getRange(2, columnaCodigoCliente, lastActiveRow);
+        //Separar identificacion y codigo
+        numidentificacion = codigos[0]
+        codigoCliente = codigos[1]
       }
+
       let NumerosIdentificacion = String(rangeNumeroIdentificaciones.getValues());
       NumerosIdentificacion = NumerosIdentificacion.split(",")
+      let CodigosCliente = String(rangeCodigosCliente.getValues());
+      CodigosCliente = CodigosCliente.split(",")
+
+
 
       // Verificar si el código ya existe
-      if (NumerosIdentificacion.includes(String(codigo))) {
-        var posicionArreglo = NumerosIdentificacion.indexOf(String(codigo)) + 2;
+      if (NumerosIdentificacion.includes(String(numidentificacion))) {
+        var posicionArreglo = NumerosIdentificacion.indexOf(String(numidentificacion)) + 2;
         if (posicionArreglo !== numRow) {
-          Logger.log(`posicion en el arreglo ${NumerosIdentificacion.indexOf(String(codigo))} y en numero de fila ${numRow}`)
+          Logger.log(`posicion en el arreglo ${NumerosIdentificacion.indexOf(String(numidentificacion))} y en numero de fila ${numRow}`)
           Logger.log("El Num identificion ya existe.");
-          return true
+          return 1
+        }
+
+      } else if (CodigosCliente.includes(String(codigoCliente))) {
+        var posicionArreglo = CodigosCliente.indexOf(String(codigoCliente)) + 2;
+        if (posicionArreglo !== numRow) {
+          Logger.log(`posicion en el arreglo ${CodigosCliente.indexOf(String(codigoCliente))} y en numero de fila ${numRow}`)
+          Logger.log("El Num identificion ya existe.");
+          return 2
         }
       } else {
         Logger.log("El Num identificion no existe.");
-        return false
+        return false;
       }
     } catch (error) {
       Logger.log("Error al verificar el Num identificion: " + error.message);

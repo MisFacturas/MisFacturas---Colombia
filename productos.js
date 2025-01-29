@@ -1,9 +1,8 @@
-//var spreadsheet = SpreadsheetApp.getActive();
 
 function buscarUnidadesDeMedidaProducto(terminoBusqueda) {
   let spreadsheet = SpreadsheetApp.getActive();
   let datos_sheet = spreadsheet.getSheetByName('Datos');
-  let unidadesDeMedida = datos_sheet.getRange(35, 3, 365, 1).getValues();
+  let unidadesDeMedida = datos_sheet.getRange(35, 2, 365, 1).getValues();
   var resultados = [];
   if (terminoBusqueda === "") {
     return resultados

@@ -14,6 +14,33 @@
   <!-- Custom styles for this template -->
   <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
   <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+  <style>
+    .result-item {
+      padding: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px; /* Increased margin for better visualization */
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .result-item:hover {
+      background-color: #f0f0f0;
+    }
+    .selected-client {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px; /* Increased margin for better visualization */
+      border-radius: 5px;
+    }
+    .selected-client .remove-btn {
+      cursor: pointer;
+      color: red;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body class="d-flex h-100">
@@ -44,28 +71,38 @@
         </div>
 
         <div class="col-12 px-0">
-          <form class="row g-3" id="productForm">
+          <form class="row g-3" id="productForm" onsubmit="return false;">
             <div class="col-10">
-              <label for="clientesInactivos" class="form-label">Buscar Cliente</label>
-              <select id="clientesInactivos" class="form-control form-control-lg">
+              <label for="buscarCliente" class="form-label">Ingrese nombre, código o num identificación</label>
+              <input type="text" id="buscarCliente" class="form-control form-control-lg" onkeypress="if(event.key === 'Enter') buscarClientes();">
+            </div>
+            <div class="col-2 d-flex justify-content-center align-items-end">
+              <a class="btn btn-primary" onclick="buscarClientes()"><i class="icon-24-outlined-action-main-search m-0"></i></a>
+            </div>
+            <div class="col-12" id="clientesInactivosContainer" style="display: none; margin-top: 20px;"> <!-- Added margin-top for better visualization -->
+              <label for="clientesInactivos" class="form-label">Clientes Inactivos</label>
+              <select id="clientesInactivos" class="form-control form-control-lg" style="display: none;">
                 <option value="">Seleccione un cliente</option>
                 <!-- Las opciones de clientes se agregarán aquí -->
               </select>
             </div>
-            <div class="col-2 d-flex justify-content-center align-items-end">
-              <a class="btn btn-primary"><i class="icon-24-outlined-action-main-search m-0"></i></a>
+            <div class="col-12" id="notification" style="display: none; color: green; margin-top: 20px;">
+              <!-- Notification message will be shown here -->
             </div>
           </form>
         </div>
-
+        <div class="col-12">
+          <div class="result-box" id="resultBox" style="margin-top: 20px;"> <!-- Added margin-top for better visualization -->
+            <!-- Los resultados se mostrarán aquí -->
+          </div>
+        </div>
       </div>
 
     </main>
     <footer class="mt-auto">
       <div class="row p-4 gx-0">
         <div class="col-6 pe-1">
-          <a onclick="activar()" class="btn btn-primary btn-lg w-100 btn-menu d-flex"><span
-              class="text-container pe-4">Activar</span>
+          <a onclick="activar()" class="btn btn-primary btn-lg w-100 btn-menu d-flex"><span class="text-container pe-4">Activar</span>
           </a>
         </div>
         <br />
@@ -82,26 +119,71 @@
       var cliente = document.getElementById('clientesInactivos').value;
 
       console.log("cliente:", cliente);
-      google.script.run.activarCliente(cliente);
+      google.script.run.withSuccessHandler(function(position) {
+        document.getElementById('buscarCliente').value = '';
+        document.getElementById('clientesInactivos').innerHTML = '<option value="">Seleccione un cliente</option>';
+        document.getElementById('resultBox').innerHTML = '';
+        document.getElementById('notification').innerText = 'Cliente activado exitosamente.';
+        document.getElementById('notification').style.display = 'block';
+        setTimeout(function() {
+          document.getElementById('notification').style.display = 'none';
+        }, 3000);
+      }).activarCliente(cliente);
     }
 
-    function cargarClientesInactivos() {
-      google.script.run.withSuccessHandler(mostrarClientesInactivos).buscarClientes("", "Activar");
+    function buscarClientes() {
+      var input = document.getElementById('buscarCliente').value;
+      google.script.run.withSuccessHandler(mostrarClientesInactivos).buscarClientes(input, "Activar");
     }
 
     function mostrarClientesInactivos(clientes) {
       var select = document.getElementById('clientesInactivos');
+      var resultBox = document.getElementById('resultBox');
+      var clientesInactivosContainer = document.getElementById('clientesInactivosContainer');
       select.innerHTML = '<option value="">Seleccione un cliente</option>';
+      resultBox.innerHTML = ''; // Clear previous results
+      clientesInactivosContainer.style.display = 'none'; // Hide the select box initially
       clientes.forEach(function (cliente) {
-        var option = document.createElement('option');
-        option.value = cliente;
-        option.textContent = cliente;
-        select.appendChild(option);
+        var resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        resultItem.textContent = cliente;
+        resultItem.onclick = function() {
+          select.innerHTML = ''; // Clear the select box
+          var option = document.createElement('option');
+          option.value = cliente;
+          option.textContent = cliente;
+          select.appendChild(option);
+          select.value = cliente;
+          clientesInactivosContainer.style.display = 'none'; // Hide the select box
+          resultBox.innerHTML = ''; // Clear the results
+          var selectedClient = document.createElement('div');
+          selectedClient.className = 'selected-client';
+          selectedClient.innerHTML = cliente + ' <span class="remove-btn" onclick="removeSelectedClient()">X</span>';
+          resultBox.appendChild(selectedClient);
+        };
+        resultBox.appendChild(resultItem);
       });
     }
 
-    // Cargar los clientes inactivos al cargar la página
-    document.addEventListener('DOMContentLoaded', cargarClientesInactivos);
+    function removeSelectedClient() {
+      var select = document.getElementById('clientesInactivos');
+      var resultBox = document.getElementById('resultBox');
+      select.innerHTML = '<option value="">Seleccione un cliente</option>';
+      resultBox.innerHTML = ''; // Clear the selected client
+      document.getElementById('clientesInactivosContainer').style.display = 'none'; // Hide the select box
+    }
+
+    // Prevent form submission on Enter key press
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('buscarCliente').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+          buscarClientes();
+        }
+      });
+      document.getElementById('productForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+      });
+    });
   </script>
 
 </body>

@@ -1,12 +1,3 @@
-
-
-//var spreadsheet = SpreadsheetApp.getActive();
-//var prefactura_sheet = spreadsheet.getSheetByName('Factura');
-//var listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
-//var hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
-//var folderId = hojaDatosEmisor.getRange("B13").getValue();
-
-
 function verificarEstadoValidoFactura(estadoFactura) {
   var spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
@@ -100,6 +91,8 @@ function agregarFilaNueva() {
 
   Logger.log("Agregar fila nueva");
   hojaFactura.insertRows(lastProductRow, numeroFilasParaAgregar);
+  SpreadsheetApp.flush();
+
 }
 
 function agregarFilaCargoDescuento() {
@@ -306,8 +299,7 @@ function obtenerResolucionesDian(token, usuario) {
       logearUsuario();
       token = hojaDatos.getRange("F47").getValue();
     }
-
-    let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=13&IDNumber=${nit}`;
+    let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${nit}`;
     let opciones = {
       "method": "get",
       "headers": { "Authorization": "misfacturas " + token },
@@ -355,10 +347,19 @@ function obtenerResolucionesDian(token, usuario) {
 
         // Escribir los datos en la hoja, debajo de los encabezados
         hojaDatosEmisor.getRange(18, 1, filas.length, encabezados.length).setValues(filas);
+       
+
+        // Set background colors
+        hojaDatosEmisor.getRange(18, 1, filas.length, 1).setBackground('#d9d9d9'); // Column A
+        hojaDatosEmisor.getRange(18, 2, filas.length, 1).setBackground('#d9d9d9'); // Column B
+        hojaDatosEmisor.getRange(18, 3, filas.length, 1).setBackground('#d9d9d9'); // Column C
+        hojaDatosEmisor.getRange(18, 4, filas.length, 1).setBackground('#d9d9d9'); // Column D
+        hojaDatosEmisor.getRange(18, 5, filas.length, 1).setBackground('#edffeb'); // Column E
+        hojaDatosEmisor.getRange(18, 6, filas.length, 1).setBackground('#d9d9d9'); // Column F
+
         return true;
       } else {
         throw new Error("Error de la API: " + contenidoRespuesta); // Muestra el error de la API
-        return false;
       }
     } catch (error) {
 
@@ -577,6 +578,7 @@ function getPaymentSummary() {
   let prefactura_sheet = spreadsheet.getSheetByName('Factura');
   var PaymentTypeTxt = prefactura_sheet.getRange("J2").getValue();
   var PaymentMeansTxt = prefactura_sheet.getRange("J3").getValue();
+  PaymentMeansTxt = PaymentMeansTxt.split("-")[1];
   var PaymentSummary = {
     "PaymentType": metodosPago[PaymentTypeTxt],
     "PaymentMeans": paymentMeansCode[PaymentMeansTxt],

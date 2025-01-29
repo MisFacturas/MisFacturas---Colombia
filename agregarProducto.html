@@ -31,7 +31,7 @@
 
       camposObligatorios.forEach(id => {
         const campo = document.getElementById(id);
-        if (!campo.value.trim()) {
+        if (!campo.value.trim() && campo) {
           campo.style.backgroundColor = '#FFC7C7';  // Marca en rojo si está vacío
           isValid = false;
         } else {
@@ -44,10 +44,10 @@
 
     function submitForm() {
       if (verificarDatosObligatoriosProducto()) {
+
         const form = document.getElementById('productForm');
         form.dispatchEvent(new Event('submit'));
         google.script.run.openProductosSheet();
-
       } else {
         alert('Por favor complete todos los campos obligatorios.');
       }
@@ -62,10 +62,12 @@
         data[key] = value;
       });
 
-
+      // Incluir el estado del checkbox en los datos del formulario
+      data.unidadMedidaCheckbox = document.getElementById('unidadMedidaCheckbox').checked;
 
       google.script.run.withSuccessHandler(function (response) {
         resetForm(); // Llama a la función para resetear el formulario
+        document.getElementById('unidadDeMedida').disabled = false;  // Habilitar el campo después de enviar
       }).processForm(data);
     }
 
@@ -124,11 +126,9 @@
       const checkbox = document.getElementById('unidadMedidaCheckbox');
       const unidadInput = document.getElementById('unidadDeMedida');
       if (checkbox.checked) {
-        unidadInput.value = 'Unidad';
-        unidadInput.disabled = true;
+        unidadInput.value = 'Unidad-94';
       } else {
         unidadInput.value = '';
-        unidadInput.disabled = false;
       }
     }
   </script>
@@ -182,7 +182,7 @@
             <div class="col-12">
               <label for="unidadDeMedida" class="form-label">Unidad de medida</label>
               <input type="text" id="unidadDeMedida" class="form-control" placeholder="Buscar" name="unidadDeMedida"
-                autocomplete="off" onkeyup="buscarUnidadMedida()">>
+                autocomplete="off" onkeyup="buscarUnidadMedida()">
               <div class="result-box">
                 <!-- Los resultados se mostrarán aquí -->
               </div>
@@ -190,7 +190,7 @@
                 <input class="form-check-input" type="checkbox" id="unidadMedidaCheckbox"
                   onclick="toggleUnidadDeMedida()">
                 <label class="form-check-label" for="unidadCheckbox">
-                  Unidad
+                  Unidad-94
                 </label>
               </div>
             </div>
@@ -219,6 +219,7 @@
               </label>
               <select id="tarifaIva" name="tarifaIva" class="form-select form-select-lg">
                 <option value="0">Extento</option>
+                <option value="0">Excluido</option>
                 <option value="5">5%</option>
                 <option value="16">16%</option>
                 <option value="19">19%</option>
@@ -230,7 +231,7 @@
                 INC
               </label>
               <select id="tarifaInc" name="tarifaInc" class="form-select form-select-lg">
-                <option value="0">0%</option>
+                <option value="0">Seleccione</option>
                 <option value="2">2%</option>
                 <option value="4">4%</option>
                 <option value="8">8%</option>

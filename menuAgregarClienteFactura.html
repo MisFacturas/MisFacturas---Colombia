@@ -27,8 +27,6 @@
     google.script.run.showNuevaFactura();
   }
 
-
-
   function buscarPais() {
     var input = document.getElementById('pais').value;
     google.script.run.withSuccessHandler(mostrarResultados).buscarPaises(input);
@@ -50,25 +48,51 @@
     document.getElementById('pais').value = pais;
     var resultBox = document.querySelector('.result-box');
     resultBox.innerHTML = ''; // Limpiar los resultados
+    verificarPais(); // Verificar el país seleccionado
+  }
+
+  function verificarPais() {
+    const pais = document.getElementById('pais').value;
+    const departamento = document.getElementById('departamento');
+    const municipio = document.getElementById('municipio');
+    const mensajeDian = document.getElementById('mensajeDian');
+
+    if (pais === 'Colombia') {
+      departamento.disabled = false;
+      municipio.disabled = false;
+      cargarMunicipios();
+      mensajeDian.style.display = 'block';
+    } else {
+      departamento.value = '';
+      municipio.value = '';
+      departamento.disabled = true;
+      municipio.disabled = true;
+      mensajeDian.style.display = 'none';
+    }
   }
 
   function verificarDatosObligatorios() {
     const form = document.getElementById('clienteForm');
     const tipoPersona = document.getElementById('tipoPersona').value;
+    let isValid = true;
+
+    if (tipoPersona === 'Seleccione') {
+      document.getElementById('tipoPersona').style.backgroundColor = '#FFC7C7';
+      isValid = false;
+    }
+
     const columnasObligatorias = tipoPersona === 'Natural' ?
       ['tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente', 'regimen', 'primerNombre', 'primerApellido', 'pais', 'direccion', 'codigoPostal', 'telefono', 'email', 'detallesTributarios', 'responsabilidadFiscal'] :
       tipoPersona === 'Juridica' ?
         ['tipoTercero', 'tipoPersona', 'tipoDocumento', 'numeroIdentificacion', 'codigoCliente', 'regimen', 'nombreComercial', 'pais', 'direccion', 'codigoPostal', 'telefono', 'email', 'detallesTributarios', 'responsabilidadFiscal'] :
         [];
 
-    let isValid = true;
-
     columnasObligatorias.forEach(id => {
       const field = document.getElementById(id);
       if (field.tagName === 'SELECT' && field.value === 'Seleccione') {
         field.style.backgroundColor = '#FFC7C7';
         isValid = false;
-      } else if (!field.value.trim()) {
+      } else if (field.value === '') {
         field.style.backgroundColor = '#FFC7C7';
         isValid = false;
       } else {
@@ -76,45 +100,93 @@
       }
     });
 
+    // Validate email format
+    const emailField = document.getElementById('email');
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(emailField.value)) {
+      emailField.style.backgroundColor = '#FFC7C7';
+      document.getElementById('emailHelp').style.display = 'block';
+      isValid = false;
+    } else {
+      emailField.style.backgroundColor = '';
+      document.getElementById('emailHelp').style.display = 'none';
+    }
+
+    // Validate department and municipality if country is Colombia
+    const pais = document.getElementById('pais').value;
+    if (pais === 'Colombia') {
+      const departamento = document.getElementById('departamento');
+      const municipio = document.getElementById('municipio');
+      if (departamento.value === '' || municipio.value === '') {
+        departamento.style.backgroundColor = '#FFC7C7';
+        municipio.style.backgroundColor = '#FFC7C7';
+        isValid = false;
+      } else {
+        departamento.style.backgroundColor = '';
+        municipio.style.backgroundColor = '';
+      }
+    }
+
+    // Validate responsibility fiscal
+    const responsabilidadFiscal = Array.from(document.querySelectorAll('#responsabilidadFiscal input[type="checkbox"]'))
+      .filter(cb => cb.checked)
+      .map(cb => cb.value)
+      .join(',');
+    if (responsabilidadFiscal === '') {
+      document.getElementById('responsabilidadFiscal').style.backgroundColor = '#FFC7C7';
+      isValid = false;
+    } else {
+      document.getElementById('responsabilidadFiscal').style.backgroundColor = '';
+    }
+
     return isValid;
   }
 
   function saveData() {
-    if (verificarDatosObligatorios()) {
-      const formData = {
-        tipoTercero: document.getElementById('tipoTercero').value,
-        tipoPersona: document.getElementById('tipoPersona').value,
-        nombreComercial: document.getElementById('nombreComercial').value,
-        primerNombre: document.getElementById('primerNombre').value,
-        segundoNombre: document.getElementById('segundoNombre').value,
-        primerApellido: document.getElementById('primerApellido').value,
-        segundoApellido: document.getElementById('segundoApellido').value,
-        tipoDocumento: document.getElementById('tipoDocumento').value,
-        numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
-        codigoCliente: document.getElementById('codigoCliente').value,
-        regimen: document.getElementById('regimen').value,
-        pais: document.getElementById('pais').value,
-        departamento: document.getElementById('departamento').value,
-        municipio: document.getElementById('municipio').value,
-        direccion: document.getElementById('direccion').value,
-        codigoPostal: document.getElementById('codigoPostal').value,
-        telefono: document.getElementById('telefono').value,
-        sitioWeb: document.getElementById('sitioWeb').value,
-        email: document.getElementById('email').value,
-        detallesTributarios: document.getElementById('detallesTributarios').value,
-        responsabilidadFiscal: Array.from(document.getElementById('responsabilidadFiscal').selectedOptions).map(option => option.value).join(', ')
-      };
-
-      google.script.run.withSuccessHandler(function (response) {
-
-        resetForm();  // Llamar a resetForm para limpiar el formulario
-      }).saveClientData(formData);
-
-
-    } else {
-      alert('Por favor complete todos los campos obligatorios.');
+    if (!verificarDatosObligatorios()) {
+      alert('Por favor complete todos los campos obligatorios y asegúrese de que los datos sean correctos.');
+      return;
     }
+
+    const emailField = document.getElementById('email');
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(emailField.value)) {
+      alert('Por favor ingrese un correo electrónico válido. Ejemplo: alguien@correo.com');
+      return;
+    }
+
+    const formData = {
+      tipoTercero: document.getElementById('tipoTercero').value,
+      tipoPersona: document.getElementById('tipoPersona').value,
+      nombreComercial: document.getElementById('nombreComercial').value,
+      primerNombre: document.getElementById('primerNombre').value,
+      segundoNombre: document.getElementById('segundoNombre').value,
+      primerApellido: document.getElementById('primerApellido').value,
+      segundoApellido: document.getElementById('segundoApellido').value,
+      tipoDocumento: document.getElementById('tipoDocumento').value,
+      numeroIdentificacion: document.getElementById('numeroIdentificacion').value,
+      codigoCliente: document.getElementById('codigoCliente').value,
+      regimen: document.getElementById('regimen').value,
+      pais: document.getElementById('pais').value,
+      departamento: document.getElementById('departamento').value,
+      municipio: document.getElementById('municipio').value,
+      direccion: document.getElementById('direccion').value,
+      codigoPostal: document.getElementById('codigoPostal').value,
+      telefono: document.getElementById('telefono').value,
+      sitioWeb: document.getElementById('sitioWeb').value,
+      email: document.getElementById('email').value,
+      detallesTributarios: document.getElementById('detallesTributarios').value,
+      responsabilidadFiscal: Array.from(document.querySelectorAll('#responsabilidadFiscal input[type="checkbox"]'))
+        .filter(cb => cb.checked)
+        .map(cb => cb.value)
+        .join(',')
+    };
+
+    google.script.run.withSuccessHandler(function (response) {
+      resetForm();  // Llamar a resetForm para limpiar el formulario
+    }).saveClientData(formData);
   }
+
   function resetForm() {
     const form = document.getElementById('clientForm');
     form.reset();
@@ -127,7 +199,20 @@
       const campo = document.getElementById(id);
       campo.style.backgroundColor = '';  // Limpia el color
     });
+
+    // Disable fields
+    document.getElementById('nombreComercial').disabled = true;
+    document.getElementById('primerNombre').disabled = true;
+    document.getElementById('segundoNombre').disabled = true;
+    document.getElementById('primerApellido').disabled = true;
+    document.getElementById('segundoApellido').disabled = true;
+
+    // Set default country to Colombia and enable department and municipality fields
+    document.getElementById('pais').value = 'Colombia';
+    document.getElementById('departamento').disabled = false;
+    document.getElementById('municipio').disabled = false;
   }
+
   const departamentos = {
     "Amazonas": "91",
     "Antioquia": "05",
@@ -164,34 +249,7 @@
     "Vichada": "99"
   };
 
-
   document.addEventListener('DOMContentLoaded', function () {
-    const tipoPersona = document.getElementById('tipoPersona');
-    const allFields = [
-      'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'pais', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
-    ];
-    const naturalFields = [
-      'tipoDocumento', 'numeroIdentificacion', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'codigoCliente', 'regimen', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal'
-    ];
-    const juridicaFields = [
-      'tipoDocumento', 'numeroIdentificacion', 'codigoCliente', 'regimen', 'departamento', 'municipio', 'direccion', 'codigoPostal', 'telefono', 'sitioWeb', 'email', 'detallesTributarios', 'responsabilidadFiscal', 'nombreComercial'
-    ];
-
-    // Bloquear todos los campos por defecto excepto tipoTercero y tipoPersona
-    allFields.forEach(id => {
-      document.getElementById(id).disabled = true;
-    });
-
-    // Bloquear el campo de país por defecto
-    document.getElementById('pais').value = 'Colombia';
-    document.getElementById('pais').disabled = true;
-    document.getElementById('departamento').disabled = true;
-    document.getElementById('municipio').disabled = true;
-
-    // Deshabilitar el checkbox de cambiar país por defecto
-    document.getElementById('cambiarPaisCheckbox').disabled = true;
-
-    // Agregar opciones de departamentos al select
     const departamentoSelect = document.getElementById('departamento');
     for (const [nombre, codigo] of Object.entries(departamentos)) {
       const option = document.createElement('option');
@@ -200,51 +258,15 @@
       departamentoSelect.appendChild(option);
     }
 
-    tipoPersona.addEventListener('change', function () {
-      // Bloquear todos los campos primero
-      allFields.forEach(id => {
-        document.getElementById(id).disabled = true;
-      });
-
-      // Desbloquear los campos correspondientes al tipo de persona seleccionado
-      if (tipoPersona.value === 'Natural') {
-        naturalFields.forEach(id => {
-          document.getElementById(id).disabled = false;
-        });
-        document.getElementById('nombreComercial').disabled = true;
-      } else if (tipoPersona.value === 'Juridica') {
-        juridicaFields.forEach(id => {
-          document.getElementById(id).disabled = false;
-        });
-      }
-
-      // Mantener el campo de país bloqueado
-      document.getElementById('pais').disabled = true;
-      // Mantener el campo de municipio bloqueado
-      document.getElementById('municipio').disabled = true;
-    });
-
-    document.getElementById('cambiarPaisCheckbox').addEventListener('change', togglePais);
     document.getElementById('departamento').addEventListener('change', verificarDepartamento);
+    document.getElementById('pais').addEventListener('change', verificarPais); // Add event listener for country change
+    document.getElementById('tipoPersona').addEventListener('change', verificarTipoPersona); // Add event listener for type of person change
+
+    // Set default country to Colombia and enable department and municipality fields
+    document.getElementById('pais').value = 'Colombia';
+    verificarPais();
+    verificarTipoPersona(); // Ensure fields are correctly set on load
   });
-
-  function togglePais() {
-    const pais = document.getElementById('pais');
-    const departamento = document.getElementById('departamento');
-    const municipio = document.getElementById('municipio');
-    const checkbox = document.getElementById('cambiarPaisCheckbox');
-
-    if (checkbox.checked) {
-      pais.disabled = false;
-      departamento.disabled = true;
-      municipio.disabled = true;
-    } else {
-      pais.disabled = true;
-      pais.value = 'Colombia';
-      departamento.disabled = true;
-      municipio.disabled = true;
-    }
-  }
 
   function verificarDepartamento() {
     const departamento = document.getElementById('departamento');
@@ -275,6 +297,63 @@
       }).buscarMunicipios(departamento);
     }
   }
+
+  function verificarTipoPersona() {
+    const tipoPersona = document.getElementById('tipoPersona').value;
+    const nombreComercial = document.getElementById('nombreComercial');
+    const primerNombre = document.getElementById('primerNombre');
+    const segundoNombre = document.getElementById('segundoNombre');
+    const primerApellido = document.getElementById('primerApellido');
+    const segundoApellido = document.getElementById('segundoApellido');
+
+    if (tipoPersona === 'Natural') {
+      nombreComercial.disabled = true;
+      primerNombre.disabled = false;
+      segundoNombre.disabled = false;
+      primerApellido.disabled = false;
+      segundoApellido.disabled = false;
+    } else if (tipoPersona === 'Juridica') {
+      nombreComercial.disabled = false;
+      primerNombre.disabled = true;
+      segundoNombre.disabled = true;
+      primerApellido.disabled = true;
+      segundoApellido.disabled = true;
+    } else {
+      nombreComercial.disabled = false;
+      primerNombre.disabled = false;
+      segundoNombre.disabled = false;
+      primerApellido.disabled = false;
+      segundoApellido.disabled = false;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('#responsabilidadFiscal input[type="checkbox"]');
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function () {
+        if (this.id === 'noAplica' && this.checked) {
+          // Si "No Aplica" está seleccionado, deselecciona las otras opciones
+          checkboxes.forEach(cb => {
+            if (cb.id !== 'noAplica') {
+              cb.checked = false;
+            }
+          });
+        } else if (this.checked) {
+          // Si cualquier otra opción está seleccionada, deselecciona "No Aplica"
+          document.getElementById('noAplica').checked = false;
+        }
+
+        // Guardar la información separada por comas
+        const selectedValues = Array.from(checkboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.value)
+          .join(',');
+        console.log('Selected values:', selectedValues);
+        // Aquí puedes agregar la lógica para guardar `selectedValues` donde sea necesario
+      });
+    });
+  });
 </script>
 
 <body class="d-flex h-100">
@@ -291,7 +370,7 @@
       </div>
       <div class="col-12 text-center py-4"></div>
       <div class="px-4 gx-0 d-flex flex-column">
-        <h2 class="text-center">Crear Cliente</h2>
+        <h2 class="text-center">Crear Cliente</h1>
       </div>
 
     </header>
@@ -306,7 +385,7 @@
 
         <form class="row g-3" id="clientForm">
           <div class="col-md-12">
-            <label for="tipoTercero" class="form-label">Tipo de cliente</label>
+            <label for="tipoTercero" class="form-label">Tipo de cliente <span style="color: red;">*</span></label>
             <select id="tipoTercero" class="form-select form-select-lg">
               <option selected>Cliente</option>
               <option>Proveedor</option>
@@ -314,7 +393,7 @@
           </div>
 
           <div class="col-md-12">
-            <label for="tipoPersona" class="form-label">Tipo de persona</label>
+            <label for="tipoPersona" class="form-label">Tipo de persona <span style="color: red;">*</span></label>
             <select id="tipoPersona" class="form-select form-select-lg">
               <option class="placeholder" selected disabled hidden>Seleccione</option>
               <option>Natural</option>
@@ -323,31 +402,31 @@
           </div>
           <div class="col-md-6">
             <label for="nombreComercial" class="form-label">Nombre comercial</label>
-            <input type="text" class="form-control form-control-lg" id="nombreComercial" disabled>
+            <input type="text" class="form-control form-control-lg" id="nombreComercial">
           </div>
           <div class="col-md-6">
             <label for="primerNombre" class="form-label">Primer nombre</label>
-            <input type="text" class="form-control form-control-lg" id="primerNombre" disabled>
+            <input type="text" class="form-control form-control-lg" id="primerNombre">
           </div>
           <div class="col-md-6">
             <label for="segundoNombre" class="form-label">Segundo nombre</label>
-            <input type="text" class="form-control form-control-lg" id="segundoNombre" disabled>
+            <input type="text" class="form-control form-control-lg" id="segundoNombre">
           </div>
           <div class="col-md-6">
             <label for="primerApellido" class="form-label">Primer apellido</label>
-            <input type="text" class="form-control form-control-lg" id="primerApellido" disabled>
+            <input type="text" class="form-control form-control-lg" id="primerApellido">
           </div>
           <div class="col-md-6">
             <label for="segundoApellido" class="form-label">Segundo apellido</label>
-            <input type="text" class="form-control form-control-lg" id="segundoApellido" disabled>
+            <input type="text" class="form-control form-control-lg" id="segundoApellido">
           </div>
           <div class="col-md-6">
-            <label for="codigoCliente" class="form-label">Código cliente</label>
-            <input type="text" class="form-control form-control-lg" id="codigoCliente" disabled>
+            <label for="codigoCliente" class="form-label">Código cliente <span style="color: red;">*</span></label>
+            <input type="text" class="form-control form-control-lg" id="codigoCliente">
           </div>
           <div class="col-md-6">
-            <label for="tipoDocumento" class="form-label">Tipo de documento</label>
-            <select id="tipoDocumento" class="form-select form-select-lg" disabled>
+            <label for="tipoDocumento" class="form-label">Tipo de documento <span style="color: red;">*</span></label>
+            <select id="tipoDocumento" class="form-select form-select-lg">
               <option class="placeholder" selected disabled hidden>Seleccione</option>
               <option>Cédula de ciudadanía</option>
               <option>Tarjeta de extranjería</option>
@@ -363,13 +442,13 @@
           </div>
 
           <div class="col-md-6">
-            <label for="numeroIdentificacion" class="form-label">Número de identificación</label>
-            <input type="text" class="form-control form-control-lg" id="numeroIdentificacion" disabled>
+            <label for="numeroIdentificacion" class="form-label">Número de identificación <span style="color: red;">*</span></label>
+            <input type="text" class="form-control form-control-lg" id="numeroIdentificacion">
           </div>
 
           <div class="col-md-6">
-            <label for="regimen" class="form-label">Régimen</label>
-            <select id="regimen" class="form-select form-select-lg" disabled>
+            <label for="regimen" class="form-label">Régimen <span style="color: red;">*</span></label>
+            <select id="regimen" class="form-select form-select-lg">
               <option class="placeholder" selected disabled hidden>Seleccione</option>
               <option>Impuesto sobre las ventas - IVA</option>
               <option>No responsable de IVA</option>
@@ -377,20 +456,16 @@
           </div>
 
           <div class="col-md-6">
-            <label for="pais" class="form-label">País</label>
+            <label for="pais" class="form-label">País <span style="color: red;">*</span></label>
             <input type="text" id="pais" class="form-control form-control-lg" placeholder="Buscar país"
-              autocomplete="off" onkeyup="buscarPais()" disabled>
+              autocomplete="off" onkeyup="buscarPais()">
             <div class="result-box">
               <!-- Los resultados se mostrarán aquí -->
-            </div>
-            <div>
-              <input type="checkbox" id="cambiarPaisCheckbox" disabled>
-              <label for="cambiarPaisCheckbox">Cambiar País</label>
             </div>
           </div>
           <div class="col-md-6">
             <label for="departamento" class="form-label">Departamento</label>
-            <select id="departamento" class="form-select form-select-lg" onchange="cargarMunicipios()" disabled>
+            <select id="departamento" class="form-select form-select-lg" onchange="cargarMunicipios()">
               <option class="placeholder" selected disabled hidden>Seleccione</option>
               <option value="Amazonas">Amazonas</option>
               <option value="Antioquia">Antioquia</option>
@@ -429,33 +504,34 @@
           </div>
           <div class="col-md-6">
             <label for="municipio" class="form-label">Municipio</label>
-            <select id="municipio" class="form-select form-select-lg" disabled>
+            <select id="municipio" class="form-select form-select-lg">
               <option class="placeholder" selected disabled hidden>Seleccione</option>
-            </select>  
+            </select>
           </div>
           <div class="col-md-6">
-            <label for="direccion" class="form-label">Dirección</label>
-            <input type="text" class="form-control form-control-lg" id="direccion" disabled>
+            <label for="direccion" class="form-label">Dirección <span style="color: red;">*</span></label>
+            <input type="text" class="form-control form-control-lg" id="direccion">
           </div>
           <div class="col-md-6">
-            <label for="codigoPostal" class="form-label">Código postal</label>
-            <input type="text" class="form-control form-control-lg" id="codigoPostal" disabled>
+            <label for="codigoPostal" class="form-label">Código postal <span style="color: red;">*</span></label>
+            <input type="number" class="form-control form-control-lg" id="codigoPostal">
           </div>
           <div class="col-md-6">
-            <label for="telefono" class="form-label">Teléfono</label>
-            <input type="text" class="form-control form-control-lg" id="telefono" disabled>
+            <label for="telefono" class="form-label">Teléfono <span style="color: red;">*</span></label>
+            <input type="number" class="form-control form-control-lg" id="telefono">
           </div>
           <div class="col-md-12">
             <label for="sitioWeb" class="form-label">Sitio web</label>
-            <input type="text" class="form-control form-control-lg" id="sitioWeb" disabled>
+            <input type="text" class="form-control form-control-lg" id="sitioWeb">
           </div>
           <div class="col-md-12">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control form-control-lg" id="email" disabled>
+            <label for="email" class="form-label">Email <span style="color: red;">*</span></label>
+            <input type="email" placeholder="ejemplo@correo.com" class="form-control form-control-lg" id="email">
+            <small id="emailHelp" class="form-text text-muted" style="display:none;">Por favor ingrese un correo electrónico válido, con el formato alguien@correo.com.</small>
           </div>
           <div class="col-12">
-            <label for="detallesTributarios" class="form-label">Detalles tributarios</label>
-            <select id="detallesTributarios" class="form-select form-select-lg" disabled>
+            <label for="detallesTributarios" class="form-label">Detalles tributarios <span style="color: red;">*</span></label>
+            <select id="detallesTributarios" class="form-select form-select-lg">
               <option class="placeholder" selected disabled hidden>Seleccione</option>
               <option>IVA</option>
               <option>INC</option>
@@ -464,15 +540,29 @@
             </select>
           </div>
           <div class="col-12">
-            <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal</label>
-            <select id="responsabilidadFiscal" class="form-select form-select-lg" disabled>
-              <option class="placeholder" selected disabled hidden>Seleccione</option>
-              <option>Gran contribuyente</option>
-              <option>Autorretenedor</option>
-              <option>Agente de retencion</option>
-              <option>Regimen simple de tributacion</option>
-              <option>No aplica - Otros</option>
-            </select>
+            <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal <span style="color: red;">*</span></label>
+            <div id="responsabilidadFiscal">
+              <div>
+                <input type="checkbox" id="granContribuyente" value="Gran contribuyente">
+                <label for="granContribuyente">Gran contribuyente</label>
+              </div>
+              <div>
+                <input type="checkbox" id="autorretenedor" value="Autorretenedor">
+                <label for="autorretenedor">Autorretenedor</label>
+              </div>
+              <div>
+                <input type="checkbox" id="agenteRetencion" value="Agente de retencion IVA">
+                <label for="agenteRetencion">Agente de retención IVA</label>
+              </div>
+              <div>
+                <input type="checkbox" id="regimenSimple" value="Regimen simple de tributacion">
+                <label for="regimenSimple">Régimen simple de tributación</label>
+              </div>
+              <div>
+                <input type="checkbox" id="noAplica" value="No aplica - Otros">
+                <label for="noAplica">No aplica - Otros</label>
+              </div>
+            </div>
           </div>
 
         </form>
@@ -489,9 +579,7 @@
         <br />
         <div class="col-6 ps-1">
           <a onclick="Back()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
-            <i class="icon-left"></i>
-            <span>Atras</span>
-
+            <span>Volver a factura</span>
           </a>
         </div>
 
