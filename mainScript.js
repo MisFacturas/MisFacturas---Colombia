@@ -1,4 +1,3 @@
-
 function onOpen() {
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -42,27 +41,29 @@ function showSidebar2() {
   console.log("showSidebar2 Enters");
   let ui = SpreadsheetApp.getUi();
   console.log("setActiveSheet2 Inicio");
-  let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
-  Logger.log("hoja " + hoja)
-  Logger.log(typeof (hoja))
-  if (hoja == null) {
-    let respuesta = ui.alert('Primero debes de instalar las hojas necesarias ¿Deseas instalarlas ya?', ui.ButtonSet.YES_NO);
-    if (respuesta == ui.Button.YES) {
-      iniciarHojasFactura()
-      OnOpenSheetInicio()
-      agregarDataValidations()
-    } else {
-      return
+  let requiredSheets = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+  
+  for (let sheetName of requiredSheets) {
+    let sheet = ss.getSheetByName(sheetName);
+    if (sheet == null) {
+      let respuesta = ui.alert(`La hoja "${sheetName}" no existe. Primero debes de instalar las hojas necesarias ¿Deseas instalarlas ya?`, ui.ButtonSet.YES_NO);
+      if (respuesta == ui.Button.YES) {
+        iniciarHojasFactura();
+        OnOpenSheetInicio();
+        agregarDataValidations();
+      } else {
+        return;
+      }
     }
-  } else {
-    var html = HtmlService.createHtmlOutputFromFile('main')
-      .setTitle('Menú');
-    SpreadsheetApp.getUi()
-      .showSidebar(html);
-
-
-    console.log("showSidebar Exits");
   }
+
+  var html = HtmlService.createHtmlOutputFromFile('main')
+    .setTitle('Menú');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+
+  console.log("showSidebar Exits");
 }
 
 function iniciarHojasFactura() {
@@ -157,6 +158,10 @@ function agregarDataValidations() {
   const rangoDropdownProductoF = hojaFacturas.getRange("B15");
   const rangoDropdownCopiaFacturaCliente = HojaValorescopiaFactura.getRange("B2:C2");
   const rangoDropdownCopiaFacturaProducto = HojaValorescopiaFactura.getRange("B15");
+  const rangoDropdownFacturaMedioDePago = hojaFacturas.getRange("J3");
+  const rangoDropdownFacturaMoneda = hojaFacturas.getRange("J4");
+  const rangoDropdownCopiaFacturaMedioDePago = HojaValorescopiaFactura.getRange("J3");
+  const rangoDropdownCopiaFacturaMoneda = HojaValorescopiaFactura.getRange("J4");
   const rangoDropdownProductosColumnaD = hojaValoresP.getRange("D2:D");
   const rangoDropdownProductosColumnaG = hojaValoresP.getRange("G2:G");
   const rangoDropdownProductosColumnaI = hojaValoresP.getRange("I2:I");
@@ -175,6 +180,10 @@ function agregarDataValidations() {
   const rangoValoresProductosDatos = hojaValoresP.getRange("P2:P");
   const rangoValoresClienteFactura = hojaValoresC.getRange("$W$2:$W");
   const rangoValoresProductosFactura = hojaValoresP.getRange("$P$2:$P");
+  const rangoValoresFacturaMedioDePago = hojaDatos.getRange("R18:R93");
+  const rangoValoresFacturaMoneda = hojaDatos.getRange("F18:F20");
+  const rangoValoresCopiaFacturaMedioDePago = hojaDatos.getRange("R18:R93");
+  const rangoValoresCopiaFacturaMoneda = hojaDatos.getRange("F18:F20");
   const rangoValoresProductosColumnaD = hojaDatos.getRange("F36:F43");
   const rangoValoresProductosColumnaG = hojaDatos.getRange("B35:B399");
   const rangoValoresProductosColumnaI = hojaDatos.getRange("K26:K29");
@@ -251,6 +260,22 @@ function agregarDataValidations() {
     {
       rango: rangoDropdownClientesColumnaU,
       valores: rangoValoresClientesColumnaU
+    },
+    {
+      rango: rangoDropdownCopiaFacturaMedioDePago,
+      valores: rangoValoresCopiaFacturaMedioDePago
+    },
+    {
+      rango: rangoDropdownCopiaFacturaMoneda,
+      valores: rangoValoresCopiaFacturaMoneda
+    },
+    {
+      rango: rangoDropdownFacturaMedioDePago,
+      valores: rangoValoresFacturaMedioDePago
+    },
+    {
+      rango: rangoDropdownFacturaMoneda,
+      valores: rangoValoresFacturaMoneda
     }
   ];
 
@@ -719,7 +744,7 @@ function onEdit(e) {
             hojaActual.getRange("A" + String(impuestosSeccionStartRow)).setValue("IVA")//tipo impuesto
             hojaActual.getRange("B" + String(impuestosSeccionStartRow)).setValue("=G" + String(lastRowProducto))//tarifa
             hojaActual.getRange("C" + String(impuestosSeccionStartRow)).setValue("=E" + String(lastRowProducto))//base grabable
-            hojaActual.getRange("E" + String(impuestosSeccionStartRow)).setValue("=C" + String(impuestosSeccionStartRow) + "*G" + String(lastRowProducto))//total impuesto
+            hojaActual.getRange("E" + String(impuestosSeccionStartRow)).setValue("=C" + String(impuestosSeccionStartRow) + "*G" + String(impuestosSeccionStartRow))//total impuesto
           }
         }
         calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual)
