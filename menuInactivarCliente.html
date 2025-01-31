@@ -120,6 +120,10 @@
 
     function inactivar() {
       var cliente = document.getElementById('clientesActivos').value;
+      if (cliente.includes("Consumidor Final") || cliente.includes("0") || cliente.includes("222222222222")) {
+        alert("No se puede desactivar el cliente 'Consumidor Final'.");
+        return;
+      }
       console.log("cliente:", cliente);
       google.script.run.withSuccessHandler(function() {
         document.getElementById('buscarCliente').value = '';
@@ -145,11 +149,19 @@
       select.innerHTML = '<option value="">Seleccione un cliente</option>';
       resultBox.innerHTML = ''; // Clear previous results
       clientesActivosContainer.style.display = 'none'; // Hide the select box initially
+      if (clientes.length === 0) {
+        resultBox.innerHTML = '<p>No se encontraron clientes.</p>';
+        return;
+      }
       clientes.forEach(function (cliente) {
         var resultItem = document.createElement('div');
         resultItem.className = 'result-item';
         resultItem.textContent = cliente;
         resultItem.onclick = function() {
+          if (cliente.includes("Consumidor Final") || cliente.includes("0") || cliente.includes("222222222222")) {
+            alert("No se puede desactivar el cliente 'Consumidor Final'.");
+            return;
+          }
           select.innerHTML = ''; // Clear the select box
           var option = document.createElement('option');
           option.value = cliente;

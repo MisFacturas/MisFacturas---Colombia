@@ -98,9 +98,9 @@ function obtenerInformacionProducto(producto) {
   let precioUnitario = datos_sheet.getRange("J11").getValue();
   let tarifaIVA = datos_sheet.getRange("K11").getValue();
   let tarifaINC = datos_sheet.getRange("L11").getValue();
-  let precioImpuesto = datos_sheet.getRange("L11").getValue();
-  let tarifaRetencion = datos_sheet.getRange("M11").getValue();
-  let valorRetencion = datos_sheet.getRange("N11").getValue();
+  let precioImpuesto = datos_sheet.getRange("M11").getValue();
+  let tarifaRetencion = datos_sheet.getRange("N11").getValue();
+  let valorRetencion = datos_sheet.getRange("O11").getValue();
 
 
   let informacionProducto = {

@@ -66,17 +66,31 @@ function showSidebar2() {
   console.log("showSidebar Exits");
 }
 
+function grantAccessToTemplate() {
+  const plantillaID = "1szeKZtkx62En3aHDnLuWeehKzpdLL_ewpITXOVdhqHo";
+  const plantilla = SpreadsheetApp.openById(plantillaID);
+  const userEmail = Session.getEffectiveUser().getEmail();
+  plantilla.addEditor(userEmail);
+}
+
+function revokeAccessToTemplate() {
+  const plantillaID = "1szeKZtkx62En3aHDnLuWeehKzpdLL_ewpITXOVdhqHo";
+  const plantilla = SpreadsheetApp.openById(plantillaID);
+  const userEmail = Session.getEffectiveUser().getEmail();
+  plantilla.removeEditor(userEmail);
+}
+
 function iniciarHojasFactura() {
   Logger.log("Inicio instalación de hojas");
+
+  grantAccessToTemplate();
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const plantillaID = "1szeKZtkx62En3aHDnLuWeehKzpdLL_ewpITXOVdhqHo";
   const plantilla = SpreadsheetApp.openById(plantillaID);
 
   const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
-  const hojasBloqueadasEInvisibles = ["ListadoEstado", "Datos", "ClientesInvalidos", "Copia de Factura"];
-
-
+  const hojasInvisibles = ["ListadoEstado", "Datos", "ClientesInvalidos", "Copia de Factura"];
 
   // Instalar hojas desde la plantilla si no existen
   nombresHojas.forEach(nombreHoja => {
@@ -86,36 +100,12 @@ function iniciarHojasFactura() {
     if (!hoja) {
       const hojaPlantilla = plantilla.getSheetByName(nombreHoja);
       if (hojaPlantilla) {
-        // Copiar hoja y replicar protecciones
+        // Copiar hoja
         const hojaCopia = hojaPlantilla.copyTo(ss).setName(nombreHoja);
 
-        // Obtener las protecciones de la hoja original
-        const protecciones = hojaPlantilla.getProtections(SpreadsheetApp.ProtectionType.RANGE);
-
-        // Replicar las protecciones en la copia
-        protecciones.forEach(proteccion => {
-          const rango = proteccion.getRange();
-          const rangoEnCopia = hojaCopia.getRange(rango.getA1Notation());
-
-          const nuevaProteccion = rangoEnCopia.protect();
-          nuevaProteccion.setDescription(proteccion.getDescription());
-          nuevaProteccion.setWarningOnly(proteccion.isWarningOnly());
-
-          // Transferir permisos de edición
-          if (!proteccion.isWarningOnly()) {
-            nuevaProteccion.addEditors(proteccion.getEditors());
-            if (proteccion.canDomainEdit()) {
-              nuevaProteccion.setDomainEdit(true);
-            }
-          }
-        });
-
         // Bloquear la hoja completa si está en la lista de bloqueadas e invisibles
-        if (hojasBloqueadasEInvisibles.includes(nombreHoja)) {
+        if (hojasInvisibles.includes(nombreHoja)) {
           hojaCopia.hideSheet(); // Hacer la hoja invisible
-          const protection = hojaCopia.protect();
-          protection.removeEditors(protection.getEditors()); // Bloquear completamente
-          protection.addEditor(Session.getEffectiveUser()); // Solo el propietario tiene acceso
         }
 
       } else {
@@ -137,6 +127,8 @@ function iniciarHojasFactura() {
     }
   });
 
+  revokeAccessToTemplate();
+
   SpreadsheetApp.getUi().alert("Hojas instaladas satisfactoriamente.");
   //SpreadsheetApp.getUi().alert("Recuerda que antes de utilizar misfacturas debes de crear la carpeta donde se guardarán las facturas. Dirígete a la hoja Datos de emisor y dale clic en el botón crear carpeta.");
 }
@@ -152,7 +144,7 @@ function agregarDataValidations() {
 
   // Rango donde aplicar los dropdowns
   const rangoDropdownCliente = hojaDatos.getRange("H2");
-  const rangoDropdownClienteInvalido = hojaDatos.getRange("I6");
+  const rangoDropdownClienteInvalido = hojaDatos.getRange("H6");
   const rangoDropdownProductos = hojaDatos.getRange("I11");
   const rangoDropdownClienteF = hojaFacturas.getRange("B2:C2");
   const rangoDropdownProductoF = hojaFacturas.getRange("B15");
@@ -175,7 +167,7 @@ function agregarDataValidations() {
 
 
   // Rango de valores para los dropdowns
-  const rangoValoresClienteInvalido = hojaValoresCInvalidos.getRange("B2:B");
+  const rangoValoresClienteInvalido = hojaValoresCInvalidos.getRange("W2:W");
   const rangoValoresClienteDatos = hojaValoresC.getRange("W2:W");
   const rangoValoresProductosDatos = hojaValoresP.getRange("P2:P");
   const rangoValoresClienteFactura = hojaValoresC.getRange("$W$2:$W");
@@ -359,11 +351,9 @@ function reinstalarHojaDatos(ss, plantilla) {
   if (hojaPlantilla) {
     const hojaCopia = hojaPlantilla.copyTo(ss).setName(nombreHoja);
     Logger.log("dentro if")
-    // Bloquear la hoja "Datos"
-    const protection = hojaCopia.protect();
-    protection.removeEditors(protection.getEditors());
-    protection.addEditor(Session.getEffectiveUser());
-    hojaCopia.hideSheet(); // Hacer la hoja invisible
+    // Hacer la hoja invisible
+    hojaCopia.hideSheet();
+
     Logger.log("hoja aca")
   } else {
     SpreadsheetApp.getUi().alert('La hoja "Datos" no existe en la plantilla.');
@@ -660,6 +650,11 @@ function convertToPercentage(value) {
 function onEdit(e) {
   let hojaActual = e.source.getActiveSheet();
   let nombreHoja = hojaActual.getName();
+
+  if (nombreHoja === "Datos" || nombreHoja === "ClientesInvalidos" || nombreHoja === "ListadoEstado" || nombreHoja === "Copia de Factura") {
+    showWarningAndHideSheet();
+  } 
+
 
   if (nombreHoja === "Factura") {
     let factura_sheet = hojaActual;
@@ -1121,7 +1116,7 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja, numRow) {
       let NumerosIdentificacion = String(rangeNumeroIdentificaciones.getValues());
       NumerosIdentificacion = NumerosIdentificacion.split(",")
       let CodigosCliente = String(rangeCodigosCliente.getValues());
-      CodigosCliente = CodigosCliente.split(",")
+      CodigosCliente = CodigosCliente.split(",") 
 
 
 
@@ -1257,4 +1252,28 @@ function getDelivery() {
   };
   return Delivery;
 
+}
+function showWarningAndHideSheet() {
+  const ui = SpreadsheetApp.getUi();
+  ui.alert('No tienes permiso para editar esta hoja.');
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura"];
+  hojasInvisibles.forEach(nombreHoja => {
+    const hoja = ss.getSheetByName(nombreHoja);
+    if (hoja) {
+      hoja.hideSheet();
+    }
+  });
+}
+
+function onChange(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura"];
+  hojasInvisibles.forEach(nombreHoja => {
+    const hoja = ss.getSheetByName(nombreHoja);
+    if (hoja && !hoja.isSheetHidden()) {
+      hoja.hideSheet();
+      SpreadsheetApp.getUi().alert(`La hoja "${nombreHoja}" debe permanecer oculta.`);
+    }
+  });
 }

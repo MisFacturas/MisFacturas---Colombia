@@ -143,6 +143,10 @@
       select.innerHTML = '<option value="">Seleccione un cliente</option>';
       resultBox.innerHTML = ''; // Clear previous results
       clientesInactivosContainer.style.display = 'none'; // Hide the select box initially
+      if (clientes.length === 0) {
+        resultBox.innerHTML = '<p>No se encontraron clientes.</p>';
+        return;
+      }
       clientes.forEach(function (cliente) {
         var resultItem = document.createElement('div');
         resultItem.className = 'result-item';
