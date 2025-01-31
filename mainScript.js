@@ -67,14 +67,14 @@ function showSidebar2() {
 }
 
 function grantAccessToTemplate() {
-  const plantillaID = "1szeKZtkx62En3aHDnLuWeehKzpdLL_ewpITXOVdhqHo";
+  const plantillaID = "1FgLge7RWvu3R-51Se6ekjN3pOTZE40HLwafRIwoIMUg";
   const plantilla = SpreadsheetApp.openById(plantillaID);
   const userEmail = Session.getEffectiveUser().getEmail();
   plantilla.addEditor(userEmail);
 }
 
 function revokeAccessToTemplate() {
-  const plantillaID = "1szeKZtkx62En3aHDnLuWeehKzpdLL_ewpITXOVdhqHo";
+  const plantillaID = "1FgLge7RWvu3R-51Se6ekjN3pOTZE40HLwafRIwoIMUg";
   const plantilla = SpreadsheetApp.openById(plantillaID);
   const userEmail = Session.getEffectiveUser().getEmail();
   plantilla.removeEditor(userEmail);
@@ -86,7 +86,7 @@ function iniciarHojasFactura() {
   grantAccessToTemplate();
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const plantillaID = "1szeKZtkx62En3aHDnLuWeehKzpdLL_ewpITXOVdhqHo";
+  const plantillaID = "1FgLge7RWvu3R-51Se6ekjN3pOTZE40HLwafRIwoIMUg";
   const plantilla = SpreadsheetApp.openById(plantillaID);
 
   const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
