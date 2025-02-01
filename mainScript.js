@@ -43,15 +43,17 @@ function showSidebar2() {
   console.log("setActiveSheet2 Inicio");
   let requiredSheets = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
   let ss = SpreadsheetApp.getActiveSpreadsheet();
-  
+
   for (let sheetName of requiredSheets) {
     let sheet = ss.getSheetByName(sheetName);
     if (sheet == null) {
-      let respuesta = ui.alert(`La hoja "${sheetName}" no existe. Primero debes de instalar las hojas necesarias ¿Deseas instalarlas ya?`, ui.ButtonSet.YES_NO);
+      let respuesta = ui.alert(`Faltan hojas de calculo requeridas para el funcionamiento de misfacturas. Primero debes de instalar las hojas necesarias ¿Deseas instalarlas ya?`, ui.ButtonSet.YES_NO);
       if (respuesta == ui.Button.YES) {
         iniciarHojasFactura();
         OnOpenSheetInicio();
         agregarDataValidations();
+        let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(155);
+        ui.showModalDialog(htmlOutput, 'Vinculación requerida');
       } else {
         return;
       }
@@ -172,10 +174,10 @@ function agregarDataValidations() {
   const rangoValoresProductosDatos = hojaValoresP.getRange("P2:P");
   const rangoValoresClienteFactura = hojaValoresC.getRange("$W$2:$W");
   const rangoValoresProductosFactura = hojaValoresP.getRange("$P$2:$P");
-  const rangoValoresFacturaMedioDePago = hojaDatos.getRange("R18:R93");
-  const rangoValoresFacturaMoneda = hojaDatos.getRange("F18:F20");
-  const rangoValoresCopiaFacturaMedioDePago = hojaDatos.getRange("R18:R93");
-  const rangoValoresCopiaFacturaMoneda = hojaDatos.getRange("F18:F20");
+  const rangoValoresFacturaMedioDePago = hojaDatos.getRange("R18:R37");
+  const rangoValoresFacturaMoneda = hojaDatos.getRange("X18:X196");
+  const rangoValoresCopiaFacturaMedioDePago = hojaDatos.getRange("R18:R937");
+  const rangoValoresCopiaFacturaMoneda = hojaDatos.getRange("X18:X196");
   const rangoValoresProductosColumnaD = hojaDatos.getRange("F36:F43");
   const rangoValoresProductosColumnaG = hojaDatos.getRange("B35:B399");
   const rangoValoresProductosColumnaI = hojaDatos.getRange("K26:K29");
@@ -278,8 +280,6 @@ function agregarDataValidations() {
       .build();
     rango.setDataValidation(regla); // Aplicar la regla
   });
-
-  SpreadsheetApp.getUi().alert("Validaciones de datos aplicadas correctamente.");
 }
 
 function IniciarMisfacturas() {
@@ -290,17 +290,34 @@ function IniciarMisfacturas() {
     iniciarHojasFactura()
     OnOpenSheetInicio()
     agregarDataValidations()
+    let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(300).setHeight(100);
+    ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+
+
   } else {
     let respuesta = ui.alert('Si vuelves a instalar, solo se instalaran las hojas no existan o que hayan sido eliminadas?', ui.ButtonSet.YES_NO);
     if (respuesta == ui.Button.YES) {
       iniciarHojasFactura()
       OnOpenSheetInicio()
       agregarDataValidations()
+      let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(300).setHeight(100);
+      ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+
     } else {
       return
     }
   }
 
+}
+
+function abrirMenuVinculacion() {
+  // Código para abrir el menú de vinculación en el sidebar
+  let htmlOutput = HtmlService.createHtmlOutputFromFile('menuVincular')
+    .setTitle('Vincular misfacturas');
+  SpreadsheetApp.getUi().showSidebar(htmlOutput);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Datos de emisor");
+  SpreadsheetApp.setActiveSheet(sheet);
 }
 
 function eliminarHojasFactura() {
@@ -653,7 +670,7 @@ function onEdit(e) {
 
   if (nombreHoja === "Datos" || nombreHoja === "ClientesInvalidos" || nombreHoja === "ListadoEstado" || nombreHoja === "Copia de Factura") {
     showWarningAndHideSheet();
-  } 
+  }
 
 
   if (nombreHoja === "Factura") {
@@ -673,7 +690,7 @@ function onEdit(e) {
       ponerFechaYHoraActual();
     }
     if (rowEditada == 3 && colEditada == 8) {
-      let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+      let hojaDatosEmisor = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Datos de emisor');
       let numeroAutorizacion = celdaEditada.getValue();
       let consecutivoFactura = 0;
       for (i = 18; i <= 20; i++) {
@@ -706,7 +723,8 @@ function onEdit(e) {
         factura_sheet.getRange("G" + String(i)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
         factura_sheet.getRange("H" + String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
         cargos = Number(factura_sheet.getRange("J" + String(i)).getValue())//Cargos
-        factura_sheet.getRange("K" + String(i)).setValue(dictInformacionProducto["valor Retencion"] * factura_sheet.getRange("E" + String(i)).getValue())//Retencion
+        Logger.log("retencion: " + dictInformacionProducto["valor Retencion"])
+        factura_sheet.getRange("K" + String(i)).setValue(dictInformacionProducto["tarifa Retencion"] * factura_sheet.getRange("E" + String(i)).getValue())//Retencion
         factura_sheet.getRange("L" + String(i)).setValue("=E" + String(i) + "+F" + String(i))
       }
 
@@ -777,7 +795,7 @@ function onEdit(e) {
     } else if (colEditada == 10 && rowEditada == 4) {
       //Verifica la moneda
       let moneda = celdaEditada.getValue();
-      if (moneda != "Pesos Colombianos") {
+      if (moneda != "COP-Peso colombiano") {
         hojaActual.getRange(rowEditada + 1, colEditada).setBackground('#FFC7C7');
         ponerFechaTasaDeCambio();
       } else {
@@ -1083,7 +1101,7 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja, numRow) {
             Logger.log("El Num identificion no existe.");
             return false;
           }
-        } else if (codigos[1] === "11"){
+        } else if (codigos[1] === "11") {
           Logger.log("entro a verificar si el numero es un codigo")
           rangeCodigosCliente = sheet.getRange(2, columnaCodigoCliente, lastActiveRow);
           let CodigosCliente = String(rangeCodigosCliente.getValues());
@@ -1116,7 +1134,7 @@ function verificarIdentificacionUnica(codigo, nombreHoja, inHoja, numRow) {
       let NumerosIdentificacion = String(rangeNumeroIdentificaciones.getValues());
       NumerosIdentificacion = NumerosIdentificacion.split(",")
       let CodigosCliente = String(rangeCodigosCliente.getValues());
-      CodigosCliente = CodigosCliente.split(",") 
+      CodigosCliente = CodigosCliente.split(",")
 
 
 
@@ -1190,6 +1208,8 @@ function agregarCodigoIdentificador(e, tipoPersona) {
         let rangoValidacion = hoja.getRange("O" + rowEditada);
         rangoValidacion.clearDataValidations();
       }
+    } else {
+      hoja.getRange(rowEditada, 23).setValue("")
     }
   } else if (hoja.getName() == "Productos") {
     let nombre = hoja.getRange(rowEditada, 3).getValue()
@@ -1276,4 +1296,50 @@ function onChange(e) {
       SpreadsheetApp.getUi().alert(`La hoja "${nombreHoja}" debe permanecer oculta.`);
     }
   });
+}
+
+function plantillaVincularMF(){
+  const plantillaHTML = `
+       <style>
+          @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+          body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            padding: 10px;
+          }
+          .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+          }
+          .red-text {
+            color: rgb(231, 112, 14);
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 600;
+          }
+          button {
+            padding: 3px 12px;
+            font-family: 'Roboto', sans-serif;
+            background-color: rgba(255, 255, 255, 0);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+          }
+          button:hover {
+            background-color:rgba(255, 218, 187, 0.32);
+          }
+        </style>
+        <div class="container">
+          <p>Por favor <b>vincule su cuenta</b> para poder generar las facturas.</p>
+          <div class="button-container">
+            <button onclick="google.script.run.abrirMenuVinculacion(); google.script.host.close()"><p class="red-text">  Vincular ahora  <p></button>
+          </div>
+        </div>
+          `;
+  return plantillaHTML;
 }

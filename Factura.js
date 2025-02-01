@@ -26,7 +26,7 @@ function verificarEstadoValidoFactura(estadoFactura) {
     estaValido = false;
     estadoFactura.push("Moneda");
   }
-  if (moneda === "Pesos Colombianos") {
+  if (moneda === "COP-Peso colombiano") {
     for (let j = 0; j < 3; j++) {
       if (informacionFactura2[j][1] === "") {
         estaValido = false;
@@ -58,7 +58,7 @@ function verificarEstadoValidoFactura(estadoFactura) {
 }
 
 function guardarFactura() {
-  
+
   SpreadsheetApp.flush();
   SpreadsheetApp.getUi().alert("Revisando validez de la factura. Aguarde unos segundos");
   let estadoFactura = [];
@@ -81,7 +81,7 @@ function agregarFilaNueva() {
 
   // Verificar si numeroFilasParaAgregar es nulo, vacío o no es un número
   if (numeroFilasParaAgregar == 0 || numeroFilasParaAgregar == "" || isNaN(numeroFilasParaAgregar)) {
-    SpreadsheetApp.getUi().alert("Error: Por favor, ingresa un número válido de filas para agregar.");
+    SpreadsheetApp.getUi().alert("Error: Por favor ingresa un número válido de filas para agregar.");
     return; // Detener la ejecución si hay error
   }
 
@@ -210,7 +210,7 @@ function enviarFactura() {
       SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
       limpiarHojaFactura();
     } else if (contenidoRespuesta["Message"] === "E002: El documento que intenta ingresar ya existe en el sistema") {
-      SpreadsheetApp.getUi().alert("Error: La factura ya existe en el sistema de misfacturas. Por favor, verifique que el número de factura sea único.");
+      SpreadsheetApp.getUi().alert("Error: La factura ya existe en el sistema de misfacturas. Por favor verifique que el número de factura sea único.");
       hojaFactura.getRange("H2").setBackground("#FFC7C7");
     }
     else {
@@ -345,9 +345,13 @@ function obtenerResolucionesDian(token, usuario) {
           //item.Observaciones
         ]);
 
+        // Limpiar la hoja desde la fila 18 hasta la 30
+        hojaDatosEmisor.getRange(18, 1, 13, hojaDatosEmisor.getLastColumn()).clearContent();
+
+
         // Escribir los datos en la hoja, debajo de los encabezados
         hojaDatosEmisor.getRange(18, 1, filas.length, encabezados.length).setValues(filas);
-       
+
 
         // Set background colors
         hojaDatosEmisor.getRange(18, 1, filas.length, 1).setBackground('#d9d9d9'); // Column A
@@ -528,10 +532,13 @@ function getInvoiceGeneralInformation() {
   var numeroFactura = prefactura_sheet.getRange("H2").getValue();
   var fechaEmision = prefactura_sheet.getRange("H4").getValue() + "T" + prefactura_sheet.getRange("H6").getValue();//fecha de emision
   var diasVencimiento = prefactura_sheet.getRange("H5").getValue();//dias de vencimiento
+  var moneda = prefactura_sheet.getRange("J4").getValue();//moneda
+  moneda = moneda.split("-")[0];
   var exchangeRate = prefactura_sheet.getRange("J5").getValue();//tasa de cambio
   var exchangeRateDate = prefactura_sheet.getRange("J6").getValue();//fecha de tasa de cambio
   var observaciones = prefactura_sheet.getRange("B10").getValue();//observaciones
   var fechaVencimiento = SumarDiasAFecha(diasVencimiento, prefactura_sheet.getRange("H4").getValue());
+
 
   //Agregar para el json
   var InvoiceGeneralInformation = {
@@ -541,7 +548,7 @@ function getInvoiceGeneralInformation() {
     "IssueDate": fechaEmision,
     "Prefix": buscarPrefijo(numeroAutorizacion),
     "DaysOff": String(diasVencimiento),
-    "Currency": "COP",
+    "Currency": moneda,
     "ExchangeRate": exchangeRate,
     "ExchangeRateDate": exchangeRateDate,
     "CustomizationID": "10",
@@ -592,6 +599,7 @@ function guardarYGenerarInvoice() {
   let hojaProductos = spreadsheet.getSheetByName('Productos');
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
   let consecutivoFactura = hojaFactura.getRange("H2").getValue();
   let consecutivoFacturaActualizado = consecutivoFactura + 1;
   let numeroAutorizacion = hojaFactura.getRange("H3").getValue();
@@ -632,6 +640,7 @@ function guardarYGenerarInvoice() {
     }
     let filaProducto = obtenerFilaPorReferencia(Number(LineaFactura['referencia']));
     let unidadDeMedida = hojaProductos.getRange("G" + String(filaProducto)).getValue();
+    unidadDeMedida = unidadDeMedida.split("-")[1];
 
     let ItemReference = String(LineaFactura['referencia']);
     let Name = String(LineaFactura['producto']);
@@ -643,7 +652,7 @@ function guardarYGenerarInvoice() {
     let LineExtensionAmount = parseFloat(LineaFactura['subtotal']);
     let TotalCargosLinea = Number(LineaFactura['cargos']);
     let TotalDescuentoLinea = Number(LineaFactura['descuento%']) * 100;
-    let MeasureUnitCode = String(codigosUnidadDeMedida[unidadDeMedida]);
+    let MeasureUnitCode = String(unidadDeMedida);
 
     let ItemTaxesInformation = [];
 

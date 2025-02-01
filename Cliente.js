@@ -266,8 +266,8 @@ function saveClientData(formData) {
     throw new Error('La hoja "Clientes" no existe.');
   }
   let codigosIdetificadores = formData.numeroIdentificacion + "-" + formData.codigoCliente;
-  
-  let existe = verificarIdentificacionUnica(codigosIdetificadores,"Clientes", false)
+
+  let existe = verificarIdentificacionUnica(codigosIdetificadores, "Clientes", false)
   if (existe === 1) {
     SpreadsheetApp.getUi().alert("El Numero de Identificacion del cliente ya existe, por favor poner un Numero de Identificacion unico");
     throw new Error('por favor poner un Numero de Identificacion unico');
@@ -374,6 +374,33 @@ function verificarDatosObligatorios(e, tipoPersona) {
       } else {
         estaVacioOPredeterminado = false;
       }
+    }
+
+    // Verificar si el país es Colombia y validar departamento y municipio
+    let pais = sheet.getRange(rowEditada, 13).getValue(); // Columna M es la 13
+    let departamento = sheet.getRange(rowEditada, 14).getValue(); // Columna N es la 14
+    let municipio = sheet.getRange(rowEditada, 15).getValue(); // Columna O es la 15
+
+    if (pais === "Colombia") {
+      if (!departamento || !municipio) {
+        estaCompleto = false;
+        if (!departamento) {
+          sheet.getRange(rowEditada, 14).setBackground('#FFC7C7'); // Resaltar en rojo claro
+        }
+        if (!municipio) {
+          sheet.getRange(rowEditada, 15).setBackground('#FFC7C7'); // Resaltar en rojo claro
+        }
+      }
+    }
+
+    // Verificar si el correo electrónico en la columna T es válido
+    let email = sheet.getRange(rowEditada, 20).getValue(); // Columna T es la 20
+    let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      estaCompleto = false;
+      sheet.getRange(rowEditada, 20).setBackground('#FFC7C7'); // Resaltar en rojo claro
+      SpreadsheetApp.getUi().alert('El correo electrónico ingresado no es válido.');
     }
 
     // Actualizar el estado en la primera columna
