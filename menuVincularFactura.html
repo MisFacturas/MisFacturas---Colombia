@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" class="h-100">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formulario con Botones</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+
+  <script>
+    function showFactura() {
+      google.script.run.showNuevaFactura();
+    }
+
+    function obtenerToken(inHoja) {
+      let contra = document.getElementById('Contra').value;
+      let usuario = document.getElementById("Usuario").value;
+
+    if (!usuario || !contra) {
+      alert("Por favor, complete todos los campos.");
+      return;
+    }
+
+      google.script.run.obtenerTokenMF(usuario, contra);
+      showFactura();
+    }
+
+    function generarToken() {
+      window.open("https://www.misfacturas.com.co/Publico/empiece-gratis");
+    }
+
+    function togglePasswordVisibility() {
+      const passwordField = document.getElementById('Contra');
+      const checkbox = document.getElementById('togglePassword');
+      passwordField.type = checkbox.checked ? 'text' : 'password';
+    }
+
+    let inHoja = true;
+  </script>
+</head>
+
+<body class="d-flex h-100">
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
+      </div>
+      <div class="col-12 text-center py-4"></div>
+      <div class="px-4 gx-0 d-flex flex-column">
+        <h2 class="text-center">Vincular cuenta de misfacturas</h1>
+      </div>
+    </header>
+
+    <main>
+      <div class="container py-5">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-6">
+            <p class="fs-6 text-center">Por favor completa la siguiente información para poder vincular tu cuenta de
+              <b>misfacturas</b> con GoogleSheets. Si no tienes una cuenta puedes <a
+                href="https://www.misfacturas.com.co/Publico/empiece-gratis" target="_blank">registrarte aquí</a>.</p>
+          </div>
+          <!-- Form Fields -->
+          <div class="col-12 col-md-6">
+            <div class="mb-3">
+              <label for="Usuario" class="form-label fs-3 fw-bold">Usuario</label>
+              <input type="text" class="form-control" id="Usuario" placeholder="Ingresa tu usuario">
+            </div>
+            <div class="mb-3">
+              <label for="Contra" class="form-label fs-3 fw-bold">Contraseña</label>
+              <input type="password" class="form-control" id="Contra" placeholder="Ingresa tu contraseña">
+            </div>
+            <!-- Toggle checkbox for showing/hiding password -->
+            <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" id="togglePassword" onclick="togglePasswordVisibility()">
+              <label class="form-check-label" for="togglePassword">Mostrar contraseña</label>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 d-flex justify-content-center">
+          <div class="col-6 col-md-4">
+            <a onclick="obtenerToken(inHoja)"
+              class="btn btn-primary btn-lg w-100 btn-menu d-flex align-items-center justify-content-center">
+              <span>Vincular</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+
+</html>

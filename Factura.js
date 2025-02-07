@@ -1,12 +1,19 @@
 function verificarEstadoValidoFactura(estadoFactura) {
   var spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
-
-  // Verificar datos de la factura 
-
   let estaValido = true;
   estadoFactura.push(estaValido);
 
+  //verificar nit
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let nit = hojaDatosEmisor.getRange("B3").getValue();
+  if (nit === "") {
+    estaValido = false;
+    estadoFactura.push("Por favor registre su NIT en la hoja Datos de Emisor");
+
+  }
+
+  // Verificar datos de la factura 
   let clienteActual = hojaFactura.getRange("B2").getValue();
   let informacionFactura1 = hojaFactura.getRange(3, 6, 4, 3).getValues();
   let informacionFactura2 = hojaFactura.getRange(2, 9, 5, 2).getValues();
@@ -59,10 +66,23 @@ function verificarEstadoValidoFactura(estadoFactura) {
 
 function guardarFactura() {
 
-  SpreadsheetApp.flush();
   SpreadsheetApp.getUi().alert("Revisando validez de la factura. Aguarde unos segundos");
+  let spreadsheet = SpreadsheetApp.getActive();
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let estadoVinculacion = hojaDatosEmisor.getRange("B13").getValue();
   let estadoFactura = [];
+  if (estadoVinculacion == "Desvinculado") {
+    let inHoja = true;
+    let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF(inHoja)).setWidth(500).setHeight(155);
+    let ui = SpreadsheetApp.getUi();
+    ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+    return;
+  }
+
+  Logger.log("Se va a verificar la validez de la factura");
   verificarEstadoValidoFactura(estadoFactura);
+  Logger.log("Estado de la factura: " + estadoFactura[0]);
+
   if (estadoFactura[0] === true) {
     guardarYGenerarInvoice();
     logearUsuario();
@@ -74,32 +94,51 @@ function guardarFactura() {
 }
 
 function agregarFilaNueva() {
-  var spreadsheet = SpreadsheetApp.getActive();
 
-  let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let numeroFilasParaAgregar = hojaFactura.getRange("B13").getValue();
+  const lock = LockService.getScriptLock();
 
-  // Verificar si numeroFilasParaAgregar es nulo, vacío o no es un número
-  if (numeroFilasParaAgregar == 0 || numeroFilasParaAgregar == "" || isNaN(numeroFilasParaAgregar)) {
-    SpreadsheetApp.getUi().alert("Error: Por favor ingresa un número válido de filas para agregar.");
-    return; // Detener la ejecución si hay error
+  try {
+    lock.tryLock(5000);
+    var spreadsheet = SpreadsheetApp.getActive();
+
+    let hojaFactura = spreadsheet.getSheetByName('Factura');
+    let numeroFilasParaAgregar = hojaFactura.getRange("B13").getValue();
+
+    // Verificar si numeroFilasParaAgregar es nulo, vacío o no es un número
+    if (numeroFilasParaAgregar == 0 || numeroFilasParaAgregar == "" || isNaN(numeroFilasParaAgregar)) {
+      SpreadsheetApp.getUi().alert("Error: Por favor ingresa un número válido de filas para agregar.");
+      return; // Detener la ejecución si hay error
+    }
+
+    let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
+    const productStartRow = 15;
+    const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
+
+    Logger.log("Agregar fila nueva");
+    hojaFactura.insertRows(lastProductRow, numeroFilasParaAgregar);
+    SpreadsheetApp.flush();
+
+  } catch (error) {
+    Logger.log("Error al agregar filas: " + error.message);
+  } finally {
+    lock.releaseLock();
   }
-
-  let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
-  const productStartRow = 15;
-  const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
-
-  Logger.log("Agregar fila nueva");
-  hojaFactura.insertRows(lastProductRow, numeroFilasParaAgregar);
-  SpreadsheetApp.flush();
-
 }
 
 function agregarFilaCargoDescuento() {
-  let spreadsheet = SpreadsheetApp.getActive();
-  let hojaFactura = spreadsheet.getSheetByName('Factura');
-  const lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
-  hojaFactura.insertRowAfter(lastCargoDescuentoRow)
+
+  const lock = LockService.getScriptLock();
+  try {
+    lock.tryLock(5000);
+    let spreadsheet = SpreadsheetApp.getActive();
+    let hojaFactura = spreadsheet.getSheetByName('Factura');
+    const lastCargoDescuentoRow = getLastCargoDescuentoRow(hojaFactura);
+    hojaFactura.insertRowAfter(lastCargoDescuentoRow);
+  } catch (error) {
+    Logger.log("Error al agregar fila de cargo/descuento: " + error.message);
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function agregarProductoDesdeFactura(cantidad, producto) {
@@ -288,9 +327,12 @@ function obtenerResolucionesDian(token, usuario) {
   let hojaDatos = spreadsheet.getSheetByName("Datos")
   let nit = hojaDatosEmisor.getRange("B3").getValue();
   if (nit === "") {
+
     hojaDatosEmisor.getRange("B3").setBackground("#FFC7C7");
     SpreadsheetApp.getUi().alert("Por favor ingrese el NIT del emisor en la hoja 'Datos de emisor' y vuelva a intentar obtener las resoluciones.");
+    spreadsheet.setActiveSheet(hojaDatosEmisor);
     return;
+
   }
   else {
     hojaDatosEmisor.getRange("B3").setBackground(null);
@@ -595,6 +637,7 @@ function getPaymentSummary() {
 }
 
 function guardarYGenerarInvoice() {
+  Logger.log("Guardando y generando invoice");
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaProductos = spreadsheet.getSheetByName('Productos');
   let hojaFactura = spreadsheet.getSheetByName('Factura');
@@ -614,10 +657,14 @@ function guardarYGenerarInvoice() {
   let posicionTotalProductos = hojaFactura.getRange("A16").getValue(); // para verificar donde esta el TOTAL
   if (posicionTotalProductos === "Total filas") {
     var cantidadProductos = hojaFactura.getRange("B16").getValue();// cantidad total de productos 
+    var cantidadFilasProductos = 1;
   } else {
     let startingRowTax = getcargosDescuentosStartRow(hojaFactura)
     let posicionTotalProductos = startingRowTax - 2
     var cantidadProductos = hojaFactura.getRange("B" + String(posicionTotalProductos)).getValue();// cantidad total de productos
+    var cantidadFilasProductos = posicionTotalProductos - 15
+    Logger.log("Cantidad de productos: " + cantidadProductos);
+    Logger.log("Cantidad de filas de productos: " + cantidadFilasProductos);
   }
 
   let llavesParaLinea = hojaFactura.getRange("A14:L14");//llamo los headers 
@@ -634,14 +681,23 @@ function guardarYGenerarInvoice() {
     let productoFilaActual = String(rangoProductoActual.getValues());
     productoFilaActual = productoFilaActual.split(",");// cojo el producto de la linea actual y se le hace split a toda la info
     let LineaFactura = {};
+    Logger.log(i);
+    if (productoFilaActual[0] === "") {
+      Logger.log("No hay productos en la fila " + i);
+      i++;
+      continue;
+    }
+
 
     for (let j = 0; j < 12; j++) {
       LineaFactura[llavesFinales[j]] = productoFilaActual[j]
     }
+
     let filaProducto = obtenerFilaPorReferencia(Number(LineaFactura['referencia']));
     let unidadDeMedida = hojaProductos.getRange("G" + String(filaProducto)).getValue();
+    Logger.log("Unidad de medida: " + unidadDeMedida);
     unidadDeMedida = unidadDeMedida.split("-")[1];
-
+    Logger.log("Unidad de medida: " + unidadDeMedida);
     let ItemReference = String(LineaFactura['referencia']);
     let Name = String(LineaFactura['producto']);
     let Quantity = String(LineaFactura['cantidad']);
@@ -776,7 +832,7 @@ function guardarYGenerarInvoice() {
 
     productoInformation.push(productoI);//agregamos el producto actual a la lista total 
     i++;
-  } while (i < (15 + cantidadProductos));
+  } while (i < (15 + cantidadFilasProductos));
 
 
   // Función para obtener todos los impuestos de productoInformation
