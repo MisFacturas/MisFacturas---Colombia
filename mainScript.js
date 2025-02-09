@@ -41,7 +41,7 @@ function showSidebar2() {
   console.log("showSidebar2 Enters");
   let ui = SpreadsheetApp.getUi();
   console.log("setActiveSheet2 Inicio");
-  let requiredSheets = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
+  let requiredSheets = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Historial Facturas", "Historial Facturas Data"];
   let ss = SpreadsheetApp.getActiveSpreadsheet();
 
   for (let sheetName of requiredSheets) {
@@ -898,6 +898,31 @@ function onEdit(e) {
         }
       }
       SpreadsheetApp.flush();
+    } else if (nombreHoja === "Historial Facturas"){
+      let celdaEditada = e.range;
+      let rowEditada = celdaEditada.getRow();
+      let colEditada = celdaEditada.getColumn();
+      if(rowEditada==5 && colEditada==9){
+        Logger.log("dentto de selccionar filtor")
+        let valor = celdaEditada.getValue()
+        filtroHistorialFacturas(valor)
+      }
+    }else if (hojaActual.getName() === "Productos"){
+      let celdaEditada = e.range;
+      let rowEditada = celdaEditada.getRow();
+      let colEditada = celdaEditada.getColumn();
+      verificarDatosObligatoriosProductos(e)
+      agregarCodigoIdentificador(e)
+      if (colEditada==2 && rowEditada>1){
+        let codigoRerencia=hojaActual.getRange(rowEditada,colEditada).getValue()
+        let existe=verificarCodigo(codigoRerencia,"Productos",true,rowEditada)
+        if(existe){
+          SpreadsheetApp.getUi().alert("El Codigo de referencia ya existe, por favor elegir otro numero unico");
+          celdaEditada.setValue("");
+          verificarDatosObligatoriosProductos(e)
+          throw new Error('por favor poner un Numero de Identificacion unico');
+        }
+      }
     }
   } catch (error) {
     Logger.log("No se pudo obtener el lock o hubo error: " + error);
