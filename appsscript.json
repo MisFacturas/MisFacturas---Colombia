@@ -4,8 +4,8 @@
     "enabledAdvancedServices": [
       {
         "userSymbol": "Sheets",
-        "version": "v4",
-        "serviceId": "sheets"
+        "serviceId": "sheets",
+        "version": "v4"
       }
     ]
   },
@@ -17,6 +17,7 @@
     "https://www.googleapis.com/auth/script.locale",
     "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/userinfo.email"
+    
   ],
   "runtimeVersion": "V8"
 }

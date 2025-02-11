@@ -1,3 +1,137 @@
+function descargarFacturaHtml() {
+  var html = HtmlService.createHtmlOutputFromFile('descargaFacturaHistorial')
+    .setTitle('Historial facutras');
+  SpreadsheetApp.getUi()
+    .showSidebar(html);
+}
+
+function linkDescargaFactura(idFactura) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let idNumber = hojaDatosEmisor.getRange("B3").getValue();
+  let schemaID = 31;
+  let documentNumber = idFactura;
+  let documentType = 1;
+  let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDownloadRgDocumentByNumber?SchemaID=${schemaID}&IDnumber=${idNumber}&DocumentType=${documentType}&DocumentNumber=${documentNumber}`;
+  let hojaDatos = spreadsheet.getSheetByName('Datos');
+  let token = hojaDatos.getRange("F47").getValue();
+
+  let opciones = {
+    "method": "get",
+    "headers": { "Authorization": "misfacturas " + token },
+    'muteHttpExceptions': true
+  };
+  Logger.log("Descargar factura antes del try");
+
+  try {
+    var respuesta = UrlFetchApp.fetch(url, opciones);
+    var estatusRespuesta = respuesta.getResponseCode();
+    Logger.log("Estatus de la respuesta: " + estatusRespuesta);
+
+    if (estatusRespuesta == 200) {
+      Logger.log("Si acepta el try, Descargando factura");
+      generarLinkDescargaFactura(respuesta, documentNumber);
+
+    } else {
+      var contenidoRespuesta = JSON.parse(respuesta.getContentText());
+
+      if (estatusRespuesta == 404 && contenidoRespuesta["Message"] === "No se encontraron resultados de facturas válidas que tengan representación gráfica") {
+        SpreadsheetApp.getUi().alert("Error: No se encontraron resultados de facturas válidas que tengan representación gráfica.");
+      } else {
+        SpreadsheetApp.getUi().alert(
+          "Error al intentar descargar la factura: " +
+          (contenidoRespuesta["Message"] || "Respuesta desconocida")
+        );
+        Logger.log("Error al intentar descargar la factura: " + contenidoRespuesta);
+      }
+    }
+  } catch (error) {
+    Logger.log("Error al enviar el JSON a la API: " + error.message);
+    SpreadsheetApp.getUi().alert("Error al intentar descargar la factura. Intente de nuevo si el error persiste comuníquese con soporte");
+  }
+}
+
+
+function generarLinkDescargaFactura(respuesta, documentNumber) {
+  const contenidoPDF = respuesta.getBlob().setName(`Factura_${documentNumber}.pdf`);
+
+  // Convierte el Blob a una cadena base64
+  const base64Data = Utilities.base64Encode(contenidoPDF.getBytes());
+
+  // Crea un enlace de descarga usando un data URI
+  const dataUri = `data:application/pdf;base64,${base64Data}`;
+
+  // Crea una interfaz HTML con un enlace de descarga
+  const interfaz = `
+       <style>
+          @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+          body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+          }
+          .container {
+            padding: 10px;
+          }
+          .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+          }
+          .red-text {
+            color: rgb(231, 112, 14);
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 600;
+          }
+          button {
+            padding: 3px 12px;
+            font-family: 'Roboto', sans-serif;
+            background-color: rgba(255, 255, 255, 0);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+          }
+          button:hover {
+            background-color:rgba(255, 218, 187, 0.32);
+          }
+        </style>
+        <div class="container">
+          <p>Su factura numero <b>${documentNumber}</b> esta lista para descargar.</p>
+          <div class="button-container">
+            <button onclick="descargarFactura()"><p class="red-text">Descargar</p></button>
+          </div>
+        </div>
+        <script>
+          function descargarFactura() {
+            const link = document.createElement('a');
+            link.href = '${dataUri}';
+            link.download = 'Factura_${documentNumber}.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            google.script.host.close();
+          }
+        </script>
+  `;
+
+  // Mostrar el diálogo modal
+  const htmlOutput = HtmlService.createHtmlOutput(interfaz)
+    .setWidth(400)  // Ancho del cuadro de diálogo
+    .setHeight(170);
+
+  const ui = SpreadsheetApp.getUi();
+  ui.showModalDialog(htmlOutput, 'Descargar PDF');
+}
+
+function getDownloadLink(idFactura) {
+  var data = linkDescargaFactura(idFactura);
+  Logger.log("sale de linkdescargar")
+  return data;
+}
+
+
 function verificarEstadoValidoFactura(estadoFactura) {
   var spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
@@ -85,7 +219,7 @@ function guardarFactura() {
 
   if (estadoFactura[0] === true) {
 
-    if (logearUsuario()){
+    if (logearUsuario()) {
 
       guardarYGenerarInvoice();
       guardarFacturaHistorial();
@@ -1043,6 +1177,14 @@ function guardarYGenerarInvoice() {
 }
 
 function guardarFacturaHistorial() {
+  var jsonString = recuperarJson();
+  var json = JSON.parse(jsonString); // Convertir el JSON string a un objeto
+
+  Logger.log(typeof json);
+  Logger.log(json["InvoiceGeneralInformation"]);
+
+  var prefijo = json.InvoiceGeneralInformation.Prefix || "";
+
   var hojaFactura = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Factura');
   var hojaListado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas Data');
   var numeroFactura = hojaFactura.getRange("H2").getValue();
@@ -1053,22 +1195,27 @@ function guardarFacturaHistorial() {
   var lastRow = hojaListado.getLastRow();
   var newRow = lastRow + 1;
 
-  var celdaNumFactura = hojaListado.getRange("A" + newRow);
+  var celdaPrefijo = hojaListado.getRange("A" + newRow);
+  celdaPrefijo.setValue(prefijo);
+  celdaPrefijo.setHorizontalAlignment('center');
+  celdaPrefijo.setBorder(true, true, true, true, null, null, null, null);
+
+  var celdaNumFactura = hojaListado.getRange("B" + newRow);
   celdaNumFactura.setValue(numeroFactura);
   celdaNumFactura.setHorizontalAlignment('center');
   celdaNumFactura.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaCliente = hojaListado.getRange("B" + newRow);
+  var celdaCliente = hojaListado.getRange("C" + newRow);
   celdaCliente.setValue(cliente);
   celdaCliente.setHorizontalAlignment('center');
   celdaCliente.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaIdentificacion = hojaListado.getRange("C" + newRow);
+  var celdaIdentificacion = hojaListado.getRange("D" + newRow);
   celdaIdentificacion.setValue(identificacion);
   celdaIdentificacion.setHorizontalAlignment('center');
   celdaIdentificacion.setBorder(true, true, true, true, null, null, null, null);
 
-  var celdaFecha = hojaListado.getRange("D" + newRow);
+  var celdaFecha = hojaListado.getRange("E" + newRow);
   celdaFecha.setValue(fechaEmision);
   celdaFecha.setHorizontalAlignment('center');
   celdaFecha.setBorder(true, true, true, true, null, null, null, null);
@@ -1083,20 +1230,19 @@ function filtroHistorialFacturas(tipoFiltro) {
   let Formula = ''
   let hojahistorial = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
   if (tipoFiltro == "Numero Idenificacion") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:D1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!C2:C1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!D2:D1000)))"
   } else if (tipoFiltro == "Nombre Cliente") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:D1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!B2:B1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!C2:C1000)))"
   } else if (tipoFiltro == "Numero Factura") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:D1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!A2:A1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!B2:B1000)))"
   } else if (tipoFiltro == "Fecha Emision") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:D1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!D2:D1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!E2:E1000)))"
+  } else if (tipoFiltro == "Prefijo") {
+    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!A2:A1000)))"
   }
-
   hojahistorial.getRange("B8").setValue(Formula)
 
-
 }
-
 
 function SumarDiasAFecha(dias, fecha) {
 
