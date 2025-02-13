@@ -363,7 +363,6 @@ function registarEstadoFactura(idFactura, numRow) {
     'muteHttpExceptions': true
   };
 
-
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
     var estatusRespuesta = respuesta.getResponseCode();
@@ -382,10 +381,10 @@ function registarEstadoFactura(idFactura, numRow) {
         status = "En revisión";
       }
       hojaFacturaHistorialData = spreadsheet.getSheetByName('Historial Facturas Data');
-      if (numRow === "" || numRow === 0) {
-        return status;
-      } else {
+      if (numRow !== undefined) {
         hojaFacturaHistorialData.getRange(numRow, 6).setValue(status);
+      } else {
+        return status;
       }
     } else {
       var contenidoRespuesta = JSON.parse(respuesta.getContentText());
@@ -1220,8 +1219,6 @@ function filtroHistorialFacturas(tipoFiltro) {
   Logger.log("tipoFiltro " + tipoFiltro)
   let Formula = ''
   let hojahistorial = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
-  SpreadsheetApp.getUi().alert("Actualizando estado de las facturas, por favor espere unos segundos.");
-  actualizarEstadoUltimasFacturas();
 
   if (tipoFiltro == "Numero Idenificacion") {
     Formula = "=FILTER('Historial Facturas Data'!A2:F1000;ISNUMBER(SEARCH(F5;'Historial Facturas Data'!D2:D1000)))"
@@ -1234,7 +1231,7 @@ function filtroHistorialFacturas(tipoFiltro) {
   } else if (tipoFiltro == "Prefijo") {
     Formula = "=FILTER('Historial Facturas Data'!A2:F1000;ISNUMBER(SEARCH(F5;'Historial Facturas Data'!A2:A1000)))"
   } else if (tipoFiltro == "") {
-    Formula = "'Historial Facturas Data'!A2:F1000"
+    Formula = `=FILTER('Historial Facturas Data'!A2:F, 'Historial Facturas Data'!A2:A <> "")`
   }
 
   hojahistorial.getRange("B8").setValue(Formula)
@@ -1245,18 +1242,19 @@ function actualizarEstadoUltimasFacturas() {
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   let hojaListadoEstado = spreadsheet.getSheetByName('ListadoEstado');
   let hojaHistorialFacturasData = spreadsheet.getSheetByName('Historial Facturas Data');
-  let lastRow = hojaListadoEstado.getLastRow();
-  let numFacturas = Math.min(10, lastRow); // Obtener el número de facturas a procesar (máximo 10)
+  let lastRowListadoEstado = hojaListadoEstado.getLastRow();
+  let lastRowHistorialFacturasData = hojaHistorialFacturasData.getLastRow();
+  let numFacturas = Math.min(10, lastRowListadoEstado, lastRowHistorialFacturasData); // Obtener el número de facturas a procesar (máximo 10)
 
   for (let i = 0; i < numFacturas; i++) {
-    let row = lastRow - i;
-    let documentId = hojaListadoEstado.getRange(row, 7).getValue(); // Obtener el documentId de la columna 7
+    let rowListadoEstado = lastRowListadoEstado - i;
+    let rowHistorialFacturasData = lastRowHistorialFacturasData - i;
+    let documentId = hojaListadoEstado.getRange(rowListadoEstado, 7).getValue(); // Obtener el documentId de la columna 7
 
-    if (documentId) {
+    if (documentId !== "" && documentId !== null && documentId !== undefined) {
       let estado = registarEstadoFactura(documentId);
       if (estado) {
-        let numRowHistorial = hojaListadoEstado.getRange(row, 8).getValue(); // Obtener el número de fila en Historial Facturas Data
-        hojaHistorialFacturasData.getRange(numRowHistorial, 6).setValue(estado); // Actualizar el estado en la columna 6
+        hojaHistorialFacturasData.getRange(rowHistorialFacturasData, 6).setValue(estado); // Actualizar el estado en la columna 6
       }
     }
   }

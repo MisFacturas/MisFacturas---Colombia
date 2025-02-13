@@ -675,7 +675,7 @@ function onEdit(e) {
   let hojaActual = e.source.getActiveSheet();
   let nombreHoja = hojaActual.getName();
 
-  if (nombreHoja === "Datos" || nombreHoja === "ClientesInvalidos" || nombreHoja === "ListadoEstado" || nombreHoja === "Copia de Factura") {
+  if (nombreHoja === "Datos" || nombreHoja === "ClientesInvalidos" || nombreHoja === "ListadoEstado" || nombreHoja === "Copia de Factura" || nombreHoja === "Historial Facturas Data" ) {
     showWarningAndHideSheet();
   }
 
