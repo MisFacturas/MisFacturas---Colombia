@@ -16,15 +16,61 @@
 <script>
 
   function back() {
-    google.script.run.showSideBar();
+    google.script.run.showSidebar();
   }
+
   function handleSubmit() {
     var idFactura = document.getElementById('idFactura').value;
-    google.script.run.linkDescargaFactura(idFactura);
-    
+    var mensaje = document.getElementById('mensaje');
+
+    if (idFactura.trim() === "") {
+      mensaje.textContent = "Por favor ingrese el prefijo y número de la factura.";
+      mensaje.style.color = "red";
+      return;
+    }
+
+    google.script.run.withSuccessHandler(generarLinkDescargaFactura).linkDescargaFactura(idFactura);
   }
 
+  function generarLinkDescargaFactura(respuesta) {
+    const documentNumber = respuesta.documentNumber;
+    const base64Data = respuesta.base64Data;
+    const dataUri = `data:application/pdf;base64,${base64Data}`;
 
+    const link = document.createElement('a');
+    link.href = dataUri;
+    link.download = `Factura_${documentNumber}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Limpiar el formulario
+    document.getElementById('idFactura').value = '';
+
+    // Mostrar mensaje temporal
+    var mensaje = document.getElementById('mensaje');
+    mensaje.textContent = "Descargando...";
+    mensaje.style.color = "blue";
+
+    // Ocultar el mensaje después de 3 segundos
+    setTimeout(function () {
+      mensaje.textContent = "La factura se ha descargado exitosamente.";
+      mensaje.style.color = "green";
+      setTimeout(function () {
+        mensaje.textContent = "";
+      }, 3000);
+    }, 3000);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('idFactura');
+    input.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        handleSubmit();
+      }
+    });
+  });
 
 </script>
 
@@ -49,13 +95,19 @@
         <div class="col-12 px-0">
           <form class="row g-3 d-flex flex-column align-items-center">
             <div class="col-12 mb-3 w-100">
-              <label for="numFactura" class="form-label">Numero de Factura</label>
-              <input type="text" id="idFactura" class="form-control text-center=" name="numFactura" required>
+              <label for="numFactura" class="form-label">Prefijo y Numero de Factura</label>
+              <input type="text" id="idFactura" class="form-control text-center=" placeholder="SETT123"
+                name="numFactura" required>
             </div>
             <div class="col-12">
               <button type="button" class="btn btn-primary btn-lg w-100 btn-menu" onclick="handleSubmit()">
                 <span class="pe-4">Descargar</span>
                 <i class="icon-download"></i>
+              </button>
+            </div>
+            <div class="col-12">
+              <p id="mensaje" class="text-center"></p>
+            </div>
           </form>
         </div>
       </div>

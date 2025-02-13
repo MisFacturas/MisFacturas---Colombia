@@ -678,11 +678,9 @@ function onEdit(e) {
   if (nombreHoja === "Datos" || nombreHoja === "ClientesInvalidos" || nombreHoja === "ListadoEstado" || nombreHoja === "Copia de Factura") {
     showWarningAndHideSheet();
   }
-  try {
-
-    lock.tryLock(5000);
 
     if (nombreHoja === "Factura") {
+
       let factura_sheet = hojaActual;
       let celdaEditada = e.range;
       let rowEditada = celdaEditada.getRow();
@@ -690,9 +688,11 @@ function onEdit(e) {
       let columnaClientes = 2; // Ajusta según sea necesario
       let rowClientes = 2;
 
-      const productStartRow = 15; // prodcutos empeiza aca
+      const productStartRow = 15; // productos empiezan aca
       let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaActual); // Assuming products end at column L
-      let posRowTotalProductos = cargosDescuentosStartRow - 2//poscion (row) de Total productos
+      let posRowTotalProductos = cargosDescuentosStartRow - 2; // posición (row) de Total productos
+
+      Logger.log(`Editando celda en fila ${rowEditada}, columna ${colEditada}`);
 
       if (colEditada === columnaClientes && rowEditada === rowClientes) {
         verificarYCopiarCliente(e);
@@ -709,93 +709,66 @@ function onEdit(e) {
           }
         }
         hojaActual.getRange("H2").setValue(consecutivoFactura);
-      }
-
-      else if (rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos) {
+      } else if (rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos) {
         let i = rowEditada;
-        let productoFilaI = factura_sheet.getRange("B" + String(i)).getValue()
+        let productoFilaI = factura_sheet.getRange("B" + String(i)).getValue();
         let dictInformacionProducto = obtenerInformacionProducto(productoFilaI);
-        let cantidadProducto = factura_sheet.getRange("C" + String(i)).getValue()
+        let cantidadProducto = factura_sheet.getRange("C" + String(i)).getValue();
 
         if (cantidadProducto === "") {
-          cantidadProducto = 0
-          factura_sheet.getRange("A" + String(i)).setValue(dictInformacionProducto["codigo Producto"])
-          factura_sheet.getRange("D" + String(i)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
-          factura_sheet.getRange("G" + String(i)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
-          factura_sheet.getRange("H" + String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
-
+          cantidadProducto = 0;
+          factura_sheet.getRange("A" + String(i)).setValue(dictInformacionProducto["codigo Producto"]);
+          factura_sheet.getRange("D" + String(i)).setValue(dictInformacionProducto["precio Unitario"]); // precio unitario
+          factura_sheet.getRange("G" + String(i)).setValue(dictInformacionProducto["tarifa IVA"]); // %IVA
+          factura_sheet.getRange("H" + String(i)).setValue(dictInformacionProducto["tarifa INC"]); // %INC
         } else {
-          factura_sheet.getRange("A" + String(i)).setValue(dictInformacionProducto["codigo Producto"])
-          factura_sheet.getRange("D" + String(i)).setValue(dictInformacionProducto["precio Unitario"])//precio unitario
-          factura_sheet.getRange("E" + String(i)).setValue("=D" + String(i) + "*C" + String(i) + "-(D" + String(i) + "*C" + String(i) + ")*" + "I" + String(i) + "+J" + String(i))//Subtotal teniendo en cuenta descuentos y cargos
-          factura_sheet.getRange("F" + String(i)).setValue("=E" + String(i) + "*" + dictInformacionProducto["tarifa IVA"] + "+E" + String(i) + "*" + String(dictInformacionProducto["tarifa INC"]))//Impuestos
-          factura_sheet.getRange("G" + String(i)).setValue(dictInformacionProducto["tarifa IVA"])//%IVA
-          factura_sheet.getRange("H" + String(i)).setValue(dictInformacionProducto["tarifa INC"])//%INC
-          cargos = Number(factura_sheet.getRange("J" + String(i)).getValue())//Cargos
-          Logger.log("retencion: " + dictInformacionProducto["valor Retencion"])
-          factura_sheet.getRange("K" + String(i)).setValue(dictInformacionProducto["tarifa Retencion"] * factura_sheet.getRange("E" + String(i)).getValue())//Retencion
-          factura_sheet.getRange("L" + String(i)).setValue("=E" + String(i) + "+F" + String(i))
+          factura_sheet.getRange("A" + String(i)).setValue(dictInformacionProducto["codigo Producto"]);
+          factura_sheet.getRange("D" + String(i)).setValue(dictInformacionProducto["precio Unitario"]); // precio unitario
+          factura_sheet.getRange("E" + String(i)).setValue("=D" + String(i) + "*C" + String(i) + "-(D" + String(i) + "*C" + String(i) + ")*" + "I" + String(i) + "+J" + String(i)); // Subtotal teniendo en cuenta descuentos y cargos
+          factura_sheet.getRange("F" + String(i)).setValue("=E" + String(i) + "*" + dictInformacionProducto["tarifa IVA"] + "+E" + String(i) + "*" + String(dictInformacionProducto["tarifa INC"])); // Impuestos
+          factura_sheet.getRange("G" + String(i)).setValue(dictInformacionProducto["tarifa IVA"]); // %IVA
+          factura_sheet.getRange("H" + String(i)).setValue(dictInformacionProducto["tarifa INC"]); // %INC
+          cargos = Number(factura_sheet.getRange("J" + String(i)).getValue()); // Cargos
+          Logger.log("retencion: " + dictInformacionProducto["valor Retencion"]);
+          factura_sheet.getRange("K" + String(i)).setValue(dictInformacionProducto["tarifa Retencion"] * factura_sheet.getRange("E" + String(i)).getValue()); // Retencion
+          factura_sheet.getRange("L" + String(i)).setValue("=E" + String(i) + "+F" + String(i));
         }
 
         let lastRowProducto = cargosDescuentosStartRow - 3;
         if (lastRowProducto === productStartRow) {
-          // //ESTADO DEAFULT no se hace nada
           let rowParaTotales = getTotalesLinea(hojaActual);
-          hojaActual.getRange("K" + String(rowParaTotales)).setValue("=L15")
-          hojaActual.getRange("L" + String(rowParaTotales)).setValue("=K" + String(rowParaTotales) + "-J" + String(rowParaTotales))
-          let productoFilaI = factura_sheet.getRange("B15").getValue()
+          hojaActual.getRange("K" + String(rowParaTotales)).setValue("=L15");
+          hojaActual.getRange("L" + String(rowParaTotales)).setValue("=K" + String(rowParaTotales) + "-J" + String(rowParaTotales));
+
+          let productoFilaI = factura_sheet.getRange("B15").getValue();
           let dictInformacionProducto = obtenerInformacionProducto(productoFilaI);
-          let tarifaINC = dictInformacionProducto["tarifa INC"]
-          let tarifaIVA = dictInformacionProducto["tarifa IVA"]
+          let tarifaINC = dictInformacionProducto["tarifa INC"];
+          let tarifaIVA = dictInformacionProducto["tarifa IVA"];
           if (tarifaINC !== 0 || tarifaIVA !== 0) {
-            hojaActual.getRange("B" + String(rowParaTotales)).setValue("=E" + String(lastRowProducto))
-            let impuestosSeccionStartRow = getLastCargoDescuentoRow(hojaActual) + 4
-            if (tarifaINC !== 0) {
-              hojaActual.getRange("A" + String(impuestosSeccionStartRow)).setValue("INC")//tipo impuesto
-              hojaActual.getRange("B" + String(impuestosSeccionStartRow)).setValue("=H" + String(lastRowProducto))//tarifa
-              hojaActual.getRange("C" + String(impuestosSeccionStartRow)).setValue("=E" + String(lastRowProducto))//base grabable
-              hojaActual.getRange("E" + String(impuestosSeccionStartRow)).setValue("=C" + String(impuestosSeccionStartRow) + "*B" + String(impuestosSeccionStartRow))//total impuesto
-            } else {
-
-            }
-            if (tarifaIVA !== 0) {
-              if (tarifaINC !== 0) {
-                hojaActual.insertRowAfter(impuestosSeccionStartRow)
-                impuestosSeccionStartRow += 1
-              }
-              hojaActual.getRange("A" + String(impuestosSeccionStartRow)).setValue("IVA")//tipo impuesto
-              hojaActual.getRange("B" + String(impuestosSeccionStartRow)).setValue("=G" + String(lastRowProducto))//tarifa
-              hojaActual.getRange("C" + String(impuestosSeccionStartRow)).setValue("=E" + String(lastRowProducto))//base grabable
-              hojaActual.getRange("E" + String(impuestosSeccionStartRow)).setValue("=C" + String(impuestosSeccionStartRow) + "*G" + String(impuestosSeccionStartRow))//total impuesto
-            }
+            hojaActual.getRange("B" + String(rowParaTotales)).setValue("=E" + String(lastRowProducto));
           }
-          calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual)
-
+          calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual);
         } else {
-
-          calcularImpuestos(hojaActual, lastRowProducto, cargosDescuentosStartRow)
-          calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual)
+          calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual);
         }
 
-        updateTotalProductCounter(lastRowProducto, productStartRow, hojaActual, cargosDescuentosStartRow)
-
+        updateTotalProductCounter(lastRowProducto, productStartRow, hojaActual, cargosDescuentosStartRow);
       } else if ((colEditada == 9 || colEditada == 10) && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
-        //verificar descuentos
+        // verificar descuentos
         let i = rowEditada;
-        let descuento = factura_sheet.getRange("I" + String(i)).getValue()
+        let descuento = factura_sheet.getRange("I" + String(i)).getValue();
         if (descuento > 1 || descuento < 0) {
           SpreadsheetApp.getUi().alert("El descuento no puede ser mayor al 100% ni menor a 0%");
-          factura_sheet.getRange("I" + String(i)).setValue(0)
+          factura_sheet.getRange("I" + String(i)).setValue(0);
         }
 
         let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaActual);
         let lastRowProducto = cargosDescuentosStartRow - 3;
-        calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual)
-
+        calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual);
       } else if ((colEditada == 2 || colEditada == 3 || colEditada == 4) && rowEditada > posRowTotalProductos) {
         let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaActual);
         let lastRowProducto = cargosDescuentosStartRow - 3;
-        calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual)
+        calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual);
       } else if (colEditada == 7 && rowEditada == 6) {
         // Entra a verificar días de vencimiento
         let valorDiasVencimiento = celdaEditada.getValue();
@@ -809,7 +782,7 @@ function onEdit(e) {
           celdaEditada.setValue(0);
         }
       } else if (colEditada == 10 && rowEditada == 4) {
-        //Verifica la moneda
+        // Verifica la moneda
         let moneda = celdaEditada.getValue();
         if (moneda != "COP-Peso colombiano") {
           hojaActual.getRange(rowEditada + 1, colEditada).setBackground('#FFC7C7');
@@ -820,13 +793,7 @@ function onEdit(e) {
           hojaActual.getRange(rowEditada + 2, colEditada).setValue("");
         }
       }
-
-      SpreadsheetApp.flush();
-
-
     } else if (nombreHoja === "Clientes") {
-
-
       let celdaEditada = e.range;
       let hojaCliente = e.source.getActiveSheet();
 
@@ -897,44 +864,20 @@ function onEdit(e) {
           hojaProductos.getRange(rowEditada, 16).setValue("");
         }
       }
-      SpreadsheetApp.flush();
-    } else if (nombreHoja === "Historial Facturas"){
+
+    } else if (nombreHoja === "Historial Facturas") {
       let celdaEditada = e.range;
       let rowEditada = celdaEditada.getRow();
       let colEditada = celdaEditada.getColumn();
-      if(rowEditada==5 && colEditada==9){
+      if (rowEditada == 5 && colEditada == 3) {
         Logger.log("dentto de selccionar filtor")
         let valor = celdaEditada.getValue()
         filtroHistorialFacturas(valor)
       }
-    }else if (hojaActual.getName() === "Productos"){
-      let celdaEditada = e.range;
-      let rowEditada = celdaEditada.getRow();
-      let colEditada = celdaEditada.getColumn();
-      verificarDatosObligatoriosProductos(e)
-      agregarCodigoIdentificador(e)
-      if (colEditada==2 && rowEditada>1){
-        let codigoRerencia=hojaActual.getRange(rowEditada,colEditada).getValue()
-        let existe=verificarCodigo(codigoRerencia,"Productos",true,rowEditada)
-        if(existe){
-          SpreadsheetApp.getUi().alert("El Codigo de referencia ya existe, por favor elegir otro numero unico");
-          celdaEditada.setValue("");
-          verificarDatosObligatoriosProductos(e)
-          throw new Error('por favor poner un Numero de Identificacion unico');
-        }
-      }
+
     }
-  } catch (error) {
-    Logger.log("No se pudo obtener el lock o hubo error: " + error);
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-function calcularImpuestos(hojaActual, lastRowProducto, cargosDescuentosStartRow) {
 
 }
-
 
 function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStartRow, hojaActual) {
 
@@ -959,10 +902,6 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
   let rowSeccionCargosYDescuentos = cargosDescuentosStartRow;
   let totalDescuentosSeccionCargosyDescuentos = calcularCargYDescu(hojaActual, rowSeccionCargosYDescuentos, lastCargoDescuentoRow);
 
-  //Seccion Impuestos
-  let firstRowImpuestos = lastCargoDescuentoRow + 4;
-  let lastRowImpuestos = getTotalesLinea(hojaActual) + 3;
-
 
   //impuestos
   hojaActual.getRange("C" + String(rowParaTotales)).setValue("=SUM(F15:F" + String(lastRowProducto) + ")")
@@ -973,13 +912,9 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
   hojaActual.getRange("E" + String(rowParaTotales)).setValue("=SUM(K15:K" + String(lastRowProducto) + ")")
 
   //descuentos
-  //let descuentosPorProductos = calcularDescuentos(hojaActual, lastRowProducto)
-  //Logger.log("descuentosPorProductos " + totalDescuentosSeccionCargosyDescuentos.descuentos)
-  //hojaActual.getRange("F" + String(rowParaTotales)).setValue(descuentosPorProductos + Number(totalDescuentosSeccionCargosyDescuentos.descuentos))
   hojaActual.getRange("F" + String(rowParaTotales)).setValue(Number(totalDescuentosSeccionCargosyDescuentos.descuentos))
 
   //cargos
-  //hojaActual.getRange("H" + String(rowParaTotales)).setValue("=SUM(J15:J" + String(lastRowProducto) + ")+" + totalDescuentosSeccionCargosyDescuentos.cargos)
   hojaActual.getRange("H" + String(rowParaTotales)).setValue(totalDescuentosSeccionCargosyDescuentos.cargos)
 
 
@@ -1016,8 +951,8 @@ function getLastProductRow(sheet, productStartRow, cargosDescuentosStartRow) {
   for (let row = productStartRow; row < cargosDescuentosStartRow; row++) {
 
     let valorCeldaActual = sheet.getRange(row, 1).getValue()
-    if (valorCeldaActual === "Total filas") {
-      return lastProductRow
+    if (valorCeldaActual === "Total items") {
+      return lastProductRow - 1;
     } else {
       lastProductRow = row;
     }
@@ -1028,10 +963,10 @@ function getLastProductRow(sheet, productStartRow, cargosDescuentosStartRow) {
 function getLastCargoDescuentoRow(sheet) {
   //obtiene la row donde esta el final de la seccion de cargos y descuentos
   const lastRow = sheet.getLastRow();
-  let row = 21
+  let row = 20
 
   for (row; row < lastRow; row++) {
-    if (sheet.getRange(row, 1).getValue() === 'Tipo Impuesto') {
+    if (sheet.getRange(row, 1).getValue() === 'Subtotal') {
       return row - 3;
     }
   }
@@ -1040,7 +975,7 @@ function getLastCargoDescuentoRow(sheet) {
 function getTotalesLinea(sheet) {
   //obtiene la row donde esta la linea de totales
   const lastRow = sheet.getLastRow();
-  let row = 25
+  let row = 20
 
   for (row; row < lastRow; row++) {
     if (sheet.getRange(row, 1).getValue() === 'Subtotal') {
@@ -1102,14 +1037,17 @@ function updateTotalProductCounter(lastRowProducto, productStartRow, hojaActual,
   let totalProducts = 0;
 
   for (let i = productStartRow; i <= lastRowProducto; i++) {
-    if (hojaActual.getRange("B" + String(i)).getValue() != "") {
-      totalProducts++
+    let cellValue = hojaActual.getRange("B" + String(i)).getValue();
+    Logger.log("Checking cell B" + String(i) + ": " + cellValue);
+    if (cellValue != "") {
+      totalProducts++;
     }
   }
 
-  let rowTotalProductos = cargosDescuentosStartRow - 2
-  hojaActual.getRange("B" + String(rowTotalProductos)).setValue(totalProducts)
-
+  let rowTotalProductos = cargosDescuentosStartRow - 2;
+  Logger.log("Updating total products in row B" + String(rowTotalProductos));
+  hojaActual.getRange("B" + String(rowTotalProductos)).setValue(totalProducts);
+  Logger.log("Total products: " + totalProducts);
 }
 
 function verificarIdentificacionUnica(codigo, nombreHoja, inHoja, numRow) {
@@ -1323,7 +1261,7 @@ function showWarningAndHideSheet() {
   const ui = SpreadsheetApp.getUi();
   ui.alert('No tienes permiso para editar esta hoja.');
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura"];
+  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura", "Historial Facturas Data"];
   hojasInvisibles.forEach(nombreHoja => {
     const hoja = ss.getSheetByName(nombreHoja);
     if (hoja) {
@@ -1342,50 +1280,4 @@ function onChange(e) {
       SpreadsheetApp.getUi().alert(`La hoja "${nombreHoja}" debe permanecer oculta.`);
     }
   });
-}
-
-function plantillaVincularMF(inHoja) {
-  const plantillaHTML = `
-       <style>
-          @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-          body {
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
-            margin: 0;
-            padding: 0;
-          }
-          .container {
-            padding: 10px;
-          }
-          .button-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-          }
-          .red-text {
-            color: rgb(231, 112, 14);
-            font-size: 16px;
-            font-family: 'Roboto', sans-serif;
-            font-weight: 600;
-          }
-          button {
-            padding: 3px 12px;
-            font-family: 'Roboto', sans-serif;
-            background-color: rgba(255, 255, 255, 0);
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-          }
-          button:hover {
-            background-color:rgba(255, 218, 187, 0.32);
-          }
-        </style>
-        <div class="container">
-          <p>Por favor <b>vincule su cuenta</b> para poder generar las facturas.</p>
-          <div class="button-container">
-            <button onclick="google.script.run.abrirMenuVinculacion(${inHoja}); google.script.host.close()"><p class="red-text">Aceptar<p></button>
-          </div>
-        </div>
-          `;
-  return plantillaHTML;
 }

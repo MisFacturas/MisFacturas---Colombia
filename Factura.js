@@ -30,7 +30,9 @@ function linkDescargaFactura(idFactura) {
 
     if (estatusRespuesta == 200) {
       Logger.log("Si acepta el try, Descargando factura");
-      generarLinkDescargaFactura(respuesta, documentNumber);
+      const contenidoPDF = respuesta.getBlob().setName(`Factura_${documentNumber}.pdf`);
+      const base64Data = Utilities.base64Encode(contenidoPDF.getBytes());
+      return { documentNumber: documentNumber, base64Data: base64Data };
 
     } else {
       var contenidoRespuesta = JSON.parse(respuesta.getContentText());
@@ -52,78 +54,6 @@ function linkDescargaFactura(idFactura) {
 }
 
 
-function generarLinkDescargaFactura(respuesta, documentNumber) {
-  const contenidoPDF = respuesta.getBlob().setName(`Factura_${documentNumber}.pdf`);
-
-  // Convierte el Blob a una cadena base64
-  const base64Data = Utilities.base64Encode(contenidoPDF.getBytes());
-
-  // Crea un enlace de descarga usando un data URI
-  const dataUri = `data:application/pdf;base64,${base64Data}`;
-
-  // Crea una interfaz HTML con un enlace de descarga
-  const interfaz = `
-       <style>
-          @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-          body {
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
-            margin: 0;
-            padding: 0;
-          }
-          .container {
-            padding: 10px;
-          }
-          .button-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-          }
-          .red-text {
-            color: rgb(231, 112, 14);
-            font-size: 16px;
-            font-family: 'Roboto', sans-serif;
-            font-weight: 600;
-          }
-          button {
-            padding: 3px 12px;
-            font-family: 'Roboto', sans-serif;
-            background-color: rgba(255, 255, 255, 0);
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-          }
-          button:hover {
-            background-color:rgba(255, 218, 187, 0.32);
-          }
-        </style>
-        <div class="container">
-          <p>Su factura numero <b>${documentNumber}</b> esta lista para descargar.</p>
-          <div class="button-container">
-            <button onclick="descargarFactura()"><p class="red-text">Descargar</p></button>
-          </div>
-        </div>
-        <script>
-          function descargarFactura() {
-            const link = document.createElement('a');
-            link.href = '${dataUri}';
-            link.download = 'Factura_${documentNumber}.pdf';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            google.script.host.close();
-          }
-        </script>
-  `;
-
-  // Mostrar el diálogo modal
-  const htmlOutput = HtmlService.createHtmlOutput(interfaz)
-    .setWidth(400)  // Ancho del cuadro de diálogo
-    .setHeight(170);
-
-  const ui = SpreadsheetApp.getUi();
-  ui.showModalDialog(htmlOutput, 'Descargar PDF');
-}
 
 function getDownloadLink(idFactura) {
   var data = linkDescargaFactura(idFactura);
@@ -186,7 +116,7 @@ function verificarEstadoValidoFactura(estadoFactura) {
   // Verificar si se agregaron productos
   let totalProductos = hojaFactura.getRange("A16").getValue();
 
-  if (totalProductos === "Total filas") {
+  if (totalProductos === "Total items") {
     // no hay necesidad de encontrar TOTAL PRODUCTOS si no esta, porque eso implica que si anadio asi sea 1 prodcuto
     let valorTotalProductos = hojaFactura.getRange("B16").getValue();
     if (valorTotalProductos === 0 || valorTotalProductos === "") {
@@ -220,11 +150,8 @@ function guardarFactura() {
   if (estadoFactura[0] === true) {
 
     if (logearUsuario()) {
-
       guardarYGenerarInvoice();
-      guardarFacturaHistorial();
-      enviarFactura();
-
+      mostrarResumenFactura();
     }
 
 
@@ -253,11 +180,10 @@ function agregarFilaNueva() {
 
     let cargosDescuentosStartRow = getcargosDescuentosStartRow(hojaFactura);
     const productStartRow = 15;
-    const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow);
+    const lastProductRow = getLastProductRow(hojaFactura, productStartRow, cargosDescuentosStartRow) + 1;
 
     Logger.log("Agregar fila nueva");
     hojaFactura.insertRows(lastProductRow, numeroFilasParaAgregar);
-    SpreadsheetApp.flush();
 
   } catch (error) {
     Logger.log("Error al agregar filas: " + error.message);
@@ -333,7 +259,6 @@ function recuperarJson() {
   let hojaFactura = spreadsheet.getSheetByName('ListadoEstado');
   let lastRow = hojaFactura.getLastRow();
   let json = hojaFactura.getRange(lastRow, 5).getValues();
-  Logger.log(json[0][0]);
   return json[0][0];
 }
 
@@ -366,6 +291,7 @@ function logearUsuario() {
 }
 
 function enviarFactura() {
+  let retorno = [];
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
@@ -396,11 +322,13 @@ function enviarFactura() {
 
     if (contenidoRespuesta["DocumentId"] && contenidoRespuesta["MessageValidation"] === "Factura insertada existosamente") {
       Logger.log(contenidoRespuesta["DocumentId"], contenidoRespuesta["MessageValidation"]);
-      SpreadsheetApp.getUi().alert("Factura enviada correctamente a misfacturas. Si desea verla ingrese a https://misfacturas-qa.cenet.ws/Aplicacion/");
-      limpiarHojaFactura();
+      retorno.push(true);
+      retorno.push(contenidoRespuesta["DocumentId"]);
+      return retorno;
     } else if (contenidoRespuesta["Message"] === "E002: El documento que intenta ingresar ya existe en el sistema") {
       SpreadsheetApp.getUi().alert("Error: La factura ya existe en el sistema de misfacturas. Por favor verifique que el número de factura sea único.");
       hojaFactura.getRange("H2").setBackground("#FFC7C7");
+      return false;
     }
     else {
       SpreadsheetApp.getUi().alert(
@@ -415,6 +343,69 @@ function enviarFactura() {
   }
 
 }
+
+function registarEstadoFactura(idFactura, numRow) {
+  let schemaID = 31;
+  let documentType = 1;
+  let spreadsheet = SpreadsheetApp.getActive();
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  let IDNumber = hojaDatosEmisor.getRange("B3").getValue();
+
+  let documentId = idFactura;
+  let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDocumentStatus?SchemaID=${schemaID}&DocumentType=${documentType}&IDNumber=${IDNumber}&DocumentID=${documentId}`;
+
+  let hojaDatos = spreadsheet.getSheetByName('Datos');
+  let token = hojaDatos.getRange("F47").getValue();
+  let opciones = {
+    "method": "post",
+    "contentType": "application/json",
+    "headers": { "Authorization": "misfacturas " + token },
+    'muteHttpExceptions': true
+  };
+
+
+  try {
+    var respuesta = UrlFetchApp.fetch(url, opciones);
+    var estatusRespuesta = respuesta.getResponseCode();
+    Logger.log("Estatus de la respuesta: " + estatusRespuesta);
+
+    if (estatusRespuesta == 200) {
+      var contenidoRespuesta = respuesta.getContentText();
+      contenidoRespuesta = JSON.parse(contenidoRespuesta);
+      Logger.log(contenidoRespuesta);
+      var status = contenidoRespuesta.DocumentStatus
+      if (status === 74) {
+        status = "Enviada";
+      } else if (status === 70) {
+        status = "Invalida";
+      } else {
+        status = "En revisión";
+      }
+      hojaFacturaHistorialData = spreadsheet.getSheetByName('Historial Facturas Data');
+      if (numRow === "" || numRow === 0) {
+        return status;
+      } else {
+        hojaFacturaHistorialData.getRange(numRow, 6).setValue(status);
+      }
+    } else {
+      var contenidoRespuesta = JSON.parse(respuesta.getContentText());
+      if (estatusRespuesta == 404 && contenidoRespuesta["Message"] === "No se encontraron resultados de facturas válidas que tengan representación gráfica") {
+        SpreadsheetApp.getUi().alert("Error: No se encontraron resultados de facturas válidas que tengan representación gráfica.");
+      } else {
+        SpreadsheetApp.getUi().alert(
+          "Error al intentar descargar la factura: " +
+          (contenidoRespuesta["Message"] || "Respuesta desconocida")
+        );
+        Logger.log("Error al intentar descargar la factura: " + contenidoRespuesta);
+      }
+    }
+
+  } catch (error) {
+    Logger.log("Error al enviar el JSON a la API: " + error.message);
+    SpreadsheetApp.getUi().alert("Error al intentar descargar la factura. Intente de nuevo si el error persiste comuníquese con soporte");
+  }
+}
+
 
 function obtenerTokenMF(usuario, contra) {
   let spreadsheet = SpreadsheetApp.getActive();
@@ -805,7 +796,7 @@ function guardarYGenerarInvoice() {
 
   //obtener el total de prodcutos
   let posicionTotalProductos = hojaFactura.getRange("A16").getValue(); // para verificar donde esta el TOTAL
-  if (posicionTotalProductos === "Total filas") {
+  if (posicionTotalProductos === "Total items") {
     var cantidadProductos = hojaFactura.getRange("B16").getValue();// cantidad total de productos 
     var cantidadFilasProductos = 1;
   } else {
@@ -1091,17 +1082,16 @@ function guardarYGenerarInvoice() {
 
 
   //Definir los valores para el json
+  Logger.log("Valores totales: " + totalesValores);
   let pfSubTotal = parseFloat(totalesValores[0]);
   let pfBaseGrabable = parseFloat(totalesValores[1]);
   let pfSubTotalMasImpuestos = parseFloat(totalesValores[3]);
   let pfRetenciones = parseFloat(totalesValores[4]);
   let pfDescuentos = parseFloat(totalesValores[5]);
   let pfCargos = parseFloat(totalesValores[7]);
-  let pfAnticipo = parseFloat(totalesValores[9]);
-  let pfNetoAPagar = Number(totalesValores[10]);
-  if (pfAnticipo = null) {
-    pfAnticipo = 0;
-  }
+  let pfAnticipo = Number(totalesValores[9]);
+  let pfNetoAPagar = Number(totalesValores[11]);
+
 
   let invoice_total = {
     "lineExtensionamount": pfSubTotal,
@@ -1109,7 +1099,7 @@ function guardarYGenerarInvoice() {
     "TaxInclusiveAmount": pfSubTotalMasImpuestos,
     "AllowanceTotalAmount": pfDescuentos,
     "ChargeTotalAmount": pfCargos,
-    "PrePaidAmount": Number(pfAnticipo),
+    "PrePaidAmount": pfAnticipo,
     "PayableAmount": pfNetoAPagar
   }
 
@@ -1171,12 +1161,9 @@ function guardarYGenerarInvoice() {
   let fecha = obtenerFecha();
   let codigoCliente = hojaFactura.getRange("B3").getValue();
   listadoestado_sheet.appendRow([fecha, numeroFactura, nombreCliente, codigoCliente, invoice, nuevoInvoiceResumido]);
-
-  SpreadsheetApp.getUi().alert("Factura generada y guardada satisfactoriamente, aguarde unos segundos");
-
 }
 
-function guardarFacturaHistorial() {
+function guardarFacturaHistorial(documentId) {
   var jsonString = recuperarJson();
   var json = JSON.parse(jsonString); // Convertir el JSON string a un objeto
 
@@ -1220,7 +1207,11 @@ function guardarFacturaHistorial() {
   celdaFecha.setHorizontalAlignment('center');
   celdaFecha.setBorder(true, true, true, true, null, null, null, null);
 
-
+  let hojaListadoEstado = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ListadoEstado');
+  let lineaJson = hojaListadoEstado.getLastRow();
+  hojaListadoEstado.getRange(lineaJson, 7).setValue(documentId);
+  registarEstadoFactura(documentId, newRow);
+  limpiarHojaFactura();
 }
 
 function filtroHistorialFacturas(tipoFiltro) {
@@ -1229,19 +1220,46 @@ function filtroHistorialFacturas(tipoFiltro) {
   Logger.log("tipoFiltro " + tipoFiltro)
   let Formula = ''
   let hojahistorial = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Historial Facturas');
+  SpreadsheetApp.getUi().alert("Actualizando estado de las facturas, por favor espere unos segundos.");
+  actualizarEstadoUltimasFacturas();
+
   if (tipoFiltro == "Numero Idenificacion") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!D2:D1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:F1000;ISNUMBER(SEARCH(F5;'Historial Facturas Data'!D2:D1000)))"
   } else if (tipoFiltro == "Nombre Cliente") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!C2:C1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:F1000;ISNUMBER(SEARCH(F5;'Historial Facturas Data'!C2:C1000)))"
   } else if (tipoFiltro == "Numero Factura") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!B2:B1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:F1000;ISNUMBER(SEARCH(F5;'Historial Facturas Data'!B2:B1000)))"
   } else if (tipoFiltro == "Fecha Emision") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!E2:E1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:F1000;ISNUMBER(SEARCH(F5;'Historial Facturas Data'!E2:E1000)))"
   } else if (tipoFiltro == "Prefijo") {
-    Formula = "=FILTER('Historial Facturas Data'!A2:E1000;ISNUMBER(SEARCH(C5;'Historial Facturas Data'!A2:A1000)))"
+    Formula = "=FILTER('Historial Facturas Data'!A2:F1000;ISNUMBER(SEARCH(F5;'Historial Facturas Data'!A2:A1000)))"
+  } else if (tipoFiltro == "") {
+    Formula = "'Historial Facturas Data'!A2:F1000"
   }
+
   hojahistorial.getRange("B8").setValue(Formula)
 
+}
+
+function actualizarEstadoUltimasFacturas() {
+  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let hojaListadoEstado = spreadsheet.getSheetByName('ListadoEstado');
+  let hojaHistorialFacturasData = spreadsheet.getSheetByName('Historial Facturas Data');
+  let lastRow = hojaListadoEstado.getLastRow();
+  let numFacturas = Math.min(10, lastRow); // Obtener el número de facturas a procesar (máximo 10)
+
+  for (let i = 0; i < numFacturas; i++) {
+    let row = lastRow - i;
+    let documentId = hojaListadoEstado.getRange(row, 7).getValue(); // Obtener el documentId de la columna 7
+
+    if (documentId) {
+      let estado = registarEstadoFactura(documentId);
+      if (estado) {
+        let numRowHistorial = hojaListadoEstado.getRange(row, 8).getValue(); // Obtener el número de fila en Historial Facturas Data
+        hojaHistorialFacturasData.getRange(numRowHistorial, 6).setValue(estado); // Actualizar el estado en la columna 6
+      }
+    }
+  }
 }
 
 function SumarDiasAFecha(dias, fecha) {
@@ -1259,3 +1277,46 @@ function SumarDiasAFecha(dias, fecha) {
   return nuevaFecha;
 }
 
+function mostrarResumenFactura() {
+  var jsonString = recuperarJson();
+  var json = JSON.parse(jsonString); // Convertir el JSON string a un objeto
+
+  // Extraer la información importante
+  var nombreCliente = json.CustomerInformation.RegistrationName;
+  var numeroFactura = json.InvoiceGeneralInformation.InvoiceNumber;
+
+  // Extraer la información de impuestos
+  var impuestos = json.InvoiceTaxTotal.map(function (tax) {
+    var tipoImpuesto = tax.Id === "01" ? "IVA" : tax.Id === "04" ? "INC" : "Otro";
+    return {
+      tipo: tipoImpuesto,
+      percent: tax.Percent,
+      amount: tax.TaxAmount
+    };
+  });
+
+  // Extraer la información de InvoiceTotal
+  var invoiceTotal = json.InvoiceTotal;
+
+  // Crear el contenido HTML para el cuadro de diálogo
+  var htmlContent = plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoiceTotal);
+
+  // Mostrar el cuadro de diálogo
+  var htmlOutput = HtmlService.createHtmlOutput(htmlContent)
+    .setWidth(600)
+    .setHeight(500);
+  SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Resumen de la Factura');
+}
+
+function modificarFactura() {
+  // Cerrar el cuadro de diálogo y retornar un valor para evitar que se ejecuten los siguientes UI
+  return false;
+}
+
+function enviarFacturaHtml() {
+  let respuesta = enviarFactura();
+  if (respuesta[0] == true) {
+    guardarFacturaHistorial(respuesta[1]);
+
+  }
+}
