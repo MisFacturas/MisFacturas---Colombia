@@ -1315,6 +1315,7 @@ function enviarFacturaHtml() {
   let respuesta = enviarFactura();
   if (respuesta[0] == true) {
     guardarFacturaHistorial(respuesta[1]);
-
+    ui = SpreadsheetApp.getUi();
+    ui.alert("Factura enviada correctamente, puede descargarla desde la hoja 'Historial Facturas'.");
   }
 }
