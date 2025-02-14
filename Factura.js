@@ -1064,7 +1064,7 @@ function guardarYGenerarInvoice() {
 
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = hojaFactura.getRange("A25").getValue(); // para verificar donde esta el TOTAL
+  const posicionOriginalTotalFactura = hojaFactura.getRange("A23").getValue(); // para verificar donde esta el TOTAL
   let rangeTotales = ""
 
 
@@ -1285,7 +1285,7 @@ function mostrarResumenFactura() {
 
   // Extraer la información de impuestos
   var impuestos = json.InvoiceTaxTotal.map(function (tax) {
-    var tipoImpuesto = tax.Id === "01" ? "IVA" : tax.Id === "04" ? "INC" : "Otro";
+    var tipoImpuesto = tax.Id === "01" ? "IVA" : tax.Id === "04" ? "INC" : "ReteRenta";
     return {
       tipo: tipoImpuesto,
       percent: tax.Percent,
@@ -1302,7 +1302,7 @@ function mostrarResumenFactura() {
   // Mostrar el cuadro de diálogo
   var htmlOutput = HtmlService.createHtmlOutput(htmlContent)
     .setWidth(600)
-    .setHeight(500);
+    .setHeight(450);
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Resumen de la Factura');
 }
 

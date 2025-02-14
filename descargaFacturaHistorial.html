@@ -90,7 +90,7 @@
     <main class="d-flex flex-column align-items-center justify-content-center flex-grow-1">
       <div class="row py-3 px-4 gx-0 w-100">
         <div class="col-12 py-4">
-          <p class="fs-6">Ingresa el prefijo seguido del número de la factura la cual deseas descargar.</p>
+          <p class="fs-7" >Ingresa el prefijo seguido del número de la factura la cual deseas descargar.</p>
         </div>
         <div class="col-12 px-0">
           <form class="row g-3 d-flex flex-column align-items-center">
@@ -98,6 +98,9 @@
               <label for="numFactura" class="form-label">Prefijo y Numero de Factura</label>
               <input type="text" id="idFactura" class="form-control text-center=" placeholder="SETT123"
                 name="numFactura" required>
+            </div>
+            <div class="col-12">
+              <p class="text-center" style="color: rgb(102, 4, 4); font-size: 0.75rem;">Recuerda que solo las facturas en estado <b>"Enviada"</b> se pueden descargar.</p>
             </div>
             <div class="col-12">
               <button type="button" class="btn btn-primary btn-lg w-100 btn-menu" onclick="handleSubmit()">

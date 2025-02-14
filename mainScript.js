@@ -332,7 +332,7 @@ function eliminarHojasFactura() {
   let respuesta = ui.alert('Recuerda que al desinstalar las hojas se eliminará toda la información de las mismas. Esta función solo debe ejecutarse si tienes un problema irreparable con las hojas. ¿Estás seguro de continuar?', ui.ButtonSet.YES_NO);
   if (respuesta == ui.Button.YES) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos"];
+    const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Historial Facturas", "Historial Facturas Data"];
 
     // Crear una hoja nueva en blanco
     let nuevaHoja = ss.getSheetByName("Hoja en blanco");
@@ -498,13 +498,14 @@ function eliminarTotalidadInformacion() {
   let hojaClientes = spreadsheet.getSheetByName("Clientes");
   let hojaListadoEstado = spreadsheet.getSheetByName('ListadoEstado');
   let ClientesInvalidos = spreadsheet.getSheetByName('ClientesInvalidos');
-
+  let hojaFacturasData = spreadsheet.getSheetByName('Historial Facturas Data');
 
   borrarInfoHoja(hojaProductos)
   borrarInfoHoja(hojaClientes)
   borrarInfoHoja(hojaListadoEstado)
   borrarInfoHoja(ClientesInvalidos)
   borrarInfoHoja(hojaDatosEmisor)
+  borrarInfoHoja(hojaFacturasData)
   hojaDatos.getRange("Q11").setValue(0)
   hojaDatos.getRange("F47").setValue("")
   hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
