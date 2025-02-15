@@ -403,6 +403,26 @@ function verificarDatosObligatorios(e, tipoPersona) {
       SpreadsheetApp.getUi().alert('El correo electrónico ingresado no es válido.');
     }
 
+    // Verificar si el código postal en la columna Q es válido
+    let codigoPostal = sheet.getRange(rowEditada, 17).getValue(); // Columna Q es la 
+    let codigoPostalRegex = /^\d{6}$/;
+
+    if (!codigoPostalRegex.test(codigoPostal)) {
+      estaCompleto = false;
+      sheet.getRange(rowEditada, 17).setBackground('#FFC7C7'); // Resaltar en rojo claro
+      SpreadsheetApp.getUi().alert('El código postal ingresado no es válido. Debe ser un número de 6 dígitos.');
+    }
+
+    // Verificar si la dirección en la columna P contiene caracteres especiales
+    let direccion = sheet.getRange(rowEditada, 16).getValue(); // Columna P es la 16
+    let direccionRegex = /^[^#]*$/; // Patrón que no permite el carácter #
+
+    if (!direccionRegex.test(direccion)) {
+      estaCompleto = false;
+      sheet.getRange(rowEditada, 16).setBackground('#FFC7C7'); // Resaltar en rojo claro
+      SpreadsheetApp.getUi().alert('La dirección ingresada no es válida. No debe contener caracteres especiales como #.');
+    }
+
     // Actualizar el estado en la primera columna
     if (estaVacioOPredeterminado) {
       sheet.getRange(rowEditada, 1).clearContent(); // Limpiar contenido de "Estado"

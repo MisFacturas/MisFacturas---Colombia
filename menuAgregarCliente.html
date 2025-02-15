@@ -117,6 +117,19 @@
       document.getElementById('emailHelp').style.display = 'none';
     }
 
+    // Validate postal code format
+    const codigoPostalField = document.getElementById('codigoPostal');
+    const codigoPostalPattern = /^\d{6}$/;
+    if (!codigoPostalPattern.test(codigoPostalField.value)) {
+      codigoPostalField.style.backgroundColor = '#FFC7C7';
+      document.getElementById('codigoPostalHelp').style.display = 'block';
+      isValid = false;
+    } else {
+      codigoPostalField.style.backgroundColor = '';
+      document.getElementById('codigoPostalHelp').style.display = 'none';
+    }
+
+
     // Validate department and municipality if country is Colombia
     const pais = document.getElementById('pais').value;
     if (pais === 'Colombia') {
@@ -142,6 +155,11 @@
       isValid = false;
     } else {
       document.getElementById('responsabilidadFiscal').style.backgroundColor = '';
+    }
+
+    validarDireccion();
+    if (!direccionPattern.test(document.getElementById('direccion').value)) {
+      isValid = false;
     }
 
     return isValid;
@@ -359,6 +377,35 @@
       });
     });
   });
+
+  function validarCodigoPostal() {
+    const codigoPostalField = document.getElementById('codigoPostal');
+    const codigoPostalHelp = document.getElementById('codigoPostalHelp');
+    const codigoPostalPattern = /^\d{6}$/;
+
+    if (!codigoPostalPattern.test(codigoPostalField.value)) {
+      codigoPostalField.style.backgroundColor = '#FFC7C7';
+      codigoPostalHelp.style.display = 'block';
+    } else {
+      codigoPostalField.style.backgroundColor = '';
+      codigoPostalHelp.style.display = 'none';
+    }
+  }
+
+  function validarDireccion() {
+    const direccionField = document.getElementById('direccion');
+    const direccionHelp = document.getElementById('direccionHelp');
+    const direccionPattern = /^[^#]*$/; // Patrón que no permite el carácter #
+
+    if (!direccionPattern.test(direccionField.value)) {
+      direccionField.style.backgroundColor = '#FFC7C7';
+      direccionHelp.style.display = 'block';
+    } else {
+      direccionField.style.backgroundColor = '';
+      direccionHelp.style.display = 'none';
+    }
+  }
+
 </script>
 
 <body class="d-flex h-100">
@@ -447,7 +494,8 @@
           </div>
 
           <div class="col-md-6">
-            <label for="numeroIdentificacion" class="form-label">Número de identificación <span style="color: red;">*</span></label>
+            <label for="numeroIdentificacion" class="form-label">Número de identificación <span
+                style="color: red;">*</span></label>
             <input type="text" class="form-control form-control-lg" id="numeroIdentificacion">
           </div>
 
@@ -515,11 +563,15 @@
           </div>
           <div class="col-md-6">
             <label for="direccion" class="form-label">Dirección <span style="color: red;">*</span></label>
-            <input type="text" class="form-control form-control-lg" id="direccion">
+            <input type="text" class="form-control form-control-lg" id="direccion" oninput="validarDireccion()">
+            <small id="direccionHelp" class="form-text text-muted" style="display:none;">Por favor ingrese una dirección
+              válida sin caracteres especiales como #.</small>
           </div>
           <div class="col-md-6">
             <label for="codigoPostal" class="form-label">Código postal <span style="color: red;">*</span></label>
-            <input type="number" class="form-control form-control-lg" id="codigoPostal">
+            <input type="number" class="form-control form-control-lg" id="codigoPostal" oninput="validarCodigoPostal()">
+            <small id="codigoPostalHelp" class="form-text text-muted" style="display:none;">Por favor ingrese un código
+              postal válido de 6 dígitos.</small>
           </div>
           <div class="col-md-6">
             <label for="telefono" class="form-label">Teléfono <span style="color: red;">*</span></label>
@@ -532,10 +584,12 @@
           <div class="col-md-12">
             <label for="email" class="form-label">Email <span style="color: red;">*</span></label>
             <input type="email" placeholder="ejemplo@correo.com" class="form-control form-control-lg" id="email">
-            <small id="emailHelp" class="form-text text-muted" style="display:none;">Por favor ingrese un correo electrónico válido, con el formato alguien@correo.com.</small>
+            <small id="emailHelp" class="form-text text-muted" style="display:none;">Por favor ingrese un correo
+              electrónico válido, con el formato alguien@correo.com.</small>
           </div>
           <div class="col-12">
-            <label for="detallesTributarios" class="form-label">Detalles tributarios <span style="color: red;">*</span></label>
+            <label for="detallesTributarios" class="form-label">Detalles tributarios <span
+                style="color: red;">*</span></label>
             <select id="detallesTributarios" class="form-select form-select-lg">
               <option class="placeholder" selected disabled hidden>Seleccione</option>
               <option>IVA</option>
@@ -545,7 +599,8 @@
             </select>
           </div>
           <div class="col-12">
-            <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal <span style="color: red;">*</span></label>
+            <label for="responsabilidadFiscal" class="form-label">Responsabilidad fiscal <span
+                style="color: red;">*</span></label>
             <div id="responsabilidadFiscal">
               <div>
                 <input type="checkbox" id="granContribuyente" value="Gran contribuyente">

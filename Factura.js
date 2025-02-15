@@ -1064,7 +1064,7 @@ function guardarYGenerarInvoice() {
 
 
   //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = hojaFactura.getRange("A23").getValue(); // para verificar donde esta el TOTAL
+  const posicionOriginalTotalFactura = hojaFactura.getRange("A20").getValue(); // para verificar donde esta el TOTAL
   let rangeTotales = ""
 
 
