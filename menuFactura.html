@@ -21,7 +21,7 @@
     google.script.run.showSidebar();
   }
 
-  function showEnviarEmail() {
+  function showHistorialFacturas() {
     google.script.run.openHistorialSheet();
   }
 
@@ -49,10 +49,7 @@
       <div class="px-4 gx-0 d-flex flex-column">
         <h2 class="text-center">Facturación</h1>
       </div>
-
     </header>
-
-
 
     <main>
 
@@ -62,8 +59,10 @@
             lugar.</p>
         </div>
 
-        <a onclick="openNuevaFactura()" class="btn btn-lg btn-outline-secondary mb-2"><i
-            class="icon-file-plus"></i><span>Nueva factura</span></a>
+        <a onclick="openNuevaFactura()" class="btn btn-lg btn-primary mb-2">
+          <i class="icon-file-plus"></i><span>Nueva factura</span></a>
+         <a onclick="showHistorialFacturas()" class="btn btn-lg btn-outline-secondary mb-2">
+          <i class="icon-list"></i><span>Listado de facturas</span></a>
 
     </main>
 
@@ -71,18 +70,14 @@
 
     <footer class="mt-auto">
       <div class="row p-4 gx-0">
-        <div class="col-6 pe-1">
-          <a onclick="showMenuPrincipal()" class="btn btn-outline-primary btn-lg w-100 btn-menu d-flex">
+        <div class="col-6">
+          <a onclick="showMenuPrincipal()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
             <span>Inicio</span>
             <i class="icon-24-outlined-other-location-home"></i>
           </a>
         </div>
       </div>
     </footer>
-
-
-
-
 
   </div>
 

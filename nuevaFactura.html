@@ -38,6 +38,10 @@
   function showMenuPrincipal() {
     google.script.run.showSidebar();
   }
+
+  function back() {
+    google.script.run.showMenuFactura();
+  }
 </script>
 
 <body class="d-flex h-100">
@@ -49,7 +53,7 @@
         <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="">
       </div>
       <div class="mt-4 px-4 gx-0 d-flex flex-column">
-        <a onclick="showMenuPrincipal()" class="btn btn-dark btn-fluid"><i class="icon-left"></i>
+        <a onclick="back()" class="btn btn-dark btn-fluid"><i class="icon-left"></i>
           <span>Regresar</span></a>
       </div>
       <div class="col-12 text-center py-4"></div>
