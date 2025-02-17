@@ -400,7 +400,9 @@ function verificarDatosObligatorios(e, tipoPersona) {
     if (!emailRegex.test(email)) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 20).setBackground('#FFC7C7'); // Resaltar en rojo claro
-      SpreadsheetApp.getUi().alert('El correo electrónico ingresado no es válido.');
+      if (email !== "") {
+        SpreadsheetApp.getUi().alert('El correo electrónico ingresado no es válido.');
+      }
     }
 
     // Verificar si el código postal en la columna Q es válido
@@ -410,9 +412,10 @@ function verificarDatosObligatorios(e, tipoPersona) {
     if (!codigoPostalRegex.test(codigoPostal)) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 17).setBackground('#FFC7C7'); // Resaltar en rojo claro
-      SpreadsheetApp.getUi().alert('El código postal ingresado no es válido. Debe ser un número de 6 dígitos.');
+      if (codigoPostal !== "") {
+        SpreadsheetApp.getUi().alert('El código postal ingresado no es válido. Debe ser un número de 6 dígitos.');
+      }
     }
-
     // Verificar si la dirección en la columna P contiene caracteres especiales
     let direccion = sheet.getRange(rowEditada, 16).getValue(); // Columna P es la 16
     let direccionRegex = /^[^#]*$/; // Patrón que no permite el carácter #

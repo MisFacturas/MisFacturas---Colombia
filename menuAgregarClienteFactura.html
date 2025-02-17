@@ -151,9 +151,16 @@
       document.getElementById('responsabilidadFiscal').style.backgroundColor = '';
     }
 
-    validarDireccion();
-    if (!direccionPattern.test(document.getElementById('direccion').value)) {
+    // Validate address format
+    const direccionField = document.getElementById('direccion');
+    const direccionPattern = /^[^#]*$/; // Patrón que no permite el carácter #
+    if (!direccionPattern.test(direccionField.value)) {
+      direccionField.style.backgroundColor = '#FFC7C7';
+      document.getElementById('direccionHelp').style.display = 'block';
       isValid = false;
+    } else {
+      direccionField.style.backgroundColor = '';
+      document.getElementById('direccionHelp').style.display = 'none';
     }
 
     return isValid;
@@ -517,7 +524,7 @@
               <option value="Antioquia">Antioquia</option>
               <option value="Arauca">Arauca</option>
               <option value="Atlantico">Atlantico</option>
-              <option value="Bogota">BogotaDC</option>
+              <option value="BogotaDC">BogotaDC</option>
               <option value="Bolivar">Bolivar</option>
               <option value="Boyaca">Boyaca</option>
               <option value="Caldas">Caldas</option>
