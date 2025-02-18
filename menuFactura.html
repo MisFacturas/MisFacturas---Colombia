@@ -22,7 +22,9 @@
   }
 
   function showHistorialFacturas() {
+    google.script.run.actualizarEstadoUltimasFacturas();
     google.script.run.openHistorialSheet();
+    google.script.run.descargarFacturaHtml();
   }
 
 

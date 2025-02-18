@@ -366,12 +366,10 @@ function registarEstadoFactura(idFactura, numRow) {
   try {
     var respuesta = UrlFetchApp.fetch(url, opciones);
     var estatusRespuesta = respuesta.getResponseCode();
-    Logger.log("Estatus de la respuesta: " + estatusRespuesta);
 
     if (estatusRespuesta == 200) {
       var contenidoRespuesta = respuesta.getContentText();
       contenidoRespuesta = JSON.parse(contenidoRespuesta);
-      Logger.log(contenidoRespuesta);
       var status = contenidoRespuesta.DocumentStatus
       if (status === 74) {
         status = "Enviada";
@@ -1239,6 +1237,7 @@ function filtroHistorialFacturas(tipoFiltro) {
 }
 
 function actualizarEstadoUltimasFacturas() {
+  Logger.log("Actualizando estado de las últimas facturas...");
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   let hojaListadoEstado = spreadsheet.getSheetByName('ListadoEstado');
   let hojaHistorialFacturasData = spreadsheet.getSheetByName('Historial Facturas Data');
