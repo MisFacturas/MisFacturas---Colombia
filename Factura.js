@@ -399,7 +399,6 @@ function registarEstadoFactura(idFactura, numRow) {
 
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
-    SpreadsheetApp.getUi().alert("Error al intentar descargar la factura. Intente de nuevo si el error persiste comuníquese con soporte");
   }
 }
 
