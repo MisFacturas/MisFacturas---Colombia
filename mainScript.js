@@ -93,6 +93,7 @@ function iniciarHojasFactura() {
 
   const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Historial Facturas", "Historial Facturas Data"];
   const hojasInvisibles = ["ListadoEstado", "Datos", "ClientesInvalidos", "Copia de Factura", "Historial Facturas Data"];
+  const hojaBloqueada = ["Inicio"]
 
   // Instalar hojas desde la plantilla si no existen
   nombresHojas.forEach(nombreHoja => {
@@ -108,6 +109,12 @@ function iniciarHojasFactura() {
         // Bloquear la hoja completa si está en la lista de bloqueadas e invisibles
         if (hojasInvisibles.includes(nombreHoja)) {
           hojaCopia.hideSheet(); // Hacer la hoja invisible
+        }
+
+        if (hojaBloqueada.includes(nombreHoja)) {
+          const protection = hojaCopia.protect();
+          protection.removeEditors(protection.getEditors()); // Bloquear completamente
+          protection.addEditor(Session.getEffectiveUser()); // Solo el propietario tiene acceso
         }
 
       } else {
@@ -128,6 +135,7 @@ function iniciarHojasFactura() {
       ss.deleteSheet(hoja);
     }
   });
+  
 
   revokeAccessToTemplate();
 
