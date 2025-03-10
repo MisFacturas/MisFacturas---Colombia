@@ -1,4 +1,5 @@
 function descargarFacturaHtml() {
+  logearUsuario();
   var html = HtmlService.createHtmlOutputFromFile('descargaFacturaHistorial')
     .setTitle('Historial facutras');
   SpreadsheetApp.getUi()
@@ -6,7 +7,6 @@ function descargarFacturaHtml() {
 }
 
 function linkDescargaFactura(idFactura) {
-  logearUsuario();
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let idNumber = hojaDatosEmisor.getRange("B3").getValue();
