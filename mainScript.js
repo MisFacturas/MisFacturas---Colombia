@@ -490,6 +490,7 @@ function showVincularCuenta() {
     .showSidebar(html);
 }
 
+
 function showEliminarInfo() {
   var html = HtmlService.createHtmlOutputFromFile('menuEliminarInfo')
     .setTitle('Eliminar informacion');
@@ -561,7 +562,7 @@ function mensajeBorrarInfoError() {
   SpreadsheetApp.getUi().alert('Si deseas eliminar toda la informacion de misfacturas asegurate de escribir ELIMINAR en el campo');
 }
 
-function DesvincularMisfacturas() {
+function DesvincularMisfacturas(cambioAmb) {
   Logger.log("Desvincular")
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
@@ -569,8 +570,10 @@ function DesvincularMisfacturas() {
   hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
   hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
   hojaDatos.getRange("F47").setValue("")
-  SpreadsheetApp.getUi().alert('Haz desvinculado exitosamente misfacturas');
-  for (let i = 18; i < 50; i++) {
+  if (!cambioAmb) {
+    SpreadsheetApp.getUi().alert('Haz desvinculado exitosamente misfacturas');
+  }
+  for (let i = 18; i < 30; i++) {
     hojaDatosEmisor.getRange(i, 1, 1, 6).setValue("")
     hojaDatosEmisor.getRange(i, 1, 1, 6).setBackground(null)
   }
@@ -1289,4 +1292,45 @@ function onChange(e) {
       SpreadsheetApp.getUi().alert(`La hoja "${nombreHoja}" debe permanecer oculta.`);
     }
   });
+}
+
+
+function cambiarAmbiente() {
+  let ui = SpreadsheetApp.getUi();
+  
+  // Preguntar si el usuario está seguro
+  let respuesta = ui.alert(
+    '¿Estás seguro de que quieres cambiar el ambiente? Tendrás que volver a iniciar sesión.',
+    ui.ButtonSet.YES_NO
+  );
+
+  if (respuesta == ui.Button.YES) {
+    // Mostrar cuadro de diálogo personalizado con los ambientes
+    let htmlOutput = HtmlService.createHtmlOutput(plantillaCambiarAmbiente())
+      .setWidth(400)
+      .setHeight(320);
+    
+    ui.showModalDialog(htmlOutput, 'Cambiar Ambiente');
+  } else {
+    ui.alert('No se ha cambiado el ambiente.');
+  }
+}
+
+function aplicarCambioAmbiente(nuevoAmbiente) {
+  let spreadsheet = SpreadsheetApp.getActive();
+  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  
+  Logger.log("Nuevo ambiente seleccionado: " + nuevoAmbiente);
+  
+  // Actualizar el valor en la hoja y en las propiedades del documento
+  const scriptProps = PropertiesService.getDocumentProperties();
+  scriptProps.setProperties({
+    'Ambiente': nuevoAmbiente
+  });
+  Logger.log("Si se creo el doc prop para el ambiente: " + nuevoAmbiente);
+
+  abrirMenuVinculacion();  
+  let cambioAmb = true;
+  DesvincularMisfacturas(cambioAmb);
+  hojaDatosEmisor.getRange("C1002").setValue(nuevoAmbiente)
 }

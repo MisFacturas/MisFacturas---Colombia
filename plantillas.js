@@ -158,3 +158,100 @@ function plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoic
 function formatearPesos(valor) {
     return `$${valor.toLocaleString('es-CO')}`;
 }
+
+function plantillaCambiarAmbiente() {
+  return `
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+      body {
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        padding: 20px;
+      }
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+      .option {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+      }
+      .option:hover {
+        background-color: rgba(255, 218, 187, 0.32);
+      }
+      .option input[type="radio"] {
+        margin-right: 10px;
+      }
+      .button-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+      }
+      .red-text {
+        color: rgb(231, 112, 14);
+        font-size: 16px;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+      }
+      .grey-text {
+        color: grey;
+        font-size: 16px;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+      }
+      button {
+        padding: 3px 12px;
+        font-family: 'Roboto', sans-serif;
+        background-color: rgba(255, 255, 255, 0);
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+      button:hover {
+        background-color: rgba(255, 218, 187, 0.32);
+      }
+    </style>
+    <div class="container">
+      <div class="title">Selecciona el nuevo ambiente:</div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="ambiente" value="QA" checked> QA
+        </label>
+        <label class="option">
+          <input type="radio" name="ambiente" value="Preproducción"> Preproducción
+        </label>
+        <label class="option">
+          <input type="radio" name="ambiente" value="Producción"> Producción
+        </label>
+      </div>
+      <div class="button-container">
+        <button onclick="google.script.host.close()"><p class="grey-text">Cancelar</p></button>
+        <button onclick="confirmarCambio(); google.script.host.close()"><p class="red-text">Confirmar</p></button>
+      </div>
+    </div>
+    <script>
+      function confirmarCambio() {
+        const selectedOption = document.querySelector('input[name="ambiente"]:checked').value;
+        google.script.run.withSuccessHandler(function() {
+          google.script.host.close();
+        }).aplicarCambioAmbiente(selectedOption);
+      }
+    </script>
+  `;
+}

@@ -6,6 +6,20 @@ function descargarFacturaHtml() {
     .showSidebar(html);
 }
 
+function obtenerBaseUrlSegunAmbiente() {
+  const scriptProps = PropertiesService.getDocumentProperties();
+  const ambiente = scriptProps.getProperty('Ambiente');
+  
+  if (ambiente === "QA") {
+    return "https://misfacturas-qa.cenet.ws/";
+  } else if (ambiente === "Preproducción") {
+    return "https://misfacturas.cenet.ws/";
+  } else {
+    // Por defecto, usamos producción
+    return "https://www.misfacturas.com.co/";
+  }
+}
+
 function linkDescargaFactura(idFactura) {
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
@@ -13,7 +27,9 @@ function linkDescargaFactura(idFactura) {
   let schemaID = 31;
   let documentNumber = idFactura;
   let documentType = 1;
-  let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDownloadRgDocumentByNumber?SchemaID=${schemaID}&IDnumber=${idNumber}&DocumentType=${documentType}&DocumentNumber=${documentNumber}`;
+  const baseUrl = obtenerBaseUrlSegunAmbiente();
+  let url = `${baseUrl}integrationAPI_2/api/GetDownloadRgDocumentByNumber?SchemaID=${schemaID}&IDnumber=${idNumber}&DocumentType=${documentType}&DocumentNumber=${documentNumber}`;
+  
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   let token = hojaDatos.getRange("F47").getValue();
 
@@ -275,9 +291,10 @@ function logearUsuario() {
     ui.showModalDialog(htmlOutput, 'Vinculación requerida');
     return false;
   }
+  
+  const baseUrl = obtenerBaseUrlSegunAmbiente();
+  let url = `${baseUrl}IntegrationAPI_2/api/login?username=${usuario}&password=${contrasena}`;
 
-
-  let url = `https://misfacturas.cenet.ws/IntegrationAPI_2/api/login?username=${usuario}&password=${contrasena}`;
   let opciones = {
     "method": "post",
     "contentType": "application/json",
@@ -299,7 +316,9 @@ function enviarFactura() {
   let schemaID = 31;
   let idNumber = hojaDatosEmisor.getRange("B3").getValue();
   let templateID = 73;
-  let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/insertinvoice?SchemaID=${schemaID}&IDNumber=${idNumber}&TemplateID=${templateID}`;
+  
+  const baseUrl = obtenerBaseUrlSegunAmbiente();
+  let url = `${baseUrl}integrationAPI_2/api/insertinvoice?SchemaID=${schemaID}&IDNumber=${idNumber}&TemplateID=${templateID}`;
   let json = recuperarJson();
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   let token = hojaDatos.getRange("F47").getValue();
@@ -351,10 +370,10 @@ function registarEstadoFactura(idFactura, numRow) {
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let IDNumber = hojaDatosEmisor.getRange("B3").getValue();
-
   let documentId = idFactura;
-  let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDocumentStatus?SchemaID=${schemaID}&DocumentType=${documentType}&IDNumber=${IDNumber}&DocumentID=${documentId}`;
-
+  
+  const baseUrl = obtenerBaseUrlSegunAmbiente();
+  let url = `${baseUrl}integrationAPI_2/api/GetDocumentStatus?SchemaID=${schemaID}&DocumentType=${documentType}&IDNumber=${IDNumber}&DocumentID=${documentId}`;
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   let token = hojaDatos.getRange("F47").getValue();
   let opciones = {
@@ -408,8 +427,9 @@ function obtenerTokenMF(usuario, contra) {
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaDatos = spreadsheet.getSheetByName("Datos")
-
-  let url = `https://misfacturas.cenet.ws/IntegrationAPI_2/api/login?username=${usuario}&password=${contra}`;
+  
+  const baseUrl = obtenerBaseUrlSegunAmbiente();
+  let url = `${baseUrl}IntegrationAPI_2/api/login?username=${usuario}&password=${contra}`;
   let opciones = {
     "method": "post",
     "contentType": "application/json",
@@ -441,14 +461,15 @@ function obtenerTokenMF(usuario, contra) {
       hojaDatos.getRange("F47").setValue(token)
       var resdian = obtenerResolucionesDian(token, usuario);
       if (!resdian) {
-        return;
+        // Aunque falle obtenerResolucionesDian, la autenticación fue exitosa
+        return true;
       }
+      return true; // Retorna true para indicar éxito
     } else {
       hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
       hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
       hojaDatos.getRange("F47").setValue("")
       throw new Error("Error de la API: " + contenidoRespuesta); // Muestra el error de la API
-
     }
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
@@ -456,6 +477,7 @@ function obtenerTokenMF(usuario, contra) {
     hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
     hojaDatos.getRange("F47").setValue("")
     SpreadsheetApp.getUi().alert("Error al vincular tu cuenta. Verifica que el usuario y la contraseña estén correctos e intenta de nuevo. Si el error persiste, comunícate con soporte.");
+    return false; // Retorna false para indicar error
   }
 }
 
@@ -479,7 +501,8 @@ function obtenerResolucionesDian(token, usuario) {
       logearUsuario();
       token = hojaDatos.getRange("F47").getValue();
     }
-    let url = `https://misfacturas.cenet.ws/integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${nit}`;
+    const baseUrl = obtenerBaseUrlSegunAmbiente();
+    let url = `${baseUrl}integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${nit}`;
     let opciones = {
       "method": "get",
       "headers": { "Authorization": "misfacturas " + token },
