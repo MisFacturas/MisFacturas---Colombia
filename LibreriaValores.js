@@ -1407,6 +1407,7 @@ var departamentosCodigos = {
   "Arauca": "81",
   "Atlantico": "08",
   "Bogota": "11",
+  "BogotaDC": "11",
   "Bolivar": "13",
   "Boyaca": "15",
   "Caldas": "17",
@@ -2046,6 +2047,9 @@ function buscarMunicipios(departamento) {
       municipios = Object.keys(municipiosAtlantico);
       break;
     case 'Bogota':
+      municipios = Object.keys(municipiosBogota);
+      break;
+    case 'BogotaDC':
       municipios = Object.keys(municipiosBogota);
       break;
     case 'Bolivar':

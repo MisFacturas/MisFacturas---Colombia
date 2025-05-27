@@ -454,7 +454,9 @@ function getCityCode(departamentoCliente, ciudadCliente) {
       return municipiosArauca[ciudadCliente];
     case "Atlantico":
       return municipiosAtlantico[ciudadCliente];
-    case "Bogota":
+    case "Bogota" || "BogotaDC":
+      return municipiosBogota[ciudadCliente];
+    case "BogotaDC":
       return municipiosBogota[ciudadCliente];
     case "Bolivar":
       return municipiosBolivar[ciudadCliente];

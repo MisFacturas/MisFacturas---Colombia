@@ -249,6 +249,7 @@
     "Arauca": "81",
     "Atlantico": "08",
     "Bogota": "11",
+    "BogotaDC":"11", 
     "Bolivar": "13",
     "Boyaca": "15",
     "Caldas": "17",
@@ -316,9 +317,21 @@
     var municipioSelect = document.getElementById('municipio');
     municipioSelect.innerHTML = '<option value="">Seleccione</option>'; // Limpiar municipios anteriores
 
+    // Si es Bogota o BogotaDC, poner automáticamente el municipio y deshabilitar el selector
+    if (departamento === 'Bogota' || departamento === 'BogotaDC') {
+      municipioSelect.innerHTML = '<option value="BOGOTA, D.C.">BOGOTA, D.C.</option>';
+      municipioSelect.value = 'BOGOTA, D.C.';
+      municipioSelect.disabled = true;
+      return;
+    } else {
+      municipioSelect.disabled = false;
+    }
+
     if (departamento) {
       google.script.run.withSuccessHandler(function (municipios) {
-        municipios.forEach(function (municipio) {
+        // Eliminar duplicados por si acaso
+        var uniqueMunicipios = [...new Set(municipios)];
+        uniqueMunicipios.forEach(function (municipio) {
           var option = document.createElement('option');
           option.value = municipio;
           option.textContent = municipio;
@@ -531,7 +544,7 @@
               <option value="Antioquia">Antioquia</option>
               <option value="Arauca">Arauca</option>
               <option value="Atlantico">Atlantico</option>
-              <option value="BogotaDC">BogotaDC</option>
+              <option value="BogotaDC">Bogota D.C.</option>
               <option value="Bolivar">Bolivar</option>
               <option value="Boyaca">Boyaca</option>
               <option value="Caldas">Caldas</option>
