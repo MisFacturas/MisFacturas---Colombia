@@ -24,7 +24,7 @@
     var mensaje = document.getElementById('mensaje');
 
     if (idFactura.trim() === "") {
-      mensaje.textContent = "Por favor ingrese el prefijo y número de la factura.";
+      mensaje.textContent = "Por favor ingresa el prefijo y número de la factura.";
       mensaje.style.color = "red";
       return;
     }
@@ -89,13 +89,16 @@
 
     <main class="d-flex flex-column align-items-center justify-content-center flex-grow-1">
       <div class="row py-3 px-4 gx-0 w-100">
+        <div class="px-4 gx-0 d-flex flex-column">
+          <h2 class="text-center">Descargar factura</h2>
+        </div>
         <div class="col-12 py-4">
-          <p class="fs-7" >Ingresa el prefijo seguido del número de la factura la cual deseas descargar.</p>
+          <p class="fs-7" >Ingresa el prefijo seguido del número de la factura que deseas descargar.</p>
         </div>
         <div class="col-12 px-0">
           <form class="row g-3 d-flex flex-column align-items-center">
             <div class="col-12 mb-3 w-100">
-              <label for="numFactura" class="form-label">Prefijo y Numero de Factura</label>
+              <label for="numFactura" class="form-label">Prefijo y número de factura</label>
               <input type="text" id="idFactura" class="form-control text-center=" placeholder="SETT123"
                 name="numFactura" required>
             </div>

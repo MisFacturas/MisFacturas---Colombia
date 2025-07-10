@@ -41,7 +41,7 @@ function showSidebar2() {
   console.log("showSidebar2 Enters");
   let ui = SpreadsheetApp.getUi();
   console.log("setActiveSheet2 Inicio");
-  let requiredSheets = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Historial Facturas", "Historial Facturas Data"];
+  let requiredSheets = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Listado Facturas", "Listado Facturas Data"];
   let ss = SpreadsheetApp.getActiveSpreadsheet();
 
   for (let sheetName of requiredSheets) {
@@ -52,7 +52,7 @@ function showSidebar2() {
         iniciarHojasFactura();
         OnOpenSheetInicio();
         agregarDataValidations();
-        let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(155);
+        let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
         ui.showModalDialog(htmlOutput, 'Vinculación requerida');
       } else {
         return;
@@ -91,8 +91,8 @@ function iniciarHojasFactura() {
   const plantillaID = "1FgLge7RWvu3R-51Se6ekjN3pOTZE40HLwafRIwoIMUg";
   const plantilla = SpreadsheetApp.openById(plantillaID);
 
-  const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Historial Facturas", "Historial Facturas Data"];
-  const hojasInvisibles = ["ListadoEstado", "Datos", "ClientesInvalidos", "Copia de Factura", "Historial Facturas Data"];
+  const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Listado Facturas", "Listado Facturas Data"];
+  const hojasInvisibles = ["ListadoEstado", "Datos", "ClientesInvalidos", "Copia de Factura", "Listado Facturas Data"];
   const hojaBloqueada = ["Inicio"]
 
   // Instalar hojas desde la plantilla si no existen
@@ -298,7 +298,7 @@ function IniciarMisfacturas() {
     iniciarHojasFactura()
     OnOpenSheetInicio()
     agregarDataValidations()
-    let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(300).setHeight(100);
+    let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
     ui.showModalDialog(htmlOutput, 'Vinculación requerida');
 
 
@@ -308,7 +308,7 @@ function IniciarMisfacturas() {
       iniciarHojasFactura()
       OnOpenSheetInicio()
       agregarDataValidations()
-      let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(300).setHeight(100);
+      let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
       ui.showModalDialog(htmlOutput, 'Vinculación requerida');
 
     } else {
@@ -340,7 +340,7 @@ function eliminarHojasFactura() {
   let respuesta = ui.alert('Recuerda que al desinstalar las hojas se eliminará toda la información de las mismas. Esta función solo debe ejecutarse si tienes un problema irreparable con las hojas. ¿Estás seguro de continuar?', ui.ButtonSet.YES_NO);
   if (respuesta == ui.Button.YES) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Historial Facturas", "Historial Facturas Data"];
+    const nombresHojas = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Listado Facturas", "Listado Facturas Data"];
 
     // Crear una hoja nueva en blanco
     let nuevaHoja = ss.getSheetByName("Hoja en blanco");
@@ -447,7 +447,7 @@ function openFacturaSheet() {
 
 function openHistorialSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Historial Facturas");
+  var sheet = ss.getSheetByName("Listado Facturas");
   SpreadsheetApp.setActiveSheet(sheet);
 }
 
@@ -507,7 +507,7 @@ function eliminarTotalidadInformacion() {
   let hojaClientes = spreadsheet.getSheetByName("Clientes");
   let hojaListadoEstado = spreadsheet.getSheetByName('ListadoEstado');
   let ClientesInvalidos = spreadsheet.getSheetByName('ClientesInvalidos');
-  let hojaFacturasData = spreadsheet.getSheetByName('Historial Facturas Data');
+  let hojaFacturasData = spreadsheet.getSheetByName('Listado Facturas Data');
 
   borrarInfoHoja(hojaProductos)
   borrarInfoHoja(hojaClientes)
@@ -683,11 +683,13 @@ function convertToPercentage(value) {
 }
 
 function onEdit(e) {
+  // Trigger global para todas las hojas
+  onEditFacturaActualizarNumeroFactura(e); // Actualiza número de factura en J2 al cambiar H2 en Factura
   const lock = LockService.getScriptLock();
   let hojaActual = e.source.getActiveSheet();
   let nombreHoja = hojaActual.getName();
 
-  if (nombreHoja === "Datos" || nombreHoja === "ClientesInvalidos" || nombreHoja === "ListadoEstado" || nombreHoja === "Copia de Factura" || nombreHoja === "Historial Facturas Data" ) {
+  if (nombreHoja === "Datos" || nombreHoja === "ClientesInvalidos" || nombreHoja === "ListadoEstado" || nombreHoja === "Copia de Factura" || nombreHoja === "Listado Facturas Data" ) {
     showWarningAndHideSheet();
   }
 
@@ -720,7 +722,6 @@ function onEdit(e) {
             break;
           }
         }
-        hojaActual.getRange("H2").setValue(consecutivoFactura);
       } else if (rowEditada >= productStartRow && (colEditada == 2 || colEditada == 3) && rowEditada < posRowTotalProductos) {
         let i = rowEditada;
         let productoFilaI = factura_sheet.getRange("B" + String(i)).getValue();
@@ -797,12 +798,13 @@ function onEdit(e) {
         // Verifica la moneda
         let moneda = celdaEditada.getValue();
         if (moneda != "COP-Peso colombiano") {
-          hojaActual.getRange(rowEditada + 1, colEditada).setBackground('#FFC7C7');
+          hojaActual.getRange(rowEditada + 1, colEditada).setBackground('#e0ecd4');
+          hojaActual.getRange(rowEditada + 1, colEditada).setValue("");
           ponerFechaTasaDeCambio();
         } else {
-          hojaActual.getRange(rowEditada + 1, colEditada).setBackground('#FFFFFF');
-          hojaActual.getRange(rowEditada + 1, colEditada).setValue("");
-          hojaActual.getRange(rowEditada + 2, colEditada).setValue("");
+          hojaActual.getRange(rowEditada + 1, colEditada).setBackground('#e0dcdc');
+          hojaActual.getRange(rowEditada + 1, colEditada).setValue("N/A");
+          hojaActual.getRange(rowEditada + 2, colEditada).setValue("N/A");
         }
       }
     } else if (nombreHoja === "Clientes") {
@@ -877,7 +879,7 @@ function onEdit(e) {
         }
       }
 
-    } else if (nombreHoja === "Historial Facturas") {
+    } else if (nombreHoja === "Listado Facturas") {
       let celdaEditada = e.range;
       let rowEditada = celdaEditada.getRow();
       let colEditada = celdaEditada.getColumn();
@@ -1273,7 +1275,7 @@ function showWarningAndHideSheet() {
   const ui = SpreadsheetApp.getUi();
   ui.alert('No tienes permiso para editar esta hoja.');
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura", "Historial Facturas Data"];
+  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura", "Listado Facturas Data"];
   hojasInvisibles.forEach(nombreHoja => {
     const hoja = ss.getSheetByName(nombreHoja);
     if (hoja) {
@@ -1284,7 +1286,7 @@ function showWarningAndHideSheet() {
 
 function onChange(e) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura", "Historial Facturas Data"];
+  const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura", "Listado Facturas Data"];
   hojasInvisibles.forEach(nombreHoja => {
     const hoja = ss.getSheetByName(nombreHoja);
     if (hoja && !hoja.isSheetHidden()) {
@@ -1333,4 +1335,40 @@ function aplicarCambioAmbiente(nuevoAmbiente) {
   let cambioAmb = true;
   DesvincularMisfacturas(cambioAmb);
   hojaDatosEmisor.getRange("C1002").setValue(nuevoAmbiente)
+}
+
+/**
+ * Muestra un popup explicando el estado "En revisión".
+ */
+function mostrarPopupEstadoEnRevision() {
+  let htmlOutput = HtmlService.createHtmlOutput(plantillaEstadoEnRevision()).setWidth(600).setHeight(400);
+  SpreadsheetApp.getUi().showModalDialog(htmlOutput, '¿Qué significa "En revisión"?');
+}
+
+/**
+ * Dummy para la opción "No mostrar nuevamente" (puedes implementar lógica de usuario si lo deseas)
+ */
+function noMostrarPopupEstadoEnRevision() {
+  // Aquí podrías guardar en PropertiesService o similar si quieres persistencia por usuario
+  return true;
+}
+
+function onEditFacturaActualizarNumeroFactura(e) {
+  let hojaActual = e.source.getActiveSheet();
+  let rowEditada = e.range.getRow();
+  let colEditada = e.range.getColumn();
+
+  if (hojaActual.getName() === "Factura" && colEditada === 8 && rowEditada === 2) {
+    let numeroAutorizacion = hojaActual.getRange(rowEditada, colEditada).getValue();
+    let hojaDatosEmisor = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Datos de emisor');
+    let data = hojaDatosEmisor.getRange('A18:E67').getValues(); // Máximo 50 resoluciones
+    let consecutivoFactura = '';
+    for (let i = 0; i < data.length; i++) {
+      if (data[i][0] == numeroAutorizacion) {
+        consecutivoFactura = data[i][4]; // Columna E (índice 4)
+        break;
+      }
+    }
+    hojaActual.getRange(2, 10).setValue(consecutivoFactura); // J2
+  }
 }
