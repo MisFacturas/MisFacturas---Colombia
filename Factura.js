@@ -920,13 +920,16 @@ function guardarYGenerarInvoice() {
       LineaFactura[llavesFinales[j]] = productoFilaActual[j]
     }
 
-    let filaProducto = obtenerFilaPorReferencia(Number(LineaFactura['referencia']));
+    Logger.log("Referencia del producto: " + LineaFactura['referencia']);
+    let filaProducto = obtenerFilaPorReferencia((LineaFactura['referencia']));
+    Logger.log("Fila del producto: " + filaProducto);
     let unidadDeMedida = hojaProductos.getRange("G" + String(filaProducto)).getValue();
     Logger.log("Unidad de medida: " + unidadDeMedida);
     unidadDeMedida = unidadDeMedida.split("-")[1];
     Logger.log("Unidad de medida: " + unidadDeMedida);
     let ItemReference = String(LineaFactura['referencia']);
     let Name = String(LineaFactura['producto']);
+    let NameReal = Name.split("-")[0].trim();
     let Quantity = String(LineaFactura['cantidad']);
     let Price = Number(LineaFactura['preciounitario']);
     let chargeIndicator = false;
@@ -947,7 +950,8 @@ function guardarYGenerarInvoice() {
       const rangoCodigosReferencia = hojaProductos.getRange(2, 2, ultimaFila - 1, 1).getValues();
 
       for (let i = 0; i < rangoCodigosReferencia.length; i++) {
-        if (rangoCodigosReferencia[i][0] === referencia) {
+        Logger.log("Posible codigo del producto: " + (rangoCodigosReferencia[i][0]));
+        if (rangoCodigosReferencia[i][0] === referencia || rangoCodigosReferencia[i][0] == referencia) {
           return i + 2; // +2 porque el rango empieza en la fila 2
         }
       }
@@ -1038,7 +1042,7 @@ function guardarYGenerarInvoice() {
 
     let productoI = {//aqui organizamos todos los parametros necesarios para los productos
       ItemReference: ItemReference,
-      Name: Name,
+      Name: NameReal,
       Quatity: new Number(Quantity),
       Price: new Number(Price),
 
@@ -1190,9 +1194,11 @@ function guardarYGenerarInvoice() {
   }
 
 
-  let cliente = hojaFactura.getRange("B2").getValue();
+  // Solo guardar el nombre del cliente (sin documento)
+  let clienteRaw = hojaFactura.getRange("B2").getValue();
+  let cliente = (typeof clienteRaw === "string" && clienteRaw.includes("-")) ? clienteRaw.split("-")[0].trim() : clienteRaw;
   let InvoiceGeneralInformation = getInvoiceGeneralInformation();
-  let CustomerInformation = getCustomerInformation(cliente);
+  let CustomerInformation = getCustomerInformation(clienteRaw);
 
   let sheetDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let userId = String(sheetDatosEmisor.getRange("B11").getValue());
@@ -1264,7 +1270,7 @@ function guardarFacturaHistorial(documentId) {
   var numeroFactura = hojaFactura.getRange("J2").getValue();
   var cliente = hojaFactura.getRange("B2").getValue();
   var fechaEmision = hojaFactura.getRange("H4").getValue();
-  var informacionCliente = getCustomerInformation(cliente);
+  var informacionCliente = getCustomerInformation(clienteRaw);
   var identificacion = informacionCliente.Identification;
 
   // Insertar una nueva fila en la posición 2 (después del encabezado)

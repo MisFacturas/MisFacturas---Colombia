@@ -580,6 +580,7 @@ function getCustomerInformation(cliente) {
   //Responsabilidad fiscal
   var responsabilidadFiscal = datos_sheet.getRange("AC2").getValue();
 
+  let clienteLimpio = (typeof cliente === "string" && cliente.includes("-")) ? cliente.split("-")[0].trim() : cliente;
 
   if (tipoIdentificacion == "#NUM!") {
     Browser.msgBox("ERROR: Seleccione Tipo de Identificacion en Clientes")
@@ -591,7 +592,7 @@ function getCustomerInformation(cliente) {
     "IdentificationType": Number(tiposDocumento[tipoIdentificacion]),
     "Identification": Number(numeroIdentificacion),
     "DV": calcularDV(tipoIdentificacion),
-    "RegistrationName": cliente,
+    "RegistrationName": clienteLimpio,
     "CountryCode": paisesCodigos[paisCliente],
     "CountryName": paisCliente,
     "SubdivisionCode": String(departamentosCodigos[departamentoCliente]),
