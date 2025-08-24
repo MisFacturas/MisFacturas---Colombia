@@ -1,5 +1,5 @@
 function plantillaVincularMF(inHoja) {
-    return `
+  return `
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
         body {
@@ -208,8 +208,8 @@ function plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoic
           <div class="info"><span>Impuestos:</span></div>
           <ul>
             ${impuestos.map(function (impuesto) {
-              return `<li><span>${impuesto.tipo} (${impuesto.percent}%):</span> <span>${formatearPesos(impuesto.amount)}</span></li>`;
-            }).join('')}
+    return `<li><span>${impuesto.tipo} (${impuesto.percent}%):</span> <span>${formatearPesos(impuesto.amount)}</span></li>`;
+  }).join('')}
           </ul>
         </div>
         <div class="column">
@@ -234,7 +234,7 @@ function plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoic
 }
 
 function formatearPesos(valor) {
-    return `$${valor.toLocaleString('es-CO')}`;
+  return `$${valor.toLocaleString('es-CO')}`;
 }
 
 function plantillaCambiarAmbiente() {

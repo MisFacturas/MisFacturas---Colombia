@@ -374,7 +374,7 @@ var municipiosAtlantico = {
 var municipiosBogota = {
   "BOGOTA, D.C.": "11001"
 }
-var municipiosBolivar = { 
+var municipiosBolivar = {
   "CARTAGENA DE INDIAS": "13001",
   "ACHI": "13006",
   "ALTOS DEL ROSARIO": "13030",
@@ -689,7 +689,7 @@ var municipiosCesar = {
   "TAMALAMEQUE": "20787"
 }
 var municipiosChoco = {
-"QUIBDO": "27001",
+  "QUIBDO": "27001",
   "ACANDI": "27006",
   "ALTO BAUDO (PIE DE PATO)": "27025",
   "ATRATO (YUTO)": "27050",
@@ -871,7 +871,7 @@ var municipiosCundinamarca = {
   "ZIPAQUIRA": "25899"
 }
 var municipiosGuainia = {
-"INIRIDA": "94001",
+  "INIRIDA": "94001",
   "BARRANCOMINAS": "94343",
   "MAPIRIPANA": "94663",
   "SAN FELIPE": "94883",
@@ -888,7 +888,7 @@ var municipiosGuaviare = {
   "MIRAFLORES": "95200"
 }
 var municipiosHuila = {
-"NEIVA": "41001",
+  "NEIVA": "41001",
   "ACEVEDO": "41006",
   "AGRADO": "41013",
   "AIPE": "41016",
@@ -927,7 +927,7 @@ var municipiosHuila = {
   "YAGUARA": "41885"
 }
 var municipiosLaGuajira = {
-"RIOHACHA": "44001",
+  "RIOHACHA": "44001",
   "ALBANIA": "44035",
   "BARRANCAS": "44078",
   "DIBULLA": "44090",
@@ -1073,7 +1073,7 @@ var municipiosNarino = {
   "YACUANQUER": "52885"
 }
 var municipiosNorteDeSantander = {
-"CUCUTA": "54001",
+  "CUCUTA": "54001",
   "ABREGO": "54003",
   "ARBOLEDAS": "54051",
   "BOCHALEMA": "54099",
@@ -1115,7 +1115,7 @@ var municipiosNorteDeSantander = {
   "VILLA DEL ROSARIO": "54874"
 }
 var municipiosPutumayo = {
-"MOCOA": "86001",
+  "MOCOA": "86001",
   "COLON": "86219",
   "ORITO": "86320",
   "PUERTO ASIS": "86568",
@@ -1144,7 +1144,7 @@ var municipiosQuindio = {
   "SALENTO": "63690"
 }
 var municipiosRisaralda = {
-"PEREIRA": "66001",
+  "PEREIRA": "66001",
   "APIA": "66045",
   "BALBOA": "66075",
   "BELEN DE UMBRIA": "66088",
@@ -1281,7 +1281,7 @@ var municipiosSucre = {
   "TOLU VIEJO": "70823"
 }
 var municipiosTolima = {
-"IBAGUE": "73001",
+  "IBAGUE": "73001",
   "ALPUJARRA": "73024",
   "ALVARADO": "73026",
   "AMBALEMA": "73030",
@@ -1372,7 +1372,7 @@ var municipiosValleDelCauca = {
   "YOTOCO": "76890",
   "YUMBO": "76892",
   "ZARZAL": "76895"
-} 
+}
 var municipiosVaupes = {
   "MITU": "97001",
   "CARURU": "97161",
@@ -1387,15 +1387,15 @@ var municipiosVichada = {
   "SANTA ROSALIA": "99624"
 }
 var municipiosCodigos = {
-  
-  
-  
-  
- 
- 
 
 
-  
+
+
+
+
+
+
+
 
 
 
@@ -1439,7 +1439,7 @@ var departamentosCodigos = {
 };
 
 var reteRentaValores = {
-  "" : 0.00,
+  "": 0.00,
   "No Aplica": 0.00,
   "Retencion sobre el IVA 15%": 15.00,
   "Retencion sobre el IVA 100%": 100.00,

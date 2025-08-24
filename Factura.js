@@ -11,7 +11,7 @@ function descargarFacturaHtml() {
 function obtenerBaseUrlSegunAmbiente() {
   const scriptProps = PropertiesService.getDocumentProperties();
   const ambiente = scriptProps.getProperty('Ambiente');
-  
+
   if (ambiente === "QA") {
     return "https://misfacturas-qa.cenet.ws/";
   } else if (ambiente === "Preproducción") {
@@ -31,7 +31,7 @@ function linkDescargaFactura(idFactura) {
   let documentType = 1;
   const baseUrl = obtenerBaseUrlSegunAmbiente();
   let url = `${baseUrl}integrationAPI_2/api/GetDownloadRgDocumentByNumber?SchemaID=${schemaID}&IDnumber=${idNumber}&DocumentType=${documentType}&DocumentNumber=${documentNumber}`;
-  
+
   let hojaDatos = spreadsheet.getSheetByName('Datos');
   let token = hojaDatos.getRange("F47").getValue();
 
@@ -159,7 +159,7 @@ function guardarFactura() {
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let estadoVinculacion = hojaDatosEmisor.getRange("B13").getValue();
   let estadoFactura = [];
-  
+
   if (estadoVinculacion == "Desvinculado") {
     let inHoja = true;
     let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF(inHoja)).setWidth(500).setHeight(400);
@@ -299,23 +299,23 @@ function logearUsuario() {
     ui.showModalDialog(htmlOutput, 'Vinculación requerida');
     return false;
   }
-  
+
   const baseUrl = obtenerBaseUrlSegunAmbiente();
-  let url = `${baseUrl}integrationAPI_2/api/loginWeb?username=${usuario}&password=${contrasena}`;
+  let url = `${baseUrl}integrationAPI_2/api/login?username=${usuario}&password=${contrasena}`;
 
   let opciones = {
     "method": "post",
     "contentType": "application/json",
     'muteHttpExceptions': true
   };
-  
+
   let respuesta;
   let contenidoRespuesta;
-  
+
   try {
     respuesta = UrlFetchApp.fetch(url, opciones);
     contenidoRespuesta = respuesta.getContentText();
-    
+
     // Verificar si la respuesta está vacía o es inválida
     if (!contenidoRespuesta || contenidoRespuesta.trim() === '') {
       Logger.log("Error: Respuesta vacía de la API de login");
@@ -328,7 +328,7 @@ function logearUsuario() {
     SpreadsheetApp.getUi().alert("Error de conexión: No se pudo conectar con el servidor. Verifique su conexión a internet e intente nuevamente.");
     return false;
   }
-  
+
   try {
     let token = JSON.parse(contenidoRespuesta);
     hojaDatos.getRange("F47").setValue(token);
@@ -350,7 +350,7 @@ function enviarFactura() {
   let schemaID = 31;
   let idNumber = hojaDatosEmisor.getRange("B3").getValue();
   let templateID = 73;
-  
+
   const baseUrl = obtenerBaseUrlSegunAmbiente();
   let url = `${baseUrl}integrationAPI_2/api/insertinvoice?SchemaID=${schemaID}&IDNumber=${idNumber}&TemplateID=${templateID}`;
   let json = recuperarJson();
@@ -407,7 +407,7 @@ function registarEstadoFactura(idFactura, numRow) {
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let IDNumber = hojaDatosEmisor.getRange("B3").getValue();
   let documentId = idFactura;
-  
+
   const baseUrl = obtenerBaseUrlSegunAmbiente();
   let url = `${baseUrl}integrationAPI_2/api/GetDocumentStatus?SchemaID=${schemaID}&DocumentType=${documentType}&IDNumber=${IDNumber}&DocumentID=${documentId}`;
   let hojaDatos = spreadsheet.getSheetByName('Datos');
@@ -463,9 +463,9 @@ function obtenerTokenMF(usuario, contra) {
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let hojaDatos = spreadsheet.getSheetByName("Datos")
-  
+
   const baseUrl = obtenerBaseUrlSegunAmbiente();
-  let url = `${baseUrl}integrationAPI_2/api/loginWeb?username=${usuario}&password=${contra}`;
+  let url = `${baseUrl}integrationAPI_2/api/login?username=${usuario}&password=${contra}`;
   let opciones = {
     "method": "post",
     "contentType": "application/json",
@@ -552,13 +552,13 @@ function obtenerResolucionesDian(token, usuario) {
     try {
       const respuesta = UrlFetchApp.fetch(url, opciones);
       const contenidoTexto = respuesta.getContentText(); // Obtiene el cuerpo de la respuesta como texto
-      
+
       // Verificar si la respuesta está vacía o es inválida
       if (!contenidoTexto || contenidoTexto.trim() === '') {
         Logger.log("Error: Respuesta vacía de la API de resoluciones DIAN");
         throw new Error("Respuesta vacía del servidor");
       }
-      
+
       const datos = JSON.parse(contenidoTexto); // Convierte el texto a un objeto JSON
 
       if (datos.InvoiceAuthorizationList && datos.InvoiceAuthorizationList.length > 0) {

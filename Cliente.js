@@ -406,10 +406,11 @@ function verificarDatosObligatorios(e, tipoPersona) {
     }
 
     // Verificar si el código postal en la columna Q es válido
-    let codigoPostal = sheet.getRange(rowEditada, 17).getValue(); // Columna Q es la 
+    let codigoPostal = sheet.getRange(rowEditada, 17).getValue(); // Columna Q es la 17
     let codigoPostalRegex = /^\d{6}$/;
 
-    if (!codigoPostalRegex.test(codigoPostal)) {
+    // Permitir solo el número 0 en la fila 2, columna Q
+    if (!(rowEditada === 2 && (codigoPostal === 0 || codigoPostal === "0")) && !codigoPostalRegex.test(codigoPostal)) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 17).setBackground('#FFC7C7'); // Resaltar en rojo claro
       if (codigoPostal !== "") {
@@ -605,7 +606,8 @@ function getCustomerInformation(cliente) {
     "CustomerCode": String(codigoCliente),
     "AdditionalAccountID": Number(tiposPersona[tipoPersona]),
     "TaxLevelCodeListName": codigosRegimenes[regimen],
-    "PostalZone": String(datos_sheet.getRange("U2").getValue()),
+    // Obtener el código postal como texto plano, preservando ceros a la izquierda
+    "PostalZone": datos_sheet.getRange("U2").getDisplayValue(),
     "TaxSchemeCode": detallesTributariosLib[detallesTributarios],
     "TaxSchemeName": detallesTributarios,
     "FiscalResponsabilities": responsabilidadFiscalLib[responsabilidadFiscal],
