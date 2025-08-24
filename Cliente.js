@@ -409,7 +409,14 @@ function verificarDatosObligatorios(e, tipoPersona) {
     let codigoPostal = sheet.getRange(rowEditada, 17).getValue(); // Columna Q es la 17
     let codigoPostalRegex = /^\d{6}$/;
 
-    // Permitir solo el número 0 en la fila 2, columna Q
+    // Si tiene 5 dígitos, agregar un 0 adelante y formatear la celda
+    if (rowEditada !== 2 && typeof codigoPostal === "number" && codigoPostal.toString().length === 5) {
+      let codigoPostalStr = "0" + codigoPostal.toString();
+      sheet.getRange(rowEditada, 17).setNumberFormat("@"); // Formato texto para mostrar el 0 antes de poner el valor
+      sheet.getRange(rowEditada, 17).setValue(codigoPostalStr);
+      codigoPostal = codigoPostalStr;
+    }
+
     if (!(rowEditada === 2 && (codigoPostal === 0 || codigoPostal === "0")) && !codigoPostalRegex.test(codigoPostal)) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 17).setBackground('#FFC7C7'); // Resaltar en rojo claro
