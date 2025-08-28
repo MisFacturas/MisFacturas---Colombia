@@ -140,6 +140,7 @@ function iniciarHojasFactura() {
   revokeAccessToTemplate();
 
   SpreadsheetApp.getUi().alert("Hojas instaladas satisfactoriamente.");
+  SpreadsheetApp.getUi().alert("Recuerda que tu configuracion regional del sheet debe de estar en Estados Unidos para su correcto funcionamiento.");
   //SpreadsheetApp.getUi().alert("Recuerda que antes de utilizar misfacturas debes de crear la carpeta donde se guardarán las facturas. Dirígete a la hoja Datos de emisor y dale clic en el botón crear carpeta.");
 }
 
@@ -310,10 +311,11 @@ function IniciarMisfacturas() {
       agregarDataValidations()
       let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
       ui.showModalDialog(htmlOutput, 'Vinculación requerida');
-
+      
     } else {
       return
     }
+    
   }
 
 }

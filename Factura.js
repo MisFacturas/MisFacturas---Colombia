@@ -343,60 +343,98 @@ function logearUsuario() {
 }
 
 function enviarFactura() {
-  let retorno = [];
-  let spreadsheet = SpreadsheetApp.getActive();
-  let hojaFactura = spreadsheet.getSheetByName('Factura');
-  let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
-  let schemaID = 31;
-  let idNumber = hojaDatosEmisor.getRange("B3").getValue();
-  let templateID = 73;
+  const spreadsheet = SpreadsheetApp.getActive();
+  const hojaFactura = spreadsheet.getSheetByName('Factura');
+  const hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
+  const hojaDatos = spreadsheet.getSheetByName('Datos');
 
-  const baseUrl = obtenerBaseUrlSegunAmbiente();
-  let url = `${baseUrl}integrationAPI_2/api/insertinvoice?SchemaID=${schemaID}&IDNumber=${idNumber}&TemplateID=${templateID}`;
-  let json = recuperarJson();
-  let hojaDatos = spreadsheet.getSheetByName('Datos');
-  let token = hojaDatos.getRange("F47").getValue();
+  const schemaID = 31;
+  const idNumber = String(hojaDatosEmisor.getRange("B3").getDisplayValue()).trim();
+  const templateID = 73;
 
-  let opciones = {
-    "method": "post",
-    "contentType": "application/json",
-    "payload": json,
-    "headers": { "Authorization": "misfacturas " + token },
-    'muteHttpExceptions': true
+  const baseUrl = obtenerBaseUrlSegunAmbiente(); // Asegúrate que termina en "/" o ajusta abajo
+  const url = `${baseUrl}integrationAPI_2/api/insertinvoice?SchemaID=${encodeURIComponent(schemaID)}&IDNumber=${encodeURIComponent(idNumber)}&TemplateID=${encodeURIComponent(templateID)}`;
+
+  const token = String(hojaDatos.getRange("F47").getDisplayValue()).trim(); // usa displayValue y trim
+  let json = recuperarJson(); // puede venir como objeto o string
+
+  // Asegura que el payload sea string JSON
+  const payload = (typeof json === 'string') ? json : JSON.stringify(json);
+
+  const headers = {
+    "Authorization": "misfacturas " + token,   // ¿Tu API exige 'misfacturas' o 'Bearer'? Verifica abajo.
+    "Accept": "application/json"
   };
-  Logger.log("Enviar factura antes del try");
+
+  const opciones = {
+    method: "post",
+    contentType: "application/json",
+    payload: payload,
+    headers: headers,
+    muteHttpExceptions: true, // importante para ver el cuerpo aunque haya 4xx/5xx
+  };
+
+  Logger.log("Enviar factura: URL=" + url);
+  Logger.log("Headers (sin token) => { Authorization: 'misfacturas ***' , Accept: 'application/json' }");
+  Logger.log("Payload length=" + payload.length);
+
   try {
-    var respuesta = UrlFetchApp.fetch(url, opciones);
-    var estatusRespuesta = respuesta.getResponseCode();
-    Logger.log("Estatus de la respuesta: " + estatusRespuesta);
+    const resp = UrlFetchApp.fetch(url, opciones);
+    const status = resp.getResponseCode();
+    const respHeaders = (typeof resp.getAllHeaders === 'function') ? resp.getAllHeaders() : {};
+    const body = resp.getContentText() || "";
+    Logger.log("HTTP " + status + " ; Content-Type=" + (respHeaders['Content-Type'] || respHeaders['content-type'] || ''));
+    Logger.log("Body (primeros 500 chars): " + body.slice(0, 500));
 
-    var contenidoRespuesta = respuesta.getContentText();
-    contenidoRespuesta = JSON.parse(contenidoRespuesta);
-    Logger.log(contenidoRespuesta);
-
-    // Si la respuesta tiene DocumentId, siempre se debe guardar y limpiar la hoja
-    if (contenidoRespuesta["DocumentId"]) {
+    // Manejo explícito por estatus antes de parsear
+    if (status === 401) {
+      // Fallo de autenticación
       return {
-        DocumentId: contenidoRespuesta["DocumentId"],
-        MessageValidation: contenidoRespuesta["MessageValidation"] || contenidoRespuesta["Message"] || ""
+        MessageValidation: "401 no autorizado. Verifica el formato del header Authorization y que el token esté vigente.",
+        RawBodyPreview: body.slice(0, 200)
       };
     }
-    else if (contenidoRespuesta["Message"] === "E002: El documento que intenta ingresar ya existe en el sistema") {
-      // No mostrar alert aquí, solo retornar el objeto especial
+    if (status === 403) {
+      return { MessageValidation: "403 prohibido. Revisa permisos de la cuenta/API.", RawBodyPreview: body.slice(0, 200) };
+    }
+
+    // Sólo intenta parsear si parece JSON
+    let parsed;
+    if (body.trim().startsWith("{") || body.trim().startsWith("[")) {
+      try {
+        parsed = JSON.parse(body);
+      } catch (e) {
+        return {
+          MessageValidation: "La respuesta no es JSON válido (falló el parseo).",
+          RawBodyPreview: body.slice(0, 200)
+        };
+      }
+    } else {
+      // No JSON → devuelve diagnóstico
+      return {
+        MessageValidation: "La API respondió con un cuerpo no-JSON.",
+        RawBodyPreview: body.slice(0, 200)
+      };
+    }
+
+    // Lógica anterior con el objeto ya parseado
+    if (parsed["DocumentId"]) {
+      return {
+        DocumentId: parsed["DocumentId"],
+        MessageValidation: parsed["MessageValidation"] || parsed["Message"] || ""
+      };
+    } else if (parsed["Message"] === "E002: El documento que intenta ingresar ya existe en el sistema") {
       hojaFactura.getRange("J2").setBackground("#FFC7C7");
       return { duplicado: true };
-    }
-    else if (contenidoRespuesta["Message"] && contenidoRespuesta["Message"].toLowerCase().includes("resolucion") && contenidoRespuesta["Message"].toLowerCase().includes("no es válido")) {
-      // Caso de error de resolución no válida
-      return { MessageValidation: contenidoRespuesta["Message"] };
-    }
-    else {
-      return { MessageValidation: contenidoRespuesta["Message"] || "Respuesta desconocida" };
+    } else if (parsed["Message"] && parsed["Message"].toLowerCase().includes("resolucion") && parsed["Message"].toLowerCase().includes("no es válido")) {
+      return { MessageValidation: parsed["Message"] };
+    } else {
+      return { MessageValidation: parsed["Message"] || "Respuesta desconocida", Parsed: parsed };
     }
 
   } catch (error) {
-    Logger.log("Error al enviar el JSON a la API: " + error.message);
-    return { MessageValidation: "Error al enviar la factura a misfacturas. Intente de nuevo si el error persiste o contacte soporte." };
+    Logger.log("Error al enviar el JSON a la API: " + error && error.message ? error.message : error);
+    return { MessageValidation: "Error al enviar la factura a misfacturas. Si persiste, contacte soporte." };
   }
 }
 
@@ -1270,7 +1308,7 @@ function guardarFacturaHistorial(documentId) {
   var numeroFactura = hojaFactura.getRange("J2").getValue();
   var cliente = hojaFactura.getRange("B2").getValue();
   var fechaEmision = hojaFactura.getRange("H4").getValue();
-  var informacionCliente = getCustomerInformation(clienteRaw);
+  var informacionCliente = getCustomerInformation(cliente);
   var identificacion = informacionCliente.Identification;
 
   // Insertar una nueva fila en la posición 2 (después del encabezado)
