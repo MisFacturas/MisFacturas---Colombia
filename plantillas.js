@@ -215,7 +215,7 @@ function plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoic
         <div class="column">
           <div class="info"><span>Totales de la Factura:</span></div>
           <ul>
-            <li><span>Subtotal:</span> <span>${formatearPesos(invoiceTotal.lineExtensionamount)}</span></li>
+            <li><span>Subtotal:</span> <span>${formatearPesos(invoiceTotal.LineExtensionAmount)}</span></li>
             <li><span>Impuestos Excluidos:</span> <span>${formatearPesos(invoiceTotal.TaxExclusiveAmount)}</span></li>
             <li><span>Impuestos Incluidos:</span> <span>${formatearPesos(invoiceTotal.TaxInclusiveAmount)}</span></li>
             <li><span>Descuentos:</span> <span>${formatearPesos(invoiceTotal.AllowanceTotalAmount)}</span></li>
@@ -234,7 +234,11 @@ function plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoic
 }
 
 function formatearPesos(valor) {
-  return `$${valor.toLocaleString('es-CO')}`;
+  var numero = Number(valor);
+  if (!isFinite(numero)) {
+    numero = 0;
+  }
+  return `$${numero.toLocaleString('es-CO')}`;
 }
 
 function plantillaCambiarAmbiente() {

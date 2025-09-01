@@ -1309,6 +1309,7 @@ function cambiarAmbiente() {
   );
 
   if (respuesta == ui.Button.YES) {
+    Logger.log("cambio")
     // Mostrar cuadro de diálogo personalizado con los ambientes
     let htmlOutput = HtmlService.createHtmlOutput(plantillaCambiarAmbiente())
       .setWidth(400)

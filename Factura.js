@@ -11,7 +11,7 @@ function descargarFacturaHtml() {
 function obtenerBaseUrlSegunAmbiente() {
   const scriptProps = PropertiesService.getDocumentProperties();
   const ambiente = scriptProps.getProperty('Ambiente');
-
+  Logger.log("ambiente: "+ambiente)
   if (ambiente === "QA") {
     return "https://misfacturas-qa.cenet.ws/";
   } else if (ambiente === "Preproducción") {
@@ -358,6 +358,8 @@ function enviarFactura() {
   const token = String(hojaDatos.getRange("F47").getDisplayValue()).trim(); // usa displayValue y trim
   let json = recuperarJson(); // puede venir como objeto o string
 
+  Logger.log("json:"+json)
+
   // Asegura que el payload sea string JSON
   const payload = (typeof json === 'string') ? json : JSON.stringify(json);
 
@@ -384,8 +386,8 @@ function enviarFactura() {
     const respHeaders = (typeof resp.getAllHeaders === 'function') ? resp.getAllHeaders() : {};
     const body = resp.getContentText() || "";
     Logger.log("HTTP " + status + " ; Content-Type=" + (respHeaders['Content-Type'] || respHeaders['content-type'] || ''));
-    Logger.log("Body (primeros 500 chars): " + body.slice(0, 500));
-
+    Logger.log("Body (primeros 500 chars): " + body);
+    Logger.log("res"+resp)
     // Manejo explícito por estatus antes de parsear
     if (status === 401) {
       // Fallo de autenticación
@@ -465,7 +467,10 @@ function registarEstadoFactura(idFactura, numRow) {
       var contenidoRespuesta = respuesta.getContentText();
       contenidoRespuesta = JSON.parse(contenidoRespuesta);
       var status = contenidoRespuesta.DocumentStatus
-      if (status === 74) {
+      Logger.log("contendfRespuestaSatus: "+contenidoRespuesta.DocumentStatus)
+      Logger.log("status :"+status)
+      Logger.log("IDNumber :" +IDNumber)
+      if (status === 74 || status === 72 ) {
         status = "Enviada";
       } else if (status === 70) {
         status = "Invalida";
@@ -853,7 +858,7 @@ function getInvoiceGeneralInformation() {
     "PreinvoiceNumber": String(numeroFactura),
     "InvoiceNumber": String(numeroFactura),
     "IssueDate": fechaHoraEmision,
-    "Prefix": buscarPrefijo(numeroAutorizacion),
+    "Prefix": buscarPrefijo(numeroAutorizacion) || "",
     "DaysOff": String(diasVencimiento),
     "Currency": moneda,
     "ExchangeRate": exchangeRate,
@@ -890,12 +895,21 @@ function buscarPrefijo(numeroAutorizacion) {
 function getPaymentSummary() {
   let spreadsheet = SpreadsheetApp.getActive();
   let prefactura_sheet = spreadsheet.getSheetByName('Factura');
-  var PaymentTypeTxt = prefactura_sheet.getRange("H3").getValue();
-  var PaymentMeansTxt = prefactura_sheet.getRange("J3").getValue();
-  PaymentMeansTxt = PaymentMeansTxt.split("-")[1];
+  var paymentTypeRaw = String(prefactura_sheet.getRange("H3").getValue() || "").trim();
+  var paymentMeansRaw = String(prefactura_sheet.getRange("J3").getValue() || "").trim();
+
+  // Resolver clave del tipo de pago (con o sin separador "-")
+  var paymentTypeKey = paymentTypeRaw.indexOf("-") >= 0 ? paymentTypeRaw.split("-").pop().trim() : paymentTypeRaw;
+  var paymentTypeValue = metodosPago[paymentTypeKey] || "";
+
+  // Resolver clave del medio de pago probando "nombre" en cualquiera de los lados del separador
+  var meansKeyA = paymentMeansRaw.indexOf("-") >= 0 ? paymentMeansRaw.split("-").pop().trim() : paymentMeansRaw;
+  var meansKeyB = paymentMeansRaw.indexOf("-") >= 0 ? paymentMeansRaw.split("-")[0].trim() : paymentMeansRaw;
+  var paymentMeansValue = paymentMeansCode[meansKeyA] || paymentMeansCode[meansKeyB] || "";
+
   var PaymentSummary = {
-    "PaymentType": metodosPago[PaymentTypeTxt],
-    "PaymentMeans": paymentMeansCode[PaymentMeansTxt],
+    "PaymentType": paymentTypeValue,
+    "PaymentMeans": paymentMeansValue,
     "PaymentNote": ""
   }
   return PaymentSummary;
@@ -1081,8 +1095,8 @@ function guardarYGenerarInvoice() {
     let productoI = {//aqui organizamos todos los parametros necesarios para los productos
       ItemReference: ItemReference,
       Name: NameReal,
-      Quatity: new Number(Quantity),
-      Price: new Number(Price),
+      Quatity: Number(Quantity),
+      Price: Number(Price),
 
       LineAllowanceTotal: TotalDescuentoLinea,
       LineChargeTotal: TotalCargosLinea,
@@ -1222,7 +1236,7 @@ function guardarYGenerarInvoice() {
 
 
   let invoice_total = {
-    "lineExtensionamount": pfSubTotal,
+    "LineExtensionAmount": pfSubTotal,
     "TaxExclusiveAmount": pfBaseGrabable,
     "TaxInclusiveAmount": pfSubTotalMasImpuestos,
     "AllowanceTotalAmount": pfDescuentos,
@@ -1240,7 +1254,7 @@ function guardarYGenerarInvoice() {
 
   let sheetDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let userId = String(sheetDatosEmisor.getRange("B11").getValue());
-  let companyId = String(sheetDatosEmisor.getRange("B3").getValue());
+  let companyId = Number(sheetDatosEmisor.getRange("B3").getValue());
   let PaymentSummary = getPaymentSummary();
 
   let nuevoInvoiceResumido = JSON.stringify({
@@ -1280,7 +1294,7 @@ function guardarYGenerarInvoice() {
     PaymentSummary: PaymentSummary, //por ahora esto leugo se cambia la funcion getPaymentSummary para que cumpla los parametros
     ItemInformation: productoInformation,
     InvoiceTaxTotal: agruparImpuestos(obtenerTodosLosImpuestos(productoInformation)),
-    InvoiceTaxOthersTotal: null,
+    InvoiceTaxOthersTotal: [],
     InvoiceAllowanceCharge: agregarCargosDescuentosTotales(pfSubTotal),
     InvoiceTotal: invoice_total,
     Documents: []
