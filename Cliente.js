@@ -417,7 +417,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
       codigoPostal = codigoPostalStr;
     }
 
-    if (!(rowEditada === 2 && (codigoPostal === 0 || codigoPostal === "0")) && !codigoPostalRegex.test(codigoPostal)) {
+    if (!(rowEditada === 2 && (codigoPostal === 0 || codigoPostal === "0")) ) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 17).setBackground('#FFC7C7'); // Resaltar en rojo claro
       if (codigoPostal !== "") {
