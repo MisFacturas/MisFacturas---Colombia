@@ -132,6 +132,13 @@ function verificarEstadoValidoFactura(estadoFactura) {
     }
   }
 
+  // Validar que exista una resolución seleccionada en H2
+  let resolucionSeleccionada = hojaFactura.getRange("H2").getValue();
+  if (!resolucionSeleccionada) {
+    estaValido = false;
+    estadoFactura.push("Resolución DIAN");
+  }
+
   // Verificar si se agregaron productos
   let totalProductos = hojaFactura.getRange("A16").getValue();
 
@@ -460,9 +467,16 @@ function registarEstadoFactura(idFactura, numRow) {
   };
 
   try {
-    var respuesta = UrlFetchApp.fetch(url, opciones);
-    var estatusRespuesta = respuesta.getResponseCode();
-
+      var respuesta = UrlFetchApp.fetch(url, opciones);
+      var estatusRespuesta = respuesta.getResponseCode();
+      var contenidoRespuesta = respuesta.getContentText();
+      contenidoRespuesta = JSON.parse(contenidoRespuesta);
+      var status = contenidoRespuesta.DocumentStatus
+      Logger.log("contendfRespuestaSatus: "+contenidoRespuesta)
+      Logger.log("status :"+status)
+      Logger.log("IDNumber :" +IDNumber)
+      Logger.log("status respuesta"+estatusRespuesta)
+      Logger.log("respuesta"+respuesta)
     if (estatusRespuesta == 200) {
       var contenidoRespuesta = respuesta.getContentText();
       contenidoRespuesta = JSON.parse(contenidoRespuesta);
@@ -483,18 +497,21 @@ function registarEstadoFactura(idFactura, numRow) {
       } else {
         return status;
       }
-    } else {
-      var contenidoRespuesta = JSON.parse(respuesta.getContentText());
-      if (estatusRespuesta == 404 && contenidoRespuesta["Message"] === "No se encontraron resultados de facturas válidas que tengan representación gráfica") {
-        SpreadsheetApp.getUi().alert("Error: No se encontraron resultados de facturas válidas que tengan representación gráfica.");
-      } else {
-        SpreadsheetApp.getUi().alert(
-          "Error al intentar descargar la factura: " +
-          (contenidoRespuesta["Message"] || "Respuesta desconocida")
-        );
-        Logger.log("Error al intentar descargar la factura: " + contenidoRespuesta);
+  } else {
+      // Evitar spam de logs cuando el documento no existe para la empresa
+      var contenidoTexto = respuesta.getContentText();
+      try {
+        var contenidoRespuesta = JSON.parse(contenidoTexto);
+        var mensaje = (contenidoRespuesta && contenidoRespuesta.Message) ? String(contenidoRespuesta.Message) : "";
+        if (estatusRespuesta == 404 && mensaje.indexOf("No hay un documento para esta empresa") !== -1) {
+          return null; // silencio: caso esperado cuando el DocumentID ya no existe o es de otro ambiente
+        }
+      } catch (e) {
+        // Si no es JSON, dejamos pasar a log
       }
-    }
+      Logger.log("Error al consultar estado del documento: " + contenidoTexto);
+      return null;
+  }
 
   } catch (error) {
     Logger.log("Error al enviar el JSON a la API: " + error.message);
@@ -591,7 +608,7 @@ function obtenerResolucionesDian(token, usuario) {
       "contentType": "application/json",
       'muteHttpExceptions': true
     };
-
+    Logger.log("url: "+baseUrl)
     try {
       const respuesta = UrlFetchApp.fetch(url, opciones);
       const contenidoTexto = respuesta.getContentText(); // Obtiene el cuerpo de la respuesta como texto
@@ -654,11 +671,17 @@ function obtenerResolucionesDian(token, usuario) {
         hojaDatosEmisor.getRange(18, 6, filas.length, 1).setBackground('#d9d9d9'); // Column F
 
         return true;
+      } else if (datos.InvoiceAuthorizationList && datos.InvoiceAuthorizationList.length === 0) {
+        // Lista vacía: limpiar área de resoluciones y avisar al usuario sin lanzar excepción
+        hojaDatosEmisor.getRange(18, 1, 13, hojaDatosEmisor.getLastColumn()).clearContent();
+        SpreadsheetApp.getUi().alert("No se encontraron resoluciones DIAN para el NIT ingresado.");
+        return false;
       } else {
-        throw new Error("Error de la API: " + contenidoRespuesta); // Muestra el error de la API
+        const mensajeError = (datos && datos.Message) ? datos.Message : contenidoTexto;
+        throw new Error("Error de la API: " + mensajeError);
       }
     } catch (error) {
-
+      Logger.log("error: "+error)
       SpreadsheetApp.getUi().alert("Error al obtener las resoluciones dian. Verifica que el NIT sea correcto e intenta de nuevo. Si el error persiste, comunícate con soporte.");
       return false;
     }
@@ -818,6 +841,7 @@ function grabarRangoResolucionesDian(hojaFactura) {
 
   if (valoresValidos.length === 0) {
     Logger.log("No hay resoluciones vigentes disponibles.");
+    SpreadsheetApp.getUi().alert("No hay resoluciones vigentes. Debes activar una resolución DIAN para poder facturar.");
     return;
   }
 
@@ -831,6 +855,31 @@ function grabarRangoResolucionesDian(hojaFactura) {
   var rangoDropdown = hojaFactura.getRange("H2");
   rangoDropdown.setDataValidation(reglaDeValidacion);
   Logger.log("Dropdown creado exitosamente con " + valoresValidos.length + " resoluciones vigentes en H2.");
+
+  // Comportamiento inteligente según cantidad de resoluciones vigentes
+  if (valoresValidos.length === 1) {
+    // Autoseleccionar la única resolución vigente y cargar su consecutivo en J2
+    var resolucionUnica = valoresValidos[0];
+    rangoDropdown.setValue(resolucionUnica);
+
+    // Buscar el consecutivo correspondiente en la tabla (columna E)
+    var filaResolucion = null;
+    for (var j = 0; j < columnaBase.length; j++) {
+      if (String(columnaBase[j][0]) === String(resolucionUnica)) {
+        filaResolucion = 18 + j; // fila real en la hoja "Datos de emisor"
+        break;
+      }
+    }
+    if (filaResolucion) {
+      var consecutivo = hojaDatosEmisor.getRange(filaResolucion, 5).getValue(); // Columna E
+      hojaFactura.getRange("J2").setValue(consecutivo);
+    }
+  } else {
+    // Hay múltiples resoluciones vigentes: solicitar al usuario elegir una
+    hojaFactura.getRange("H2").setValue("");
+    hojaFactura.getRange("J2").setValue("");
+    SpreadsheetApp.getUi().alert("Hay varias resoluciones vigentes. Por favor, selecciona una en la celda H2.");
+  }
 }
 
 function getInvoiceGeneralInformation() {
@@ -1397,6 +1446,10 @@ function actualizarEstadoUltimasFacturas() {
     let documentId = hojaListadoEstado.getRange(rowListadoEstado, 7).getValue(); // Obtener el documentId de la columna 7
 
     if (documentId !== "" && documentId !== null && documentId !== undefined) {
+      // Evitar consultas con IDs inválidos
+      if (String(documentId).trim().toLowerCase() === "null" || String(documentId).trim().toLowerCase() === "undefined") {
+        continue;
+      }
       let estado = registarEstadoFactura(documentId);
       if (estado) {
         hojaHistorialFacturasData.getRange(rowHistorialFacturasData, 6).setValue(estado); // Actualizar el estado en la columna 6

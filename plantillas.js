@@ -226,10 +226,24 @@ function plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoic
         </div>
       </div>
       <div class="button-container">
-        <button class="btn-grey-outline" onclick="google.script.run.modificarFactura(); google.script.host.close()">Editar</button>
-        <button class="btn-orange" onclick="google.script.run.enviarFacturaHtml(); google.script.host.close()">Enviar</button>
+        <button class="btn-grey-outline" onclick="confirmarEditar()">Editar</button>
+        <button class="btn-orange" onclick="confirmarEnviar()">Enviar</button>
       </div>
     </div>
+    <script>
+      function confirmarEditar() {
+        google.script.run
+          .withSuccessHandler(function () { google.script.host.close(); })
+          .withFailureHandler(function (error) { alert('Error: ' + (error && error.message ? error.message : error)); })
+          .modificarFactura();
+      }
+      function confirmarEnviar() {
+        google.script.run
+          .withSuccessHandler(function () { google.script.host.close(); })
+          .withFailureHandler(function (error) { alert('Error: ' + (error && error.message ? error.message : error)); })
+          .enviarFacturaHtml();
+      }
+    </script>
   `;
 }
 
@@ -324,15 +338,20 @@ function plantillaCambiarAmbiente() {
       </div>
       <div class="button-container">
         <button onclick="google.script.host.close()"><p class="grey-text">Cancelar</p></button>
-        <button onclick="confirmarCambio(); google.script.host.close()"><p class="red-text">Confirmar</p></button>
+        <button onclick="confirmarCambio()"><p class="red-text">Confirmar</p></button>
       </div>
     </div>
     <script>
       function confirmarCambio() {
         const selectedOption = document.querySelector('input[name="ambiente"]:checked').value;
-        google.script.run.withSuccessHandler(function() {
-          google.script.host.close();
-        }).aplicarCambioAmbiente(selectedOption);
+        google.script.run
+          .withSuccessHandler(function() {
+            google.script.host.close();
+          })
+          .withFailureHandler(function(error) {
+            alert('Error: ' + (error && error.message ? error.message : error));
+          })
+          .aplicarCambioAmbiente(selectedOption);
       }
     </script>
   `;

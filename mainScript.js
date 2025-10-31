@@ -1337,7 +1337,7 @@ function aplicarCambioAmbiente(nuevoAmbiente) {
   abrirMenuVinculacion();
   let cambioAmb = true;
   DesvincularMisfacturas(cambioAmb);
-  hojaDatosEmisor.getRange("C1002").setValue(nuevoAmbiente)
+  hojaDatosEmisor.getRange("C998").setValue(nuevoAmbiente)
 }
 
 /**
