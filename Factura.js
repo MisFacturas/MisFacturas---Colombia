@@ -736,11 +736,12 @@ function inicarFacturaNueva() {
   hojaFactura.getRange("H6").setValue(0);
 
   // J4: Moneda por defecto
-  hojaFactura.getRange("J4").setValue("COP");
+  hojaFactura.getRange("J4").setValue("COP-Peso colombiano");
   // J5: Tasa de cambio por defecto
   hojaFactura.getRange("J5").setValue("N/A");
   // J6: Fecha de tasa de cambio por defecto
   hojaFactura.getRange("J6").setValue("N/A");
+  grabarRangoResolucionesDian(hojaFactura);
 }
 
 function verificarYCopiarCliente(e) {
@@ -971,12 +972,12 @@ function guardarYGenerarInvoice() {
   let hojaFactura = spreadsheet.getSheetByName('Factura');
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let listadoestado_sheet = spreadsheet.getSheetByName('ListadoEstado');
-  let consecutivoFactura = hojaFactura.getRange("H2").getValue();
+  let consecutivoFactura = hojaFactura.getRange("J2").getValue();
   let consecutivoFacturaActualizado = consecutivoFactura + 1;
-  let numeroAutorizacion = hojaFactura.getRange("H3").getValue();
+  let numeroAutorizacion = hojaFactura.getRange("H2").getValue();
   for (let i = 18; i <= 20; i++) {
     if (hojaDatosEmisor.getRange(i, 1).getValue() == numeroAutorizacion) {
-      consecutivoFactura = hojaDatosEmisor.getRange(i, 5).setValue(consecutivoFacturaActualizado);
+      hojaDatosEmisor.getRange(i, 5).setValue(consecutivoFacturaActualizado);
       break;
     }
   }

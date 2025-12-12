@@ -1657,6 +1657,7 @@ var codigosUnidadDeMedida = {
   "Centistokes": "4C",
   "paquete de veinte": "4E",
   "Microlitro": "4G",
+  "Litro": "LTR",
   "Micrómetro": "4H",
   "Miliamperio": "4K",
   "Megabyte": "4L",

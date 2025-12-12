@@ -641,7 +641,7 @@ function processForm(data) {
     //Precio Unitario
     sheet.getRange(newRow, 6).setValue(precioUnitario);
     sheet.getRange(newRow, 6).setHorizontalAlignment('normal');
-    sheet.getRange(newRow, 6).setNumberFormat('$#,##0');
+    sheet.getRange(newRow, 6).setNumberFormat('$#,##0.00');
     //Unidad de Medida
     sheet.getRange(newRow, 7).setValue(unidadDeMedida);
     //Columna IVA
