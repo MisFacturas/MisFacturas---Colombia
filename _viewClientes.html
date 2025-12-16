@@ -1,0 +1,51 @@
+<!-- Vista: Menú Clientes -->
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToMain()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Clientes</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="row py-3 px-4 gx-0 text-center">
+    <div class="col-12 py-4">
+      <p>Crea, guarda y visualiza tus clientes en Google Sheets.</p>
+    </div>
+  </div>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="btn-container" style="display: flex; flex-direction: column; align-items: center;">
+        <a onclick="goToCrearCliente()" class="btn btn-lg btn-primary w-100" style="max-width: 300px; margin-bottom: 10px;">
+          <i class="icon-24-outlined-other-person-user-plus me-0"></i>
+          <span>Crear cliente</span>
+        </a>
+        <a onclick="goToInactivarCliente()" class="btn btn-lg btn-outline-secondary btn-fluid" style="max-width: 300px; margin-bottom: 10px;">
+          <i class="icon-user-x me-0"></i>
+          <span>Inactivar cliente</span>
+        </a>
+        <a onclick="goToActivarCliente()" class="btn btn-lg btn-outline-secondary" style="max-width: 300px; margin-bottom: 10px;">
+          <i class="icon-24-outlined-other-person-user-check me-0"></i>
+          <span>Activar cliente</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-6 pe-1">
+    <a onclick="goToMain()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
+      <span>Inicio</span>
+      <i class="icon-24-outlined-other-location-home"></i>
+    </a>
+  </div>
+</div>

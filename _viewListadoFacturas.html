@@ -1,0 +1,59 @@
+<!-- Vista: Listado/Descarga de Facturas -->
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToFactura()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Descargar factura</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="row py-3 px-4 gx-0 w-100">
+    <div class="col-12 py-4">
+      <p class="fs-7">Ingresa el prefijo seguido del número de la factura que deseas descargar.</p>
+    </div>
+    <div class="col-12 px-0">
+      <form class="row g-3 d-flex flex-column align-items-center">
+        <div class="col-12 mb-3 w-100">
+          <label for="idFactura" class="form-label">Prefijo y número de factura</label>
+          <input type="text" id="idFactura" class="form-control text-center" placeholder="SETT123"
+            name="numFactura" required onkeypress="handleKeyPressFactura(event)">
+        </div>
+        <div class="col-12">
+          <p class="text-center" style="color: rgb(102, 4, 4); font-size: 0.75rem;">
+            Recuerda que solo las facturas en estado <b>"Enviada"</b> se pueden descargar.
+          </p>
+        </div>
+        <div class="col-12">
+          <button type="button" class="btn btn-primary btn-lg w-100 btn-menu" onclick="descargarFactura()">
+            <span class="pe-4">Descargar</span>
+            <i class="icon-download"></i>
+          </button>
+        </div>
+        <div class="col-12">
+          <p id="mensajeDescarga" class="text-center"></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-12 text-center">
+    <a onclick="goToMain()" class="btn btn-outline-primary btn-lg w-100 d-flex align-items-center justify-content-center">
+      <span>Inicio</span>
+      <i class="icon-24-outlined-other-location-home ms-2"></i>
+    </a>
+  </div>
+</div>
+
+
+

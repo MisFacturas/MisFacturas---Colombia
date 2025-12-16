@@ -1,0 +1,240 @@
+<!-- Vista: Crear Cliente -->
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToClientes()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Crear Cliente</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="row py-3 px-5 gx-0">
+    <div class="col-12 py-4">
+      <p>Ingresa la información de tu nuevo cliente.</p>
+    </div>
+
+    <form class="row g-3" id="clientFormCrear">
+      <div class="col-md-12">
+        <label for="tipoTerceroCrear" class="form-label">Tipo de cliente <span style="color: red;">*</span></label>
+        <select id="tipoTerceroCrear" class="form-select form-select-lg">
+          <option selected>Cliente</option>
+          <option>Proveedor</option>
+        </select>
+      </div>
+
+      <div class="col-md-12">
+        <label for="tipoPersonaCrear" class="form-label">Tipo de persona <span style="color: red;">*</span></label>
+        <select id="tipoPersonaCrear" class="form-select form-select-lg" onchange="verificarTipoPersonaCrear()">
+          <option class="placeholder" selected disabled hidden>Seleccione</option>
+          <option>Natural</option>
+          <option>Juridica</option>
+        </select>
+      </div>
+      
+      <div class="col-md-6">
+        <label for="nombreComercialCrear" class="form-label">Nombre comercial</label>
+        <input type="text" class="form-control form-control-lg" id="nombreComercialCrear" disabled>
+      </div>
+      <div class="col-md-6">
+        <label for="primerNombreCrear" class="form-label">Primer nombre</label>
+        <input type="text" class="form-control form-control-lg" id="primerNombreCrear" disabled>
+      </div>
+      <div class="col-md-6">
+        <label for="segundoNombreCrear" class="form-label">Segundo nombre</label>
+        <input type="text" class="form-control form-control-lg" id="segundoNombreCrear" disabled>
+      </div>
+      <div class="col-md-6">
+        <label for="primerApellidoCrear" class="form-label">Primer apellido</label>
+        <input type="text" class="form-control form-control-lg" id="primerApellidoCrear" disabled>
+      </div>
+      <div class="col-md-6">
+        <label for="segundoApellidoCrear" class="form-label">Segundo apellido</label>
+        <input type="text" class="form-control form-control-lg" id="segundoApellidoCrear" disabled>
+      </div>
+      <div class="col-md-6">
+        <label for="codigoClienteCrear" class="form-label">Código cliente <span style="color: red;">*</span></label>
+        <input type="text" class="form-control form-control-lg" id="codigoClienteCrear">
+      </div>
+      <div class="col-md-6">
+        <label for="tipoDocumentoCrear" class="form-label">Tipo de documento <span style="color: red;">*</span></label>
+        <select id="tipoDocumentoCrear" class="form-select form-select-lg">
+          <option class="placeholder" selected disabled hidden>Seleccione</option>
+          <option>Cédula de ciudadanía</option>
+          <option>Tarjeta de extranjería</option>
+          <option>Cédula de extranjería</option>
+          <option>NIT</option>
+          <option>Pasaporte</option>
+          <option>Documento de identificación extranjero</option>
+          <option>PEP (Permiso Especial de Permanencia)</option>
+          <option>PPT (Permiso Protección Temporal)</option>
+          <option>NIT de otro país</option>
+          <option>NUIP</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="numeroIdentificacionCrear" class="form-label">Número de identificación <span style="color: red;">*</span></label>
+        <input type="text" class="form-control form-control-lg" id="numeroIdentificacionCrear">
+      </div>
+
+      <div class="col-md-6">
+        <label for="regimenCrear" class="form-label">Régimen <span style="color: red;">*</span></label>
+        <select id="regimenCrear" class="form-select form-select-lg">
+          <option class="placeholder" selected disabled hidden>Seleccione</option>
+          <option>Impuesto sobre las ventas - IVA</option>
+          <option>No responsable de IVA</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label for="paisCrear" class="form-label">País <span style="color: red;">*</span></label>
+        <input type="text" id="paisCrear" class="form-control form-control-lg" placeholder="Buscar país"
+          autocomplete="off" onkeyup="buscarPaisCrear()" value="Colombia">
+        <div class="result-box" id="resultBoxPaisCrear"></div>
+        <p id="mensajeDianCrear" style="display: block; font-size: 0.8rem; color: #666; margin-top: 5px;">
+          Si el país es Colombia, debe seleccionar departamento y municipio.
+        </p>
+      </div>
+      
+      <div class="col-md-6">
+        <label for="departamentoCrear" class="form-label">Departamento</label>
+        <select id="departamentoCrear" class="form-select form-select-lg" onchange="cargarMunicipiosCrear()">
+          <option class="placeholder" selected disabled hidden>Seleccione</option>
+          <option value="Amazonas">Amazonas</option>
+          <option value="Antioquia">Antioquia</option>
+          <option value="Arauca">Arauca</option>
+          <option value="Atlantico">Atlantico</option>
+          <option value="BogotaDC">Bogota D.C.</option>
+          <option value="Bolivar">Bolivar</option>
+          <option value="Boyaca">Boyaca</option>
+          <option value="Caldas">Caldas</option>
+          <option value="Caqueta">Caqueta</option>
+          <option value="Casanare">Casanare</option>
+          <option value="Cauca">Cauca</option>
+          <option value="Cesar">Cesar</option>
+          <option value="Choco">Choco</option>
+          <option value="Cordoba">Cordoba</option>
+          <option value="Cundinamarca">Cundinamarca</option>
+          <option value="Guainia">Guainia</option>
+          <option value="Guaviare">Guaviare</option>
+          <option value="Huila">Huila</option>
+          <option value="La Guajira">La Guajira</option>
+          <option value="Magdalena">Magdalena</option>
+          <option value="Meta">Meta</option>
+          <option value="Narino">Narino</option>
+          <option value="Norte de Santander">Norte de Santander</option>
+          <option value="Putumayo">Putumayo</option>
+          <option value="Quindio">Quindio</option>
+          <option value="Risaralda">Risaralda</option>
+          <option value="San Andres y Providencia">San Andres y Providencia</option>
+          <option value="Santander">Santander</option>
+          <option value="Sucre">Sucre</option>
+          <option value="Tolima">Tolima</option>
+          <option value="Valle del Cauca">Valle del Cauca</option>
+          <option value="Vaupes">Vaupes</option>
+          <option value="Vichada">Vichada</option>
+        </select>
+      </div>
+      
+      <div class="col-md-6">
+        <label for="municipioCrear" class="form-label">Municipio</label>
+        <select id="municipioCrear" class="form-select form-select-lg">
+          <option class="placeholder" selected disabled hidden>Seleccione</option>
+        </select>
+      </div>
+      
+      <div class="col-md-6">
+        <label for="direccionCrear" class="form-label">Dirección <span style="color: red;">*</span></label>
+        <input type="text" class="form-control form-control-lg" id="direccionCrear" oninput="validarDireccionCrear()">
+        <small id="direccionHelpCrear" class="form-text text-muted" style="display:none;">
+          Por favor ingrese una dirección válida sin caracteres especiales como #.
+        </small>
+      </div>
+      
+      <div class="col-md-6">
+        <label for="codigoPostalCrear" class="form-label">Código postal <span style="color: red;">*</span></label>
+        <input type="number" class="form-control form-control-lg" id="codigoPostalCrear" oninput="validarCodigoPostalCrear()">
+        <small id="codigoPostalHelpCrear" class="form-text text-muted" style="display:none;">
+          Por favor ingrese un código postal válido de 6 dígitos.
+        </small>
+      </div>
+      
+      <div class="col-md-6">
+        <label for="telefonoCrear" class="form-label">Teléfono <span style="color: red;">*</span></label>
+        <input type="number" class="form-control form-control-lg" id="telefonoCrear">
+      </div>
+      
+      <div class="col-md-12">
+        <label for="sitioWebCrear" class="form-label">Sitio web</label>
+        <input type="text" class="form-control form-control-lg" id="sitioWebCrear">
+      </div>
+      
+      <div class="col-md-12">
+        <label for="emailCrear" class="form-label">Email <span style="color: red;">*</span></label>
+        <input type="email" placeholder="ejemplo@correo.com" class="form-control form-control-lg" id="emailCrear">
+        <small id="emailHelpCrear" class="form-text text-muted" style="display:none;">
+          Por favor ingrese un correo electrónico válido, con el formato alguien@correo.com.
+        </small>
+      </div>
+      
+      <div class="col-12">
+        <label for="detallesTributariosCrear" class="form-label">Detalles tributarios <span style="color: red;">*</span></label>
+        <select id="detallesTributariosCrear" class="form-select form-select-lg">
+          <option class="placeholder" selected disabled hidden>Seleccione</option>
+          <option>IVA</option>
+          <option>INC</option>
+          <option>IVA e INC</option>
+          <option>No aplica</option>
+        </select>
+      </div>
+      
+      <div class="col-12">
+        <label for="responsabilidadFiscalCrear" class="form-label">Responsabilidad fiscal <span style="color: red;">*</span></label>
+        <div id="responsabilidadFiscalCrear">
+          <div>
+            <input type="checkbox" id="granContribuyenteCrear" value="Gran contribuyente">
+            <label for="granContribuyenteCrear">Gran contribuyente</label>
+          </div>
+          <div>
+            <input type="checkbox" id="autorretenedorCrear" value="Autorretenedor">
+            <label for="autorretenedorCrear">Autorretenedor</label>
+          </div>
+          <div>
+            <input type="checkbox" id="agenteRetencionCrear" value="Agente de retencion IVA">
+            <label for="agenteRetencionCrear">Agente de retención IVA</label>
+          </div>
+          <div>
+            <input type="checkbox" id="regimenSimpleCrear" value="Regimen simple de tributacion">
+            <label for="regimenSimpleCrear">Régimen simple de tributación</label>
+          </div>
+          <div>
+            <input type="checkbox" id="noAplicaCrear" value="No aplica - Otros">
+            <label for="noAplicaCrear">No aplica - Otros</label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-6 pe-1">
+    <a onclick="guardarClienteCrear()" class="btn btn-primary btn-lg w-100 btn-menu d-flex">
+      <span class="text-container pe-4">Crear</span>
+    </a>
+  </div>
+  <div class="col-6 ps-1">
+    <a onclick="goToMain()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
+      <span>Inicio</span>
+      <i class="icon-24-outlined-other-location-home"></i>
+    </a>
+  </div>
+</div>

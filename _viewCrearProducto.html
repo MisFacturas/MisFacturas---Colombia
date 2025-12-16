@@ -1,0 +1,169 @@
+<!-- Vista: Crear Producto -->
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToProductos()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Crear Producto</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="row py-3 px-5 gx-0">
+    <div class="col-12 py-4">
+      <p>Ingresa la información de tu nuevo producto.</p>
+    </div>
+
+    <div class="col-12 px-0">
+      <form class="row g-3" id="productFormCrear">
+
+        <div class="col-12">
+          <label for="tipoProductoCrear" class="form-label">Tipo</label>
+          <select id="tipoProductoCrear" name="tipoProducto" class="form-select form-select-lg">
+            <option selected>Producto</option>
+            <option>Servicio</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="nombreProductoCrear" class="form-label">Nombre</label>
+          <input type="text" class="form-control form-control-lg" id="nombreProductoCrear" name="nombre" required>
+        </div>
+
+        <div class="col-12">
+          <label for="precioUnitarioCrear" class="form-label">Precio unitario</label>
+          <input type="number" step="0.01" class="form-control form-control-lg" id="precioUnitarioCrear" name="precioUnitario" required>
+        </div>
+
+        <div class="col-12">
+          <label for="unidadDeMedidaCrear" class="form-label">Unidad de medida</label>
+          <input type="text" id="unidadDeMedidaCrear" class="form-control" placeholder="Buscar" name="unidadDeMedida"
+            autocomplete="off" onkeyup="buscarUnidadMedidaProducto()">
+          <div class="result-box" id="resultBoxUnidadMedida">
+            <!-- Los resultados se mostrarán aquí -->
+          </div>
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="unidadMedidaCheckboxCrear"
+              onclick="toggleUnidadDeMedidaProducto()">
+            <label class="form-check-label" for="unidadMedidaCheckboxCrear">
+              Unidad-94
+            </label>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label for="codigoReferenciaCrear" class="form-label">Código referencia</label>
+          <input type="number" class="form-control form-control-lg" id="codigoReferenciaCrear" name="codigoReferencia" required>
+        </div>
+
+        <div class="col-12">
+          <label for="referenciaAdicionalCrear" class="form-label">Referencia adicional</label>
+          <select id="referenciaAdicionalCrear" name="referenciaAdicional" class="form-select form-select-lg">
+            <option value="" selected>Seleccione</option>
+            <option>UNSPSC</option>
+            <option>GTIN</option>
+            <option>Partida Arancelarias</option>
+            <option>Estandar de adopcion del contribuyente</option>
+            <option>No aplica</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="tarifaIvaCrear" class="form-label">IVA</label>
+          <select id="tarifaIvaCrear" name="tarifaIva" class="form-select form-select-lg">
+            <option value="0">Extento</option>
+            <option value="0">Excluido</option>
+            <option value="5">5%</option>
+            <option value="16">16%</option>
+            <option value="19">19%</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="tarifaIncCrear" class="form-label">INC</label>
+          <select id="tarifaIncCrear" name="tarifaInc" class="form-select form-select-lg">
+            <option value="0">Seleccione</option>
+            <option value="2">2%</option>
+            <option value="4">4%</option>
+            <option value="8">8%</option>
+            <option value="16">16%</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="tarifaReteRentaCrear" class="form-label">Retención sobre renta</label>
+          <select id="tarifaReteRentaCrear" name="tarifaReteRenta" class="form-select form-select-lg">
+            <option selected value="No Aplica">Seleccione</option>
+            <option>No Aplica</option>
+            <option>Compras generales (declarantes)</option>
+            <option>Compras generales (no declarantes)</option>
+            <option>Compras con tarjeta debito o credito</option>
+            <option>Compras de bienes o productos agricolas o pecuarios sin procesamiento industrial</option>
+            <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial (declarantes)</option>
+            <option>Compras de bienes o productos agricolas o pecuarios con procesamiento industrial declarantes (no declarantes)</option>
+            <option>Compras de cafe pergamino o cereza</option>
+            <option>Compras de combustibles derivados del petroleo</option>
+            <option>Enajenacion de activos fijos de personas naturales (notarias y transito son agentes retenedores)</option>
+            <option>Compras de vehiculos</option>
+            <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (por las primeras 20.000 UVT, es decir hasta $637.780.000)</option>
+            <option>Compras de bienes raices cuya destinacion y uso sea vivienda de habitacion (exceso de las primeras 20.000 UVT, es decir superior a $637.780.000)</option>
+            <option>Compras de bienes raices cuya destinacion y uso sea distinto a vivienda de habitacion</option>
+            <option>Servicios generales (declarantes)</option>
+            <option>Servicios generales (no declarantes)</option>
+            <option>Por emolumentos eclesiasticos (declarantes)</option>
+            <option>Por emolumentos eclesiasticos (no declarantes)</option>
+            <option>Servicios de transporte de carga</option>
+            <option>Servicios de transporte nacional de pasajeros por via terrestre (declarantes)</option>
+            <option>Servicios de transporte nacional de pasajeros por via terrestre (no declarantes)</option>
+            <option>Servicios de transporte nacional de pasajeros por via aerea o maritima</option>
+            <option>Servicios prestados por empresas de servicios temporales (sobre AIU)</option>
+            <option>Servicios prestados por empresas de vigilancia y aseo (sobre AIU)</option>
+            <option>Servicios integrales de salud prestados por IPS</option>
+            <option>Servicios de hoteles y restaurantes (declarantes)</option>
+            <option>Servicios de hoteles y restaurantes (no declarantes)</option>
+            <option>Arrendamiento de bienes muebles</option>
+            <option>Arrendamiento de bienes inmuebles (declarantes)</option>
+            <option>Arrendamiento de bienes inmuebles (no declarantes)</option>
+            <option>Otros ingresos tributarios (declarantes)</option>
+            <option>Otros ingresos tributarios (no declarantes)</option>
+            <option>Honorarios y comisiones (personas juridicas)</option>
+            <option>Honorarios y comisiones personas naturales que suscriban contrato o cuya sumatoria de los pagos o abonos en cuenta superen las 3.300 UVT ($105.135.000)</option>
+            <option>Honorarios y comisiones (no declarantes)</option>
+            <option>Servicios de licenciamiento o derecho de uso de software</option>
+            <option>Intereses o rendimientos financieros</option>
+            <option>Comisiones del Fondo Nacional de Garantias</option>
+            <option>Rendimientos financieros provenientes de titulos de renta fija</option>
+            <option>Loterias, rifas, apuestas y similares</option>
+            <option>Retencion en colocacion independiente de juegos de suerte y azar</option>
+            <option>Contratos de construccion y urbanizacion</option>
+          </select>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-6 pe-1">
+    <a onclick="guardarProductoCrear()" class="btn btn-primary btn-lg w-100">
+      <span class="pe-4">Guardar</span>
+    </a>
+  </div>
+  <div class="col-6 ps-1">
+    <a onclick="goToMain()" class="btn btn-outline-primary btn-lg w-100">
+      <span class="pe-4">Inicio</span>
+      <i class="icon-24-outlined-other-location-home"></i>
+    </a>
+  </div>
+</div>
+
+
+

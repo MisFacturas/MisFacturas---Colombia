@@ -1,0 +1,59 @@
+<!-- Vista: Agregar Producto a Factura -->
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToNuevaFactura()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Agregar Producto</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="row py-3 px-4 gx-0">
+    <div class="col-12 py-4">
+      <p>Ingresa cantidad y el nombre del tu producto para agregare en la factura.</p>
+    </div>
+
+    <div class="col-12">
+      <form class="row g-3" id="productForm">
+        <div class="col-12">
+          <label for="cantidad" class="form-label">Cantidad</label>
+          <input type="number" class="form-control" id="cantidad" placeholder="Cantidad">
+        </div>
+
+        <div class="col-12">
+          <label for="buscarProducto" class="form-label">Buscar producto</label>
+          <input type="text" id="buscarProducto" class="form-control" placeholder="Buscar producto"
+            autocomplete="off" onkeyup="buscarProductosFactura()">
+          <div class="result-box" id="resultBoxProductos">
+            <!-- Los resultados se mostrarán aquí -->
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-6 pe-1">
+    <a onclick="agregarProductoAFactura()" class="btn btn-primary btn-lg w-100">
+      <span class="text-container pe-4">Agregar producto</span>
+    </a>
+  </div>
+  <div class="col-6 ps-1">
+    <a onclick="goToNuevaFactura()" class="btn btn-outline-primary btn-lg w-100 d-flex align-items-center justify-content-center">
+      <i class="icon-left"></i>
+      <span class="text-container pe-4">Atrás</span>
+    </a>
+  </div>
+</div>
+
+
+

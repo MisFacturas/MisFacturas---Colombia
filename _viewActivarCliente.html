@@ -1,0 +1,96 @@
+<!-- Vista: Activar Cliente -->
+<style>
+  .result-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .result-item:hover {
+    background-color: #f0f0f0;
+  }
+  .selected-client {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+  .selected-client .remove-btn {
+    cursor: pointer;
+    color: red;
+    font-weight: bold;
+  }
+</style>
+
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToClientes()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Activar Cliente</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="row py-3 px-5 mt-3 gx-0">
+    <div class="col-12 py-2">
+      <p>Selecciona un cliente de tu lista para activarlo.</p>
+    </div>
+
+    <div class="col-12 px-0">
+      <form class="row g-3" id="productFormActivar" onsubmit="return false;">
+        <div class="col-10">
+          <label for="buscarClienteActivar" class="form-label">Ingrese nombre, código o número identificación</label>
+          <input type="text" id="buscarClienteActivar" class="form-control form-control-lg" autocomplete="off"
+            onkeypress="if(event.key === 'Enter') { event.preventDefault(); buscarClientesActivar(); }">
+        </div>
+        <div class="col-2 d-flex justify-content-center align-items-end">
+          <a class="btn btn-primary" onclick="buscarClientesActivar()">
+            <i class="icon-24-outlined-action-main-search m-0"></i>
+          </a>
+        </div>
+        
+        <div class="col-12" id="clientesInactivosContainerActivar" style="display: none; margin-top: 20px;">
+          <label for="clientesInactivosActivar" class="form-label">Clientes Inactivos</label>
+          <select id="clientesInactivosActivar" class="form-control form-control-lg" style="display: none;">
+            <option value="">Seleccione un cliente</option>
+          </select>
+        </div>
+        
+        <div class="col-12" id="notificationActivar" style="display: none; color: green; margin-top: 20px;">
+        </div>
+      </form>
+    </div>
+    
+    <div class="col-12">
+      <div class="result-box" id="resultBoxActivar" style="margin-top: 20px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-6 pe-1">
+    <a onclick="activarClienteAccion()" class="btn btn-primary btn-lg w-100 btn-menu d-flex">
+      <span class="text-container pe-4">Activar</span>
+    </a>
+  </div>
+  <div class="col-6 ps-1">
+    <a onclick="goToMain()" class="btn btn-lg w-100 btn-outline-secondary mb-2">
+      <span>Inicio</span>
+      <i class="icon-24-outlined-other-location-home"></i>
+    </a>
+  </div>
+</div>

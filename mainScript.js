@@ -37,6 +37,125 @@ function OnOpenSheetInicio() {
   SpreadsheetApp.setActiveSheet(sheet);
 }
 
+// =============================================
+// SPA - Funciones para manejo de vistas
+// =============================================
+
+/**
+ * Función helper para incluir archivos HTML (HtmlService.include)
+ * @param {string} filename - Nombre del archivo HTML a incluir
+ * @returns {string} - Contenido HTML del archivo
+ */
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+/**
+ * Obtiene el contenido de una vista específica para el SPA
+ * @param {string} viewName - Nombre de la vista a cargar
+ * @param {Object} params - Parámetros opcionales para la vista
+ * @returns {Object} - Objeto con headerNav, title, content y footer
+ */
+function getViewContent(viewName, params) {
+  var viewMap = {
+    // Vistas principales
+    'main': '_viewMain',
+    // Vistas de configuración
+    'configuracion': '_viewConfiguracion',
+    'vincular': '_viewVincular',
+    'desvincular': '_viewDesvincular',
+    'eliminarInfo': '_viewEliminarInfo',
+    // Vistas de facturación
+    'factura': '_viewFactura',
+    'nuevaFactura': '_viewNuevaFactura',
+    'agregarProductoFactura': '_viewAgregarProductoFactura',
+    'listadoFacturas': '_viewListadoFacturas',
+    // Vistas de clientes
+    'clientes': '_viewClientes',
+    'crearCliente': '_viewCrearCliente',
+    'inactivarCliente': '_viewInactivarCliente',
+    'activarCliente': '_viewActivarCliente',
+    // Vistas de productos
+    'productos': '_viewProductos',
+    'crearProducto': '_viewCrearProducto'
+  };
+  
+  var fileName = viewMap[viewName];
+  if (!fileName) {
+    return {
+      headerNav: '',
+      title: '<h2 class="text-center">Vista no encontrada</h2>',
+      content: '<div class="text-center p-4"><p>La vista solicitada no existe.</p></div>',
+      footer: ''
+    };
+  }
+  
+  try {
+    var htmlContent = HtmlService.createHtmlOutputFromFile(fileName).getContent();
+    
+    // Parsear el contenido para extraer las secciones
+    var result = parseViewContent(htmlContent);
+    return result;
+  } catch (error) {
+    Logger.log('Error cargando vista ' + viewName + ': ' + error);
+    return {
+      headerNav: '',
+      title: '<h2 class="text-center">Error</h2>',
+      content: '<div class="text-center p-4"><p>Error al cargar la vista: ' + error.message + '</p></div>',
+      footer: ''
+    };
+  }
+}
+
+/**
+ * Parsea el contenido HTML de una vista y extrae las secciones
+ * @param {string} htmlContent - Contenido HTML completo de la vista
+ * @returns {Object} - Objeto con headerNav, title, content y footer
+ */
+function parseViewContent(htmlContent) {
+  var result = {
+    headerNav: '',
+    title: '',
+    content: '',
+    footer: ''
+  };
+  
+  // Extraer header-nav
+  var headerNavMatch = htmlContent.match(/<div id="view-header-nav">([\s\S]*?)<\/div>\s*(?=<!--|\s*<div id="view-title">)/);
+  if (headerNavMatch) {
+    result.headerNav = headerNavMatch[1].trim();
+  }
+  
+  // Extraer title
+  var titleMatch = htmlContent.match(/<div id="view-title">([\s\S]*?)<\/div>\s*(?=<!--|\s*<div id="view-content">)/);
+  if (titleMatch) {
+    result.title = titleMatch[1].trim();
+  }
+  
+  // Extraer content
+  var contentMatch = htmlContent.match(/<div id="view-content">([\s\S]*?)<\/div>\s*(?=<!--|\s*<div id="view-footer">)/);
+  if (contentMatch) {
+    result.content = contentMatch[1].trim();
+  }
+  
+  // Extraer footer
+  var footerMatch = htmlContent.match(/<div id="view-footer">([\s\S]*?)<\/div>\s*$/);
+  if (footerMatch) {
+    result.footer = footerMatch[1].trim();
+  }
+  
+  return result;
+}
+
+/**
+ * Muestra el sidebar SPA principal
+ */
+function showSidebarSPA() {
+  var html = HtmlService.createHtmlOutputFromFile('sidebar')
+    .setTitle('MisFacturas');
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
 function showSidebar2() {
   console.log("showSidebar2 Enters");
   let ui = SpreadsheetApp.getUi();
@@ -49,19 +168,36 @@ function showSidebar2() {
     if (sheet == null) {
       let respuesta = ui.alert(`Faltan hojas de calculo requeridas para el funcionamiento de misfacturas. Primero debes de instalar las hojas necesarias ¿Deseas instalarlas ya?`, ui.ButtonSet.YES_NO);
       if (respuesta == ui.Button.YES) {
-        iniciarHojasFactura();
-        OnOpenSheetInicio();
-        agregarDataValidations();
-        let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
-        ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+        try {
+          iniciarHojasFactura();
+          OnOpenSheetInicio();
+          
+          // Verificar que las hojas se hayan creado antes de agregar validaciones
+          const ssCheck = SpreadsheetApp.getActiveSpreadsheet();
+          const hojasRequeridas = ["Datos", "Factura", "Clientes", "Productos", "ClientesInvalidos", "Copia de Factura"];
+          const hojasFaltantes = hojasRequeridas.filter(nombre => !ssCheck.getSheetByName(nombre));
+          
+          if (hojasFaltantes.length === 0) {
+            agregarDataValidations();
+          } else {
+            Logger.log("Advertencia: Algunas hojas no se crearon correctamente: " + hojasFaltantes.join(", "));
+          }
+          
+          let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
+          ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+        } catch (error) {
+          Logger.log("Error en showSidebar2 al instalar hojas: " + error.toString());
+          ui.alert("Error durante la instalación: " + error.toString() + "\n\nPor favor, intenta nuevamente.");
+        }
       } else {
         return;
       }
     }
   }
 
-  var html = HtmlService.createHtmlOutputFromFile('main')
-    .setTitle('Menú');
+  // Usar el nuevo sidebar SPA
+  var html = HtmlService.createHtmlOutputFromFile('sidebar')
+    .setTitle('MisFacturas');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 
@@ -152,6 +288,30 @@ function agregarDataValidations() {
   const hojaValoresP = ss.getSheetByName("Productos");
   const hojaValoresCInvalidos = ss.getSheetByName("ClientesInvalidos");
   const HojaValorescopiaFactura = ss.getSheetByName("Copia de Factura");
+
+  // Validar que todas las hojas necesarias existan
+  const hojasRequeridas = {
+    "Datos": hojaDatos,
+    "Factura": hojaFacturas,
+    "Clientes": hojaValoresC,
+    "Productos": hojaValoresP,
+    "ClientesInvalidos": hojaValoresCInvalidos,
+    "Copia de Factura": HojaValorescopiaFactura
+  };
+
+  const hojasFaltantes = [];
+  for (const [nombre, hoja] of Object.entries(hojasRequeridas)) {
+    if (!hoja) {
+      hojasFaltantes.push(nombre);
+    }
+  }
+
+  if (hojasFaltantes.length > 0) {
+    Logger.log("Error: Faltan las siguientes hojas: " + hojasFaltantes.join(", "));
+    SpreadsheetApp.getUi().alert("Error: Faltan las siguientes hojas requeridas: " + hojasFaltantes.join(", ") + 
+      "\n\nPor favor, ejecuta la instalación completa desde el menú.");
+    return; // Salir de la función si faltan hojas críticas
+  }
 
   // Rango donde aplicar los dropdowns
   const rangoDropdownCliente = hojaDatos.getRange("H2");
@@ -283,11 +443,23 @@ function agregarDataValidations() {
   ];
 
   reglas.forEach(({ rango, valores }) => {
-    const regla = SpreadsheetApp.newDataValidation()
-      .requireValueInRange(valores, true) // Usar valores del rango especificado
-      .setAllowInvalid(false) // No permitir valores fuera del rango
-      .build();
-    rango.setDataValidation(regla); // Aplicar la regla
+    try {
+      // Verificar que tanto el rango como los valores sean válidos
+      if (!rango || !valores) {
+        Logger.log("Error: Rango o valores inválidos para una validación");
+        return; // Continuar con la siguiente regla
+      }
+      
+      const regla = SpreadsheetApp.newDataValidation()
+        .requireValueInRange(valores, true) // Usar valores del rango especificado
+        .setAllowInvalid(false) // No permitir valores fuera del rango
+        .build();
+      rango.setDataValidation(regla); // Aplicar la regla
+    } catch (error) {
+      Logger.log("Error al aplicar validación de datos: " + error.toString());
+      Logger.log("Rango: " + (rango ? rango.getA1Notation() : "null"));
+      // Continuar con la siguiente regla en lugar de detener todo el proceso
+    }
   });
 }
 
@@ -296,24 +468,56 @@ function IniciarMisfacturas() {
 
   let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
   if (hoja == null) {
-    iniciarHojasFactura()
-    OnOpenSheetInicio()
-    agregarDataValidations()
-    let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
-    ui.showModalDialog(htmlOutput, 'Vinculación requerida');
-
+    try {
+      iniciarHojasFactura();
+      OnOpenSheetInicio();
+      
+      // Verificar que las hojas se hayan creado antes de agregar validaciones
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const hojasRequeridas = ["Datos", "Factura", "Clientes", "Productos", "ClientesInvalidos", "Copia de Factura"];
+      const hojasFaltantes = hojasRequeridas.filter(nombre => !ss.getSheetByName(nombre));
+      
+      if (hojasFaltantes.length === 0) {
+        agregarDataValidations();
+      } else {
+        Logger.log("Advertencia: Algunas hojas no se crearon correctamente: " + hojasFaltantes.join(", "));
+        ui.alert("Advertencia: Algunas hojas no se crearon correctamente. Por favor, intenta instalar nuevamente.");
+      }
+      
+      let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
+      ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+    } catch (error) {
+      Logger.log("Error en IniciarMisfacturas: " + error.toString());
+      ui.alert("Error durante la instalación: " + error.toString() + "\n\nPor favor, intenta nuevamente o contacta al soporte.");
+    }
 
   } else {
     let respuesta = ui.alert('Si vuelves a instalar, solo se instalaran las hojas no existan o que hayan sido eliminadas?', ui.ButtonSet.YES_NO);
     if (respuesta == ui.Button.YES) {
-      iniciarHojasFactura()
-      OnOpenSheetInicio()
-      agregarDataValidations()
-      let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
-      ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+      try {
+        iniciarHojasFactura();
+        OnOpenSheetInicio();
+        
+        // Verificar que las hojas se hayan creado antes de agregar validaciones
+        const ss = SpreadsheetApp.getActiveSpreadsheet();
+        const hojasRequeridas = ["Datos", "Factura", "Clientes", "Productos", "ClientesInvalidos", "Copia de Factura"];
+        const hojasFaltantes = hojasRequeridas.filter(nombre => !ss.getSheetByName(nombre));
+        
+        if (hojasFaltantes.length === 0) {
+          agregarDataValidations();
+        } else {
+          Logger.log("Advertencia: Algunas hojas no se crearon correctamente: " + hojasFaltantes.join(", "));
+        }
+        
+        let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
+        ui.showModalDialog(htmlOutput, 'Vinculación requerida');
+      } catch (error) {
+        Logger.log("Error en IniciarMisfacturas (reinstalación): " + error.toString());
+        ui.alert("Error durante la reinstalación: " + error.toString() + "\n\nPor favor, intenta nuevamente o contacta al soporte.");
+      }
       
     } else {
-      return
+      return;
     }
     
   }
@@ -401,8 +605,9 @@ function pruebaLogo() {
 }
 
 function showSidebar() {
-  var html = HtmlService.createHtmlOutputFromFile('main')
-    .setTitle('Menú');
+  // Usar el nuevo sidebar SPA
+  var html = HtmlService.createHtmlOutputFromFile('sidebar')
+    .setTitle('MisFacturas');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }

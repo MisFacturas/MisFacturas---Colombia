@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="es" class="h-100">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MisFacturas Sidebar">
+  <title>MisFacturas</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/bootstrap.css" rel="stylesheet">
+  <!-- Custom styles -->
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/custom.css" rel="stylesheet">
+  <link href="https://misfacturas.cenet.ws/Publico/google-sheets-resources/css/fontello-codes.css" rel="stylesheet">
+
+  <style>
+    /* Estilos para transiciones suaves entre vistas */
+    #app-content {
+      opacity: 1;
+      transition: opacity 0.15s ease-in-out;
+    }
+    #app-content.loading {
+      opacity: 0.5;
+    }
+    .spinner-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+    }
+    .spinner-container.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body class="d-flex h-100">
+  <div class="assistant-container d-flex w-100 h-100 mx-auto flex-column">
+    
+    <!-- Header fijo -->
+    <header class="mb-auto">
+      <div id="logo" class="d-flex justify-content-center bg-primary">
+        <img src="https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png" alt="MisFacturas">
+      </div>
+      <!-- Contenedor para botón de navegación (se actualiza dinámicamente) -->
+      <div id="header-nav" class="mt-4 px-4 gx-0 d-flex flex-column">
+        <!-- Botón de navegación se carga aquí -->
+      </div>
+      <!-- Contenedor para el título de la vista -->
+      <div id="header-title" class="px-4 gx-0 d-flex flex-column">
+        <!-- Título de la vista se carga aquí -->
+      </div>
+    </header>
+
+    <!-- Contenido principal dinámico -->
+    <main id="app-content">
+      <!-- El contenido de las vistas se carga aquí -->
+    </main>
+
+    <!-- Footer fijo -->
+    <footer class="mt-auto">
+      <div id="footer-content" class="row p-4 gx-0">
+        <!-- Contenido del footer se actualiza según la vista -->
+      </div>
+    </footer>
+
+    <!-- Spinner de carga -->
+    <div id="spinner" class="spinner-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =============================================
+    // SPA Router - Navegación sin recarga
+    // =============================================
+    
+    const App = {
+      currentView: null,
+      
+      // Inicializar la aplicación
+      init: function() {
+        this.navigateTo('main');
+      },
+      
+      // Mostrar/ocultar spinner
+      showLoading: function(show) {
+        const spinner = document.getElementById('spinner');
+        const content = document.getElementById('app-content');
+        if (show) {
+          spinner.classList.add('show');
+          content.classList.add('loading');
+        } else {
+          spinner.classList.remove('show');
+          content.classList.remove('loading');
+        }
+      },
+      
+      // Navegar a una vista
+      navigateTo: function(viewName, params) {
+        this.showLoading(true);
+        this.currentView = viewName;
+        
+        google.script.run
+          .withSuccessHandler(function(html) {
+            App.renderView(html);
+            App.showLoading(false);
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error cargando vista:', error);
+            App.showLoading(false);
+            alert('Error al cargar la vista: ' + error);
+          })
+          .getViewContent(viewName, params || {});
+      },
+      
+      // Renderizar el contenido de la vista
+      renderView: function(viewData) {
+        // viewData contiene: { header, content, footer, title }
+        const headerNav = document.getElementById('header-nav');
+        const headerTitle = document.getElementById('header-title');
+        const appContent = document.getElementById('app-content');
+        const footerContent = document.getElementById('footer-content');
+        
+        if (viewData.headerNav !== undefined) {
+          headerNav.innerHTML = viewData.headerNav;
+        }
+        if (viewData.title !== undefined) {
+          headerTitle.innerHTML = viewData.title;
+        }
+        if (viewData.content !== undefined) {
+          appContent.innerHTML = viewData.content;
+        }
+        if (viewData.footer !== undefined) {
+          footerContent.innerHTML = viewData.footer;
+        }
+        
+        // Ejecutar scripts si los hay
+        this.executeScripts(appContent);
+
+        // Inicializadores por vista (event listeners, etc.)
+        this.afterRender();
+      },
+
+      // Hooks post-render según vista actual
+      afterRender: function() {
+        try {
+          switch (this.currentView) {
+            case 'crearCliente':
+              initCrearClienteView();
+              break;
+            default:
+              break;
+          }
+        } catch (e) {
+          console.error('afterRender error:', e);
+        }
+      },
+      
+      // Ejecutar scripts dentro del contenido cargado
+      executeScripts: function(container) {
+        const scripts = container.querySelectorAll('script');
+        scripts.forEach(function(script) {
+          const newScript = document.createElement('script');
+          if (script.src) {
+            newScript.src = script.src;
+          } else {
+            newScript.textContent = script.textContent;
+          }
+          script.parentNode.replaceChild(newScript, script);
+        });
+      }
+    };
+
+    // =============================================
+    // Funciones de navegación globales
+    // =============================================
+    
+    function navigateTo(viewName, params) {
+      App.navigateTo(viewName, params);
+    }
+    
+    function goToMain() {
+      App.navigateTo('main');
+    }
+    
+    function goToConfiguracion() {
+      google.script.run.openDatosEmisorSheet();
+      App.navigateTo('configuracion');
+    }
+    
+    function goToVincular() {
+      App.navigateTo('vincular');
+    }
+    
+    function goToDesvincular() {
+      App.navigateTo('desvincular');
+    }
+    
+    function goToEliminarInfo() {
+      App.navigateTo('eliminarInfo');
+    }
+    
+    function goToFactura() {
+      google.script.run.openFacturaSheet();
+      App.navigateTo('factura');
+    }
+    
+    function goToClientes() {
+      google.script.run.openClientesSheet();
+      App.navigateTo('clientes');
+    }
+    
+    function goToProductos() {
+      App.navigateTo('preProductos');
+    }
+
+    // =============================================
+    // Funciones específicas de vistas
+    // =============================================
+    
+    // Vincular cuenta
+    function obtenerToken() {
+      let contra = document.getElementById('Contra').value;
+      let usuario = document.getElementById('Usuario').value;
+      
+      if (!usuario || !contra) {
+        alert('Por favor, completa todos los campos.');
+        return;
+      }
+      
+      const btn = document.getElementById('vincularBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>Vinculando...</span>';
+      
+      google.script.run
+        .withSuccessHandler(function(success) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Vincular</span>';
+          if (success) {
+            goToMain();
+          }
+        })
+        .withFailureHandler(function(error) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Vincular</span>';
+          alert('Error: ' + error);
+        })
+        .obtenerTokenMF(usuario, contra);
+    }
+    
+    function togglePasswordVisibility() {
+      const passwordField = document.getElementById('Contra');
+      const checkbox = document.getElementById('togglePassword');
+      passwordField.type = checkbox.checked ? 'text' : 'password';
+    }
+    
+    // Desvincular cuenta
+    function toggleButtonDesvincular() {
+      const inputText = document.getElementById('confirmacionTexto').value;
+      const boton = document.getElementById('botonEliminar');
+      
+      if (inputText === 'DESVINCULAR') {
+        boton.removeAttribute('disabled');
+        boton.classList.add('btn-danger');
+        boton.classList.remove('btn-secondary');
+      } else {
+        boton.setAttribute('disabled', 'disabled');
+        boton.classList.remove('btn-danger');
+        boton.classList.add('btn-secondary');
+      }
+    }
+    
+    function desvincularCuenta() {
+      const inputText = document.getElementById('confirmacionTexto').value;
+      if (inputText === 'DESVINCULAR') {
+        google.script.run.DesvincularMisfacturas();
+        goToConfiguracion();
+      } else {
+        google.script.run.MensajeErrorDesvincularMisfacturas();
+      }
+    }
+    
+    // Eliminar información
+    function toggleButtonEliminar() {
+      const inputText = document.getElementById('confirmacionTexto').value;
+      const boton = document.getElementById('botonEliminar');
+      
+      if (inputText === 'ELIMINAR') {
+        boton.removeAttribute('disabled');
+        boton.classList.add('btn-danger');
+        boton.classList.remove('btn-secondary');
+      } else {
+        boton.setAttribute('disabled', 'disabled');
+        boton.classList.remove('btn-danger');
+        boton.classList.add('btn-secondary');
+      }
+    }
+    
+    function borrarInformacion() {
+      const inputText = document.getElementById('confirmacionTexto').value;
+      if (inputText === 'ELIMINAR') {
+        google.script.run.eliminarTotalidadInformacion();
+        goToMain();
+      } else {
+        google.script.run.mensajeBorrarInfoError();
+      }
+    }
+
+    // =============================================
+    // Inicializadores (se ejecutan al renderizar vistas)
+    // =============================================
+
+    function initCrearClienteView() {
+      // Reglas: si marca "No aplica - Otros", desmarca las demás.
+      // Si marca cualquier otra, desmarca "No aplica - Otros".
+      const container = document.getElementById('responsabilidadFiscalCrear');
+      if (!container || container.dataset.bound === '1') return;
+      container.dataset.bound = '1';
+
+      container.addEventListener('change', function(e) {
+        const target = e.target;
+        if (!target || target.type !== 'checkbox') return;
+
+        const noAplica = document.getElementById('noAplicaCrear');
+        if (!noAplica) return;
+
+        if (target.id === 'noAplicaCrear' && target.checked) {
+          container.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+            if (cb.id !== 'noAplicaCrear') cb.checked = false;
+          });
+        } else if (target.checked) {
+          noAplica.checked = false;
+        }
+      });
+    }
+
+    // =============================================
+    // Funciones de Facturación
+    // =============================================
+    
+    // Navegación de facturación
+    function goToNuevaFactura() {
+      google.script.run.openFacturaSheet();
+      google.script.run.inicarFacturaNueva();
+      App.navigateTo('nuevaFactura');
+    }
+    
+    function goToListadoFacturas() {
+      google.script.run.actualizarEstadoUltimasFacturas();
+      google.script.run.openHistorialSheet();
+      App.navigateTo('listadoFacturas');
+    }
+    
+    function goToAgregarProductoFactura() {
+      App.navigateTo('agregarProductoFactura');
+    }
+    
+    // Acciones de factura
+    function guardarFactura() {
+      google.script.run.guardarFactura();
+    }
+    
+    function limpiarFactura() {
+      google.script.run.limpiarHojaFactura();
+    }
+    
+    // Agregar producto a factura
+    function buscarProductosFactura() {
+      var input = document.getElementById('buscarProducto').value;
+      google.script.run.withSuccessHandler(mostrarResultadosProductos).buscarProductos(input);
+    }
+    
+    function mostrarResultadosProductos(productos) {
+      var resultBox = document.getElementById('resultBoxProductos');
+      if (!resultBox) return;
+      
+      resultBox.innerHTML = '';
+      productos.forEach(function(producto) {
+        var div = document.createElement('div');
+        div.textContent = producto;
+        div.onclick = function() {
+          seleccionarProductoFactura(producto);
+        };
+        resultBox.appendChild(div);
+      });
+    }
+    
+    function seleccionarProductoFactura(producto) {
+      document.getElementById('buscarProducto').value = producto;
+      var resultBox = document.getElementById('resultBoxProductos');
+      if (resultBox) {
+        resultBox.innerHTML = '';
+      }
+    }
+    
+    function agregarProductoAFactura() {
+      var cantidad = document.getElementById('cantidad').value;
+      var producto = document.getElementById('buscarProducto').value;
+      
+      if (!cantidad || !producto) {
+        alert('Por favor, ingresa la cantidad y selecciona un producto.');
+        return;
+      }
+      
+      console.log('Producto:', producto, 'Cantidad:', cantidad);
+      google.script.run.agregarProductoDesdeFactura(cantidad, producto);
+      
+      // Limpiar campos
+      document.getElementById('cantidad').value = '';
+      document.getElementById('buscarProducto').value = '';
+    }
+    
+    // Descargar factura
+    function handleKeyPressFactura(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        descargarFactura();
+      }
+    }
+    
+    function descargarFactura() {
+      var idFactura = document.getElementById('idFactura').value;
+      var mensaje = document.getElementById('mensajeDescarga');
+      
+      if (idFactura.trim() === '') {
+        mensaje.textContent = 'Por favor ingresa el prefijo y número de la factura.';
+        mensaje.style.color = 'red';
+        return;
+      }
+      
+      mensaje.textContent = 'Buscando factura...';
+      mensaje.style.color = 'blue';
+      
+      google.script.run
+        .withSuccessHandler(generarLinkDescargaFactura)
+        .withFailureHandler(function(error) {
+          mensaje.textContent = 'Error: ' + error;
+          mensaje.style.color = 'red';
+        })
+        .linkDescargaFactura(idFactura);
+    }
+    
+    function generarLinkDescargaFactura(respuesta) {
+      var mensaje = document.getElementById('mensajeDescarga');
+      
+      if (!respuesta || !respuesta.base64Data) {
+        mensaje.textContent = 'No se pudo obtener la factura.';
+        mensaje.style.color = 'red';
+        return;
+      }
+      
+      const documentNumber = respuesta.documentNumber;
+      const base64Data = respuesta.base64Data;
+      const dataUri = 'data:application/pdf;base64,' + base64Data;
+      
+      const link = document.createElement('a');
+      link.href = dataUri;
+      link.download = 'Factura_' + documentNumber + '.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Limpiar el formulario
+      document.getElementById('idFactura').value = '';
+      
+      // Mostrar mensaje de éxito
+      mensaje.textContent = 'Descargando...';
+      mensaje.style.color = 'blue';
+      
+      setTimeout(function() {
+        mensaje.textContent = 'La factura se ha descargado exitosamente.';
+        mensaje.style.color = 'green';
+        setTimeout(function() {
+          mensaje.textContent = '';
+        }, 3000);
+      }, 1500);
+    }
+
+    // =============================================
+    // Funciones de Clientes
+    // =============================================
+    
+    // Navegación de clientes
+    function goToClientes() {
+      google.script.run.openClientesSheet();
+      App.navigateTo('clientes');
+    }
+    
+    function goToCrearCliente() {
+      App.navigateTo('crearCliente');
+    }
+    
+    function goToInactivarCliente() {
+      App.navigateTo('inactivarCliente');
+    }
+    
+    function goToActivarCliente() {
+      App.navigateTo('activarCliente');
+    }
+    
+    // ---- Funciones para Inactivar Cliente ----
+    function buscarClientesInactivar() {
+      var input = document.getElementById('buscarClienteInactivar').value;
+      google.script.run.withSuccessHandler(mostrarClientesActivosInactivar).buscarClientes(input, 'Inactivar');
+    }
+    
+    function mostrarClientesActivosInactivar(clientes) {
+      var select = document.getElementById('clientesActivosInactivar');
+      var resultBox = document.getElementById('resultBoxInactivar');
+      var container = document.getElementById('clientesActivosContainerInactivar');
+      
+      if (!select || !resultBox) return;
+      
+      select.innerHTML = '<option value="">Seleccione un cliente</option>';
+      resultBox.innerHTML = '';
+      if (container) container.style.display = 'none';
+      
+      if (clientes.length === 0) {
+        resultBox.innerHTML = '<p>No se encontraron clientes.</p>';
+        return;
+      }
+      
+      clientes.forEach(function(cliente) {
+        var resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        resultItem.textContent = cliente;
+        resultItem.onclick = function() {
+          if (cliente.includes('Consumidor Final') || cliente.includes('222222222222')) {
+            alert("No se puede desactivar el cliente 'Consumidor Final'.");
+            return;
+          }
+          select.innerHTML = '';
+          var option = document.createElement('option');
+          option.value = cliente;
+          option.textContent = cliente;
+          select.appendChild(option);
+          select.value = cliente;
+          resultBox.innerHTML = '';
+          var selectedClient = document.createElement('div');
+          selectedClient.className = 'selected-client';
+          selectedClient.innerHTML = cliente + ' <span class="remove-btn" onclick="removeSelectedClientInactivar()">X</span>';
+          resultBox.appendChild(selectedClient);
+        };
+        resultBox.appendChild(resultItem);
+      });
+    }
+    
+    function removeSelectedClientInactivar() {
+      var select = document.getElementById('clientesActivosInactivar');
+      var resultBox = document.getElementById('resultBoxInactivar');
+      if (select) select.innerHTML = '<option value="">Seleccione un cliente</option>';
+      if (resultBox) resultBox.innerHTML = '';
+    }
+    
+    function inactivarClienteAccion() {
+      var select = document.getElementById('clientesActivosInactivar');
+      if (!select) return;
+      
+      var cliente = select.value;
+      if (!cliente) {
+        alert('Por favor selecciona un cliente.');
+        return;
+      }
+      
+      if (cliente.includes('Consumidor Final') || cliente.includes('222222222222')) {
+        alert("No se puede desactivar el cliente 'Consumidor Final'.");
+        return;
+      }
+      
+      google.script.run.withSuccessHandler(function() {
+        document.getElementById('buscarClienteInactivar').value = '';
+        document.getElementById('clientesActivosInactivar').innerHTML = '<option value="">Seleccione un cliente</option>';
+        document.getElementById('resultBoxInactivar').innerHTML = '';
+        var notification = document.getElementById('notificationInactivar');
+        notification.innerText = 'Cliente inactivado exitosamente.';
+        notification.style.display = 'block';
+        setTimeout(function() {
+          notification.style.display = 'none';
+        }, 3000);
+      }).inactivarCliente(cliente);
+    }
+    
+    // ---- Funciones para Activar Cliente ----
+    function buscarClientesActivar() {
+      var input = document.getElementById('buscarClienteActivar').value;
+      google.script.run.withSuccessHandler(mostrarClientesInactivosActivar).buscarClientes(input, 'Activar');
+    }
+    
+    function mostrarClientesInactivosActivar(clientes) {
+      var select = document.getElementById('clientesInactivosActivar');
+      var resultBox = document.getElementById('resultBoxActivar');
+      var container = document.getElementById('clientesInactivosContainerActivar');
+      
+      if (!select || !resultBox) return;
+      
+      select.innerHTML = '<option value="">Seleccione un cliente</option>';
+      resultBox.innerHTML = '';
+      if (container) container.style.display = 'none';
+      
+      if (clientes.length === 0) {
+        resultBox.innerHTML = '<p>No se encontraron clientes.</p>';
+        return;
+      }
+      
+      clientes.forEach(function(cliente) {
+        var resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        resultItem.textContent = cliente;
+        resultItem.onclick = function() {
+          select.innerHTML = '';
+          var option = document.createElement('option');
+          option.value = cliente;
+          option.textContent = cliente;
+          select.appendChild(option);
+          select.value = cliente;
+          resultBox.innerHTML = '';
+          var selectedClient = document.createElement('div');
+          selectedClient.className = 'selected-client';
+          selectedClient.innerHTML = cliente + ' <span class="remove-btn" onclick="removeSelectedClientActivar()">X</span>';
+          resultBox.appendChild(selectedClient);
+        };
+        resultBox.appendChild(resultItem);
+      });
+    }
+    
+    function removeSelectedClientActivar() {
+      var select = document.getElementById('clientesInactivosActivar');
+      var resultBox = document.getElementById('resultBoxActivar');
+      if (select) select.innerHTML = '<option value="">Seleccione un cliente</option>';
+      if (resultBox) resultBox.innerHTML = '';
+    }
+    
+    function activarClienteAccion() {
+      var select = document.getElementById('clientesInactivosActivar');
+      if (!select) return;
+      
+      var cliente = select.value;
+      if (!cliente) {
+        alert('Por favor selecciona un cliente.');
+        return;
+      }
+      
+      google.script.run.withSuccessHandler(function() {
+        document.getElementById('buscarClienteActivar').value = '';
+        document.getElementById('clientesInactivosActivar').innerHTML = '<option value="">Seleccione un cliente</option>';
+        document.getElementById('resultBoxActivar').innerHTML = '';
+        var notification = document.getElementById('notificationActivar');
+        notification.innerText = 'Cliente activado exitosamente.';
+        notification.style.display = 'block';
+        setTimeout(function() {
+          notification.style.display = 'none';
+        }, 3000);
+      }).activarCliente(cliente);
+    }
+    
+    // ---- Funciones para Crear Cliente ----
+    function verificarTipoPersonaCrear() {
+      var tipoPersona = document.getElementById('tipoPersonaCrear').value;
+      var nombreComercial = document.getElementById('nombreComercialCrear');
+      var primerNombre = document.getElementById('primerNombreCrear');
+      var segundoNombre = document.getElementById('segundoNombreCrear');
+      var primerApellido = document.getElementById('primerApellidoCrear');
+      var segundoApellido = document.getElementById('segundoApellidoCrear');
+      
+      if (tipoPersona === 'Natural') {
+        nombreComercial.disabled = true;
+        primerNombre.disabled = false;
+        segundoNombre.disabled = false;
+        primerApellido.disabled = false;
+        segundoApellido.disabled = false;
+      } else if (tipoPersona === 'Juridica') {
+        nombreComercial.disabled = false;
+        primerNombre.disabled = true;
+        segundoNombre.disabled = true;
+        primerApellido.disabled = true;
+        segundoApellido.disabled = true;
+      }
+    }
+    
+    function buscarPaisCrear() {
+      var input = document.getElementById('paisCrear').value;
+      google.script.run.withSuccessHandler(mostrarResultadosPaisCrear).buscarPaises(input);
+    }
+    
+    function mostrarResultadosPaisCrear(paises) {
+      var resultBox = document.getElementById('resultBoxPaisCrear');
+      if (!resultBox) return;
+      
+      resultBox.innerHTML = '';
+      paises.forEach(function(pais) {
+        var div = document.createElement('div');
+        div.textContent = pais;
+        div.style.cursor = 'pointer';
+        div.style.padding = '5px';
+        div.onclick = function() {
+          document.getElementById('paisCrear').value = pais;
+          resultBox.innerHTML = '';
+          verificarPaisCrear();
+        };
+        resultBox.appendChild(div);
+      });
+    }
+    
+    function verificarPaisCrear() {
+      var pais = document.getElementById('paisCrear').value;
+      var departamento = document.getElementById('departamentoCrear');
+      var municipio = document.getElementById('municipioCrear');
+      var mensajeDian = document.getElementById('mensajeDianCrear');
+      
+      if (pais === 'Colombia') {
+        departamento.disabled = false;
+        municipio.disabled = false;
+        if (mensajeDian) mensajeDian.style.display = 'block';
+      } else {
+        departamento.value = '';
+        municipio.value = '';
+        departamento.disabled = true;
+        municipio.disabled = true;
+        if (mensajeDian) mensajeDian.style.display = 'none';
+      }
+    }
+    
+    function cargarMunicipiosCrear() {
+      var departamento = document.getElementById('departamentoCrear').value;
+      var municipioSelect = document.getElementById('municipioCrear');
+      municipioSelect.innerHTML = '<option value="">Seleccione</option>';
+      
+      if (departamento === 'Bogota' || departamento === 'BogotaDC') {
+        municipioSelect.innerHTML = '<option value="BOGOTA, D.C.">BOGOTA, D.C.</option>';
+        municipioSelect.value = 'BOGOTA, D.C.';
+        municipioSelect.disabled = true;
+        return;
+      } else {
+        municipioSelect.disabled = false;
+      }
+      
+      if (departamento) {
+        google.script.run.withSuccessHandler(function(municipios) {
+          var uniqueMunicipios = [...new Set(municipios)];
+          uniqueMunicipios.forEach(function(municipio) {
+            var option = document.createElement('option');
+            option.value = municipio;
+            option.textContent = municipio;
+            municipioSelect.appendChild(option);
+          });
+        }).buscarMunicipios(departamento);
+      }
+    }
+    
+    function validarCodigoPostalCrear() {
+      var field = document.getElementById('codigoPostalCrear');
+      var help = document.getElementById('codigoPostalHelpCrear');
+      var pattern = /^\d{6}$/;
+      
+      if (!pattern.test(field.value)) {
+        field.style.backgroundColor = '#FFC7C7';
+        if (help) help.style.display = 'block';
+      } else {
+        field.style.backgroundColor = '';
+        if (help) help.style.display = 'none';
+      }
+    }
+    
+    function validarDireccionCrear() {
+      var field = document.getElementById('direccionCrear');
+      var help = document.getElementById('direccionHelpCrear');
+      var pattern = /^[^#]*$/;
+      
+      if (!pattern.test(field.value)) {
+        field.style.backgroundColor = '#FFC7C7';
+        if (help) help.style.display = 'block';
+      } else {
+        field.style.backgroundColor = '';
+        if (help) help.style.display = 'none';
+      }
+    }
+    
+    function verificarDatosObligatoriosCrear() {
+      var tipoPersona = document.getElementById('tipoPersonaCrear').value;
+      var isValid = true;
+      
+      if (tipoPersona === 'Seleccione' || !tipoPersona) {
+        document.getElementById('tipoPersonaCrear').style.backgroundColor = '#FFC7C7';
+        isValid = false;
+      }
+      
+      var columnasObligatorias = tipoPersona === 'Natural' ?
+        ['tipoTerceroCrear', 'tipoPersonaCrear', 'tipoDocumentoCrear', 'numeroIdentificacionCrear', 'codigoClienteCrear', 'regimenCrear', 'primerNombreCrear', 'primerApellidoCrear', 'paisCrear', 'direccionCrear', 'codigoPostalCrear', 'telefonoCrear', 'emailCrear', 'detallesTributariosCrear'] :
+        tipoPersona === 'Juridica' ?
+          ['tipoTerceroCrear', 'tipoPersonaCrear', 'tipoDocumentoCrear', 'numeroIdentificacionCrear', 'codigoClienteCrear', 'regimenCrear', 'nombreComercialCrear', 'paisCrear', 'direccionCrear', 'codigoPostalCrear', 'telefonoCrear', 'emailCrear', 'detallesTributariosCrear'] :
+          [];
+      
+      columnasObligatorias.forEach(function(id) {
+        var field = document.getElementById(id);
+        if (!field) return;
+        
+        if (field.tagName === 'SELECT' && (field.value === 'Seleccione' || !field.value)) {
+          field.style.backgroundColor = '#FFC7C7';
+          isValid = false;
+        } else if (field.value === '') {
+          field.style.backgroundColor = '#FFC7C7';
+          isValid = false;
+        } else {
+          field.style.backgroundColor = '';
+        }
+      });
+      
+      // Validar email
+      var emailField = document.getElementById('emailCrear');
+      var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailPattern.test(emailField.value)) {
+        emailField.style.backgroundColor = '#FFC7C7';
+        var emailHelp = document.getElementById('emailHelpCrear');
+        if (emailHelp) emailHelp.style.display = 'block';
+        isValid = false;
+      }
+      
+      // Validar código postal
+      var codigoPostalField = document.getElementById('codigoPostalCrear');
+      var codigoPostalPattern = /^\d{6}$/;
+      if (!codigoPostalPattern.test(codigoPostalField.value)) {
+        codigoPostalField.style.backgroundColor = '#FFC7C7';
+        isValid = false;
+      }
+      
+      // Validar responsabilidad fiscal
+      var checkboxes = document.querySelectorAll('#responsabilidadFiscalCrear input[type="checkbox"]');
+      var hasChecked = Array.from(checkboxes).some(function(cb) { return cb.checked; });
+      if (!hasChecked) {
+        document.getElementById('responsabilidadFiscalCrear').style.backgroundColor = '#FFC7C7';
+        isValid = false;
+      } else {
+        document.getElementById('responsabilidadFiscalCrear').style.backgroundColor = '';
+      }
+      
+      // Validar departamento y municipio si es Colombia
+      var pais = document.getElementById('paisCrear').value;
+      if (pais === 'Colombia') {
+        var departamento = document.getElementById('departamentoCrear');
+        var municipio = document.getElementById('municipioCrear');
+        if (!departamento.value || !municipio.value) {
+          departamento.style.backgroundColor = '#FFC7C7';
+          municipio.style.backgroundColor = '#FFC7C7';
+          isValid = false;
+        }
+      }
+      
+      return isValid;
+    }
+    
+    function guardarClienteCrear() {
+      if (!verificarDatosObligatoriosCrear()) {
+        alert('Por favor complete todos los campos obligatorios.');
+        return;
+      }
+      
+      var formData = {
+        tipoTercero: document.getElementById('tipoTerceroCrear').value,
+        tipoPersona: document.getElementById('tipoPersonaCrear').value,
+        nombreComercial: document.getElementById('nombreComercialCrear').value,
+        primerNombre: document.getElementById('primerNombreCrear').value,
+        segundoNombre: document.getElementById('segundoNombreCrear').value,
+        primerApellido: document.getElementById('primerApellidoCrear').value,
+        segundoApellido: document.getElementById('segundoApellidoCrear').value,
+        tipoDocumento: document.getElementById('tipoDocumentoCrear').value,
+        numeroIdentificacion: document.getElementById('numeroIdentificacionCrear').value,
+        codigoCliente: document.getElementById('codigoClienteCrear').value,
+        regimen: document.getElementById('regimenCrear').value,
+        pais: document.getElementById('paisCrear').value,
+        departamento: document.getElementById('departamentoCrear').value,
+        municipio: document.getElementById('municipioCrear').value,
+        direccion: document.getElementById('direccionCrear').value,
+        codigoPostal: document.getElementById('codigoPostalCrear').value,
+        telefono: document.getElementById('telefonoCrear').value,
+        sitioWeb: document.getElementById('sitioWebCrear').value,
+        email: document.getElementById('emailCrear').value,
+        detallesTributarios: document.getElementById('detallesTributariosCrear').value,
+        responsabilidadFiscal: Array.from(document.querySelectorAll('#responsabilidadFiscalCrear input[type="checkbox"]'))
+          .filter(function(cb) { return cb.checked; })
+          .map(function(cb) { return cb.value; })
+          .join(',')
+      };
+      
+      google.script.run.withSuccessHandler(function(response) {
+        alert('Cliente creado exitosamente.');
+        // Limpiar formulario
+        document.getElementById('clientFormCrear').reset();
+        goToClientes();
+      }).withFailureHandler(function(error) {
+        alert('Error al crear cliente: ' + error);
+      }).saveClientData(formData);
+    }
+
+    // =============================================
+    // Funciones de Productos
+    // =============================================
+    
+    // Navegación de productos
+    function goToProductos() {
+      App.navigateTo('productos');
+    }
+    
+    function goToCrearProducto() {
+      App.navigateTo('crearProducto');
+    }
+    
+    function verListaProductos() {
+      google.script.run.openProductosSheet();
+    }
+    
+    // Buscar unidad de medida
+    function buscarUnidadMedidaProducto() {
+      var input = document.getElementById('unidadDeMedidaCrear').value;
+      google.script.run.withSuccessHandler(mostrarResultadosUnidadMedida).buscarUnidadesDeMedidaProducto(input);
+    }
+    
+    function mostrarResultadosUnidadMedida(unidadesDeMedida) {
+      var resultBox = document.getElementById('resultBoxUnidadMedida');
+      if (!resultBox) return;
+      
+      resultBox.innerHTML = '';
+      unidadesDeMedida.forEach(function(unidad) {
+        var div = document.createElement('div');
+        div.textContent = unidad;
+        div.style.cursor = 'pointer';
+        div.style.padding = '5px';
+        div.style.borderBottom = '1px solid #eee';
+        div.onclick = function() {
+          seleccionarUnidadMedida(unidad);
+        };
+        resultBox.appendChild(div);
+      });
+    }
+    
+    function seleccionarUnidadMedida(unidad) {
+      document.getElementById('unidadDeMedidaCrear').value = unidad;
+      var resultBox = document.getElementById('resultBoxUnidadMedida');
+      if (resultBox) {
+        resultBox.innerHTML = '';
+      }
+    }
+    
+    function toggleUnidadDeMedidaProducto() {
+      var checkbox = document.getElementById('unidadMedidaCheckboxCrear');
+      var unidadInput = document.getElementById('unidadDeMedidaCrear');
+      if (checkbox.checked) {
+        unidadInput.value = 'Unidad-94';
+      } else {
+        unidadInput.value = '';
+      }
+    }
+    
+    // Validar campos obligatorios del producto
+    function verificarDatosObligatoriosProducto() {
+      var camposObligatorios = [
+        'tipoProductoCrear',
+        'precioUnitarioCrear',
+        'codigoReferenciaCrear',
+        'nombreProductoCrear',
+        'unidadDeMedidaCrear',
+        'referenciaAdicionalCrear'
+      ];
+      
+      var isValid = true;
+      
+      camposObligatorios.forEach(function(id) {
+        var campo = document.getElementById(id);
+        if (!campo) return;
+        
+        if (!campo.value || !campo.value.trim()) {
+          campo.style.backgroundColor = '#FFC7C7';
+          isValid = false;
+        } else {
+          campo.style.backgroundColor = '';
+        }
+      });
+      
+      return isValid;
+    }
+    
+    // Guardar producto
+    function guardarProductoCrear() {
+      if (!verificarDatosObligatoriosProducto()) {
+        alert('Por favor complete todos los campos obligatorios.');
+        return;
+      }
+      
+      var formData = {
+        tipoProducto: document.getElementById('tipoProductoCrear').value,
+        nombre: document.getElementById('nombreProductoCrear').value,
+        precioUnitario: document.getElementById('precioUnitarioCrear').value,
+        unidadDeMedida: document.getElementById('unidadDeMedidaCrear').value,
+        codigoReferencia: document.getElementById('codigoReferenciaCrear').value,
+        referenciaAdicional: document.getElementById('referenciaAdicionalCrear').value,
+        tarifaIva: document.getElementById('tarifaIvaCrear').value,
+        tarifaInc: document.getElementById('tarifaIncCrear').value,
+        tarifaReteRenta: document.getElementById('tarifaReteRentaCrear').value,
+        unidadMedidaCheckbox: document.getElementById('unidadMedidaCheckboxCrear').checked
+      };
+      
+      google.script.run.withSuccessHandler(function(response) {
+        // Limpiar formulario
+        resetFormProducto();
+        google.script.run.openProductosSheet();
+      }).withFailureHandler(function(error) {
+        alert('Error al crear producto: ' + error);
+      }).processForm(formData);
+    }
+    
+    function resetFormProducto() {
+      var form = document.getElementById('productFormCrear');
+      if (form) {
+        form.reset();
+      }
+      
+      var camposObligatorios = [
+        'tipoProductoCrear',
+        'precioUnitarioCrear',
+        'codigoReferenciaCrear',
+        'nombreProductoCrear',
+        'unidadDeMedidaCrear',
+        'referenciaAdicionalCrear'
+      ];
+      
+      camposObligatorios.forEach(function(id) {
+        var campo = document.getElementById(id);
+        if (campo) {
+          campo.style.backgroundColor = '';
+        }
+      });
+    }
+
+    // Inicializar la aplicación cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+      App.init();
+    });
+  </script>
+</body>
+
+</html>
+
+
+

@@ -1,0 +1,72 @@
+<!-- Vista: Vincular Cuenta -->
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToConfiguracion()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Vincular cuenta de misfacturas</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-6">
+        <p class="fs-6 text-center mb-4">Para vincular tu cuenta de misfacturas con Google Sheets™, por favor completa los campos Usuario y Contraseña.</p>
+        
+        <div class="alert alert-info" role="alert">
+          <h6 class="alert-heading fw-bold">Ten en cuenta:</h6>
+          <ol class="mb-0">
+            <li class="mb-2">Debes tener una cuenta registrada</li>
+            <li class="mb-2">Si no tienes una cuenta puedes <a href="https://www.misfacturas.com.co/Publico/empiece-gratis" target="_blank" class="alert-link">registrarte aquí</a>.</li>
+            <li class="mb-2">Si no tienes un plan <strong>Google Sheets™</strong> ingresa a la sección de <strong>Suscripciones</strong> en el sitio web de misfacturas.</li>
+            <li class="mb-0">Consulta el manual de usuario dando clic <a href="https://soporte.misfacturas.com.co/hc/es-419/sections/35611340115220-misfacturas-for-Google-Sheets" target="_blank" class="alert-link">aquí</a>.</li>
+          </ol>
+        </div>
+      </div>
+      <!-- Form Fields -->
+      <div class="col-12 col-md-6">
+        <div class="mb-3">
+          <label for="Usuario" class="form-label fs-3 fw-bold">Usuario</label>
+          <input type="text" class="form-control" id="Usuario" placeholder="Ingresa tu usuario">
+        </div>
+        <div class="mb-3">
+          <label for="Contra" class="form-label fs-3 fw-bold">Contraseña</label>
+          <input type="password" class="form-control" id="Contra" placeholder="Ingresa tu contraseña">
+        </div>
+        <!-- Toggle checkbox for showing/hiding password -->
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="togglePassword" onclick="togglePasswordVisibility()">
+          <label class="form-check-label" for="togglePassword">Mostrar contraseña</label>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center">
+      <div class="col-6 col-md-4">
+        <a onclick="obtenerToken()" id="vincularBtn"
+          class="btn btn-primary btn-lg w-100 btn-menu d-flex align-items-center justify-content-center">
+          <span>Vincular</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-12 text-center">
+    <a onclick="goToMain()" class="btn btn-outline-primary btn-lg w-100 d-flex align-items-center justify-content-center">
+      <span>Inicio</span>
+      <i class="icon-24-outlined-other-location-home ms-2"></i>
+    </a>
+  </div>
+</div>
+
+
+
