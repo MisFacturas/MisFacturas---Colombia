@@ -90,7 +90,8 @@ function inactivarCliente(cliente) {
 
   hojaClientes.deleteRow(rowDelCliente)
   hojaClientes.insertRowAfter(rowMaximaClientes)
-  SpreadsheetApp.getUi().alert("El cliente se ha inactivado satisfactoriamente");
+  // No ui.alert: el SPA muestra confirmación si se requiere
+  return true;
 }
 
 function activarCliente(cliente) {
@@ -269,11 +270,11 @@ function saveClientData(formData) {
 
   let existe = verificarIdentificacionUnica(codigosIdetificadores, "Clientes", false)
   if (existe === 1) {
-    SpreadsheetApp.getUi().alert("El Numero de Identificacion del cliente ya existe, por favor poner un Numero de Identificacion unico");
-    throw new Error('por favor poner un Numero de Identificacion unico');
+    // No ui.alert: el SPA muestra el mensaje
+    throw new Error("El número de identificación ya existe, por favor usa uno único.");
   } else if (existe === 2) {
-    SpreadsheetApp.getUi().alert("El Codigo del cliente ya existe, por favor poner un Codigo de cliente unico");
-    throw new Error('por favor poner un Codigo de cliente unico');
+    // No ui.alert: el SPA muestra el mensaje
+    throw new Error("El código del cliente ya existe, por favor usa uno único.");
   }
   const lastRow = sheet.getLastRow();
   const dataRange = sheet.getRange(2, 2, lastRow, 22).getValues(); // Obtener desde la columna B hasta la S (19 columnas)
@@ -329,7 +330,8 @@ function saveClientData(formData) {
   }
   sheet.getRange(emptyRow, 23).setValue(identificadorUnico);
 
-  SpreadsheetApp.getUi().alert("Nuevo cliente generado satisfactoriamente");
+  // El SPA muestra confirmación
+  return true;
 }
 
 function verificarDatosObligatorios(e, tipoPersona) {
@@ -400,29 +402,35 @@ function verificarDatosObligatorios(e, tipoPersona) {
     if (!emailRegex.test(email)) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 20).setBackground('#FFC7C7'); // Resaltar en rojo claro
-      if (email !== "") {
-        SpreadsheetApp.getUi().alert('El correo electrónico ingresado no es válido.');
-      }
+      // No ui.alert: solo marcar celda. Evita “En curso...”/bloqueo de sidebar.
     }
 
-    // Verificar si el código postal en la columna Q es válido
-    let codigoPostal = sheet.getRange(rowEditada, 17).getValue(); // Columna Q es la 17
+    // Verificar si el código postal en la columna Q es válido (Colombia: 6 dígitos)
+    // Usar displayValue para preservar ceros a la izquierda.
+    let codigoPostalDisplay = String(sheet.getRange(rowEditada, 17).getDisplayValue()).trim(); // Columna Q es la 17
+    let codigoPostalValue = sheet.getRange(rowEditada, 17).getValue();
     let codigoPostalRegex = /^\d{6}$/;
 
-    // Si tiene 5 dígitos, agregar un 0 adelante y formatear la celda
-    if (rowEditada !== 2 && typeof codigoPostal === "number" && codigoPostal.toString().length === 5) {
-      let codigoPostalStr = "0" + codigoPostal.toString();
-      sheet.getRange(rowEditada, 17).setNumberFormat("@"); // Formato texto para mostrar el 0 antes de poner el valor
-      sheet.getRange(rowEditada, 17).setValue(codigoPostalStr);
-      codigoPostal = codigoPostalStr;
+    // Caso especial: fila 2 puede tener valor predeterminado 0 / "0"
+    const esDefaultFila2 = (rowEditada === 2 && (codigoPostalDisplay === "0" || codigoPostalValue === 0));
+
+    // Si viene como número de 5 dígitos, asumir que perdió el 0 inicial y corregirlo a 6 dígitos
+    if (!esDefaultFila2 && typeof codigoPostalValue === "number" && isFinite(codigoPostalValue)) {
+      const asInt = Math.trunc(codigoPostalValue);
+      const str = String(asInt);
+      if (str.length === 5) {
+        const codigoPostalStr = "0" + str;
+        sheet.getRange(rowEditada, 17).setNumberFormat("@"); // texto para preservar 0 inicial
+        sheet.getRange(rowEditada, 17).setValue(codigoPostalStr);
+        codigoPostalDisplay = codigoPostalStr;
+      }
     }
 
-    if (!(rowEditada === 2 && (codigoPostal === 0 || codigoPostal === "0")) ) {
+    // Validación real: requerido y debe ser 6 dígitos
+    if (!esDefaultFila2 && !codigoPostalRegex.test(codigoPostalDisplay)) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 17).setBackground('#FFC7C7'); // Resaltar en rojo claro
-      if (codigoPostal !== "") {
-        SpreadsheetApp.getUi().alert('El código postal ingresado no es válido. Debe ser un número de 6 dígitos.');
-      }
+      // No ui.alert: solo marcar celda
     }
     // Verificar si la dirección en la columna P contiene caracteres especiales
     let direccion = sheet.getRange(rowEditada, 16).getValue(); // Columna P es la 16
@@ -431,7 +439,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
     if (!direccionRegex.test(direccion)) {
       estaCompleto = false;
       sheet.getRange(rowEditada, 16).setBackground('#FFC7C7'); // Resaltar en rojo claro
-      SpreadsheetApp.getUi().alert('La dirección ingresada no es válida. No debe contener caracteres especiales como #.');
+      // No ui.alert: solo marcar celda
     }
 
     // Actualizar el estado en la primera columna

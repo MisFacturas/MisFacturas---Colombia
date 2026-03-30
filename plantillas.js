@@ -234,16 +234,53 @@ function plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoic
       function confirmarEditar() {
         google.script.run
           .withSuccessHandler(function () { google.script.host.close(); })
-          .withFailureHandler(function (error) { alert('Error: ' + (error && error.message ? error.message : error)); })
+          .withFailureHandler(function (error) { mfAlert('Error: ' + (error && error.message ? error.message : error), 'Error'); })
           .modificarFactura();
       }
       function confirmarEnviar() {
         google.script.run
           .withSuccessHandler(function () { google.script.host.close(); })
-          .withFailureHandler(function (error) { alert('Error: ' + (error && error.message ? error.message : error)); })
+          .withFailureHandler(function (error) { mfAlert('Error: ' + (error && error.message ? error.message : error), 'Error'); })
           .enviarFacturaHtml();
       }
+      function mfAlert(message, title) {
+        var t = document.getElementById('mf-modal-title');
+        var m = document.getElementById('mf-modal-message');
+        var o = document.getElementById('mf-modal-overlay');
+        if (!t || !m || !o) return;
+        t.textContent = title || 'MisFacturas';
+        m.textContent = String(message || '');
+        o.classList.add('show');
+        o.setAttribute('aria-hidden', 'false');
+        var ok = document.getElementById('mf-modal-ok');
+        if (ok) ok.focus();
+      }
+      function mfCloseAlert() {
+        var o = document.getElementById('mf-modal-overlay');
+        if (!o) return;
+        o.classList.remove('show');
+        o.setAttribute('aria-hidden', 'true');
+      }
     </script>
+    <div id="mf-modal-overlay" class="mf-modal-overlay" aria-hidden="true">
+      <div class="mf-modal" role="dialog" aria-modal="true" aria-labelledby="mf-modal-title">
+        <div class="mf-modal-header">
+          <h5 id="mf-modal-title" class="mb-0"></h5>
+        </div>
+        <div id="mf-modal-message" class="mf-modal-body"></div>
+        <div class="mf-modal-footer">
+          <button id="mf-modal-ok" type="button" class="btn-orange" onclick="mfCloseAlert()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+    <style>
+      .mf-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;padding:24px;overflow:auto}
+      .mf-modal-overlay.show{display:flex;align-items:center;justify-content:center}
+      .mf-modal{width:100%;max-width:420px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+      .mf-modal-header{padding:16px 16px 0 16px;font-family:'Roboto',sans-serif}
+      .mf-modal-body{padding:12px 16px 0 16px;white-space:pre-wrap;word-break:break-word;font-family:'Roboto',sans-serif}
+      .mf-modal-footer{padding:16px;display:flex;justify-content:flex-end;gap:8px}
+    </style>
   `;
 }
 
@@ -252,7 +289,12 @@ function formatearPesos(valor) {
   if (!isFinite(numero)) {
     numero = 0;
   }
-  return `$${numero.toLocaleString('es-CO')}`;
+  // Mostrar siempre 2 decimales para evitar "redondeos visuales" y valores largos
+  var formatter = new Intl.NumberFormat('es-CO', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  return `$${formatter.format(numero)}`;
 }
 
 function plantillaCambiarAmbiente() {
@@ -349,11 +391,48 @@ function plantillaCambiarAmbiente() {
             google.script.host.close();
           })
           .withFailureHandler(function(error) {
-            alert('Error: ' + (error && error.message ? error.message : error));
+            mfAlert('Error: ' + (error && error.message ? error.message : error), 'Error');
           })
           .aplicarCambioAmbiente(selectedOption);
       }
+      function mfAlert(message, title) {
+        var t = document.getElementById('mf-modal-title');
+        var m = document.getElementById('mf-modal-message');
+        var o = document.getElementById('mf-modal-overlay');
+        if (!t || !m || !o) return;
+        t.textContent = title || 'MisFacturas';
+        m.textContent = String(message || '');
+        o.classList.add('show');
+        o.setAttribute('aria-hidden', 'false');
+        var ok = document.getElementById('mf-modal-ok');
+        if (ok) ok.focus();
+      }
+      function mfCloseAlert() {
+        var o = document.getElementById('mf-modal-overlay');
+        if (!o) return;
+        o.classList.remove('show');
+        o.setAttribute('aria-hidden', 'true');
+      }
     </script>
+    <div id="mf-modal-overlay" class="mf-modal-overlay" aria-hidden="true">
+      <div class="mf-modal" role="dialog" aria-modal="true" aria-labelledby="mf-modal-title">
+        <div class="mf-modal-header">
+          <h5 id="mf-modal-title" class="mb-0"></h5>
+        </div>
+        <div id="mf-modal-message" class="mf-modal-body"></div>
+        <div class="mf-modal-footer">
+          <button id="mf-modal-ok" type="button" class="btn-orange" onclick="mfCloseAlert()">Aceptar</button>
+        </div>
+      </div>
+    </div>
+    <style>
+      .mf-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;padding:24px;overflow:auto}
+      .mf-modal-overlay.show{display:flex;align-items:center;justify-content:center}
+      .mf-modal{width:100%;max-width:420px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+      .mf-modal-header{padding:16px 16px 0 16px;font-family:'Roboto',sans-serif}
+      .mf-modal-body{padding:12px 16px 0 16px;white-space:pre-wrap;word-break:break-word;font-family:'Roboto',sans-serif}
+      .mf-modal-footer{padding:16px;display:flex;justify-content:flex-end;gap:8px}
+    </style>
   `;
 }
 

@@ -33,6 +33,43 @@
     .spinner-container.show {
       display: block;
     }
+
+    /* Modal simple (sin bootstrap JS) */
+    #app-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 2000;
+      padding: 24px;
+      overflow: auto;
+    }
+    #app-modal-overlay.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #app-modal {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    #app-modal .app-modal-header {
+      padding: 16px 16px 0 16px;
+    }
+    #app-modal .app-modal-body {
+      padding: 12px 16px 0 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    #app-modal .app-modal-footer {
+      padding: 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
   </style>
 </head>
 
@@ -72,6 +109,19 @@
         <span class="visually-hidden">Cargando...</span>
       </div>
     </div>
+
+    <!-- Modal interno del sidebar (reemplaza alert()) -->
+    <div id="app-modal-overlay" aria-hidden="true">
+      <div id="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+        <div class="app-modal-header">
+          <h5 id="app-modal-title" class="mb-0"></h5>
+        </div>
+        <div id="app-modal-message" class="app-modal-body"></div>
+        <div class="app-modal-footer">
+          <button id="app-modal-ok" type="button" class="btn btn-primary">Aceptar</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -81,10 +131,51 @@
     
     const App = {
       currentView: null,
+      state: {},
+      ui: {
+        _okCb: null,
+        showAlert: function(message, title, okCb) {
+          const overlay = document.getElementById('app-modal-overlay');
+          const titleEl = document.getElementById('app-modal-title');
+          const msgEl = document.getElementById('app-modal-message');
+          const okBtn = document.getElementById('app-modal-ok');
+          if (!overlay || !titleEl || !msgEl || !okBtn) return;
+
+          titleEl.textContent = title || 'MisFacturas';
+          msgEl.textContent = String(message || '');
+          this._okCb = typeof okCb === 'function' ? okCb : null;
+
+          overlay.classList.add('show');
+          overlay.setAttribute('aria-hidden', 'false');
+          okBtn.focus();
+        },
+        closeAlert: function() {
+          const overlay = document.getElementById('app-modal-overlay');
+          if (!overlay) return;
+          overlay.classList.remove('show');
+          overlay.setAttribute('aria-hidden', 'true');
+          const cb = this._okCb;
+          this._okCb = null;
+          if (cb) cb();
+        }
+      },
       
       // Inicializar la aplicación
       init: function() {
-        this.navigateTo('main');
+        // Si una función de servidor abrió el sidebar pidiendo una vista específica,
+        // la consumimos una sola vez. Si no, vamos a main.
+        google.script.run
+          .withSuccessHandler(function(initialView) {
+            if (initialView) {
+              App.navigateTo(String(initialView));
+            } else {
+              App.navigateTo('main');
+            }
+          })
+          .withFailureHandler(function() {
+            App.navigateTo('main');
+          })
+          .consumeSpaInitialView();
       },
       
       // Mostrar/ocultar spinner
@@ -113,7 +204,7 @@
           .withFailureHandler(function(error) {
             console.error('Error cargando vista:', error);
             App.showLoading(false);
-            alert('Error al cargar la vista: ' + error);
+            App.ui.showAlert('Error al cargar la vista: ' + error, 'Error');
           })
           .getViewContent(viewName, params || {});
       },
@@ -153,6 +244,9 @@
             case 'crearCliente':
               initCrearClienteView();
               break;
+            case 'resumenFactura':
+              initResumenFacturaView();
+              break;
             default:
               break;
           }
@@ -176,6 +270,24 @@
       }
     };
 
+    // Wire modal events
+    (function() {
+      const overlay = document.getElementById('app-modal-overlay');
+      const okBtn = document.getElementById('app-modal-ok');
+      if (okBtn) okBtn.addEventListener('click', function() { App.ui.closeAlert(); });
+      if (overlay) {
+        overlay.addEventListener('click', function(e) {
+          if (e.target === overlay) App.ui.closeAlert();
+        });
+      }
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          const isOpen = overlay && overlay.classList.contains('show');
+          if (isOpen) App.ui.closeAlert();
+        }
+      });
+    })();
+
     // =============================================
     // Funciones de navegación globales
     // =============================================
@@ -191,6 +303,14 @@
     function goToConfiguracion() {
       google.script.run.openDatosEmisorSheet();
       App.navigateTo('configuracion');
+    }
+
+    function goToCambiarAmbiente() {
+      App.navigateTo('cambiarAmbiente');
+    }
+
+    function goToInstalacion() {
+      App.navigateTo('instalacion');
     }
     
     function goToVincular() {
@@ -229,7 +349,7 @@
       let usuario = document.getElementById('Usuario').value;
       
       if (!usuario || !contra) {
-        alert('Por favor, completa todos los campos.');
+        App.ui.showAlert('Por favor, completa todos los campos.');
         return;
       }
       
@@ -241,14 +361,38 @@
         .withSuccessHandler(function(success) {
           btn.disabled = false;
           btn.innerHTML = '<span>Vincular</span>';
-          if (success) {
-            goToMain();
+          // Compat: antes el backend retornaba boolean.
+          if (success === true) {
+            App.ui.showAlert('Cuenta vinculada exitosamente.', 'Confirmación', function() { goToMain(); });
+            return;
           }
+
+          // Nuevo: backend retorna objeto con estado de resoluciones
+          if (success && success.ok) {
+            const resol = success.resoluciones;
+            if (resol && resol.ok === false) {
+              App.ui.showAlert(
+                'Cuenta vinculada exitosamente.\n\n' + (resol.message || 'No fue posible obtener resoluciones DIAN.'),
+                'Vinculación',
+                function() {
+                  // Llevar a Configuración para que el usuario corrija NIT o intente de nuevo
+                  goToConfiguracion();
+                }
+              );
+              return;
+            }
+
+            App.ui.showAlert('Cuenta vinculada exitosamente.', 'Confirmación', function() { goToMain(); });
+            return;
+          }
+
+          // Si no vino ok, mostrar mensaje genérico
+          App.ui.showAlert('No fue posible completar la vinculación.', 'Error');
         })
         .withFailureHandler(function(error) {
           btn.disabled = false;
           btn.innerHTML = '<span>Vincular</span>';
-          alert('Error: ' + error);
+          App.ui.showAlert('Error: ' + error, 'Error');
         })
         .obtenerTokenMF(usuario, contra);
     }
@@ -278,10 +422,18 @@
     function desvincularCuenta() {
       const inputText = document.getElementById('confirmacionTexto').value;
       if (inputText === 'DESVINCULAR') {
-        google.script.run.DesvincularMisfacturas();
-        goToConfiguracion();
+        google.script.run
+          .withSuccessHandler(function() {
+            App.ui.showAlert('Haz desvinculado exitosamente misfacturas', 'Confirmación', function() {
+              goToConfiguracion();
+            });
+          })
+          .withFailureHandler(function(err) {
+            App.ui.showAlert('Error al desvincular: ' + (err && err.message ? err.message : err), 'Error');
+          })
+          .DesvincularMisfacturas(false);
       } else {
-        google.script.run.MensajeErrorDesvincularMisfacturas();
+        App.ui.showAlert('Si deseas desvincular misfacturas asegurate de escribir DESVINCULAR en el campo', 'Validación');
       }
     }
     
@@ -304,10 +456,18 @@
     function borrarInformacion() {
       const inputText = document.getElementById('confirmacionTexto').value;
       if (inputText === 'ELIMINAR') {
-        google.script.run.eliminarTotalidadInformacion();
-        goToMain();
+        google.script.run
+          .withSuccessHandler(function() {
+            App.ui.showAlert('Información eliminada correctamente', 'Confirmación', function() {
+              goToMain();
+            });
+          })
+          .withFailureHandler(function(err) {
+            App.ui.showAlert('Error al eliminar información: ' + (err && err.message ? err.message : err), 'Error');
+          })
+          .eliminarTotalidadInformacion();
       } else {
-        google.script.run.mensajeBorrarInfoError();
+        App.ui.showAlert('Si deseas eliminar toda la informacion de misfacturas asegurate de escribir ELIMINAR en el campo', 'Validación');
       }
     }
 
@@ -345,15 +505,25 @@
     
     // Navegación de facturación
     function goToNuevaFactura() {
-      google.script.run.openFacturaSheet();
-      google.script.run.inicarFacturaNueva();
-      App.navigateTo('nuevaFactura');
+      google.script.run
+        .withSuccessHandler(function() {
+          App.navigateTo('nuevaFactura');
+        })
+        .withFailureHandler(function(err) {
+          App.ui.showAlert('Error preparando nueva factura: ' + (err && err.message ? err.message : err), 'Error');
+        })
+        .spaPrepareNuevaFactura();
     }
     
     function goToListadoFacturas() {
-      google.script.run.actualizarEstadoUltimasFacturas();
-      google.script.run.openHistorialSheet();
-      App.navigateTo('listadoFacturas');
+      google.script.run
+        .withSuccessHandler(function() {
+          App.navigateTo('listadoFacturas');
+        })
+        .withFailureHandler(function(err) {
+          App.ui.showAlert('Error preparando listado de facturas: ' + (err && err.message ? err.message : err), 'Error');
+        })
+        .spaPrepareListadoFacturas();
     }
     
     function goToAgregarProductoFactura() {
@@ -362,7 +532,33 @@
     
     // Acciones de factura
     function guardarFactura() {
-      google.script.run.guardarFactura();
+      App.showLoading(true);
+      google.script.run
+        .withSuccessHandler(function(res) {
+          App.showLoading(false);
+          if (!res) {
+            App.ui.showAlert('No se pudo procesar la factura.', 'Error');
+            return;
+          }
+          if (res.ok) {
+            App.state.facturaResumen = res.resumen || null;
+            App.navigateTo('resumenFactura');
+            return;
+          }
+          // Errores controlados
+          if (res.code === 'NEED_LINK') {
+            App.ui.showAlert(res.message || 'Debes vincular tu cuenta.', 'Vinculación', function() {
+              goToVincular();
+            });
+            return;
+          }
+          App.ui.showAlert(res.message || 'No se pudo guardar la factura.', 'Validación');
+        })
+        .withFailureHandler(function(err) {
+          App.showLoading(false);
+          App.ui.showAlert('Error: ' + (err && err.message ? err.message : err), 'Error');
+        })
+        .guardarFactura();
     }
     
     function limpiarFactura() {
@@ -403,7 +599,7 @@
       var producto = document.getElementById('buscarProducto').value;
       
       if (!cantidad || !producto) {
-        alert('Por favor, ingresa la cantidad y selecciona un producto.');
+        App.ui.showAlert('Por favor, ingresa la cantidad y selecciona un producto.');
         return;
       }
       
@@ -481,6 +677,150 @@
       }, 1500);
     }
 
+    // Resumen de factura (SPA)
+    function initResumenFacturaView() {
+      const data = App.state.facturaResumen;
+      if (!data) return;
+
+      const fmtCOP = (v) => {
+        const n = Number(v);
+        if (!isFinite(n)) return '';
+        // COP con 2 decimales (evita mostrar 652.472432, etc.)
+        return '$' + new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+      };
+
+      const setText = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = (v === undefined || v === null) ? '' : String(v);
+      };
+
+      setText('rf-cliente', data.nombreCliente || '');
+      setText('rf-numero', data.numeroFactura || '');
+
+      // Impuestos
+      const impuestosEl = document.getElementById('rf-impuestos');
+      if (impuestosEl) {
+        impuestosEl.innerHTML = '';
+        (data.impuestos || []).forEach(function(imp) {
+          const li = document.createElement('li');
+          li.className = 'd-flex justify-content-between py-1';
+          li.innerHTML = '<span>' + imp.tipo + ' (' + imp.percent + '%):</span><span>' + fmtCOP(imp.amount) + '</span>';
+          impuestosEl.appendChild(li);
+        });
+      }
+
+      // Totales
+      const tot = data.invoiceTotal || {};
+      setText('rf-subtotal', fmtCOP(tot.LineExtensionAmount));
+      setText('rf-excl', fmtCOP(tot.TaxExclusiveAmount));
+      setText('rf-incl', fmtCOP(tot.TaxInclusiveAmount));
+      // Retenciones puede venir separado en el resumen (no siempre está en InvoiceTotal)
+      setText('rf-retenciones', fmtCOP(data.retencionesTotal));
+      setText('rf-desc', fmtCOP(tot.AllowanceTotalAmount));
+      setText('rf-cargos', fmtCOP(tot.ChargeTotalAmount));
+      setText('rf-anticipos', fmtCOP(tot.PrePaidAmount));
+      setText('rf-total', fmtCOP(tot.PayableAmount));
+    }
+
+    function editarFacturaDesdeResumen() {
+      // Volver a la vista de Nueva Factura para edición
+      App.navigateTo('nuevaFactura');
+    }
+
+    function enviarFacturaDesdeResumen() {
+      App.showLoading(true);
+      google.script.run
+        .withSuccessHandler(function(res) {
+          App.showLoading(false);
+          const msg = (res && res.message) ? res.message : 'Factura enviada correctamente.';
+          // Al enviar satisfactoriamente, volver a flujo de nueva factura
+          if (res && res.ok === false) {
+            App.ui.showAlert(msg, 'Error');
+            return;
+          }
+          App.ui.showAlert(msg, 'Confirmación', function() {
+            // Limpiar resumen en memoria y preparar nueva factura
+            App.state.facturaResumen = null;
+            goToNuevaFactura();
+          });
+        })
+        .withFailureHandler(function(err) {
+          App.showLoading(false);
+          App.ui.showAlert('Error: ' + (err && err.message ? err.message : err), 'Error');
+        })
+        .enviarFacturaHtml();
+    }
+
+    // Cambiar ambiente (SPA)
+    function confirmarCambioAmbiente() {
+      const selected = document.querySelector('input[name=\"ambiente\"]:checked');
+      const nuevo = selected ? selected.value : null;
+      if (!nuevo) {
+        App.ui.showAlert('Selecciona un ambiente.', 'Validación');
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function() {
+          App.ui.showAlert(
+            'Ambiente cambiado a: ' + nuevo + '\\n\\nDebes volver a vincular tu cuenta.',
+            'Confirmación',
+            function() {
+              goToVincular();
+            }
+          );
+        })
+        .withFailureHandler(function(err) {
+          App.ui.showAlert('Error al cambiar ambiente: ' + (err && err.message ? err.message : err), 'Error');
+        })
+        .aplicarCambioAmbiente(nuevo);
+    }
+
+    // Instalación desde el sidebar (evita popups del servidor)
+    function setInstallStatus(text) {
+      const el = document.getElementById('install-status');
+      if (el) el.textContent = text || '';
+    }
+
+    function verificarHojasFaltantes() {
+      setInstallStatus('Verificando...');
+      google.script.run
+        .withSuccessHandler(function(missing) {
+          if (!missing || missing.length === 0) {
+            setInstallStatus('OK: no faltan hojas.');
+            App.ui.showAlert('No faltan hojas. Tu instalación está completa.', 'Confirmación');
+            return;
+          }
+          setInstallStatus('Faltan: ' + missing.join(', '));
+          App.ui.showAlert('Faltan las siguientes hojas:\n\n- ' + missing.join('\n- '), 'Hojas faltantes');
+        })
+        .withFailureHandler(function(err) {
+          setInstallStatus('');
+          App.ui.showAlert('Error verificando hojas: ' + (err && err.message ? err.message : err), 'Error');
+        })
+        .spaGetMissingSheets();
+    }
+
+    function instalarHojas() {
+      setInstallStatus('Instalando... esto puede tardar unos segundos.');
+      App.showLoading(true);
+      google.script.run
+        .withSuccessHandler(function(res) {
+          App.showLoading(false);
+          setInstallStatus('');
+          const msg = (res && res.message) ? res.message : 'Instalación completada.';
+          App.ui.showAlert(msg, 'Instalación', function() {
+            goToVincular();
+          });
+        })
+        .withFailureHandler(function(err) {
+          App.showLoading(false);
+          setInstallStatus('');
+          App.ui.showAlert('Error: ' + (err && err.message ? err.message : err), 'Error');
+        })
+        .spaInstallHojas();
+    }
+
     // =============================================
     // Funciones de Clientes
     // =============================================
@@ -531,7 +871,7 @@
         resultItem.textContent = cliente;
         resultItem.onclick = function() {
           if (cliente.includes('Consumidor Final') || cliente.includes('222222222222')) {
-            alert("No se puede desactivar el cliente 'Consumidor Final'.");
+            App.ui.showAlert("No se puede desactivar el cliente 'Consumidor Final'.");
             return;
           }
           select.innerHTML = '';
@@ -563,12 +903,12 @@
       
       var cliente = select.value;
       if (!cliente) {
-        alert('Por favor selecciona un cliente.');
+        App.ui.showAlert('Por favor selecciona un cliente.');
         return;
       }
       
       if (cliente.includes('Consumidor Final') || cliente.includes('222222222222')) {
-        alert("No se puede desactivar el cliente 'Consumidor Final'.");
+        App.ui.showAlert("No se puede desactivar el cliente 'Consumidor Final'.");
         return;
       }
       
@@ -641,7 +981,7 @@
       
       var cliente = select.value;
       if (!cliente) {
-        alert('Por favor selecciona un cliente.');
+        App.ui.showAlert('Por favor selecciona un cliente.');
         return;
       }
       
@@ -855,7 +1195,7 @@
     
     function guardarClienteCrear() {
       if (!verificarDatosObligatoriosCrear()) {
-        alert('Por favor complete todos los campos obligatorios.');
+        App.ui.showAlert('Por favor complete todos los campos obligatorios.');
         return;
       }
       
@@ -887,12 +1227,13 @@
       };
       
       google.script.run.withSuccessHandler(function(response) {
-        alert('Cliente creado exitosamente.');
         // Limpiar formulario
         document.getElementById('clientFormCrear').reset();
-        goToClientes();
+        App.ui.showAlert('Cliente creado exitosamente.', 'Confirmación', function() {
+          goToClientes();
+        });
       }).withFailureHandler(function(error) {
-        alert('Error al crear cliente: ' + error);
+        App.ui.showAlert('Error al crear cliente: ' + error, 'Error');
       }).saveClientData(formData);
     }
 
@@ -986,7 +1327,7 @@
     // Guardar producto
     function guardarProductoCrear() {
       if (!verificarDatosObligatoriosProducto()) {
-        alert('Por favor complete todos los campos obligatorios.');
+        App.ui.showAlert('Por favor complete todos los campos obligatorios.');
         return;
       }
       
@@ -1003,13 +1344,19 @@
         unidadMedidaCheckbox: document.getElementById('unidadMedidaCheckboxCrear').checked
       };
       
-      google.script.run.withSuccessHandler(function(response) {
-        // Limpiar formulario
-        resetFormProducto();
-        google.script.run.openProductosSheet();
-      }).withFailureHandler(function(error) {
-        alert('Error al crear producto: ' + error);
-      }).processForm(formData);
+      google.script.run
+        .withSuccessHandler(function(response) {
+          resetFormProducto();
+          const msg = (response && response.message) ? response.message : 'Producto creado exitosamente.';
+          App.ui.showAlert(msg, 'Confirmación', function() {
+            google.script.run.openProductosSheet();
+            goToProductos();
+          });
+        })
+        .withFailureHandler(function(error) {
+          App.ui.showAlert('Error al crear producto: ' + (error && error.message ? error.message : error), 'Error');
+        })
+        .processForm(formData);
     }
     
     function resetFormProducto() {

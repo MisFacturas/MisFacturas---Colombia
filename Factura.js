@@ -22,11 +22,19 @@ function obtenerBaseUrlSegunAmbiente() {
   }
 }
 
+function obtenerSchemaID() {
+  var hojaDatosEmisor = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Datos de emisor');
+  var tipoDoc = String(hojaDatosEmisor.getRange("B2").getValue()).trim();
+  if (tipoDoc === "Cédula" || tipoDoc === "Cedula") return 13;
+  return 31; // NIT por defecto
+}
+
 function linkDescargaFactura(idFactura) {
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let idNumber = hojaDatosEmisor.getRange("B3").getValue();
-  let schemaID = 31;
+  let schemaID = obtenerSchemaID();
+  Logger.log("schemaID: "+schemaID)
   let documentNumber = idFactura;
   let documentType = 1;
   const baseUrl = obtenerBaseUrlSegunAmbiente();
@@ -87,12 +95,11 @@ function verificarEstadoValidoFactura(estadoFactura) {
   let estaValido = true;
   estadoFactura.push(estaValido);
 
-  //verificar nit
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let nit = hojaDatosEmisor.getRange("B3").getValue();
   if (nit === "") {
     estaValido = false;
-    estadoFactura.push("Por favor registre su NIT en la hoja Datos de Emisor");
+    estadoFactura.push("Por favor registre su número de documento (NIT o Cédula) en la hoja Datos de Emisor");
 
   }
 
@@ -155,23 +162,13 @@ function verificarEstadoValidoFactura(estadoFactura) {
 }
 
 function guardarFactura() {
-  // Mostrar el modal de procesando
-  var html = HtmlService.createHtmlOutput('<script>setTimeout(function(){google.script.host.close();}, 500);</script>')
-    .setWidth(350)
-    .setHeight(50);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Procesando...');
-
-
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   let estadoVinculacion = hojaDatosEmisor.getRange("B13").getValue();
   let estadoFactura = [];
 
   if (estadoVinculacion == "Desvinculado") {
-    let inHoja = true;
-    let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF(inHoja)).setWidth(500).setHeight(400);
-    SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Vincular a MisFacturas');
-    return;
+    return { ok: false, code: 'NEED_LINK', message: 'Debes vincular tu cuenta para poder generar facturas.' };
   }
 
   Logger.log("Se va a verificar la validez de la factura");
@@ -182,15 +179,66 @@ function guardarFactura() {
   if (estadoFactura[0] === false) {
     // Filtrar solo los mensajes de error (excluir el primer elemento que es true/false)
     let mensajesError = estadoFactura.slice(1);
-    let mensajeError = "La factura no es válida. Por favor rellene los campos obligatorios:\n" + mensajesError.join("\n- ");
-    SpreadsheetApp.getUi().alert(mensajeError);
-    return;
+    let mensajeError = "La factura no es válida. Por favor rellene los campos obligatorios:\n- " + mensajesError.join("\n- ");
+    return { ok: false, code: 'INVALID', message: mensajeError, fields: mensajesError };
   }
 
   if (logearUsuario()) {
     guardarYGenerarInvoice();
-    mostrarResumenFactura();
+    // Retornar el resumen para mostrarlo en el sidebar (no showModalDialog)
+    var jsonString = recuperarJson();
+    var json = JSON.parse(jsonString);
+    // Normalizar montos para UI (2 decimales)
+    function mfMoney(v) {
+      var n = Number(v);
+      if (!isFinite(n)) n = 0;
+      return Math.round((n + Number.EPSILON) * 100) / 100;
+    }
+
+    var nombreCliente = json.CustomerInformation.RegistrationName;
+    var numeroFactura = json.InvoiceGeneralInformation.InvoiceNumber;
+
+    var impuestos = json.InvoiceTaxTotal.map(function (tax) {
+      var tipoImpuesto = tax.Id === "01" ? "IVA" : tax.Id === "04" ? "INC" : "ReteRenta";
+      return {
+        tipo: tipoImpuesto,
+        percent: mfMoney(tax.Percent),
+        amount: mfMoney(tax.TaxAmount)
+      };
+    });
+
+    // Retenciones totales para el resumen lateral (no vienen en InvoiceTotal)
+    var retencionesTotal = 0;
+    (json.InvoiceTaxTotal || []).forEach(function (tax) {
+      if (String(tax.Id) === "06" || tax.TaxEvidenceIndicator === true) {
+        retencionesTotal += Number(tax.TaxAmount) || 0;
+      }
+    });
+    retencionesTotal = mfMoney(retencionesTotal);
+
+    var invoiceTotal = json.InvoiceTotal || {};
+    var invoiceTotalUI = {
+      LineExtensionAmount: mfMoney(invoiceTotal.LineExtensionAmount),
+      TaxExclusiveAmount: mfMoney(invoiceTotal.TaxExclusiveAmount),
+      TaxInclusiveAmount: mfMoney(invoiceTotal.TaxInclusiveAmount),
+      AllowanceTotalAmount: mfMoney(invoiceTotal.AllowanceTotalAmount),
+      ChargeTotalAmount: mfMoney(invoiceTotal.ChargeTotalAmount),
+      PrePaidAmount: mfMoney(invoiceTotal.PrePaidAmount),
+      PayableAmount: mfMoney(invoiceTotal.PayableAmount),
+    };
+
+    return {
+      ok: true,
+      resumen: {
+        nombreCliente: nombreCliente,
+        numeroFactura: numeroFactura,
+        impuestos: impuestos,
+        retencionesTotal: retencionesTotal,
+        invoiceTotal: invoiceTotalUI
+      }
+    };
   }
+  return { ok: false, code: 'AUTH', message: 'No fue posible autenticar. Verifica la vinculación e intenta nuevamente.' };
 }
 
 function agregarFilaNueva() {
@@ -355,7 +403,7 @@ function enviarFactura() {
   const hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
   const hojaDatos = spreadsheet.getSheetByName('Datos');
 
-  const schemaID = 31;
+  const schemaID = obtenerSchemaID();
   const idNumber = String(hojaDatosEmisor.getRange("B3").getDisplayValue()).trim();
   const templateID = 73;
 
@@ -448,7 +496,7 @@ function enviarFactura() {
 }
 
 function registarEstadoFactura(idFactura, numRow) {
-  let schemaID = 31;
+  let schemaID = obtenerSchemaID();
   let documentType = 1;
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaDatosEmisor = spreadsheet.getSheetByName('Datos de emisor');
@@ -549,18 +597,18 @@ function obtenerTokenMF(usuario, contra) {
     if (respuestaJson.length > 0 && typeof respuestaJson === 'string') {
       let token = respuestaJson; // Extrae el API Key
       Logger.log("API Key obtenida: " + token);
-      SpreadsheetApp.getUi().alert("Se ha vinculado tu cuenta exitosamente");
       hojaDatos.getRange("F49").setValue(usuario)
       hojaDatos.getRange("F50").setValue(contra)
       hojaDatosEmisor.getRange("B13").setBackground('#ccffc7')  // Almacena el API Key en la celda
       hojaDatosEmisor.getRange("B13").setValue("Vinculado")
       hojaDatos.getRange("F47").setValue(token)
+      // Intentar obtener resoluciones (si falla, la vinculación sigue siendo exitosa)
       var resdian = obtenerResolucionesDian(token, usuario);
-      if (!resdian) {
-        // Aunque falle obtenerResolucionesDian, la autenticación fue exitosa
-        return true;
-      }
-      return true; // Retorna true para indicar éxito
+      return {
+        ok: true,
+        vinculacion: { ok: true },
+        resoluciones: resdian || { ok: false, message: "No fue posible obtener resoluciones DIAN." }
+      };
     } else {
       hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
       hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
@@ -572,8 +620,8 @@ function obtenerTokenMF(usuario, contra) {
     hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
     hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
     hojaDatos.getRange("F47").setValue("")
-    SpreadsheetApp.getUi().alert("Error al vincular su cuenta. Verifique que el usuario y contraseña sean correctos, también confirme contar con el plan Google Sheets™ e intente nuevamente. Si el error persiste, comuníquese con soporte a través del siguiente correo: soporte@misfacturas.com.co");
-    return false; // Retorna false para indicar error
+    // No mostrar alert() del servidor (cierra/sidebar pierde foco). Devolvemos error al cliente.
+    throw new Error("Error al vincular su cuenta. Verifique usuario/contraseña, confirme contar con el plan Google Sheets™ e intente nuevamente. Si persiste, contacte a soporte: soporte@misfacturas.com.co");
   }
 }
 
@@ -585,9 +633,10 @@ function obtenerResolucionesDian(token, usuario) {
   if (nit === "") {
 
     hojaDatosEmisor.getRange("B3").setBackground("#FFC7C7");
-    SpreadsheetApp.getUi().alert("Por favor ingrese el NIT del emisor en la hoja 'Datos de emisor' y vuelva a intentar obtener las resoluciones.");
-    spreadsheet.setActiveSheet(hojaDatosEmisor);
-    return;
+    return {
+      ok: false,
+      message: "No se pudieron traer resoluciones DIAN: ingresa el número de documento del emisor en la hoja 'Datos de emisor' (celda B3) e intenta nuevamente."
+    };
 
   }
   else {
@@ -596,12 +645,13 @@ function obtenerResolucionesDian(token, usuario) {
       usuario = hojaDatos.getRange("F49").getValue();
       let loginExitoso = logearUsuario();
       if (!loginExitoso) {
-        return false;
+        return { ok: false, message: "No se pudo autenticar para consultar resoluciones DIAN." };
       }
       token = hojaDatos.getRange("F47").getValue();
     }
     const baseUrl = obtenerBaseUrlSegunAmbiente();
-    let url = `${baseUrl}integrationAPI_2/api/GetDianResolutions?SchemaID=31&IDNumber=${nit}`;
+    let schemaID = obtenerSchemaID();
+    let url = `${baseUrl}integrationAPI_2/api/GetDianResolutions?SchemaID=${schemaID}&IDNumber=${nit}`;
     let opciones = {
       "method": "get",
       "headers": { "Authorization": "misfacturas " + token },
@@ -612,9 +662,12 @@ function obtenerResolucionesDian(token, usuario) {
     try {
       const respuesta = UrlFetchApp.fetch(url, opciones);
       const contenidoTexto = respuesta.getContentText(); // Obtiene el cuerpo de la respuesta como texto
-
+      Logger.log("respuesta2: "+respuesta)
+      Logger.log("respuesta: "+respuesta)
+      Logger.log("opciones: "+opciones)
       // Verificar si la respuesta está vacía o es inválida
       if (!contenidoTexto || contenidoTexto.trim() === '') {
+        Logger.log("contenidoTexto: "+contenidoTexto)
         Logger.log("Error: Respuesta vacía de la API de resoluciones DIAN");
         throw new Error("Respuesta vacía del servidor");
       }
@@ -670,20 +723,24 @@ function obtenerResolucionesDian(token, usuario) {
         hojaDatosEmisor.getRange(18, 5, filas.length, 1).setBackground('#edffeb'); // Column E
         hojaDatosEmisor.getRange(18, 6, filas.length, 1).setBackground('#d9d9d9'); // Column F
 
-        return true;
+        return { ok: true };
       } else if (datos.InvoiceAuthorizationList && datos.InvoiceAuthorizationList.length === 0) {
         // Lista vacía: limpiar área de resoluciones y avisar al usuario sin lanzar excepción
         hojaDatosEmisor.getRange(18, 1, 13, hojaDatosEmisor.getLastColumn()).clearContent();
-        SpreadsheetApp.getUi().alert("No se encontraron resoluciones DIAN para el NIT ingresado.");
-        return false;
+        return {
+          ok: false,
+          message: "No se encontraron resoluciones DIAN para el número de documento ingresado."
+        };
       } else {
         const mensajeError = (datos && datos.Message) ? datos.Message : contenidoTexto;
-        throw new Error("Error de la API: " + mensajeError);
+        return { ok: false, message: "Error de la API al obtener resoluciones DIAN: " + mensajeError };
       }
     } catch (error) {
       Logger.log("error: "+error)
-      SpreadsheetApp.getUi().alert("Error al obtener las resoluciones dian. Verifica que el NIT sea correcto e intenta de nuevo. Si el error persiste, comunícate con soporte.");
-      return false;
+      return {
+        ok: false,
+        message: "Error al obtener las resoluciones DIAN. Verifica que el número de documento sea correcto e intenta de nuevo. Si el error persiste, comunícate con soporte."
+      };
     }
   }
 
@@ -714,6 +771,8 @@ function limpiarHojaFactura() {
   spreadsheet.setActiveSheet(hojaFacturaPost)
   Logger.log("La hoja 'Factura' ha sido reemplazada correctamente.");
   grabarRangoResolucionesDian(hojaFacturaPost);
+  // Asegurar formato monetario 2 decimales en la nueva hoja
+  try { aplicarFormatoMonetarioDosDecimales(); } catch (e) { Logger.log('Formato moneda error: ' + e); }
 }
 
 function inicarFacturaNueva() {
@@ -742,6 +801,8 @@ function inicarFacturaNueva() {
   // J6: Fecha de tasa de cambio por defecto
   hojaFactura.getRange("J6").setValue("N/A");
   grabarRangoResolucionesDian(hojaFactura);
+  // Asegurar formato monetario 2 decimales
+  try { aplicarFormatoMonetarioDosDecimales(); } catch (e) { Logger.log('Formato moneda error: ' + e); }
 }
 
 function verificarYCopiarCliente(e) {
@@ -967,6 +1028,16 @@ function getPaymentSummary() {
 
 function guardarYGenerarInvoice() {
   Logger.log("Guardando y generando invoice");
+  // Helpers numéricos para garantizar 2 decimales en montos (evita 123.96976208000001, etc.)
+  function mfNum(v) {
+    var n = Number(v);
+    return isFinite(n) ? n : 0;
+  }
+  function mfMoney(v) {
+    // Redondeo "half-up" a 2 decimales
+    return Math.round((mfNum(v) + Number.EPSILON) * 100) / 100;
+  }
+
   let spreadsheet = SpreadsheetApp.getActive();
   let hojaProductos = spreadsheet.getSheetByName('Productos');
   let hojaFactura = spreadsheet.getSheetByName('Factura');
@@ -1032,14 +1103,15 @@ function guardarYGenerarInvoice() {
     let ItemReference = String(LineaFactura['referencia']);
     let Name = String(LineaFactura['producto']);
     let NameReal = Name.split("-")[0].trim();
-    let Quantity = String(LineaFactura['cantidad']);
-    let Price = Number(LineaFactura['preciounitario']);
+    let Quantity = mfNum(LineaFactura['cantidad']);
+    let Price = mfMoney(LineaFactura['preciounitario']);
     let chargeIndicator = false;
-    let LineTotalTaxes = Number(LineaFactura['impuestos']);
-    let LineTotal = parseFloat(LineaFactura['totaldelinea']);
-    let LineExtensionAmount = parseFloat(LineaFactura['subtotal']);
-    let TotalCargosLinea = Number(LineaFactura['cargos']);
-    let TotalDescuentoLinea = Number(LineaFactura['descuento%']) * 100;
+    let LineTotalTaxes = mfMoney(LineaFactura['impuestos']);
+    let LineTotal = mfMoney(LineaFactura['totaldelinea']);
+    let LineExtensionAmount = mfMoney(LineaFactura['subtotal']);
+    let TotalCargosLinea = mfMoney(LineaFactura['cargos']);
+    // En la hoja, descuento% está como decimal (ej: 0.013); en el JSON se envía como porcentaje (ej: 1.30)
+    let TotalDescuentoLinea = mfMoney(mfNum(LineaFactura['descuento%']) * 100);
     let MeasureUnitCode = String(unidadDeMedida);
 
     let ItemTaxesInformation = [];
@@ -1063,14 +1135,15 @@ function guardarYGenerarInvoice() {
 
     function agregarCargosDescuentos() {
       let AllowanceCharge = [];
+      let baseAmount = mfMoney(mfNum(Price) * mfNum(Quantity));
       if (TotalDescuentoLinea > 0) {
         let Allowance = {
           "Id": 9,
           "ChargeIndicator": chargeIndicator,
           "AllowanceChargeReason": "",
-          "MultiplierFactorNumeric": Number(TotalDescuentoLinea),
-          "Amount": Number(Price) * Number(Quantity) * (TotalDescuentoLinea / 100),
-          "BaseAmount": Number(Price) * Number(Quantity)
+          "MultiplierFactorNumeric": mfMoney(TotalDescuentoLinea),
+          "Amount": mfMoney(baseAmount * (TotalDescuentoLinea / 100)),
+          "BaseAmount": baseAmount
         }
         AllowanceCharge.push(Allowance);
 
@@ -1080,8 +1153,8 @@ function guardarYGenerarInvoice() {
           "Id": 20,
           "ChargeIndicator": !chargeIndicator,
           "AllowanceChargeReason": "",
-          "Amount": TotalCargosLinea,
-          "BaseAmount": Number(Price) * Number(Quantity)
+          "Amount": mfMoney(TotalCargosLinea),
+          "BaseAmount": baseAmount
         }
         AllowanceCharge.push(Charge);
 
@@ -1098,8 +1171,8 @@ function guardarYGenerarInvoice() {
           Id: "01",//Id
           TaxEvidenceIndicator: false,
           TaxableAmount: LineExtensionAmount,
-          TaxAmount: LineExtensionAmount * LineaFactura["iva%"],
-          Percent: Number(percentIva),
+          TaxAmount: mfMoney(LineExtensionAmount * mfNum(LineaFactura["iva%"])),
+          Percent: mfNum(percentIva),
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         }
@@ -1113,8 +1186,8 @@ function guardarYGenerarInvoice() {
           Id: "04",//Id
           TaxEvidenceIndicator: false,
           TaxableAmount: LineExtensionAmount,
-          TaxAmount: LineExtensionAmount * LineaFactura["inc%"],
-          Percent: Number(percentInc),
+          TaxAmount: mfMoney(LineExtensionAmount * mfNum(LineaFactura["inc%"])),
+          Percent: mfNum(percentInc),
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         };
@@ -1125,16 +1198,16 @@ function guardarYGenerarInvoice() {
         let retencionTaxInformation = {
           Id: "06",
           TaxEvidenceIndicator: true,
-          TaxableAmount: Number(LineExtensionAmount),
+          TaxableAmount: mfMoney(LineExtensionAmount),
           TaxAmount: 0,
           Percent: 0,
           BaseUnitMeasure: 0,
           PerUnitAmount: 0,
         };
         let nombreYporcentajeRetencion = buscarRetencion(LineaFactura["producto"]);
-        let porcentajeRetencion = Number(nombreYporcentajeRetencion[1]) * 100;
-        retencionTaxInformation.Percent = Number(porcentajeRetencion.toFixed(3));
-        retencionTaxInformation.TaxAmount = Number(LineExtensionAmount) * Number(porcentajeRetencion) / 100;
+        let porcentajeRetencion = mfMoney(mfNum(nombreYporcentajeRetencion[1]) * 100);
+        retencionTaxInformation.Percent = porcentajeRetencion; // 2 decimales
+        retencionTaxInformation.TaxAmount = mfMoney(mfNum(LineExtensionAmount) * porcentajeRetencion / 100);
         ItemTaxesInformation.push(retencionTaxInformation);
       }
 
@@ -1145,8 +1218,8 @@ function guardarYGenerarInvoice() {
     let productoI = {//aqui organizamos todos los parametros necesarios para los productos
       ItemReference: ItemReference,
       Name: NameReal,
-      Quatity: Number(Quantity),
-      Price: Number(Price),
+      Quatity: mfNum(Quantity),
+      Price: mfMoney(Price),
 
       LineAllowanceTotal: TotalDescuentoLinea,
       LineChargeTotal: TotalCargosLinea,
@@ -1208,7 +1281,13 @@ function guardarYGenerarInvoice() {
       }
     }
 
-    return impuestosAgrupados;
+    // Normalizar a 2 decimales para salida en JSON
+    return impuestosAgrupados.map(function(t) {
+      t.TaxableAmount = mfMoney(t.TaxableAmount);
+      t.TaxAmount = mfMoney(t.TaxAmount);
+      t.Percent = mfMoney(t.Percent);
+      return t;
+    });
   }
   function agregarCargosDescuentosTotales(subtotal) {
     let hojaFactura = spreadsheet.getSheetByName('Factura');
@@ -1225,11 +1304,11 @@ function guardarYGenerarInvoice() {
           "ChargeIndicator": !chargeIndicator,
           "AllowanceChargeReason": hojaFactura.getRange("B" + String(i)).getValue(),
           "MultiplierFactorNumeric": 0,
-          "Amount": hojaFactura.getRange("E" + String(i)).getValue(),
-          "BaseAmount": subtotal
+          "Amount": mfMoney(hojaFactura.getRange("E" + String(i)).getValue()),
+          "BaseAmount": mfMoney(subtotal)
         }
         if (String(celdaValorPorcentaje).includes("%")) {
-          Charge.MultiplierFactorNumeric = Number(celdaValorPorcentaje.replace("%", ""))
+          Charge.MultiplierFactorNumeric = mfMoney(celdaValorPorcentaje.replace("%", ""))
         }
         CargosyDescuentos.push(Charge);
       }
@@ -1239,11 +1318,11 @@ function guardarYGenerarInvoice() {
           "ChargeIndicator": chargeIndicator,
           "AllowanceChargeReason": hojaFactura.getRange("B" + String(i)).getValue(),
           "MultiplierFactorNumeric": 0,
-          "Amount": hojaFactura.getRange("E" + String(i)).getValue(),
-          "BaseAmount": subtotal
+          "Amount": mfMoney(hojaFactura.getRange("E" + String(i)).getValue()),
+          "BaseAmount": mfMoney(subtotal)
         }
         if (String(celdaValorPorcentaje).includes("%")) {
-          Allowance.MultiplierFactorNumeric = Number(celdaValorPorcentaje.replace("%", ""))
+          Allowance.MultiplierFactorNumeric = mfMoney(celdaValorPorcentaje.replace("%", ""))
         }
         CargosyDescuentos.push(Allowance);
       }
@@ -1256,43 +1335,35 @@ function guardarYGenerarInvoice() {
 
 
 
-  //estos es dinamico, verificar donde va el total cargo y descuento
-  const posicionOriginalTotalFactura = hojaFactura.getRange("A20").getValue(); // para verificar donde esta el TOTAL
-  let rangeTotales = ""
+  // Línea de totales (A:L) — usar el detector, y fallback seguro
+  let rowTotales = getTotalesLinea(hojaFactura);
+  if (!rowTotales) rowTotales = 21; // fallback para plantillas antiguas
+  let rangeTotales = hojaFactura.getRange(rowTotales, 1, 1, 12);
 
-
-  if (posicionOriginalTotalFactura === "Subtotal") {
-    rangeTotales = hojaFactura.getRange(posicionOriginalTotalFactura + 1, 1, 1, 12);//va a cambiar
-
-  } else {
-    let rowTotales = getTotalesLinea(hojaFactura)
-    rangeTotales = hojaFactura.getRange(rowTotales, 1, 1, 12);
-  }
-
-  let totalesValores = String(rangeTotales.getValues())
-  totalesValores = totalesValores.split(",")
+  // Leer valores directamente (evita errores por String/split y mantiene índices)
+  let totalesValores = rangeTotales.getValues()[0] || [];
 
 
   //Definir los valores para el json
   Logger.log("Valores totales: " + totalesValores);
-  let pfSubTotal = parseFloat(totalesValores[0]);
-  let pfBaseGrabable = parseFloat(totalesValores[1]);
-  let pfSubTotalMasImpuestos = parseFloat(totalesValores[3]);
-  let pfRetenciones = parseFloat(totalesValores[4]);
-  let pfDescuentos = parseFloat(totalesValores[5]);
-  let pfCargos = parseFloat(totalesValores[7]);
-  let pfAnticipo = Number(totalesValores[9]);
-  let pfNetoAPagar = Number(totalesValores[11]);
+  let pfSubTotal = mfMoney(totalesValores[0]);
+  let pfBaseGrabable = mfMoney(totalesValores[1]);
+  let pfSubTotalMasImpuestos = mfMoney(totalesValores[3]);
+  let pfRetenciones = mfMoney(totalesValores[4]);
+  let pfDescuentos = mfMoney(totalesValores[5]);
+  let pfCargos = mfMoney(totalesValores[7]);
+  let pfAnticipo = mfMoney(totalesValores[9]);
+  let pfNetoAPagar = mfMoney(totalesValores[11]);
 
 
   let invoice_total = {
-    "LineExtensionAmount": pfSubTotal,
-    "TaxExclusiveAmount": pfBaseGrabable,
-    "TaxInclusiveAmount": pfSubTotalMasImpuestos,
-    "AllowanceTotalAmount": pfDescuentos,
-    "ChargeTotalAmount": pfCargos,
-    "PrePaidAmount": pfAnticipo,
-    "PayableAmount": pfNetoAPagar
+    "LineExtensionAmount": mfMoney(pfSubTotal),
+    "TaxExclusiveAmount": mfMoney(pfBaseGrabable),
+    "TaxInclusiveAmount": mfMoney(pfSubTotalMasImpuestos),
+    "AllowanceTotalAmount": mfMoney(pfDescuentos),
+    "ChargeTotalAmount": mfMoney(pfCargos),
+    "PrePaidAmount": mfMoney(pfAnticipo),
+    "PayableAmount": mfMoney(pfNetoAPagar)
   }
 
 
@@ -1345,7 +1416,7 @@ function guardarYGenerarInvoice() {
     ItemInformation: productoInformation,
     InvoiceTaxTotal: agruparImpuestos(obtenerTodosLosImpuestos(productoInformation)),
     InvoiceTaxOthersTotal: [],
-    InvoiceAllowanceCharge: agregarCargosDescuentosTotales(pfSubTotal),
+    InvoiceAllowanceCharge: agregarCargosDescuentosTotales(invoice_total.LineExtensionAmount),
     InvoiceTotal: invoice_total,
     Documents: []
   });
@@ -1477,6 +1548,11 @@ function SumarDiasAFecha(dias, fecha) {
 function mostrarResumenFactura() {
   var jsonString = recuperarJson();
   var json = JSON.parse(jsonString); // Convertir el JSON string a un objeto
+  function mfMoney(v) {
+    var n = Number(v);
+    if (!isFinite(n)) n = 0;
+    return Math.round((n + Number.EPSILON) * 100) / 100;
+  }
 
   // Extraer la información importante
   var nombreCliente = json.CustomerInformation.RegistrationName;
@@ -1487,22 +1563,33 @@ function mostrarResumenFactura() {
     var tipoImpuesto = tax.Id === "01" ? "IVA" : tax.Id === "04" ? "INC" : "ReteRenta";
     return {
       tipo: tipoImpuesto,
-      percent: tax.Percent,
-      amount: tax.TaxAmount
+      percent: mfMoney(tax.Percent),
+      amount: mfMoney(tax.TaxAmount)
     };
   });
 
   // Extraer la información de InvoiceTotal
-  var invoiceTotal = json.InvoiceTotal;
+  var invoiceTotal = json.InvoiceTotal || {};
+  var invoiceTotalUI = {
+    LineExtensionAmount: mfMoney(invoiceTotal.LineExtensionAmount),
+    TaxExclusiveAmount: mfMoney(invoiceTotal.TaxExclusiveAmount),
+    TaxInclusiveAmount: mfMoney(invoiceTotal.TaxInclusiveAmount),
+    AllowanceTotalAmount: mfMoney(invoiceTotal.AllowanceTotalAmount),
+    ChargeTotalAmount: mfMoney(invoiceTotal.ChargeTotalAmount),
+    PrePaidAmount: mfMoney(invoiceTotal.PrePaidAmount),
+    PayableAmount: mfMoney(invoiceTotal.PayableAmount),
+  };
 
   // Crear el contenido HTML para el cuadro de diálogo
-  var htmlContent = plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoiceTotal);
+  var htmlContent = plantillaResumenFactura(nombreCliente, numeroFactura, impuestos, invoiceTotalUI);
 
-  // Mostrar el cuadro de diálogo
-  var htmlOutput = HtmlService.createHtmlOutput(htmlContent)
-    .setWidth(600)
-    .setHeight(450);
-  SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Resumen de la Factura');
+  // Legacy: ya no mostramos diálogos (el SPA renderiza el resumen).
+  return {
+    nombreCliente: nombreCliente,
+    numeroFactura: numeroFactura,
+    impuestos: impuestos,
+    invoiceTotal: invoiceTotalUI
+  };
 }
 
 function modificarFactura() {
@@ -1513,28 +1600,27 @@ function modificarFactura() {
 function enviarFacturaHtml() {
   let respuesta = enviarFactura();
   if (respuesta && respuesta.duplicado) {
-    SpreadsheetApp.getUi().alert("Advertencia: El documento que intenta ingresar ya existe en el sistema. Por favor, verifique el número de factura o actualice el consecutivo en la hoja 'Datos de emisor'.");
-    return;
+    return { ok: false, message: "Advertencia: El documento que intenta ingresar ya existe en el sistema. Verifique el número de factura o actualice el consecutivo en la hoja 'Datos de emisor'." };
   }
   // Caso especial: mensaje de prefactura
   if (respuesta && respuesta.MessageValidation && typeof respuesta.MessageValidation === 'string' && respuesta.MessageValidation.toLowerCase().includes('prefactura')) {
     if (respuesta.DocumentId) {
       guardarFacturaHistorial(respuesta.DocumentId);
-      SpreadsheetApp.getUi().alert("Factura enviada como PREFECTURA: " + respuesta.MessageValidation);
+      return { ok: true, message: "Factura enviada como PREFECTURA: " + respuesta.MessageValidation, documentId: respuesta.DocumentId };
     } else {
-      SpreadsheetApp.getUi().alert(respuesta.MessageValidation);
+      return { ok: false, message: respuesta.MessageValidation };
     }
   } else if (respuesta && Array.isArray(respuesta) && respuesta[0] == true) {
     guardarFacturaHistorial(respuesta[1]);
-    ui = SpreadsheetApp.getUi();
-    ui.alert("Factura enviada correctamente, puede descargarla desde la hoja 'Listado Facturas'.");
+    return { ok: true, message: "Factura enviada correctamente, puede descargarla desde la hoja 'Listado Facturas'.", documentId: respuesta[1] };
   } else if (respuesta && respuesta.DocumentId) {
     // Caso de éxito sin prefactura explícita
     guardarFacturaHistorial(respuesta.DocumentId);
-    SpreadsheetApp.getUi().alert("Factura enviada correctamente, puede descargarla desde la hoja 'Listado Facturas'.");
+    return { ok: true, message: "Factura enviada correctamente, puede descargarla desde la hoja 'Listado Facturas'.", documentId: respuesta.DocumentId };
   } else if (respuesta && respuesta.MessageValidation) {
-    SpreadsheetApp.getUi().alert(respuesta.MessageValidation);
+    return { ok: false, message: respuesta.MessageValidation };
   } // No else final: no mostrar mensaje genérico innecesario
+  return { ok: false, message: 'No fue posible enviar la factura.' };
 }
 
 function onEditFacturaActualizarNumeroFactura(e) {

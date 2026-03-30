@@ -1,0 +1,55 @@
+<!-- Vista: Cambiar Ambiente (SPA) -->
+<!-- Header Nav -->
+<div id="view-header-nav">
+  <a onclick="goToConfiguracion()" class="btn btn-dark btn-fluid">
+    <i class="icon-left"></i>
+    <span>Regresar</span>
+  </a>
+</div>
+
+<!-- Title -->
+<div id="view-title">
+  <div class="col-12 text-center py-4"></div>
+  <h2 class="text-center">Cambiar Ambiente</h2>
+</div>
+
+<!-- Content -->
+<div id="view-content">
+  <div class="row py-3 px-4 gx-0">
+    <div class="col-12 py-2">
+      <p>Selecciona el nuevo ambiente. Tendrás que volver a iniciar sesión.</p>
+    </div>
+
+    <div class="col-12">
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="ambiente" id="ambienteQA" value="QA">
+        <label class="form-check-label" for="ambienteQA">QA</label>
+      </div>
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="ambiente" id="ambientePre" value="Preproducción">
+        <label class="form-check-label" for="ambientePre">Preproducción</label>
+      </div>
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="radio" name="ambiente" id="ambienteProd" value="Producción" checked>
+        <label class="form-check-label" for="ambienteProd">Producción</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div id="view-footer">
+  <div class="col-6 pe-1">
+    <a onclick="goToConfiguracion()" class="btn btn-outline-secondary btn-lg w-100">
+      <span>Cancelar</span>
+    </a>
+  </div>
+  <div class="col-6 ps-1">
+    <a onclick="confirmarCambioAmbiente()" class="btn btn-primary btn-lg w-100">
+      <span>Confirmar</span>
+    </a>
+  </div>
+</div>
+
+
+

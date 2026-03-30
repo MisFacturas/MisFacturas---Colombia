@@ -24,11 +24,27 @@ function onOpen(e) {
 
   Logger.log("ScriptApp.AuthMode.NONE")
   ui.createAddonMenu()
-    .addItem('Inicio', 'showSidebar2')
-    .addItem('Instalar', 'IniciarMisfacturas')
+    .addItem('Inicio', 'menuInicioSPA')
+    .addItem('Instalar', 'menuInstalarSPA')
     .addItem("Desinstalar", "eliminarHojasFactura").addToUi();
 
   return;
+}
+
+// =============================
+// Menú (sin flujos largos)
+// =============================
+
+function menuInicioSPA() {
+  // Abrir sidebar rápido (evita “En curso…” pegado por flujos largos)
+  showSidebarSPA();
+}
+
+function menuInstalarSPA() {
+  // Abrir sidebar en vista de instalación (sin prompts ni dialogs del server)
+  const props = PropertiesService.getDocumentProperties();
+  props.setProperty('spa_initial_view', 'instalacion');
+  showSidebarSPA();
 }
 
 function OnOpenSheetInicio() {
@@ -70,6 +86,7 @@ function getViewContent(viewName, params) {
     'nuevaFactura': '_viewNuevaFactura',
     'agregarProductoFactura': '_viewAgregarProductoFactura',
     'listadoFacturas': '_viewListadoFacturas',
+    'resumenFactura': '_viewResumenFactura',
     // Vistas de clientes
     'clientes': '_viewClientes',
     'crearCliente': '_viewCrearCliente',
@@ -77,7 +94,10 @@ function getViewContent(viewName, params) {
     'activarCliente': '_viewActivarCliente',
     // Vistas de productos
     'productos': '_viewProductos',
-    'crearProducto': '_viewCrearProducto'
+    'crearProducto': '_viewCrearProducto',
+    // Vistas utilitarias
+    'cambiarAmbiente': '_viewCambiarAmbiente',
+    'instalacion': '_viewInstalacion'
   };
   
   var fileName = viewMap[viewName];
@@ -104,6 +124,42 @@ function getViewContent(viewName, params) {
       content: '<div class="text-center p-4"><p>Error al cargar la vista: ' + error.message + '</p></div>',
       footer: ''
     };
+  }
+}
+
+/**
+ * Permite que funciones de servidor (ej: botones en hoja) abran el SPA
+ * en una vista específica. Se consume una sola vez.
+ */
+function consumeSpaInitialView() {
+  try {
+    const props = PropertiesService.getDocumentProperties();
+    const v = props.getProperty('spa_initial_view') || '';
+    if (v) props.deleteProperty('spa_initial_view');
+    return v;
+  } catch (e) {
+    Logger.log('consumeSpaInitialView error: ' + e);
+    return '';
+  }
+}
+
+function spaGetMissingSheets() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const required = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Listado Facturas", "Listado Facturas Data"];
+  return required.filter(n => !ss.getSheetByName(n));
+}
+
+function spaInstallHojas() {
+  // Ejecutar instalación completa sin ui.alert/showModalDialog
+  try {
+    iniciarHojasFactura();
+    OnOpenSheetInicio();
+    agregarDataValidations();
+    aplicarFormatoMonetarioDosDecimales();
+    return { ok: true, message: 'Hojas instaladas satisfactoriamente. Recuerda que la configuración regional debe estar en Estados Unidos.' };
+  } catch (e) {
+    Logger.log('spaInstallHojas error: ' + e);
+    throw new Error('Error durante la instalación: ' + (e && e.message ? e.message : e));
   }
 }
 
@@ -156,52 +212,85 @@ function showSidebarSPA() {
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
-function showSidebar2() {
-  console.log("showSidebar2 Enters");
-  let ui = SpreadsheetApp.getUi();
-  console.log("setActiveSheet2 Inicio");
-  let requiredSheets = ["Inicio", "Productos", "Datos de emisor", "Clientes", "Factura", "ListadoEstado", "ClientesInvalidos", "Copia de Factura", "Datos", "Listado Facturas", "Listado Facturas Data"];
-  let ss = SpreadsheetApp.getActiveSpreadsheet();
+/**
+ * Fuerza formato monetario con 2 decimales en las hojas principales.
+ * Nota: Esto SOLO cambia formato (visualización), no altera valores.
+ */
+function aplicarFormatoMonetarioDosDecimales() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const moneyFmt = '$#,##0.00';
+  const percentFmt = '0.00%';
 
-  for (let sheetName of requiredSheets) {
-    let sheet = ss.getSheetByName(sheetName);
-    if (sheet == null) {
-      let respuesta = ui.alert(`Faltan hojas de calculo requeridas para el funcionamiento de misfacturas. Primero debes de instalar las hojas necesarias ¿Deseas instalarlas ya?`, ui.ButtonSet.YES_NO);
-      if (respuesta == ui.Button.YES) {
-        try {
-          iniciarHojasFactura();
-          OnOpenSheetInicio();
-          
-          // Verificar que las hojas se hayan creado antes de agregar validaciones
-          const ssCheck = SpreadsheetApp.getActiveSpreadsheet();
-          const hojasRequeridas = ["Datos", "Factura", "Clientes", "Productos", "ClientesInvalidos", "Copia de Factura"];
-          const hojasFaltantes = hojasRequeridas.filter(nombre => !ssCheck.getSheetByName(nombre));
-          
-          if (hojasFaltantes.length === 0) {
-            agregarDataValidations();
-          } else {
-            Logger.log("Advertencia: Algunas hojas no se crearon correctamente: " + hojasFaltantes.join(", "));
-          }
-          
-          let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
-          ui.showModalDialog(htmlOutput, 'Vinculación requerida');
-        } catch (error) {
-          Logger.log("Error en showSidebar2 al instalar hojas: " + error.toString());
-          ui.alert("Error durante la instalación: " + error.toString() + "\n\nPor favor, intenta nuevamente.");
-        }
-      } else {
-        return;
+  // Factura y copia (columnas monetarias típicas)
+  ['Factura', 'Copia de Factura'].forEach(name => {
+    const sh = ss.getSheetByName(name);
+    if (!sh) return;
+    const maxRows = sh.getMaxRows();
+    if (maxRows <= 15) return;
+
+    // D/E/F: Precio unitario, Subtotal, Impuestos
+    sh.getRange(15, 4, maxRows - 14, 3).setNumberFormat(moneyFmt);
+    // J/K/L: Cargos, Retención, Total de línea
+    sh.getRange(15, 10, maxRows - 14, 3).setNumberFormat(moneyFmt);
+
+    // G/H/I: IVA %, INC %, Descuento % (mostrar decimales, evita redondeos visuales)
+    sh.getRange(15, 7, maxRows - 14, 3).setNumberFormat(percentFmt);
+
+    // Sección Cargos y/o Descuentos: Base (D) y Total (E) en formato dinero
+    try {
+      const start = getcargosDescuentosStartRow(sh);
+      const last = getLastCargoDescuentoRow(sh);
+      if (start && last && (start + 2) <= (last + 1)) {
+        const r0 = start + 2;
+        const rows = (last + 1) - r0 + 1;
+        sh.getRange(r0, 4, rows, 2).setNumberFormat(moneyFmt); // D:E
       }
+      // Línea de totales (A:L)
+      const totRow = getTotalesLinea(sh);
+      if (totRow) {
+        sh.getRange(totRow, 1, 1, 12).setNumberFormat(moneyFmt);
+      }
+    } catch (e) {
+      // No bloquear si la hoja aún no tiene la estructura completa
+      Logger.log('Formato monetario (extra) omitido: ' + (e && e.message ? e.message : e));
+    }
+  });
+
+  // Productos (columnas monetarias típicas: F=precio, L=impuesto, O=valor retención)
+  const productos = ss.getSheetByName('Productos');
+  if (productos) {
+    const maxRows = productos.getMaxRows();
+    if (maxRows > 2) {
+      productos.getRange(2, 6, maxRows - 1, 1).setNumberFormat(moneyFmt); // F
+      productos.getRange(2, 12, maxRows - 1, 1).setNumberFormat(moneyFmt); // L
+      productos.getRange(2, 15, maxRows - 1, 1).setNumberFormat(moneyFmt); // O
+      // N: tarifa retención (porcentaje) — mostrar 2 decimales
+      productos.getRange(2, 14, maxRows - 1, 1).setNumberFormat(percentFmt); // N (col 14)
     }
   }
+}
 
-  // Usar el nuevo sidebar SPA
-  var html = HtmlService.createHtmlOutputFromFile('sidebar')
-    .setTitle('MisFacturas');
-  SpreadsheetApp.getUi()
-    .showSidebar(html);
+/**
+ * Helpers para reducir múltiples llamadas desde el SPA.
+ * Esto ayuda a evitar que Google Sheets se quede mostrando "En curso..."
+ * por múltiples llamadas seguidas (open sheet + init + render).
+ */
+function spaPrepareNuevaFactura() {
+  openFacturaSheet();
+  inicarFacturaNueva();
+  aplicarFormatoMonetarioDosDecimales();
+  return true;
+}
 
-  console.log("showSidebar Exits");
+function spaPrepareListadoFacturas() {
+  actualizarEstadoUltimasFacturas();
+  openHistorialSheet();
+  return true;
+}
+
+function showSidebar2() {
+  // Compat: redirigir al nuevo SPA
+  menuInicioSPA();
 }
 
 function grantAccessToTemplate() {
@@ -254,7 +343,7 @@ function iniciarHojasFactura() {
         }
 
       } else {
-        SpreadsheetApp.getUi().alert('La hoja "' + nombreHoja + '" no existe en la plantilla.');
+        Logger.log('La hoja "' + nombreHoja + '" no existe en la plantilla.');
       }
     }
   });
@@ -275,9 +364,10 @@ function iniciarHojasFactura() {
 
   revokeAccessToTemplate();
 
-  SpreadsheetApp.getUi().alert("Hojas instaladas satisfactoriamente.");
-  SpreadsheetApp.getUi().alert("Recuerda que tu configuracion regional del sheet debe de estar en Estados Unidos para su correcto funcionamiento.");
-  //SpreadsheetApp.getUi().alert("Recuerda que antes de utilizar misfacturas debes de crear la carpeta donde se guardarán las facturas. Dirígete a la hoja Datos de emisor y dale clic en el botón crear carpeta.");
+  // Asegurar formato monetario con 2 decimales (visualización)
+  aplicarFormatoMonetarioDosDecimales();
+  // No usar ui.alert aquí: se muestra en el SPA
+  return true;
 }
 
 function agregarDataValidations() {
@@ -461,67 +551,29 @@ function agregarDataValidations() {
       // Continuar con la siguiente regla en lugar de detener todo el proceso
     }
   });
+
+  // Dropdown tipo de identificación del emisor en "Datos de emisor" B2
+  try {
+    const hojaDatosEmisor = ss.getSheetByName("Datos de emisor");
+    if (hojaDatosEmisor) {
+      const rangoTipoDoc = hojaDatosEmisor.getRange("B2");
+      const reglaTipoDoc = SpreadsheetApp.newDataValidation()
+        .requireValueInList(["NIT", "Cédula"], true)
+        .setAllowInvalid(false)
+        .build();
+      rangoTipoDoc.setDataValidation(reglaTipoDoc);
+      if (!rangoTipoDoc.getValue()) {
+        rangoTipoDoc.setValue("NIT");
+      }
+    }
+  } catch (error) {
+    Logger.log("Error al aplicar validación tipo documento emisor: " + error.toString());
+  }
 }
 
 function IniciarMisfacturas() {
-  let ui = SpreadsheetApp.getUi();
-
-  let hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Datos de emisor");
-  if (hoja == null) {
-    try {
-      iniciarHojasFactura();
-      OnOpenSheetInicio();
-      
-      // Verificar que las hojas se hayan creado antes de agregar validaciones
-      const ss = SpreadsheetApp.getActiveSpreadsheet();
-      const hojasRequeridas = ["Datos", "Factura", "Clientes", "Productos", "ClientesInvalidos", "Copia de Factura"];
-      const hojasFaltantes = hojasRequeridas.filter(nombre => !ss.getSheetByName(nombre));
-      
-      if (hojasFaltantes.length === 0) {
-        agregarDataValidations();
-      } else {
-        Logger.log("Advertencia: Algunas hojas no se crearon correctamente: " + hojasFaltantes.join(", "));
-        ui.alert("Advertencia: Algunas hojas no se crearon correctamente. Por favor, intenta instalar nuevamente.");
-      }
-      
-      let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
-      ui.showModalDialog(htmlOutput, 'Vinculación requerida');
-    } catch (error) {
-      Logger.log("Error en IniciarMisfacturas: " + error.toString());
-      ui.alert("Error durante la instalación: " + error.toString() + "\n\nPor favor, intenta nuevamente o contacta al soporte.");
-    }
-
-  } else {
-    let respuesta = ui.alert('Si vuelves a instalar, solo se instalaran las hojas no existan o que hayan sido eliminadas?', ui.ButtonSet.YES_NO);
-    if (respuesta == ui.Button.YES) {
-      try {
-        iniciarHojasFactura();
-        OnOpenSheetInicio();
-        
-        // Verificar que las hojas se hayan creado antes de agregar validaciones
-        const ss = SpreadsheetApp.getActiveSpreadsheet();
-        const hojasRequeridas = ["Datos", "Factura", "Clientes", "Productos", "ClientesInvalidos", "Copia de Factura"];
-        const hojasFaltantes = hojasRequeridas.filter(nombre => !ss.getSheetByName(nombre));
-        
-        if (hojasFaltantes.length === 0) {
-          agregarDataValidations();
-        } else {
-          Logger.log("Advertencia: Algunas hojas no se crearon correctamente: " + hojasFaltantes.join(", "));
-        }
-        
-        let htmlOutput = HtmlService.createHtmlOutput(plantillaVincularMF()).setWidth(500).setHeight(250);
-        ui.showModalDialog(htmlOutput, 'Vinculación requerida');
-      } catch (error) {
-        Logger.log("Error en IniciarMisfacturas (reinstalación): " + error.toString());
-        ui.alert("Error durante la reinstalación: " + error.toString() + "\n\nPor favor, intenta nuevamente o contacta al soporte.");
-      }
-      
-    } else {
-      return;
-    }
-    
-  }
-
+  // Legacy: el menú ahora abre el SPA en la vista instalación
+  menuInstalarSPA();
 }
 
 function abrirMenuVinculacion(inHoja) {
@@ -726,9 +778,8 @@ function eliminarTotalidadInformacion() {
   hojaDatos.getRange("F47").setValue("")
   hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
   hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
-  SpreadsheetApp.getUi().alert('Informacion eliminada correctamente');
-
-
+  // No usar Spreadsheet UI alerts: el SPA muestra confirmación
+  return true;
 }
 
 function borrarInfoHoja(hoja) {
@@ -766,7 +817,9 @@ function borrarInfoHoja(hoja) {
 
 function mensajeBorrarInfoError() {
   Logger.log("Error borrar info")
-  SpreadsheetApp.getUi().alert('Si deseas eliminar toda la informacion de misfacturas asegurate de escribir ELIMINAR en el campo');
+  // Mantener por compatibilidad con flujos legacy (sidebar antiguo).
+  // En SPA este mensaje se muestra del lado del cliente.
+  return 'Si deseas eliminar toda la informacion de misfacturas asegurate de escribir ELIMINAR en el campo';
 }
 
 function DesvincularMisfacturas(cambioAmb) {
@@ -777,18 +830,19 @@ function DesvincularMisfacturas(cambioAmb) {
   hojaDatosEmisor.getRange("B13").setBackground('#FFC7C7')
   hojaDatosEmisor.getRange("B13").setValue("Desvinculado")
   hojaDatos.getRange("F47").setValue("")
-  if (!cambioAmb) {
-    SpreadsheetApp.getUi().alert('Haz desvinculado exitosamente misfacturas');
-  }
+  // No usar Spreadsheet UI alerts: el SPA muestra confirmación
   for (let i = 18; i < 30; i++) {
     hojaDatosEmisor.getRange(i, 1, 1, 6).setValue("")
     hojaDatosEmisor.getRange(i, 1, 1, 6).setBackground(null)
   }
+  return true;
 }
 
 function mensajeErrorDesvincularMisfacturas() {
   Logger.log("Error Desvincular")
-  SpreadsheetApp.getUi().alert('Si deseas desvincular misfacturas asegurate de escribir DESVINCULAR en el campo');
+  // Mantener por compatibilidad con flujos legacy (sidebar antiguo).
+  // En SPA este mensaje se muestra del lado del cliente.
+  return 'Si deseas desvincular misfacturas asegurate de escribir DESVINCULAR en el campo';
 }
 
 function openProductosSheet() {
@@ -800,8 +854,8 @@ function openProductosSheet() {
 function processForm(data) {
   let existe = verificarIdentificacionUnica(data.codigoReferencia, "Productos")
   if (existe) {
-    SpreadsheetApp.getUi().alert("El codigo de referencia ya existe, por favor poner un codigo de referencia unico");
-    throw new Error('por favor poner un Numero de Identificacion unico');
+    // No usar Spreadsheet UI alerts: el SPA muestra el mensaje
+    throw new Error("El codigo de referencia ya existe, por favor poner un codigo de referencia unico");
   }
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Productos");
@@ -869,7 +923,7 @@ function processForm(data) {
     //Tarifa Retencion (formatea la celda como porcentaje)
     const tarifaRetencionCell = sheet.getRange(newRow, 14);
     tarifaRetencionCell.setValue(tarifaRetencion); // Establece el valor del IVA como decimal
-    tarifaRetencionCell.setNumberFormat('0%'); // Formatea la celda como porcentaje con dos decimales
+    tarifaRetencionCell.setNumberFormat('0.00%'); // Permite decimales (ej: 1.30%)
     //Valor Retencion
     valorRetencion = precioUnitario * (parseFloat(tarifaRetencion) / 100);
     sheet.getRange(newRow, 15).setValue(valorRetencion);
@@ -879,14 +933,17 @@ function processForm(data) {
     sheet.getRange(newRow, 16).setHorizontalAlignment('normal');
 
 
-    return SpreadsheetApp.getUi().alert("Nuevo producto creado satisfactoriamente");
+    return { ok: true, message: "Nuevo producto creado satisfactoriamente" };
   } catch (error) {
-    return SpreadsheetApp.getUi().alert("Error al guardar los datos: " + error.message);
+    throw new Error("Error al guardar los datos: " + error.message);
   }
 }
 
 function convertToPercentage(value) {
-  return (value * 100).toFixed(2);
+  var n = Number(value);
+  if (!isFinite(n)) return 0;
+  // Retorna número (no string) con 2 decimales
+  return Math.round((n * 100 + Number.EPSILON) * 100) / 100;
 }
 
 function onEdit(e) {
@@ -944,21 +1001,25 @@ function onEdit(e) {
       } else {
         factura_sheet.getRange("A" + String(i)).setValue(dictInformacionProducto["codigo Producto"]);
         factura_sheet.getRange("D" + String(i)).setValue(dictInformacionProducto["precio Unitario"]); // precio unitario
-        factura_sheet.getRange("E" + String(i)).setValue("=D" + String(i) + "*C" + String(i) + "-(D" + String(i) + "*C" + String(i) + ")*" + "I" + String(i) + "+J" + String(i)); // Subtotal teniendo en cuenta descuentos y cargos
-        factura_sheet.getRange("F" + String(i)).setValue("=E" + String(i) + "*" + dictInformacionProducto["tarifa IVA"] + "+E" + String(i) + "*" + String(dictInformacionProducto["tarifa INC"])); // Impuestos
+        // Subtotal redondeado a 2 decimales (evita valores como 650.172432)
+        factura_sheet.getRange("E" + String(i)).setValue("=ROUND(D" + String(i) + "*C" + String(i) + "-(D" + String(i) + "*C" + String(i) + ")*I" + String(i) + "+J" + String(i) + ",2)");
+        // Impuestos redondeados a 2 decimales
+        factura_sheet.getRange("F" + String(i)).setValue("=ROUND(E" + String(i) + "*" + dictInformacionProducto["tarifa IVA"] + "+E" + String(i) + "*" + String(dictInformacionProducto["tarifa INC"]) + ",2)");
         factura_sheet.getRange("G" + String(i)).setValue(dictInformacionProducto["tarifa IVA"]); // %IVA
         factura_sheet.getRange("H" + String(i)).setValue(dictInformacionProducto["tarifa INC"]); // %INC
         cargos = Number(factura_sheet.getRange("J" + String(i)).getValue()); // Cargos
         Logger.log("retencion: " + dictInformacionProducto["valor Retencion"]);
-        factura_sheet.getRange("K" + String(i)).setValue(dictInformacionProducto["tarifa Retencion"] * factura_sheet.getRange("E" + String(i)).getValue()); // Retencion
-        factura_sheet.getRange("L" + String(i)).setValue("=E" + String(i) + "+F" + String(i));
+        // Retención redondeada a 2 decimales (como fórmula para que se actualice)
+        factura_sheet.getRange("K" + String(i)).setValue("=ROUND(E" + String(i) + "*" + dictInformacionProducto["tarifa Retencion"] + ",2)");
+        // Total de línea redondeado a 2 decimales
+        factura_sheet.getRange("L" + String(i)).setValue("=ROUND(E" + String(i) + "+F" + String(i) + ",2)");
       }
 
       let lastRowProducto = cargosDescuentosStartRow - 3;
       if (lastRowProducto === productStartRow) {
         let rowParaTotales = getTotalesLinea(hojaActual);
         hojaActual.getRange("K" + String(rowParaTotales)).setValue("=L15");
-        hojaActual.getRange("L" + String(rowParaTotales)).setValue("=K" + String(rowParaTotales) + "-J" + String(rowParaTotales));
+        hojaActual.getRange("L" + String(rowParaTotales)).setValue("=ROUND(K" + String(rowParaTotales) + "-J" + String(rowParaTotales) + ",2)");
 
         let productoFilaI = factura_sheet.getRange("B15").getValue();
         let dictInformacionProducto = obtenerInformacionProducto(productoFilaI);
@@ -976,8 +1037,16 @@ function onEdit(e) {
     } else if ((colEditada == 9 || colEditada == 10) && rowEditada >= productStartRow && rowEditada < posRowTotalProductos) {
       // verificar descuentos
       let i = rowEditada;
-      let descuento = factura_sheet.getRange("I" + String(i)).getValue();
-      if (descuento > 1 || descuento < 0) {
+      // Asegurar formato de porcentaje con 2 decimales (evita que se "vea" 1% cuando es 1.30%)
+      factura_sheet.getRange("I" + String(i)).setNumberFormat('0.00%');
+
+      let descuento = Number(factura_sheet.getRange("I" + String(i)).getValue());
+      // UX: si el usuario escribe 1.3 pensando "1.3%", convertir a decimal (0.013)
+      if (isFinite(descuento) && descuento > 1 && descuento <= 100) {
+        descuento = descuento / 100;
+        factura_sheet.getRange("I" + String(i)).setValue(descuento);
+      }
+      if (!isFinite(descuento) || descuento > 1 || descuento < 0) {
         SpreadsheetApp.getUi().alert("El descuento no puede ser mayor al 100% ni menor a 0%");
         factura_sheet.getRange("I" + String(i)).setValue(0);
       }
@@ -1116,6 +1185,8 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
       suma += fila[0];
     }
   });
+  // Redondeo a 2 decimales para evitar arrastre de decimales largos
+  suma = Math.round((Number(suma) + Number.EPSILON) * 100) / 100;
   hojaActual.getRange("B" + String(rowParaTotales)).setValue(suma)
 
   //Seccion Cargos y Descuentos
@@ -1127,22 +1198,22 @@ function calcularDescuentosCargosYTotales(lastRowProducto, cargosDescuentosStart
   //impuestos
   hojaActual.getRange("C" + String(rowParaTotales)).setValue("=SUM(F15:F" + String(lastRowProducto) + ")")
   //subtotal mas impuestos
-  hojaActual.getRange("D" + String(rowParaTotales)).setValue("=A" + String(rowParaTotales) + "+C" + String(rowParaTotales))
+  hojaActual.getRange("D" + String(rowParaTotales)).setValue("=ROUND(A" + String(rowParaTotales) + "+C" + String(rowParaTotales) + ",2)")
 
   //retenciones
   hojaActual.getRange("E" + String(rowParaTotales)).setValue("=SUM(K15:K" + String(lastRowProducto) + ")")
 
   //descuentos
-  hojaActual.getRange("F" + String(rowParaTotales)).setValue(Number(totalDescuentosSeccionCargosyDescuentos.descuentos))
+  hojaActual.getRange("F" + String(rowParaTotales)).setValue(Math.round((Number(totalDescuentosSeccionCargosyDescuentos.descuentos) + Number.EPSILON) * 100) / 100)
 
   //cargos
-  hojaActual.getRange("H" + String(rowParaTotales)).setValue(totalDescuentosSeccionCargosyDescuentos.cargos)
+  hojaActual.getRange("H" + String(rowParaTotales)).setValue(Math.round((Number(totalDescuentosSeccionCargosyDescuentos.cargos) + Number.EPSILON) * 100) / 100)
 
 
   //total
-  hojaActual.getRange("K" + String(rowParaTotales)).setValue("=D" + String(rowParaTotales) + "-F" + String(rowParaTotales) + "+H" + String(rowParaTotales))
+  hojaActual.getRange("K" + String(rowParaTotales)).setValue("=ROUND(D" + String(rowParaTotales) + "-F" + String(rowParaTotales) + "+H" + String(rowParaTotales) + ",2)")
   //neto a pagar
-  hojaActual.getRange("L" + String(rowParaTotales)).setValue("=K" + String(rowParaTotales) + "-J" + String(rowParaTotales))
+  hojaActual.getRange("L" + String(rowParaTotales)).setValue("=ROUND(K" + String(rowParaTotales) + "-J" + String(rowParaTotales) + ",2)")
 }
 
 function calcularDescuentos(hojaActual, lastRowProducto) {
@@ -1226,9 +1297,9 @@ function calcularCargYDescu(hojaActual, rowSeccionCargosYDescuentos, lastCargoDe
     if (hojaActual.getRange("A" + String(i)).getValue() === "Cargo") {
       if (String(celdaValorPorcentaje).includes("%")) {
         porcentaje = celdaValorPorcentaje.replace("%", "") / 100
-        let subtotal = hojaActual.getRange("A" + String(totalesRow)).getValue();
-        let base = hojaActual.getRange("D" + String(i)).setValue(subtotal);
-        hojaActual.getRange("E" + String(i)).setValue("=" + subtotal + "*" + porcentaje)
+        // Referenciar el subtotal (no poner un valor "congelado") y redondear a 2 decimales
+        hojaActual.getRange("D" + String(i)).setValue("=A" + String(totalesRow));
+        hojaActual.getRange("E" + String(i)).setValue("=ROUND(A" + String(totalesRow) + "*" + porcentaje + ",2)")
 
       } else {
         hojaActual.getRange("D" + String(i)).setValue("N/A")
@@ -1239,9 +1310,8 @@ function calcularCargYDescu(hojaActual, rowSeccionCargosYDescuentos, lastCargoDe
     else {
       if (String(celdaValorPorcentaje).includes("%")) {
         porcentaje = celdaValorPorcentaje.replace("%", "") / 100
-        let subtotal = hojaActual.getRange("A" + String(totalesRow)).getValue();
-        let base = hojaActual.getRange("D" + String(i)).setValue(subtotal);
-        hojaActual.getRange("E" + String(i)).setValue("=" + subtotal + "*" + porcentaje)
+        hojaActual.getRange("D" + String(i)).setValue("=A" + String(totalesRow));
+        hojaActual.getRange("E" + String(i)).setValue("=ROUND(A" + String(totalesRow) + "*" + porcentaje + ",2)")
 
       } else {
         hojaActual.getRange("D" + String(i)).setValue("N/A")
@@ -1479,8 +1549,7 @@ function getDelivery() {
 
 }
 function showWarningAndHideSheet() {
-  const ui = SpreadsheetApp.getUi();
-  ui.alert('No tienes permiso para editar esta hoja.');
+  // Evitar ui.alert: genera popups y deja “En curso…” en algunos casos
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura", "Listado Facturas Data"];
   hojasInvisibles.forEach(nombreHoja => {
@@ -1492,38 +1561,31 @@ function showWarningAndHideSheet() {
 }
 
 function onChange(e) {
+  // Evitar re-entrancia (instalación crea/oculta hojas y dispara onChange en cadena)
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(500)) return;
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const hojasInvisibles = ["Datos", "ClientesInvalidos", "ListadoEstado", "Copia de Factura", "Listado Facturas Data"];
-  hojasInvisibles.forEach(nombreHoja => {
-    const hoja = ss.getSheetByName(nombreHoja);
-    if (hoja && !hoja.isSheetHidden()) {
-      hoja.hideSheet();
-      SpreadsheetApp.getUi().alert(`La hoja "${nombreHoja}" debe permanecer oculta.`);
-    }
-  });
+  try {
+    hojasInvisibles.forEach(nombreHoja => {
+      const hoja = ss.getSheetByName(nombreHoja);
+      if (hoja && !hoja.isSheetHidden()) {
+        hoja.hideSheet();
+      }
+    });
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 
 function cambiarAmbiente() {
-  let ui = SpreadsheetApp.getUi();
-
-  // Preguntar si el usuario está seguro
-  let respuesta = ui.alert(
-    '¿Estás seguro de que quieres cambiar el ambiente? Tendrás que volver a iniciar sesión.',
-    ui.ButtonSet.YES_NO
-  );
-
-  if (respuesta == ui.Button.YES) {
-    Logger.log("cambio")
-    // Mostrar cuadro de diálogo personalizado con los ambientes
-    let htmlOutput = HtmlService.createHtmlOutput(plantillaCambiarAmbiente())
-      .setWidth(400)
-      .setHeight(320);
-
-    ui.showModalDialog(htmlOutput, 'Cambiar Ambiente');
-  } else {
-    ui.alert('No se ha cambiado el ambiente.');
-  }
+  // IMPORTANTE:
+  // Los ui.alert/showModalDialog suelen cerrar o hacer “desaparecer” el sidebar.
+  // En SPA abrimos el sidebar y navegamos a la vista de cambiar ambiente.
+  const props = PropertiesService.getDocumentProperties();
+  props.setProperty('spa_initial_view', 'cambiarAmbiente');
+  showSidebarSPA();
 }
 
 function aplicarCambioAmbiente(nuevoAmbiente) {
@@ -1539,10 +1601,12 @@ function aplicarCambioAmbiente(nuevoAmbiente) {
   });
   Logger.log("Si se creo el doc prop para el ambiente: " + nuevoAmbiente);
 
-  abrirMenuVinculacion();
-  let cambioAmb = true;
-  DesvincularMisfacturas(cambioAmb);
+  // Desvincular sin mostrar alerts del servidor
+  DesvincularMisfacturas(true);
   hojaDatosEmisor.getRange("C998").setValue(nuevoAmbiente)
+
+  // Retornar éxito al cliente (SPA mostrará el modal interno y navegará a Vincular)
+  return true;
 }
 
 /**

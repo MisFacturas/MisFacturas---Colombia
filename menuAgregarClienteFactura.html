@@ -17,6 +17,25 @@
   <script src="LibreriaValores.js"></script>
 </head>
 <script>
+  // Modal simple (reemplaza alert())
+  function mfAlert(message, title) {
+    const overlay = document.getElementById('mf-modal-overlay');
+    const titleEl = document.getElementById('mf-modal-title');
+    const msgEl = document.getElementById('mf-modal-message');
+    if (!overlay || !titleEl || !msgEl) return;
+    titleEl.textContent = title || 'MisFacturas';
+    msgEl.textContent = String(message || '');
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+    const ok = document.getElementById('mf-modal-ok');
+    if (ok) ok.focus();
+  }
+  function mfCloseAlert() {
+    const overlay = document.getElementById('mf-modal-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
   function writeDocument(htmlOutput) {
     document.open();
     document.write(htmlOutput);
@@ -168,14 +187,14 @@
 
   function saveData() {
     if (!verificarDatosObligatorios()) {
-      alert('Por favor complete todos los campos obligatorios y asegúrese de que los datos sean correctos.');
+      mfAlert('Por favor complete todos los campos obligatorios y asegúrese de que los datos sean correctos.', 'Validación');
       return;
     }
 
     const emailField = document.getElementById('email');
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(emailField.value)) {
-      alert('Por favor ingrese un correo electrónico válido. Ejemplo: alguien@correo.com');
+      mfAlert('Por favor ingrese un correo electrónico válido. Ejemplo: alguien@correo.com', 'Validación');
       return;
     }
 
@@ -659,6 +678,28 @@
 
 
   </div>
+
+  <!-- Modal interno (reemplaza alert()) -->
+  <div id="mf-modal-overlay" class="mf-modal-overlay" aria-hidden="true">
+    <div class="mf-modal" role="dialog" aria-modal="true" aria-labelledby="mf-modal-title">
+      <div class="mf-modal-header">
+        <h5 id="mf-modal-title" class="mb-0"></h5>
+      </div>
+      <div id="mf-modal-message" class="mf-modal-body"></div>
+      <div class="mf-modal-footer">
+        <button id="mf-modal-ok" type="button" class="btn btn-primary" onclick="mfCloseAlert()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .mf-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;padding:24px;overflow:auto}
+    .mf-modal-overlay.show{display:flex;align-items:center;justify-content:center}
+    .mf-modal{width:100%;max-width:420px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .mf-modal-header{padding:16px 16px 0 16px}
+    .mf-modal-body{padding:12px 16px 0 16px;white-space:pre-wrap;word-break:break-word}
+    .mf-modal-footer{padding:16px;display:flex;justify-content:flex-end;gap:8px}
+  </style>
 
 
 </body>
