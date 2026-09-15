@@ -1,11 +1,11 @@
 function showNuevaCliente() {
-  var html = HtmlService.createHtmlOutputFromFile('menuAgregarCliente').setTitle("Nuevo Cliente")
+  var html = HtmlService.createTemplateFromFile('menuAgregarCliente').evaluate().setTitle("Nuevo Cliente")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 
 function showInactivarCliente() {
-  var html = HtmlService.createHtmlOutputFromFile('menuInactivarCliente').setTitle("Inactivar Cliente")
+  var html = HtmlService.createTemplateFromFile('menuInactivarCliente').evaluate().setTitle("Inactivar Cliente")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
@@ -16,7 +16,7 @@ function crearCliente() {
 }
 
 function showActivarCliente() {
-  var html = HtmlService.createHtmlOutputFromFile('menuActivarCliente').setTitle("Activar Cliente")
+  var html = HtmlService.createTemplateFromFile('menuActivarCliente').evaluate().setTitle("Activar Cliente")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
@@ -455,7 +455,7 @@ function verificarDatosObligatorios(e, tipoPersona) {
 }
 
 function showNuevaClienteV2() {
-  var html = HtmlService.createHtmlOutputFromFile('menuAgregarClienteFactura').setTitle("Nuevo Cliente")
+  var html = HtmlService.createTemplateFromFile('menuAgregarClienteFactura').evaluate().setTitle("Nuevo Cliente")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }

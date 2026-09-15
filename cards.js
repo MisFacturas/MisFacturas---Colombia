@@ -27,7 +27,7 @@ function createCard(text, isHomepage) {
   }
   console.log("createCard");
   
-  var imageUrl = 'https://misfacturas.cenet.ws/Publico/google-sheets-resources/images/logoAssistant.png' 
+  var imageUrl = 'https://www.misfacturas.com.co/Publico/Content/img/logo-misfacturas.png' 
   var image = CardService.newImage()
       .setImageUrl(imageUrl)
       .setAltText('misfacturas');

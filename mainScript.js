@@ -207,7 +207,7 @@ function parseViewContent(htmlContent) {
  * Muestra el sidebar SPA principal
  */
 function showSidebarSPA() {
-  var html = HtmlService.createHtmlOutputFromFile('sidebar')
+  var html = HtmlService.createTemplateFromFile('sidebar').evaluate()
     .setTitle('MisFacturas');
   SpreadsheetApp.getUi().showSidebar(html);
 }
@@ -579,11 +579,11 @@ function IniciarMisfacturas() {
 function abrirMenuVinculacion(inHoja) {
   // Código para abrir el menú de vinculación en el sidebar
   if (inHoja) {
-    let htmlOutput = HtmlService.createHtmlOutputFromFile('menuVincularFactura')
+    let htmlOutput = HtmlService.createTemplateFromFile('menuVincularFactura').evaluate()
       .setTitle('Vincular misfacturas');
     SpreadsheetApp.getUi().showSidebar(htmlOutput);
   } else {
-    let htmlOutput = HtmlService.createHtmlOutputFromFile('menuVincular')
+    let htmlOutput = HtmlService.createTemplateFromFile('menuVincular').evaluate()
       .setTitle('Vincular misfacturas');
     SpreadsheetApp.getUi().showSidebar(htmlOutput);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -658,14 +658,14 @@ function pruebaLogo() {
 
 function showSidebar() {
   // Usar el nuevo sidebar SPA
-  var html = HtmlService.createHtmlOutputFromFile('sidebar')
+  var html = HtmlService.createTemplateFromFile('sidebar').evaluate()
     .setTitle('MisFacturas');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 function showPreProductos() {
   console.log("Attempting to show Productos");
-  var html = HtmlService.createHtmlOutputFromFile('preProductos')
+  var html = HtmlService.createTemplateFromFile('preProductos').evaluate()
     .setTitle('Productos');
   SpreadsheetApp.getUi()
     .showSidebar(html);
@@ -678,21 +678,21 @@ function openDatosEmisorSheet() {
 }
 
 function showConfiguracion() {
-  var html = HtmlService.createHtmlOutputFromFile('menuConfiguracion')
+  var html = HtmlService.createTemplateFromFile('menuConfiguracion').evaluate()
     .setTitle('Datos emisor');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 
 function showDesvincular() {
-  var html = HtmlService.createHtmlOutputFromFile('menuDesvincular')
+  var html = HtmlService.createTemplateFromFile('menuDesvincular').evaluate()
     .setTitle('Desvincular cuenta');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 
 function showAggProductos() {
-  var html = HtmlService.createHtmlOutputFromFile('agregarProducto')
+  var html = HtmlService.createTemplateFromFile('agregarProducto').evaluate()
     .setTitle('Agregar Productos');
   SpreadsheetApp.getUi()
     .showSidebar(html);
@@ -711,20 +711,20 @@ function openHistorialSheet() {
 }
 
 function showMenuFactura() {
-  var html = HtmlService.createHtmlOutputFromFile('menuFactura')
+  var html = HtmlService.createTemplateFromFile('menuFactura').evaluate()
     .setTitle('Menú Factura');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 
 function showNuevaFactura() {
-  var html = HtmlService.createHtmlOutputFromFile('nuevaFactura').setTitle("Nueva factura")
+  var html = HtmlService.createTemplateFromFile('nuevaFactura').evaluate().setTitle("Nueva factura")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 
 function showAgregarProdcuto() {
-  var html = HtmlService.createHtmlOutputFromFile('menuAgregarProducto').setTitle("Agregar Producto")
+  var html = HtmlService.createTemplateFromFile('menuAgregarProducto').evaluate().setTitle("Agregar Producto")
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
@@ -736,14 +736,14 @@ function openClientesSheet() {
 }
 
 function showClientes() {
-  var html = HtmlService.createHtmlOutputFromFile('menuCliente')
+  var html = HtmlService.createTemplateFromFile('menuCliente').evaluate()
     .setTitle('Menu cliente');
   SpreadsheetApp.getUi()
     .showSidebar(html);
 }
 
 function showVincularCuenta() {
-  var html = HtmlService.createHtmlOutputFromFile('menuVincular')
+  var html = HtmlService.createTemplateFromFile('menuVincular').evaluate()
     .setTitle('Vincular cuenta');
   SpreadsheetApp.getUi()
     .showSidebar(html);
@@ -751,7 +751,7 @@ function showVincularCuenta() {
 
 
 function showEliminarInfo() {
-  var html = HtmlService.createHtmlOutputFromFile('menuEliminarInfo')
+  var html = HtmlService.createTemplateFromFile('menuEliminarInfo').evaluate()
     .setTitle('Eliminar informacion');
   SpreadsheetApp.getUi()
     .showSidebar(html);

@@ -3,7 +3,7 @@ function descargarFacturaHtml() {
   var ui = SpreadsheetApp.getUi();
   var html = HtmlService.createHtmlOutput(plantillaAvisoDescargaFactura()).setWidth(420).setHeight(230);
   ui.showModalDialog(html, 'Descargar factura');
-  var htmlSidebar = HtmlService.createHtmlOutputFromFile('descargaFacturaListado')
+  var htmlSidebar = HtmlService.createTemplateFromFile('descargaFacturaListado').evaluate()
     .setTitle('Listado Facturas');
   SpreadsheetApp.getUi().showSidebar(htmlSidebar);
 }
@@ -1011,12 +1011,23 @@ function getPaymentSummary() {
 
   // Resolver clave del tipo de pago (con o sin separador "-")
   var paymentTypeKey = paymentTypeRaw.indexOf("-") >= 0 ? paymentTypeRaw.split("-").pop().trim() : paymentTypeRaw;
-  var paymentTypeValue = metodosPago[paymentTypeKey] || "";
+  var paymentTypeValue = metodosPago[paymentTypeKey] || lookupIgnoringAccents(metodosPago, paymentTypeKey) || "";
 
   // Resolver clave del medio de pago probando "nombre" en cualquiera de los lados del separador
   var meansKeyA = paymentMeansRaw.indexOf("-") >= 0 ? paymentMeansRaw.split("-").pop().trim() : paymentMeansRaw;
   var meansKeyB = paymentMeansRaw.indexOf("-") >= 0 ? paymentMeansRaw.split("-")[0].trim() : paymentMeansRaw;
-  var paymentMeansValue = paymentMeansCode[meansKeyA] || paymentMeansCode[meansKeyB] || "";
+  var paymentMeansValue = paymentMeansCode[meansKeyA] || paymentMeansCode[meansKeyB]
+    || lookupIgnoringAccents(paymentMeansCode, meansKeyA)
+    || lookupIgnoringAccents(paymentMeansCode, meansKeyB)
+    || "";
+
+  // Fallback: if the dropdown value is "code-Name" format and name lookup failed,
+  // use the numeric code prefix directly (e.g., "31" from "31-Transferencia Debito...")
+  if (!paymentMeansValue && /^\d+$/.test(meansKeyB)) {
+    paymentMeansValue = meansKeyB;
+  }
+
+  Logger.log("PaymentMeans resolved: raw=" + paymentMeansRaw + " => code=" + paymentMeansValue);
 
   var PaymentSummary = {
     "PaymentType": paymentTypeValue,
@@ -1024,6 +1035,20 @@ function getPaymentSummary() {
     "PaymentNote": ""
   }
   return PaymentSummary;
+}
+
+function removeAccents(str) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function lookupIgnoringAccents(dict, key) {
+  var normalizedKey = removeAccents(key).toLowerCase();
+  for (var dictKey in dict) {
+    if (removeAccents(dictKey).toLowerCase() === normalizedKey) {
+      return dict[dictKey];
+    }
+  }
+  return "";
 }
 
 function guardarYGenerarInvoice() {
