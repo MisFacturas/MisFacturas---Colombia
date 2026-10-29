@@ -1934,6 +1934,7 @@ var paymentMeansCode = {
   "Crédito ACH": "2",
   "Método de pago solicitado no usado": "96",
   "Otro*": "ZZZ",
+  "Acuerdo mutuo": "ZZZ",
   "Nota bancaria transferible": "91",
   "Giro formato abierto": "95",
   "Cheque local transferible": "92",

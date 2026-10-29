@@ -1022,9 +1022,10 @@ function getPaymentSummary() {
     || "";
 
   // Fallback: if the dropdown value is "code-Name" format and name lookup failed,
-  // use the numeric code prefix directly (e.g., "31" from "31-Transferencia Debito...")
-  if (!paymentMeansValue && /^\d+$/.test(meansKeyB)) {
-    paymentMeansValue = meansKeyB;
+  // use the code prefix directly as long as it is a known DIAN code
+  // (e.g., "31" from "31-Transferencia Debito..." or "ZZZ" from "ZZZ-Acuerdo mutuo")
+  if (!paymentMeansValue && isKnownPaymentMeansCode(meansKeyB)) {
+    paymentMeansValue = meansKeyB.toUpperCase();
   }
 
   Logger.log("PaymentMeans resolved: raw=" + paymentMeansRaw + " => code=" + paymentMeansValue);
@@ -1035,6 +1036,17 @@ function getPaymentSummary() {
     "PaymentNote": ""
   }
   return PaymentSummary;
+}
+
+function isKnownPaymentMeansCode(code) {
+  var normalized = String(code || "").trim().toUpperCase();
+  if (!normalized) return false;
+  for (var name in paymentMeansCode) {
+    if (String(paymentMeansCode[name]).toUpperCase() === normalized) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function removeAccents(str) {
